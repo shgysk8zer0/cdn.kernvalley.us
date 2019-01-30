@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+	<head>
+		<meta charset="utf-8" />
+		<style>
+			@import url("https://cdn.chriszuber.com/css/core-css/element.css");
+			@import url("https://cdn.chriszuber.com/css/core-css/class-rules.css");
+		</style>
+	</head>
+	<body>
+		<dialog id="registration-dialog">
+			<form>
+				<fieldset>
+					<legend>
+						<slot name="legend">Register</slot>
+					</legend>
+					<div>
+						<label for="username">
+							<slot name="username-label">Username</slot>
+						</label>
+						<input type="email" name="username" id="username" placeholder="user@example.com" autocomplete="username" required="" />
+					</div>
+					<div>
+						<label for="password">
+							<slot name="password-label">Password</slot>
+						</label>
+						<input type="password" name="password" id="password" minlength="8" maxlength="72" autocomplete="new-password" placeholder="********" required="" />
+					</div>
+				</fieldset>
+				<button type="submit" class="btn btn-accept" title="Submit">
+					<slot name="submit-btn">Submit</button>
+				</button>
+				<button type="reset" class="btn btn-reject" title="Cancel">
+					<slot name="reset-btn">Cancel</slot>
+				</slot>
+			</form>
+			<button type="button" is="login-button" class="btn btn-primary">
+				<slot name="login-btn">Login</slot>
+			</button>
+		</dialog>
+	</body>
+</html>
