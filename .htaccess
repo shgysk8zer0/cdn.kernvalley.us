@@ -22,7 +22,7 @@ Options -Indexes +SymLinksIfOwnerMatch
 		Header set Strict-Transport-Security max-age=16070400;
 	</IfModule>
 	<IfModule setenvif_module>
-		<FilesMatch "\.(gif|ico|jpe?g|png|svgz?|webp)$">
+		<FilesMatch "\.(html|js|css|gif|ico|jpe?g|png|svgz?|webp|woff|woff2|ttf|otf)$">
 			SetEnvIf Origin ":" IS_CORS
 			Header set Access-Control-Allow-Origin "*" env=IS_CORS
 			Header set Access-Control-Allow-Credentials false
