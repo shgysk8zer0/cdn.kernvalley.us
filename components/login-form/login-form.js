@@ -36,7 +36,11 @@ export default class HTMLLoginFormElement extends HTMLElement {
 					this.dialog.close();
 				}
 			});
-			form.addEventListener('reset', () => container.querySelector('dialog').close());
+
+			form.addEventListener('reset', () => {
+				container.querySelector('dialog').close();
+				this.shadowRoot.querySelector('[is="gravatar-img"]').hash = '';
+			});
 			this.dispatchEvent(new Event('ready'));
 		});
 	}
