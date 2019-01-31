@@ -1,4 +1,4 @@
-import webShareApi from 'https://cdn.chriszuber.com//js/std-js/webShareApi.js';
+import webShareApi from 'https://cdn.chriszuber.com/js/std-js/webShareApi.js';
 import {
 	facebook,
 	twitter,
@@ -7,7 +7,7 @@ import {
 	reddit,
 	gmail,
 	email,
-} from 'https://cdn.chriszuber.com//js/std-js/share-config.js';
+} from 'https://cdn.chriszuber.com/js/std-js/share-config.js';
 
 webShareApi(facebook, twitter, googlePlus, linkedIn, reddit, gmail, email);
 
@@ -37,7 +37,9 @@ export default class HTMLShareButtonElement extends HTMLButtonElement {
 	}
 
 	get url() {
-		return this.hasAttribute('url') ? new URL(this.getAttribute('url'), document.baseURI).href : location.href;
+		return this.hasAttribute('url')
+			? new URL(this.getAttribute('url'), document.baseURI).href
+			: location.href;
 	}
 
 	set url(url) {
