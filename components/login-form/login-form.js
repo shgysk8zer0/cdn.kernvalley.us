@@ -1,5 +1,5 @@
 import {importLink} from 'https://cdn.chriszuber.com/js/std-js/functions.js';
-import User from '../../js/User.js';
+import User from 'https://cdn.chriszuber.com/js/User.js';
 
 export default class HTMLLoginFormElement extends HTMLElement {
 	constructor() {
@@ -11,6 +11,13 @@ export default class HTMLLoginFormElement extends HTMLElement {
 			const container = document.createElement('div');
 			container.append(...tmp.head.children, ...tmp.body.children);
 			this.shadowRoot.append(container);
+			this.shadowRoot.querySelector('[type="email"]').addEventListener('input', event => {
+				if (event.target.validity.valid) {
+					this.shadowRoot.querySelector('[is="gravatar-img"]').email = event.target.value;
+				}
+			}, {
+				passive: true,
+			});
 			const form = this.form;
 			container.classList.toggle('no-dialog', document.createElement('dialog') instanceof HTMLUnknownElement);
 
