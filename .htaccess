@@ -25,7 +25,6 @@ Options -Indexes +SymLinksIfOwnerMatch
 		<FilesMatch "\.(html|js|css|gif|ico|jpe?g|png|svgz?|webp|woff|woff2|ttf|otf)$">
 			SetEnvIf Origin ":" IS_CORS
 			Header set Access-Control-Allow-Origin "*" env=IS_CORS
-			Header set Access-Control-Allow-Credentials false
 			Header set Access-Control-Allow-Methods "GET, OPTIONS, HEAD"
 		</FilesMatch>
 	</IfModule>
