@@ -42,7 +42,7 @@ function update(img) {
 		src.searchParams.set('f', 'y');
 	}
 	if (sizeList.length !== 0) {
-		img.srcSet = getSrcs({hash, sizeList, fallback, rating, force}).join(',');
+		img.srcset = getSrcs({hash, sizeList, fallback, rating, force}).join(',');
 	}
 	img.src = src.href;
 }
