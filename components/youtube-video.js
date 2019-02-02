@@ -27,7 +27,11 @@ export default class HTMLYouTubeVideoElement extends HTMLElement {
 		const embed = this.getAttribute('embed');
 		try {
 			const url = new URL(embed);
-			if (url.searchParams.has('v')) {
+			if (url.host === 'youtu.be') {
+				return url.pathname.substr(1);
+			} else if (!url.host.endsWith('youtube.com')) {
+				throw new Error('Invalid URL for YouTube');
+			} else if (url.searchParams.has('v')) {
 				return url.searchParams.get('v');
 			} else if (url.pathname.startsWith('embed')) {
 				return url.pathname.split('/')[2];
