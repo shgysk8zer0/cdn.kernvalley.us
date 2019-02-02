@@ -1,7 +1,7 @@
 import {wait, importLink} from 'https://cdn.chriszuber.com/js/std-js/functions.js';
 import {pageVisible} from 'https://cdn.chriszuber.com/js/std-js/functions.js';
 
-export default class HTMLImgurGalleryElement extends HTMLDivElement {
+export default class HTMLImgurGalleryElement extends HTMLElement {
 	constructor() {
 		super();
 		this.attachShadow({mode: 'open'});
@@ -209,4 +209,4 @@ export default class HTMLImgurGalleryElement extends HTMLDivElement {
 	}
 }
 
-customElements.define('imgur-gallery', HTMLImgurGalleryElement, {extends: 'div'});
+customElements.define('imgur-gallery', HTMLImgurGalleryElement);
