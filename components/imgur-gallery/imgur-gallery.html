@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+	<head>
+		<style>
+			@import url("https://cdn.chriszuber.com/css/core-css/element.css");
+			@import url("https://cdn.chriszuber.com/css/core-css/class-rules.css");
+
+			slot[name="gallery"] {
+				margin-left: 0.4em;
+			}
+
+			button.nav-button {
+				border: none;
+				background: none;
+				color: var(--alt-color, #cecece);
+				position: absolute;
+				bottom: 0.2em;
+				font-size: 3rem;
+			}
+
+			button.nav-button.prev {
+				left: 0.4em;
+			}
+
+			button.nav-button.next {
+				right: 0.4em;
+			}
+		</style>
+	</head>
+	<body>
+		<figure class="relative inline-block">
+			<slot name="active-image" class="inline-block"></slot>
+			<button type="button" class="nav-button prev shadow" data-click="prev">
+				<slot name="prev-btn">&lt;</slot>
+			</button>
+			<button type="button" class="nav-button next shadow" data-click="next">
+				<slot name="next-btn">&gt;</slot>
+			</button>
+		</figure>
+		<slot name="gallery" class="overflow-x-auto inline-block"></slot>
+	</body>
+</html>
