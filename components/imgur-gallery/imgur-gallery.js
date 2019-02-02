@@ -1,5 +1,5 @@
 import {wait, importLink} from 'https://cdn.chriszuber.com/js/std-js/functions.js';
-import {pageVisible} from 'https://cdn.chriszuber.com/js/functions.js';
+import {pageVisible} from 'https://cdn.chriszuber.com/js/std-js/functions.js';
 
 export default class HTMLImgurGalleryElement extends HTMLDivElement {
 	constructor() {
