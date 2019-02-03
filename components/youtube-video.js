@@ -56,7 +56,9 @@ export default class HTMLYouTubeVideoElement extends HTMLElement {
 	}
 
 	get baseURL() {
-		return this.privacy ? 'https://www.youtube-nocookie.com/embed/'  : 'https://www.youtube.com/embed';
+		return this.privacy
+			? 'https://www.youtube-nocookie.com/embed/'
+			: 'https://www.youtube.com/embed';
 	}
 
 	get height() {
