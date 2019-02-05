@@ -8,8 +8,13 @@ export default class HTMLDrawingCanvasElement extends HTMLCanvasElement {
 		this.dispatchEvent(new Event('ready'));
 
 		const movehandler = e => {
-			touch.x = e.pageX - this.offsetLeft;
-			touch.y = e.pageY - this.offsetTop;
+			if (window.hasOwnProperty('TouchEvent') && e instanceof TouchEvent && e.touches.length === 1) {
+				touch.x = e.touches.item(0).pageX - this.offsetLeft;
+				touch.y = e.touches.item(0).pageY - this.offsetTop;
+			} else if (e instanceof MouseEvent) {
+				touch.x = e.pageX - this.offsetLeft;
+				touch.y = e.pageY - this.offsetTop;
+			}
 		};
 
 		let touch = {x: 0, y: 0};
