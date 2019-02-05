@@ -7,23 +7,37 @@ export default class HTMLDrawingCanvasElement extends HTMLCanvasElement {
 		this.ctx.fillRect(0, 0, this.width, this.height);
 		this.dispatchEvent(new Event('ready'));
 
-		let mouse = {x: 0, y: 0};
+		const movehandler = e => {
+			touch.x = e.pageX - this.offsetLeft;
+			touch.y = e.pageY - this.offsetTop;
+		};
+
+		let touch = {x: 0, y: 0};
 
 		function paint() {
-			this.ctx.lineTo(mouse.x, mouse.y);
+			this.ctx.lineTo(touch.x, touch.y);
 			this.ctx.stroke();
 		}
 
-		this.addEventListener('mousemove', e => {
-			mouse.x = e.pageX - this.offsetLeft;
-			mouse.y = e.pageY - this.offsetTop;
+		this.addEventListener('touchmove', movehandler, {
+			passive: true,
+		});
+
+		this.addEventListener('mousemove', movehandler, {
+			passive: true,
+		});
+
+		this.addEventListener('touchstart', () => {
+			this.ctx.beginPath();
+			this.ctx.moveTo(touch.x, touch.y);
+			this.addEventListener('touchmove', paint, false);
 		}, {
 			passive: true,
 		});
 
 		this.addEventListener('mousedown', () => {
 			this.ctx.beginPath();
-			this.ctx.moveTo(mouse.x, mouse.y);
+			this.ctx.moveTo(touch.x, touch.y);
 			this.addEventListener('mousemove', paint, false);
 		}, {
 			passive: true,
@@ -31,6 +45,12 @@ export default class HTMLDrawingCanvasElement extends HTMLCanvasElement {
 
 		this.addEventListener('mouseup', () => {
 			this.removeEventListener('mousemove', paint, false);
+		}, {
+			passive: true,
+		});
+
+		this.addEventListener('touchend', () => {
+			this.removeEventListener('touchmove', paint, false);
 		}, {
 			passive: true,
 		});
