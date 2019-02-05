@@ -1,0 +1,59 @@
+{
+  "name": "cdn.chriszuber.com",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Static assets for modern web development",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/shgysk8zer0/cdn.chriszuber.com.git"
+  },
+  "keywords": [
+    "cdn",
+    "ecmascript",
+    "es6",
+    "css",
+    "web components",
+    "custom elements"
+  ],
+  "author": "Chris Zuber <shgysk8zer0@gmail.com>",
+  "homepage": "https://github.com/shgysk8zer0/cdn.chriszuber.com#readme",
+  "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://github.com/shgysk8zer0/cdn.chriszuber.com/issues"
+  },
+  "config": {
+    "serve": {
+      "domain": "localhost",
+      "port": {
+        "dev": 8081
+      }
+    },
+    "dir": {
+      "css": "css/ components/",
+      "js": "js/ components/",
+      "img": "img/",
+      "html": "components/"
+    }
+  },
+  "scripts": {
+    "preinstall": "git submodule update --init --recursive",
+    "start": "python -m SimpleHTTPServer ${npm_package_config_serve_port_dev}",
+    "test": "npm run lint:js && npm run lint:css",
+    "lint:css": "stylelint ${npm_package_config_dir_css}",
+    "lint:js": "eslint ${npm_package_config_dir_js}",
+    "fix:css": "stylelint ${npm_package_config_dir_css} --fix",
+    "fix:js": "eslint ${npm_package_config_dir_js} --fix",
+    "fix": "npm run fix:js && npm run fix:css"
+  },
+  "devDependencies": {
+    "babel-eslint": "^10.0.1",
+    "eslint": "^5.7.0",
+    "eslint-plugin-async-await": "0.0.0",
+    "eslint-plugin-babel": "^5.2.1",
+    "stylelint": "^9.6.0",
+    "stylelint-config-recommended": "^2.1.0",
+    "stylelint-config-standard": "^18.2.0",
+    "svgo": "^1.1.1",
+    "svg-sprite-generator": "0.0.7"
+  }
+}
