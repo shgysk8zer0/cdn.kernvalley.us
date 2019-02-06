@@ -1,5 +1,5 @@
-import {wait, importLink} from 'https://cdn.chriszuber.com/js/std-js/functions.js';
-import {pageVisible} from 'https://cdn.chriszuber.com/js/std-js/functions.js';
+import {wait, importLink} from '/js/std-js/functions.js';
+import {pageVisible} from '/js/std-js/functions.js';
 
 export default class HTMLImgurGalleryElement extends HTMLElement {
 	constructor() {
@@ -70,11 +70,25 @@ export default class HTMLImgurGalleryElement extends HTMLElement {
 		clone.classList.remove('active');
 		clone.slot = 'active-image';
 		clone.sizes = this.sizes;
-
-		if (active instanceof HTMLElement) {
-			active.remove();
-		}
+		clone.hidden = true;
 		this.append(clone);
+
+		new Promise(resolve => {
+			const img = clone.querySelector('img');
+			if (img.complete) {
+				resolve();
+			} else {
+				img.addEventListener('load', () => {
+					resolve();
+				}, {once: true});
+			}
+		}).then(() => {
+			if (active instanceof HTMLElement) {
+				active.remove();
+			}
+			clone.hidden = false;
+			this.dispatchEvent(new CustomEvent('change'), {detail: clone});
+		});
 	}
 
 	get hashes() {
@@ -182,10 +196,15 @@ export default class HTMLImgurGalleryElement extends HTMLElement {
 		}
 	}
 
+	async imgChanged() {
+		await new Promise(resolve => this.addEventListener('change', () => resolve(), {once: true}));
+	}
+
 	async *imageGen() {
 		await this.ready();
 		while (true) {
 			yield this.nextImage;
+			await this.imgChanged();
 			await wait(this.delay);
 			await pageVisible();
 		}

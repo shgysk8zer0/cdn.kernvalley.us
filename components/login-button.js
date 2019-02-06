@@ -1,5 +1,5 @@
-import User from 'https://cdn.chriszuber.com/js/User.js';
-import 'https://cdn.chriszuber.com/components/login-form/login-form.js';
+import User from '/js/User.js';
+import '/components/login-form/login-form.js';
 
 export default class HTMLLoginButton extends HTMLButtonElement {
 	constructor() {

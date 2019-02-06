@@ -1,6 +1,6 @@
-import {importLink} from 'https://cdn.chriszuber.com/js/std-js/functions.js';
-import User from 'https://cdn.chriszuber.com/js/User.js';
-import '../gravatar-img.js';
+import {importLink} from '/js/std-js/functions.js';
+import User from '/js/User.js';
+import '/components/gravatar-img.js';
 
 export default class HTMLLoginFormElement extends HTMLElement {
 	constructor() {
