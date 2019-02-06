@@ -1,0 +1,32 @@
+#header {
+	grid-area: header;
+	background-image: var(--header-bg);
+}
+
+#header.responsive-bg {
+	background-position: top center;
+}
+
+@media ((orientation: landscape) and (min-width: 1025px)) or (min-height: 1918px) {
+	#header.responsive-bg {
+		background-image: var(--header-bg-f);
+	}
+}
+
+@media ((orientation: landscape) and (max-width: 1024px)) or (max-height: 1914px) {
+	#header.responsive-bg {
+		background-image: var(--header-bg-h);
+	}
+}
+
+@media ((orientation: landscape) and (max-width: 640px)) or (max-height: 1199px) {
+	#header.responsive-bg {
+		background-image: var(--header-bg-l);
+	}
+}
+
+@media ((orientation: landscape) and (max-width: 320px)) or (max-height: 779px) {
+	#header.responsive-bg {
+		background-image: var(--header-bg-m);
+	}
+}
