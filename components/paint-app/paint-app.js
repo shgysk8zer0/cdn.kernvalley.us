@@ -13,6 +13,8 @@ export default class HTMLPaintAppElement extends HTMLElement {
 			shadow.append(...tmp.head.children, ...tmp.body.children);
 			[...shadow.querySelectorAll('form')].forEach(form => form.addEventListener('submit', event => event.preventDefault()));
 
+			$('a[download]', shadow).click(e => e.target.closest('a[download]').href = this.dataURL);
+
 			const canvas = shadow.querySelector('canvas');
 			$('#clear-btn', shadow).click(async () => {
 				if (await confirm('Are you sure you want to erase everything?')) {
@@ -52,7 +54,7 @@ export default class HTMLPaintAppElement extends HTMLElement {
 
 			$('#color-picker', shadow).change(event => canvas.stroke = event.target.value);
 			$('#stroke-width', shadow).change(event => canvas.lineWidth = parseInt(event.target.value));
-			this.dispatchEvent('ready');
+			this.dispatchEvent(new Event('ready'));
 		});
 	}
 
