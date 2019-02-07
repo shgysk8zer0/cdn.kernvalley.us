@@ -7,58 +7,74 @@ export default class HTMLDrawingCanvasElement extends HTMLCanvasElement {
 		this.ctx.fillRect(0, 0, this.width, this.height);
 		this.dispatchEvent(new Event('ready'));
 
-		const movehandler = e => {
+		const config = {};
+
+		const draw = e => {
+			e.preventDefault();
+			const {top, left} = this.offset;
+
 			if (window.hasOwnProperty('TouchEvent') && e instanceof TouchEvent && e.touches.length === 1) {
-				touch.x = e.touches.item(0).pageX - this.offsetLeft;
-				touch.y = e.touches.item(0).pageY - this.offsetTop;
+				const scale = this.scale;
+				const {pageX, pageY} = e.touches.item(0);
+				const [x, y] = [scale.x * (pageX - left), scale.y * (pageY - top)];
+				this.ctx.lineTo(x, y);
+				this.ctx.stroke();
 			} else if (e instanceof MouseEvent) {
-				touch.x = e.pageX - this.offsetLeft;
-				touch.y = e.pageY - this.offsetTop;
+				const {pageX, pageY} = e;
+				this.ctx.lineTo(pageX - left, pageY - top);
+				this.ctx.stroke();
 			}
 		};
 
-		let touch = {x: 0, y: 0};
+		const begin = e => {
+			this.ctx.beginPath();
+			const {top, left} = this.offset;
 
-		function paint() {
-			this.ctx.lineTo(touch.x, touch.y);
-			this.ctx.stroke();
+			if (window.hasOwnProperty('TouchEvent') && e instanceof TouchEvent && e.touches.length === 1) {
+				const {pageX, pageY} = e.touches.item(0);
+				const scale = this.scale;
+				const [x, y] = [scale.x * (pageX - left), scale.y * (pageY - top)];
+				this.ctx.moveTo(x, y);
+				this.addEventListener('touchmove', draw, config);
+			} else if (e instanceof MouseEvent) {
+				const {pageX, pageY} = e;
+				this.ctx.moveTo(pageX - left, pageY - top);
+				this.addEventListener('mousemove', draw, config);
+			}
+		};
+
+		const end = e => {
+			if (window.hasOwnProperty('TouchEvent') && e instanceof TouchEvent) {
+				this.removeEventListener('touchmove', draw, config);
+			} else if (e instanceof MouseEvent) {
+				this.removeEventListener('mousemove', draw, config);
+			}
+		};
+
+		this.addEventListener('touchstart', begin, config);
+		this.addEventListener('touchend', end, config);
+		this.addEventListener('mousedown', begin, config);
+		this.addEventListener('mouseup', end, config);
+	}
+
+	get coords() {
+		return this.getBoundingClientRect();
+	}
+
+	get scale() {
+		const coords = this.coords;
+		return {x: this.width / coords.width, y: this.height / coords.height};
+	}
+
+	get offset() {
+		let el = this.offsetParent;
+		const offset = {top: this.offsetTop, left: this.offsetLeft};
+		while (el instanceof HTMLElement) {
+			offset.left += el.offsetLeft;
+			offset.top += el.offsetTop;
+			el = el.offsetParent;
 		}
-
-		this.addEventListener('touchmove', movehandler, {
-			passive: true,
-		});
-
-		this.addEventListener('mousemove', movehandler, {
-			passive: true,
-		});
-
-		this.addEventListener('touchstart', () => {
-			this.ctx.beginPath();
-			this.ctx.moveTo(touch.x, touch.y);
-			this.addEventListener('touchmove', paint, false);
-		}, {
-			passive: true,
-		});
-
-		this.addEventListener('mousedown', () => {
-			this.ctx.beginPath();
-			this.ctx.moveTo(touch.x, touch.y);
-			this.addEventListener('mousemove', paint, false);
-		}, {
-			passive: true,
-		});
-
-		this.addEventListener('mouseup', () => {
-			this.removeEventListener('mousemove', paint, false);
-		}, {
-			passive: true,
-		});
-
-		this.addEventListener('touchend', () => {
-			this.removeEventListener('touchmove', paint, false);
-		}, {
-			passive: true,
-		});
+		return offset;
 	}
 
 	get exportFormat() {
