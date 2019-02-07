@@ -127,6 +127,12 @@ export default class HTMLPaintAppElement extends HTMLElement {
 		case 'export-quality':
 			this.canvas.exportQuality = newValue;
 			break;
+		case 'height':
+			this.canvas.height = newValue;
+			break;
+		case 'width':
+			this.canvas.width = newValue;
+			break;
 		default:
 			throw new Error(`Unhandled attribute change: "${name}"`);
 		}
@@ -139,6 +145,8 @@ export default class HTMLPaintAppElement extends HTMLElement {
 			'line-width',
 			'export-format',
 			'export-quality',
+			'height',
+			'width',
 		];
 	}
 }
