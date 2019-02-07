@@ -7,8 +7,8 @@ const KEYS = [
 	'token',
 ];
 
-import HTMLGravatarImageElement from '../components/gravatar-img.js';
-import {notify} from 'https://cdn.chriszuber.com/js/std-js/functions.js';
+import HTMLGravatarImageElement from '/components/gravatar-img.js';
+import {notify} from '/js/std-js/functions.js';
 
 const ENDPOINT = 'https://api.chriszuber.com';
 
