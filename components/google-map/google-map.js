@@ -1,4 +1,4 @@
-import {importLink} from 'https://cdn.chriszuber.com/js/std-js/functions.js';
+import {importLink} from '/js/std-js/functions.js';
 // @see https://developers.google.com/maps/documentation/javascript/tutorial
 export default class GoogleMapElement extends HTMLElement {
 	constructor() {
