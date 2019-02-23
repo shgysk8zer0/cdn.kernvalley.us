@@ -50,10 +50,11 @@
     "eslint": "^5.7.0",
     "eslint-plugin-async-await": "0.0.0",
     "eslint-plugin-babel": "^5.2.1",
+    "http-server": "^0.11.1",
     "stylelint": "^9.6.0",
     "stylelint-config-recommended": "^2.1.0",
     "stylelint-config-standard": "^18.2.0",
-    "svgo": "^1.1.1",
-    "svg-sprite-generator": "0.0.7"
+    "svg-sprite-generator": "0.0.7",
+    "svgo": "^1.1.1"
   }
 }

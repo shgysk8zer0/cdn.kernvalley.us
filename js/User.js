@@ -130,7 +130,7 @@ export default class User {
 		body.set('username', username);
 		body.set('password', password);
 		const headers = new Headers({Accept: 'application/json'});
-		const url = new URL('/register/', ENDPOINT);
+		const url = new URL('/user/', ENDPOINT);
 		try {
 			const resp = await fetch(url, {
 				method: 'POST',
