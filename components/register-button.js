@@ -1,4 +1,4 @@
-import User from 'https://cdn.chriszuber.com/js/User.js';
+import User from '/js/User.js';
 
 export default class HTMLRegisterButton extends HTMLButtonElement {
 	constructor() {

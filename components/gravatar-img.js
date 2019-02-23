@@ -1,4 +1,4 @@
-import md5 from 'https://cdn.chriszuber.com/js/std-js/md5.js';
+import md5 from '/js/std-js/md5.js';
 
 const GRAVATAR = 'https://secure.gravatar.com/avatar/';
 const SIZES = [
@@ -192,8 +192,10 @@ export default class HTMLGravatarImageElement extends HTMLImageElement {
 			}
 			break;
 		case 'email':
-			this.email = newValue;
-			this.removeAttribute('email');
+			if (newValue !== null) {
+				this.hash = md5(newValue);
+				this.removeAttribute('email');
+			}
 			break;
 		default:
 			throw new Error(`Unhandled attribute change: "${name}"`);

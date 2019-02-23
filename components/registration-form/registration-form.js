@@ -1,5 +1,5 @@
-import {importLink} from 'https://cdn.chriszuber.com/js/std-js/functions.js';
-import User from 'https://cdn.chriszuber.com/js/User.js';
+import {importLink} from '/js/std-js/functions.js';
+import User from '/js/User.js';
 
 export default class HTMLRegistrationFormElement extends HTMLElement {
 	constructor() {

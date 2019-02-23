@@ -1,4 +1,4 @@
-import webShareApi from 'https://cdn.chriszuber.com/js/std-js/webShareApi.js';
+import webShareApi from '/js/std-js/webShareApi.js';
 import {
 	facebook,
 	twitter,
@@ -7,7 +7,7 @@ import {
 	reddit,
 	gmail,
 	email,
-} from 'https://cdn.chriszuber.com/js/std-js/share-config.js';
+} from '/js/std-js/share-config.js';
 
 webShareApi(facebook, twitter, googlePlus, linkedIn, reddit, gmail, email);
 

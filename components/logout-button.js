@@ -1,5 +1,5 @@
-import User from 'https://cdn.chriszuber.com/js/User.js';
-import {confirm} from 'https://cdn.chriszuber.com/js/std-js/asyncDialog.js';
+import User from '/js/User.js';
+import {confirm} from '/js/std-js/asyncDialog.js';
 
 export default class HTMLLogoutButton extends HTMLButtonElement {
 	constructor() {

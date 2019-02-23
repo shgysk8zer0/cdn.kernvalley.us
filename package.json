@@ -17,16 +17,15 @@
   ],
   "author": "Chris Zuber <shgysk8zer0@gmail.com>",
   "homepage": "https://github.com/shgysk8zer0/cdn.chriszuber.com#readme",
-  "license": "GPL-3.0",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/shgysk8zer0/cdn.chriszuber.com/issues"
   },
   "config": {
     "serve": {
       "domain": "localhost",
-      "port": {
-        "dev": 8081
-      }
+      "path": "./",
+      "port": 8081
     },
     "dir": {
       "css": "css/ components/",
@@ -37,7 +36,7 @@
   },
   "scripts": {
     "preinstall": "git submodule update --init --recursive",
-    "start": "python -m SimpleHTTPServer ${npm_package_config_serve_port_dev}",
+    "start": "http-server ${npm_config_serve_psth} -p ${npm_package_config_serve_port} -a ${npm_package_config_serve_domain} -o",
     "test": "npm run lint:js && npm run lint:css",
     "lint:css": "stylelint ${npm_package_config_dir_css}",
     "lint:js": "eslint ${npm_package_config_dir_js}",
