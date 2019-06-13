@@ -5,6 +5,6 @@ export default class PaymentRequest {
 		requestPayerPhone = false,
 		shippingType = 'shipping',
 	} = {}) {
-		console.log({methodData, details, requestPayerName, requestPayerEmail, requestPhone, shippingType});
+		console.log({methodData, details, options: {requestPayerName, requestPayerEmail, requestPayerPhone, shippingType}});
 	}
 }

@@ -1,4 +1,4 @@
-export default class HTMLPaymentRequestFormElement extends HTMLFormElement {
+export default class HTMLPaymentRequestElement extends HTMLElement {
 	constructor() {
 		super();
 	}
@@ -78,4 +78,4 @@ export default class HTMLPaymentRequestFormElement extends HTMLFormElement {
 	}
 }
 
-customElements.define('payment-request', HTMLPaymentRequestFormElement, {extends: 'form'});
+customElements.define('payment-request', HTMLPaymentRequestElement);
