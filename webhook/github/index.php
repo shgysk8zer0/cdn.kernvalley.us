@@ -2,7 +2,7 @@
 namespace WebHook\GitHub;
 
 use \shgysk8zer0\PHPAPI\{HTTPException, Headers};
-use \shgysk8zer0\WebHook\{GitHub};
+use \shgysk8zer0\PHPAPI\WebHook\{GitHub};
 use \Throwable;
 
 const METHODS = 'POST, OPTIONS, HEAD';
