@@ -1,8 +1,8 @@
 <?php
 namespace WebHook\GitHub;
 
-use \shgysk8zer0\{HTTPException, Headers};
-use \shgysk8zer0\WebHook\{GitHub};
+use \shgysk8zer0\PHPAPI\{HTTPException, Headers};
+use \shgysk8zer0\PHPAPI\WebHook\{GitHub};
 use \Throwable;
 
 const METHODS = 'POST, OPTIONS, HEAD';
@@ -45,7 +45,7 @@ try {
 		Headers::set('Allow', METHODS);
 		throw new HTTPException('Allowed Methods: ' . METHODS, Headers::METHOD_NOT_ALLOWED);
 	}
-} catch(HTTPException $e) {
+} catch (HTTPException $e) {
 	Headers::status($e->getCode());
 	Headers::set('Content-Type', 'application/json');
 	echo json_encode($e);
@@ -53,4 +53,5 @@ try {
 	Headers::status(Headers::INTERNAL_SERVER_ERROR);
 	Headers::set('Content-Type', 'text/plain');
 	echo 'Internal Server Error' . PHP_EOL;
+	error_log(sprintf('%s:%d "%s"', $e->getFile(), $e->getLine(), $e->getMessage()), 3, './errors.log');
 }
