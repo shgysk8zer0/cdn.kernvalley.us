@@ -6,4 +6,3 @@
 /js/std-js/
 *.min.js
 *.config.js
-/import.meta.js
