@@ -100,7 +100,7 @@ export default class PaymentRequestFallback extends EventTarget {
 	}
 
 	async show() {
-		return await new Promise(async (resolve, reject) => {
+		return await new Promise(async (resolve) => {
 			await customElements.whenDefined('payment-form');
 
 			if (! (document.forms.payment instanceof HTMLFormElement)) {
