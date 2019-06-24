@@ -54,6 +54,7 @@ export default class PaymentRequestFallback extends EventTarget {
 			form.requestPayerPhone = requestPayerPhone;
 			form.requestShipping   = requestShipping;
 			form.shippingType      = shippingType;
+			form.method = 'POST';
 
 			dialog.append(form);
 			document.body.append(dialog);
