@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+	<head>
+		<meta charset="utf-8" />
+	</head>
+	<body>
+		<input type="hidden" name="methodName" value="basic-card" readonly="" />
+		<input type="hidden" name="requestId" readonly="" />
+		<table class="display-items">
+				<caption>Order summary</caption>
+			<tbody></tbody>
+		</table>
+		<fieldset is="shipping-address" name="shippingAddress" disabled="" hidden="">
+			<legend>
+				<span class="shipping-type-label capitalize">Shipping</span>
+				<span>address</span>
+			</legend>
+			<input type="text" name="shippingAddress[recipient]" autocomplete="shipping name" placeholder="Full Name" required="" />
+			<br />
+			<input type="text" name="shippingAddress[organization]" autocomplete="shipping organization" placeholder="Company name" />
+			<br />
+			<input type="text" name="shippingAddress[addressLine][]" autocomplete="shipping street-address" placeholder="Street address" required="" />
+			<br />
+			<input type="text" name="shippingAddress[city]" autocomplete="shipping address-level2" placeholder="City" required="" />
+			<span>,</span>
+			<input type="text" name="shippingAddress[region]" autocomplete="shipping address-level1" placeholder="State" required="" />
+			<br />
+			<input type="number" name="shippingAddress[postalCode]" autocomplete="shipping postal-code" placeholder="#####" size="5" required="" />
+			<input type="text" name="shippingAddress[country]" autocomplete="shipping country" minlen="2" maxlen="3" size="4" placeholder="Country" required="" />
+		</fieldset>
+		<fieldset is="shipping-method" name="shippingMethod" disabled="" hidden="">
+			<legend>Shipping method</legend>
+			<select name="shippingOption" required="">
+				<option value="">Select Shipping</option>
+			</select>
+		</fieldset>
+		<fieldset is="payment-method" name="paymentMethod">
+			<legend>Payment method</legend>
+			<input type="text" name="details[cardholderName]" autocomplete="cc-name" placeholder="Full Name" required="" />
+			<br />
+			<input type="number" name="details[cardNumber]" autocomplete="cc-num" placeholder="#############" required="" />
+			<br />
+			<input type="number" min="1" max="12" name="details[expiryMonth]" autocomplete="cc-expiry-month" placeholder="##" size="2" required="" />
+			<span>/</span>
+			<input type="number" name="details[expiryYear]" autocomplete="cc-expiry-year" placeholder="####" size="4" required="" />
+			<br />
+			<input type="number" min="100" max="9999" name="details[cardSecurityCode]" autocomlete="cc-csc" placeholder="###" size="4" required="" />
+		</fieldset>
+		<fieldset is="billing-address" name="billingAddress">
+			<legend>Billing address</legend>
+			<input type="text" name="details[billingAddress][recipient]" autocomplete="billing name" placeholder="Full Name" required="" />
+			<br />
+			<input type="text" name="details[billingAddress][organization]" autocomplete="billing organization" placeholder="Company name" />
+			<br />
+			<input type="text" name="details[billingAddress][addressLine][]" autocomplete="billing street-address" placeholder="Street address" required="" />
+			<br />
+			<input type="text" name="details[billingAddress][city]" autocomplete="billing address-level2" placeholder="City" required="" />
+			<span>,</span>
+			<input type="text" name="details[billingAddress][region]" autocomplete="billing address-level1" placeholder="State" required="" />
+			<br />
+			<input type="number" name="details[billingAddress][postalCode]" autocomplete="billing postal-code" placeholder="#####" size="5" required="" />
+			<input type="text" name="details[billingAddress][country]" autocomplete="billing country" minlen="2" maxlen="3" placeholder="Country" size="4" required="" />
+		</fieldset>
+		<fieldset is="contact-info" name="contactInfo" disabled="" hidden="">
+			<legend>Contact info</legend>
+			<input type="text" name="payerName" autocomplete="name" placeholder="Full Name" required="" hidden="" disabled="" />
+			<br />
+			<input type="email" name="payerEmail" autocomplete="email" placeholder="user@example.com" required="" hidden="" disabled="" />
+			<br />
+			<input type="tel" name="payerPhone" autocomplete="tel" placeholder="+1-555-555-5555" required="" hidden="" disabled="" />
+		</fieldset>
+		<button type="submit" class="btn btn-accept">Pay</button>
+		<button type="reset" class="btn btn-reject">Cancel</button>
+		<template id="display-item-template">
+			<tr>
+				<td data-field="label"></td>
+				<td data-field="amount"></td>
+			</tr>
+		</template>
+	</body>
+</html>

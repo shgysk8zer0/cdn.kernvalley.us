@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr" is="web-app" class="no-js smooth-scroll border-box" theme="default" layout="home">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width" />
+		<title>Web App Testing</title>
+		<script type="module" src="/js/index.js" async=""></script>
+		<script type="module" src="/components/bacon-ipsum.js" async=""></script>
+		<link rel="stylesheet" href="/css/index.css" media="screen" />
+		<link rel="manifest" href="package.json" />
+		<link rel="icon" href="/img/octicons/code.svg" type="image/svg+xml" sizes="any" />
+		<meta name="robots" content="follow,index" />
+		<meta name="description" content="Checks passwords against have i been pwned" />
+		<meta itemprop="description" content="Checks passwords against have i been pwned" />
+		<meta name="keywords" content="passwords, security, have i been pwned" />
+		<meta itemprop="keywords" content="passwords, security, have i been pwned" />
+		<meta name="referrer" content="origin-when-cross-origin"/>
+		<meta name="mobile-web-app-capable" content="yes" />
+		<meta itemprop="thumbnailUrl" content="https://i.imgur.com/Ul9Ii2S.png" />
+		<!-- Social data -->
+		<!-- Facebook | OpenGraph -->
+		<meta property="og:type" content="website" />
+		<meta property="og:title" content="Password Checker" />
+		<meta property="og:url" content="https://passwords.netlify.com" />
+		<meta property="og:description" content="Checks passwords against have i been pwned" />
+		<meta property="og:keywords" content="passwords, security, have i been pwned" />
+		<meta property="og:image" content="https://i.imgur.com/Ul9Ii2S.png" />
+		<meta property="og:image:height" content="512" />
+		<meta property="og:image:width" content="512" />
+		<!-- /Facebook | OpenGraph -->
+		<!-- Twitter -->
+		<meta name="twitter:card" content="summary" />
+		<meta name="twitter:creator" content="@shgysk8zer0" />
+		<meta name="twitter:description" content="Checks passwords against have i been pwned" />
+		<meta name="twitter:image" content="https://i.imgur.com/Ul9Ii2S.png" />
+		<!-- /Twitter -->
+		<!-- /Social data -->
+		<meta name="msapplication-TileColor" content="#528ff9" />
+		<meta name="msapplication-config" content="/browserconfig.xml" />
+		<meta name="theme-color" content="#528ff9" />
+	</head>
+	<body>
+		<header id="header"></header>
+		<nav id="nav" class="sticky top">
+			<button type="button" id="buy-now" class="btn btn-primary" disabled="">Buy Now</button>
+		</nav>
+		<main class="shadow card">
+			<bacon-ipsum class="block" paras="20" filler=""></bacon-ipsum>
+		</main>
+		<aside id="sidebar"></aside>
+		<footer id="footer">
+			<span>&copy;</span>
+			<time is="current-year"></time>
+		</footer>
+		<button type="button" is="share-button" class="btn btn-default round shadow fixed">
+			<svg class="current-color icon" viewBox="0 0 16 16">
+				<path d="M5.969 7.969a2.969 2.969 0 1 1-5.938 0 2.969 2.969 0 1 1 5.938 0zm9.969 5a2.969 2.969 0 1 1-5.938 0 2.969 2.969 0 1 1 5.938 0zm0-10a2.969 2.969 0 1 1-5.938 0 2.969 2.969 0 1 1 5.938 0z" overflow="visible"/>
+				<path d="M12.625 2.156L2.562 7.031.75 7.938l1.812.906 10.032 5.062.906-1.812-8.22-4.156 8.219-4-.875-1.782z" overflow="visible"/>
+			</svg>
+		</button>
+	</body>
+</html>
