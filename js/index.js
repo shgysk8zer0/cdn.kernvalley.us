@@ -1,6 +1,6 @@
 import '/components/web-app.js';
-import PaymentRequestFallback from './PaymentRequest.js';
-import PaymentResponseFallback from './PaymentResponse.js';
+import PaymentRequestFallback from './PaymentAPI/PaymentRequest.js';
+import PaymentResponseFallback from './PaymentAPI/PaymentResponse.js';
 
 if (! ('PaymentRequest' in window)) {
 	window.PaymentRequest = PaymentRequestFallback;

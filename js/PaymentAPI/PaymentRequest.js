@@ -1,6 +1,7 @@
-import '../components/payment-form/payment-form.js';
+import '../../components/payment-form/payment-form.js';
 import PaymentResponseFallback from './PaymentResponse.js';
 import PaymentRequestUpdateEvent from './PaymentRequestUpdateEvent.js';
+import PaymentAddressFallback from './PaymentAddress.js';
 function closeHandler(event) {
 	console.log(event);
 }
@@ -84,15 +85,7 @@ export default class PaymentRequestFallback extends EventTarget {
 	}
 
 	get shippingAddress() {
-		const addr = this._form.elements.shippingAddress;
-		return {
-			recipient: addr.elements['shippingAddress[recipient]'].value,
-			addressLine: [addr.elements['shippingAddress[addressLine][]'].value],
-			city: addr.elements['shippingAddress[city]'].value,
-			region: addr.elements['shippingAddress[region]'].value,
-			postalCode: addr.elements['shippingAddress[postalCode]'].value,
-			country: addr.elements['shippingAddress[country]'].value,
-		};
+		return new PaymentAddressFallback(new FormData(this._form));
 	}
 
 	get shippingType() {
