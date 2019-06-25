@@ -1,8 +1,13 @@
-export default class PaymentResponseFallback {
+import BasicCardResponseFallback from './BasicCardResponse.js';
+import PaymentAddressFallback from './PaymentAddress.js';
+
+export default class PaymentResponseFallback extends FormData {
 	constructor(event) {
 		if (event instanceof Event && event.target instanceof HTMLFormElement) {
-			this._data = new FormData(event.target);
+			super(event.target);
 			this._form = event.target;
+		} else {
+			throw new TypeError('Attempting to create a PaymentResponse without a form submission');
 		}
 	}
 
@@ -14,55 +19,61 @@ export default class PaymentResponseFallback {
 	}
 
 	toJSON() {
-		const data = {
-			requestId: this._data.get('requestId'),
-			methodName: this._data.get('methodName'),
-			details: {
-				cardNumber: this._data.get('details[cardNumber]'),
-				cardSecurityCode: this._data.get('details[cardSecurityCode]'),
-				cardholderName: this._data.get('details[cardholderName]'),
-				expiryMonth: this._data.get('details[expiryMonth]'),
-				expiryYear: this._data.get('details[expiryYear]'),
-				billingAddress: {
-					recipient: this._data.get('details[billingAddress][recipient]'),
-					organization: this._data.get('details[billingAddress][organization]'),
-					addressLine: this._data.get('details[billingAddress][addressLine][]').split('\n'),
-					city: this._data.get('details[billingAddress][city]'),
-					country: this._data.get('details[billingAddress][country]'),
-					postalCode: this._data.get('details[billingAddress][postalCode]'),
-					region: this._data.get('details[billingAddress][region]'),
-				},
-			},
-		};
+		const {requestId, methodName, details} = this;
+		const data = {requestId, methodName, details};
 
-		if (this._data.has('payerName')) {
-			data.payerName = this._data.get('payerName');
+		if (this.has('payerName')) {
+			data.payerName = this.payerName;
 		}
 
-		if (this._data.has('payerEmail')) {
-			data.payerEmail = this._data.get('payerEmail');
+		if (this.has('payerEmail')) {
+			data.payerEmail = this.payerEmail;
 		}
 
-		if (this._data.has('payerPhone')) {
-			data.payerPhone = this._data.get('payerPhone');
+		if (this.has('payerPhone')) {
+			data.payerPhone = this.payerPhone;
 		}
 
-		if (this._data.has('shippingOption')) {
-			data.shippingOption = this._data.get('shippingOption');
+		if (this.has('shippingOption')) {
+			data.shippingOption = this.shippingOption;
 		}
 
-		if (this._data.has('shippingAddress[addressLine][]')) {
-			data.shippingAddress = {
-				recipient: this._data.get('shippingAddress[recipient]'),
-				organization: this._data.get('shippingAddress[organization]'),
-				addressLine: this._data.get('details[billingAddress][addressLine][]').split('\n'),
-				city: this._data.get('details[billingAddress][city]'),
-				country: this._data.get('details[billingAddress][country]'),
-				postalCode: this._data.get('details[billingAddress][postalCode]'),
-				region: this._data.get('details[billingAddress][region]'),
-			};
+		if (this.has('shippingAddress[addressLine][]')) {
+			data.shippingAddress = this.shippingAddress;
 		}
 
 		return data;
+	}
+
+	get details() {
+		return new BasicCardResponseFallback(this);
+	}
+
+	get requestId() {
+		return this.get('requestId');
+	}
+
+	get methodName() {
+		return this.get('methodName');
+	}
+
+	get shippingOption() {
+		return this.get('shippingOption');
+	}
+
+	get shippingAddress() {
+		return new PaymentAddressFallback(this);
+	}
+
+	get payerEmail() {
+		return this.get('payerEmail');
+	}
+
+	get payerName() {
+		return this.get('payerName');
+	}
+
+	get payerPhone() {
+		return this.get('payerPhone');
 	}
 }

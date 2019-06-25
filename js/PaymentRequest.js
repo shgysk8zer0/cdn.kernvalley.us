@@ -95,6 +95,10 @@ export default class PaymentRequestFallback extends EventTarget {
 		};
 	}
 
+	get shippingType() {
+		return this._form.shippingType;
+	}
+
 	async canMakePayment() {
 		return this._conf.some(opt => opt.supportedMethods === 'basic-card');
 	}
