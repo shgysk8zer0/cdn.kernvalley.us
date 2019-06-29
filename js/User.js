@@ -10,7 +10,7 @@ const KEYS = [
 import HTMLGravatarImageElement from '/components/gravatar-img.js';
 import {notify} from '/js/std-js/functions.js';
 
-const ENDPOINT = 'https://api.chriszuber.com';
+const ENDPOINT = document.documentElement.dataset.apiEndpoint || 'https://api.kernvalley.us';
 
 async function saveCredentials({username, password}) {
 	if ('credentials' in navigator && window.PasswordCredential instanceof Function) {
@@ -125,17 +125,35 @@ export default class User {
 		}
 	}
 
-	static async register({username, password, store = true, welcome = true}) {
-		const body = new FormData();
-		body.set('username', username);
-		body.set('password', password);
-		const headers = new Headers({Accept: 'application/json'});
-		const url = new URL('/user/', ENDPOINT);
+	static async register({
+		username,
+		password,
+		givenName,
+		additionalName = '',
+		familyName,
+		telephone = null,
+		birthDate = null,
+		store = true,
+		welcome = true,
+	}) {
+		const headers = new Headers({
+			Accept: 'application/json',
+			'Content-Type': 'application/json',
+		});
+		const url = new URL('/test/', ENDPOINT);
 		try {
 			const resp = await fetch(url, {
 				method: 'POST',
 				mode: 'cors',
-				body,
+				body: JSON.stringify({
+					username,
+					password,
+					givenName,
+					additionalName,
+					familyName,
+					telephone,
+					birthDate,
+				}),
 				headers,
 			});
 
