@@ -140,7 +140,7 @@ export default class User {
 			Accept: 'application/json',
 			'Content-Type': 'application/json',
 		});
-		const url = new URL('/test/', ENDPOINT);
+		const url = new URL('/user/', ENDPOINT);
 		try {
 			const resp = await fetch(url, {
 				method: 'POST',
