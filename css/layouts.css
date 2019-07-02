@@ -4,11 +4,11 @@
 @import url("./main.css");
 @import url("./footer.css");
 
-body.grid {
+:root > body {
 	min-height: 100vh;
 }
 
-.grid[data-layout="default"] {
+:root[layout="default"] > body {
 	grid-template-columns: 2fr 75fr 23fr;
 	grid-template-areas: 'header header header'
 	'nav nav nav'
@@ -17,7 +17,7 @@ body.grid {
 	'footer footer footer';
 }
 
-.grid[data-layout="home"] {
+:root[layout="home"] > body {
 	grid-template-columns: 2fr 75fr 23fr;
 	grid-template-rows: minmax(calc(100vh - var(--nav-height, 2.5rem)), auto) var(--nav-height, 2.5rem);
 	grid-template-areas: 'header header header'
@@ -27,7 +27,7 @@ body.grid {
 	'footer footer footer';
 }
 
-.grid[data-layout="full-width"] {
+:root[layout="full-width"] > body {
 	grid-template-columns: 5fr 90fr 5fr;
 	grid-template-areas: 'header header header'
 	'nav nav nav'
@@ -37,12 +37,12 @@ body.grid {
 
 
 @media (max-width: 700px) {
-	.grid.[data-layout="default"], .grid[data-layout="home"] {
+	:root[layout="default"] > body, :root[layout="home"] > body {
 		grid-template-columns: 100vw;
 		grid-template-areas: 'header' 'nav' 'main' 'sidebar' 'footer';
 	}
 
-	.grid[data-layout="full-width"] {
+	:root[data-layout="full-width"] > body {
 		grid-template-columns: 100vw;
 		grid-template-areas: 'header' 'nav' 'main' 'footer';
 	}
