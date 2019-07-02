@@ -3,22 +3,30 @@
 	<head>
 		<meta charset="utf-8" />
 		<style>
-			@import url("https://cdn.chriszuber.com/css/core-css/element.css");
-			@import url("https://cdn.chriszuber.com/css/core-css/class-rules.css");
+			@import url("https://cdn.kernvalley.us/css/core-css/element.css");
+			@import url("https://cdn.kernvalley.us/css/core-css/class-rules.css");
 		</style>
 	</head>
 	<body>
 		<dialog id="registration-dialog">
 			<form>
+				<input type="hidden" name="@context" value="https://schema.org" readonly="" />
+				<input type="hidden" name="@type" value="Person" readonly="" />
 				<fieldset>
 					<legend>
 						<slot name="legend">Register</slot>
 					</legend>
 					<div>
+						<label for="given-name">Name</label>
+						<input type="text" autocomplete="given-name" name="givenName" placeholder="First" required="" />
+						<input type="text" autocomplete="additional-name" name="additionalName" placeholder="Middle" />
+						<input type="text" autocomplete="family-name" name="familyName" placeholder="Last" required="" />
+					</div>
+					<div>
 						<label for="username">
-							<slot name="username-label">Username</slot>
+							<slot name="username-label">Email</slot>
 						</label>
-						<input type="email" name="username" id="username" placeholder="user@example.com" autocomplete="username" required="" />
+						<input type="email" name="username" id="username" placeholder="user@example.com" autocomplete="email" required="" />
 					</div>
 					<div>
 						<label for="password">
@@ -26,13 +34,23 @@
 						</label>
 						<input type="password" name="password" id="password" minlength="8" maxlength="72" autocomplete="new-password" placeholder="********" required="" />
 					</div>
+					<div>
+						<label for="telephone">
+							<slot name="telephone-label">Phone</slot>
+						</label>
+						<input type="tel" name="telephone" id="telephone" placeholder="555-555-5555" autocomplete="tel" />
+					</div>
+					<div>
+						<label for="birth-date">Birthday</label>
+						<input type="date" id="birth-date" name="birthDate" autocomplete="bday" placeholder="yyyy-mm-dd" />
+					</div>
 				</fieldset>
 				<button type="submit" class="btn btn-accept" title="Submit">
-					<slot name="submit-btn">Submit</button>
+					<slot name="submit-btn">Submit</slot>
 				</button>
 				<button type="reset" class="btn btn-reject" title="Cancel">
 					<slot name="reset-btn">Cancel</slot>
-				</slot>
+				</button>
 			</form>
 			<button type="button" is="login-button" class="btn btn-primary">
 				<slot name="login-btn">Login</slot>

@@ -4,6 +4,7 @@
         "es6": true
     },
     "extends": "eslint:recommended",
+    "parser": "babel-eslint",
     "parserOptions": {
         "sourceType": "module",
         "ecmaVersion": 2018
@@ -33,11 +34,8 @@
         }]
     },
     "globals": {
-        "URLSearchParams": false,
         "ga": false,
-	"google": false,
-        "skipWaiting": false,
-        "clients": false,
+        "google": false,
         "PasswordCredential": false
     }
 }

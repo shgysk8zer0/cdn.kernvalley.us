@@ -22,12 +22,10 @@ export default class HTMLRegistrationFormElement extends HTMLElement {
 
 			form.addEventListener('submit', async event => {
 				event.preventDefault();
-				const data = new FormData(this.form);
-				if (await User.register({
-					username: data.get('username'),
-					password: data.get('password'),
-					store: true,
-				})) {
+				const data = Object.fromEntries(new FormData(this.form).entries());
+				data.store = true;
+
+				if (await User.register(data)) {
 					this.form.reset();
 					this.dialog.close();
 
