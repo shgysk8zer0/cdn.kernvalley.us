@@ -8,3 +8,25 @@
 @import url("./core-css/class-rules.css");
 @import url("./core-css/fonts.css");
 @import url("./core-css/animations.css");
+
+dialog {
+	max-height: 95vh;
+	max-width: 95vw;
+	overflow: auto;
+}
+
+input[type="number"][size="2"] {
+	width: 4em;
+}
+
+input[type="number"][size="3"] {
+	width: 5em;
+}
+
+input[type="number"][size="4"] {
+	width: 6em;
+}
+
+input[type="number"][size="5"] {
+	width: 7em;
+}
