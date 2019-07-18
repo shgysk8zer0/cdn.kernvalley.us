@@ -12,13 +12,15 @@ import {notify} from '/js/std-js/functions.js';
 
 const ENDPOINT = document.documentElement.dataset.apiEndpoint || 'https://api.kernvalley.us';
 
-async function saveCredentials({username, password}) {
+async function saveCredentials({username, password, image}) {
 	if ('credentials' in navigator && window.PasswordCredential instanceof Function) {
 		const creds = new PasswordCredential({
 			id: username,
 			name: username,
 			password: password,
-			iconURL: HTMLGravatarImageElement.url({email: username, size: 64}),
+			iconURL: (typeof image === 'string')
+				? image
+				: HTMLGravatarImageElement.url({email: username, size: 64}),
 		});
 		return await navigator.credentials.store(creds);
 	}
@@ -97,21 +99,28 @@ export default class User {
 				const detail = await resp.json();
 
 				if (KEYS.every(key => detail.hasOwnProperty(key))) {
-					const {id, username, created, updated, token} = detail;
+					const {id, username, created, updated, token, person} = detail;
 					User.id = id;
 					User.username = username;
 					User.created = created;
 					User.updated = updated;
 					User.token = token;
 					document.dispatchEvent(new CustomEvent('login', {detail}));
+
 					if (store) {
-						await saveCredentials({username, password}).catch(console.error);
+						await saveCredentials({
+							username,
+							password,
+							image: person.hasOwnProperty('image') ? person.image.url : null
+						}).catch(console.error);
 					}
 
 					if (welcome){
 						await notify('Logged in', {
-							body: `Welcome back, ${User.username}`,
-							icon: HTMLGravatarImageElement.url({email: User.username, size: 64}),
+							body: `Welcome back, ${person.givenName} ${person.familyName}`,
+							icon: person.hasOwnProperty('image')
+								? person.image.url
+								: HTMLGravatarImageElement.url({email: User.username, size: 64}),
 						}).catch(console.error);
 					}
 					return true;
@@ -161,19 +170,23 @@ export default class User {
 				const detail = await resp.json();
 
 				if (KEYS.every(key => detail.hasOwnProperty(key))) {
-					const {id, username, created, updated} = detail;
+					const {id, username, created, updated, person} = detail;
 					User.id = id;
 					User.username = username;
 					User.created = created;
 					User.updated = updated;
 					if (store) {
-						await saveCredentials({username, password}).catch(console.error);
+						await saveCredentials({
+							username,
+							password,
+							image: person.hasOwnProperty('image') ? person.image.url : null
+						}).catch(console.error);
 					}
 
 					if (welcome) {
 						await notify('Registration successful', {
 							body: `Welcome, ${User.username}`,
-							icon: HTMLGravatarImageElement.url({email: User.username, size: 64}),
+							icon: User.person.image.url,
 						}).catch(console.error);
 					}
 					document.dispatchEvent(new CustomEvent('login', {detail}));
