@@ -45,6 +45,14 @@ export default class User {
 		sessionStorage.setItem('username', username);
 	}
 
+	static get avatar() {
+		return sessionStorage.getItem('avatar');
+	}
+
+	static set avatar(img) {
+		sessionStorage.setItem('avatar', img);
+	}
+
 	static get created() {
 		return new Date(sessionStorage.getItem('created'));
 	}
@@ -105,22 +113,23 @@ export default class User {
 					User.created = created;
 					User.updated = updated;
 					User.token = token;
+					User.avatar = person.hasOwnProperty('image')
+						? person.image.url
+						: HTMLGravatarImageElement.url({email: User.username, size: 64});
 					document.dispatchEvent(new CustomEvent('login', {detail}));
 
 					if (store) {
 						await saveCredentials({
 							username,
 							password,
-							image: person.hasOwnProperty('image') ? person.image.url : null
+							image: User.avatar,
 						}).catch(console.error);
 					}
 
 					if (welcome){
 						await notify('Logged in', {
 							body: `Welcome back, ${person.givenName} ${person.familyName}`,
-							icon: person.hasOwnProperty('image')
-								? person.image.url
-								: HTMLGravatarImageElement.url({email: User.username, size: 64}),
+							icon: User.avatar,
 						}).catch(console.error);
 					}
 					return true;
@@ -175,18 +184,21 @@ export default class User {
 					User.username = username;
 					User.created = created;
 					User.updated = updated;
+					User.avatar = person.hasOwnProperty('image')
+						? person.image.url
+						: HTMLGravatarImageElement.url({email: User.username, size: 64});
 					if (store) {
 						await saveCredentials({
 							username,
 							password,
-							image: person.hasOwnProperty('image') ? person.image.url : null
+							image: User.avatar
 						}).catch(console.error);
 					}
 
 					if (welcome) {
 						await notify('Registration successful', {
 							body: `Welcome, ${User.username}`,
-							icon: User.person.image.url,
+							icon: User.avatar,
 						}).catch(console.error);
 					}
 					document.dispatchEvent(new CustomEvent('login', {detail}));

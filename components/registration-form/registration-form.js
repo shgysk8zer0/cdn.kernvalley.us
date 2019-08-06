@@ -1,38 +1,43 @@
-import {importLink} from '/js/std-js/functions.js';
 import User from '/js/User.js';
+const templateHTML = new URL('./registration-form.html', import.meta.url);
 
 export default class HTMLRegistrationFormElement extends HTMLElement {
 	constructor() {
 		super();
 		this.attachShadow({mode: 'open'});
-		importLink('registration-form-template').then(async tmp => {
-			tmp = tmp.cloneNode(true);
-			const container = document.createElement('div');
-			container.append(...tmp.head.children, ...tmp.body.children);
-			this.shadowRoot.append(container);
-			const form = this.form;
-			container.classList.toggle('no-dialog', document.createElement('dialog') instanceof HTMLUnknownElement);
+		fetch(templateHTML).then(async resp => {
+			if (resp.ok) {
+				const parser = new DOMParser();
+				const html = await resp.text();
+				const tmp = parser.parseFromString(html, 'text/html');
+				const container = document.createElement('div');
+				container.append(...tmp.head.children, ...tmp.body.children);
+				this.shadowRoot.append(container);
+				const form = this.form;
+				container.classList.toggle('no-dialog', document.createElement('dialog') instanceof HTMLUnknownElement);
 
-			this.shadowRoot.querySelector('[is="login-button"]').addEventListener('click', () => {
-				this.close();
-				this.form.reset();
-			}, {
-				passive: true,
-			});
-
-			form.addEventListener('submit', async event => {
-				event.preventDefault();
-				const data = Object.fromEntries(new FormData(this.form).entries());
-				data.store = true;
-
-				if (await User.register(data)) {
+				this.shadowRoot.querySelector('[is="login-button"]').addEventListener('click', () => {
+					this.close();
 					this.form.reset();
-					this.dialog.close();
+				}, {
+					passive: true,
+				});
 
-				}
-			});
-			form.addEventListener('reset', () => container.querySelector('dialog').close());
-			this.dispatchEvent(new Event('ready'));
+				form.addEventListener('submit', async event => {
+					event.preventDefault();
+					const data = Object.fromEntries(new FormData(this.form).entries());
+					data.store = true;
+
+					if (await User.register(data)) {
+						this.form.reset();
+						this.dialog.close();
+
+					}
+				});
+
+				form.addEventListener('reset', () => container.querySelector('dialog').close());
+				this.dispatchEvent(new Event('ready'));
+			}
 		});
 	}
 
