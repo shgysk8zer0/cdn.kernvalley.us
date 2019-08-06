@@ -2,6 +2,13 @@ import '../js/std-js/deprefixer.js';
 import '../js/std-js/shims.js';
 import './share-button.js';
 import './current-year.js';
+import './login-button.js';
+import './register-button.js';
+import './logout-button.js';
+import './gravatar-img.js';
+import './imgur-img.js';
+import './login-form/login-form.js';
+import './registration-form/registration-form.js';
 
 customElements.define('web-app', class HTMLWebAppElement extends HTMLHtmlElement {
 	constructor() {

@@ -12,39 +12,6 @@ window.uuidv4 = uuidv4;
 
 if ('customElements' in window) {
 	customElements.define('payment-form', class HTMLPaymentFormElement extends HTMLFormElement {
-		/*constructor(conf = [{
-			supportedMethod: 'basic-card',
-			data: {
-				supportedNetworks: [
-					'visa',
-					'mastercard',
-					'discover',
-				],
-				supportedTypes: [
-					'credit',
-					'debit',
-				],
-			},
-		}], {
-			total           = {},
-			displayItems    = [],
-			shippingOptions = [],
-		} = {}, {
-			requestPayerName  = false,
-			requestPayerEmail = false,
-			requestPayerPhone = false,
-			requestShipping   = false,
-		} = {}) {
-			super();
-			console.log({conf, total, displayItems,shippingOptions, requestPayerName, requestPayerEmail, requestPayerPhone, requestShipping});
-			this.ready.then(() => {
-				this.requestPayerName  = requestPayerName;
-				this.requestEmail      = requestPayerEmail;
-				this.requestPayerPhone = requestPayerPhone;
-				this.requestShipping   = requestShipping;
-			});
-		}*/
-
 		toString() {
 			return JSON.stringify(this);
 		}
@@ -209,7 +176,6 @@ if ('customElements' in window) {
 			const contactInfo = this.elements.contactInfo;
 			const {requestPayerEmail, requestPayerName, requestPayerPhone} = this;
 			const showContactInfo = requestPayerName || requestPayerPhone || requestPayerEmail;
-			console.info({attr, newVal});
 
 			switch(attr.toLowerCase()) {
 			case 'requestpayeremail':
@@ -246,7 +212,6 @@ if ('customElements' in window) {
 				break;
 
 			case 'shippingtype':
-				console.log({attr, newVal});
 				[...this.querySelectorAll('.shipping-type-label')].forEach(el => el.textContent = this.shippingType);
 				break;
 			}
