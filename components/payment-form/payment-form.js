@@ -99,6 +99,14 @@ if ('customElements' in window) {
 			}
 		}
 
+		set total({label = 'Total', amount}) {
+			console.info({label, amount});
+			this.ready.then(() => {
+				this.querySelector('.order-total-label').textContent = label;
+				this.querySelector('.order-total-amount').textContent = getPrice(amount);
+			});
+		}
+
 		set shippingOptions(opts) {
 			if (! Array.isArray(opts)) {
 				throw new TypeError('Shipping options must be an array');
@@ -112,7 +120,7 @@ if ('customElements' in window) {
 					select.add(none);
 					const options = opts.map(opt => {
 						const option = document.createElement('option');
-						option.textContent = `${opt.label} $${getPrice(opt.amount)}`;
+						option.textContent = `${opt.label} ${getPrice(opt.amount)}`;
 						option.value = opt.id;
 						option.selected = opt.selected;
 						return option;
@@ -171,6 +179,7 @@ if ('customElements' in window) {
 				frag.append(...doc.body.children);
 				this.append(frag);
 				this.elements.requestId.value = uuidv4();
+				console.info({'form': this});
 				this.dispatchEvent(new Event('load'));
 			}
 		}
