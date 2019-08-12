@@ -8,6 +8,10 @@ function $(selector, base) {
 	return [...base.querySelectorAll(selector)];
 }
 
+function getPrice({value, currency = 'USD'}) {
+	return Intl.NumberFormat(navigator.language, {style: 'currency', currency}).format(value);
+}
+
 window.uuidv4 = uuidv4;
 
 if ('customElements' in window) {
@@ -87,7 +91,7 @@ if ('customElements' in window) {
 					const rows = items.map(item => {
 						const tr = tmp.cloneNode(true);
 						$('[data-field="label"]', tr).forEach(td => td.textContent = item.label);
-						$('[data-field="amount"]', tr).forEach(td => td.textContent = item.amount.value);
+						$('[data-field="amount"]', tr).forEach(td => td.textContent = getPrice(item.amount));
 						return tr;
 					});
 					table.tBodies.item(0).append(...rows);
@@ -108,7 +112,7 @@ if ('customElements' in window) {
 					select.add(none);
 					const options = opts.map(opt => {
 						const option = document.createElement('option');
-						option.textContent = `${opt.label} $${opt.amount.value}`;
+						option.textContent = `${opt.label} $${getPrice(opt.amount)}`;
 						option.value = opt.id;
 						option.selected = opt.selected;
 						return option;
