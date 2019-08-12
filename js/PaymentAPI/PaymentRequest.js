@@ -29,7 +29,13 @@ export default class PaymentRequestFallback extends EventTarget {
 			],
 		},
 	}], {
-		total           = {},
+		total           = {
+			label: 'Total',
+			amount: {
+				value: NaN,
+				currency: 'USD',
+			}
+		},
 		displayItems    = [],
 		shippingOptions = [],
 	} = {}, {
@@ -46,6 +52,7 @@ export default class PaymentRequestFallback extends EventTarget {
 			const dialog = document.createElement('dialog');
 			const form = document.createElement('form', {is: 'payment-form'});
 			form.displayItems = displayItems;
+			form.total = total;
 			form.shippingOptions = shippingOptions;
 			form.name = 'payment';
 			dialog.id = 'payment-dialog';

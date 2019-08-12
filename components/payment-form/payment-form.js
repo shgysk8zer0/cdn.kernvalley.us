@@ -8,6 +8,10 @@ function $(selector, base) {
 	return [...base.querySelectorAll(selector)];
 }
 
+function getPrice({value, currency = 'USD'}) {
+	return Intl.NumberFormat(navigator.language, {style: 'currency', currency}).format(value);
+}
+
 window.uuidv4 = uuidv4;
 
 if ('customElements' in window) {
@@ -87,12 +91,20 @@ if ('customElements' in window) {
 					const rows = items.map(item => {
 						const tr = tmp.cloneNode(true);
 						$('[data-field="label"]', tr).forEach(td => td.textContent = item.label);
-						$('[data-field="amount"]', tr).forEach(td => td.textContent = item.amount.value);
+						$('[data-field="amount"]', tr).forEach(td => td.textContent = getPrice(item.amount));
 						return tr;
 					});
 					table.tBodies.item(0).append(...rows);
 				});
 			}
+		}
+
+		set total({label = 'Total', amount}) {
+			console.info({label, amount});
+			this.ready.then(() => {
+				this.querySelector('.order-total-label').textContent = label;
+				this.querySelector('.order-total-amount').textContent = getPrice(amount);
+			});
 		}
 
 		set shippingOptions(opts) {
@@ -108,7 +120,7 @@ if ('customElements' in window) {
 					select.add(none);
 					const options = opts.map(opt => {
 						const option = document.createElement('option');
-						option.textContent = `${opt.label} $${opt.amount.value}`;
+						option.textContent = `${opt.label} ${getPrice(opt.amount)}`;
 						option.value = opt.id;
 						option.selected = opt.selected;
 						return option;
@@ -167,6 +179,7 @@ if ('customElements' in window) {
 				frag.append(...doc.body.children);
 				this.append(frag);
 				this.elements.requestId.value = uuidv4();
+				console.info({'form': this});
 				this.dispatchEvent(new Event('load'));
 			}
 		}
