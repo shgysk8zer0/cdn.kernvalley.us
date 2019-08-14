@@ -46,14 +46,29 @@
 					</div>
 				</fieldset>
 				<button type="submit" class="btn btn-accept" title="Submit">
-					<slot name="submit-btn">Submit</slot>
+					<slot name="submit-btn">
+						<svg class="current-color icon" viewBox="0 0 12 16">
+							<path fill-rule="evenodd" d="M12 5l-8 8-4-4 1.5-1.5L4 10l6.5-6.5L12 5z"/>
+						</svg>
+						<span>Submit</span>
+					</slot>
 				</button>
 				<button type="reset" class="btn btn-reject" title="Cancel">
-					<slot name="reset-btn">Cancel</slot>
+					<slot name="reset-btn">
+						<svg class="current-color icon" viewBox="0 0 12 16">
+							<path fill-rule="evenodd" d="M7.48 8l3.75 3.75-1.48 1.48L6 9.48l-3.75 3.75-1.48-1.48L4.52 8 .77 4.25l1.48-1.48L6 6.52l3.75-3.75 1.48 1.48L7.48 8z"/>
+						</svg>
+						<span>Cancel</span>
+					</slot>
 				</button>
 			</form>
-			<button type="button" is="login-button" class="btn btn-primary">
-				<slot name="login-btn">Login</slot>
+			<button type="button" is="login-button" class="btn btn-primary" title="Sign In">
+				<slot name="login-btn">
+					<svg class="current-color icon" viewBox="0 0 14 16">
+						<path fill-rule="evenodd" d="M7 6.75V12h4V8h1v4c0 .55-.45 1-1 1H7v3l-5.45-2.72c-.33-.17-.55-.52-.55-.91V1c0-.55.45-1 1-1h9c.55 0 1 .45 1 1v3h-1V1H3l4 2v2.25L10 3v2h4v2h-4v2L7 6.75z"></path>
+					</svg>
+					<span>Sign In</span>
+				</slot>
 			</button>
 		</dialog>
 	</body>

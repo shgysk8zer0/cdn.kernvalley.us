@@ -18,27 +18,55 @@
 						<img is="gravatar-img" alt="Gravatar" class="round shadow-dark" decoding="async" referrerpolicy="no-referrer" crossorigin="annonymous" sizes="10rem" hash="" />
 					</div>
 					<div>
-						<label for="username">
-							<slot name="username-label">Username</slot>
+						<label for="username" title="Email Address">
+							<slot name="username-label">
+								<svg class="current-color icon" viewBox="0 0 16 16">
+									<path d="M10.555 8.094C9.849 8.717 9.015 9 8 9c-1.016 0-1.853-.29-2.559-.914-1.109.363-2.436 1.288-2.437 2.902L3 14c0 .554.446 1 1 1h8c.554 0 1-.446 1-1v-3c0-1.387-1.102-2.556-2.445-2.906z"></path>
+									<path d="M11 5a3 3 0 1 1-6 0 3 3 0 1 1 6 0z" overflow="visible"></path>
+								</svg>
+							</slot>
 						</label>
 						<input type="email" name="username" id="username" placeholder="user@example.com" autocomplete="username" required="" />
 					</div>
 					<div>
-						<label for="password">
-							<slot name="password-label">Password</slot>
+						<label for="password" title="Password">
+							<svg class="current-color icon" viewBox="0 0 16 16">
+								<path d="M5 3C2.25 3 0 5.25 0 8s2.25 5 5 5c1.586 0 2.903-.845 3.813-2h5.593l.22-.75 1.03-4L15.97 5H8.813C7.903 3.845 6.586 3 5 3zm0 2c1.116 0 2.038.595 2.563 1.5l.312.5h5.531l-.53 2H7.874l-.312.5C7.038 10.405 6.116 11 5 11c-1.669 0-3-1.331-3-3s1.331-3 3-3z" overflow="visible"></path>
+								<path d="M14.498 8H9l-.563 2H14z" opacity=".35" overflow="visible"></path>
+								<path d="M5 8a1 1 0 1 1-2 0 1 1 0 1 1 2 0z" overflow="visible"></path>
+							</svg>
 						</label>
 						<input type="password" name="password" id="password" minlength="8" maxlength="72" autocomplete="current-password" placeholder="********" required="" />
 					</div>
 				</fieldset>
 				<button type="submit" class="btn btn-accept" title="Submit">
-					<slot name="submit-btn">Submit</slot>
+					<slot name="submit-btn">
+						<svg class="current-color icon" viewBox="0 0 12 16">
+							<path fill-rule="evenodd" d="M12 5l-8 8-4-4 1.5-1.5L4 10l6.5-6.5L12 5z"/>
+						</svg>
+						<span>Submit</span>
+					</slot>
 				</button>
 				<button type="reset" class="btn btn-reject" title="Cancel">
-					<slot name="reset-btn">Cancel</slot>
+					<slot name="reset-btn">
+						<svg class="current-color icon" viewBox="0 0 12 16">
+							<path fill-rule="evenodd" d="M7.48 8l3.75 3.75-1.48 1.48L6 9.48l-3.75 3.75-1.48-1.48L4.52 8 .77 4.25l1.48-1.48L6 6.52l3.75-3.75 1.48 1.48L7.48 8z"/>
+						</svg>
+						<span>Cancel</span>
+					</slot>
 				</button>
 			</form>
-			<button type="button" is="register-button" class="btn btn-primary">
-				<slot name="register-btn">Register</slot>
+			<button type="button" is="register-button" class="btn btn-primary" title="Register">
+				<slot name="register-btn">
+					<svg class="current-color icon" viewBox="0 0 16 16">
+						<g transform="translate(-261 -727)">
+							<path d="M269.55 735.09c-.705.624-1.54.906-2.555.906s-1.853-.29-2.558-.914c-1.11.363-2.436 1.288-2.438 2.902l-.004 3.012c0 .554.446 1 1 1h8c.554 0 1-.446 1-1v-3c0-1.387-1.102-2.556-2.445-2.906z"></path>
+							<circle cx="49.5" cy="342.5" r="2.5" transform="matrix(1.2 0 0 1.2 207.6 321)"></circle>
+							<path d="M273 728v1.997h-2v1.996h2v1.997h2v-1.997h2v-1.996h-2V728z"></path>
+						</g>
+					</svg>
+					<span>Register</span>
+				</slot>
 			</button>
 		</dialog>
 	</body>
