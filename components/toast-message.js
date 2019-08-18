@@ -1,6 +1,7 @@
 customElements.define('toast-message', class HTMLToastMessageElement extends HTMLElement {
 	constructor(message = null) {
 		super();
+		this.hidden = ! this.open;
 		this.attachShadow({mode: 'open'});
 
 		fetch(new URL('toast-message.html', import.meta.url)).then(async resp => {
