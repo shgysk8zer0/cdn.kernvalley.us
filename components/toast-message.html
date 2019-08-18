@@ -11,9 +11,8 @@
 				background: var(--toast-background, #fafafa);
 				color: var(--toast-color, #373737);
 				width: 800px;
-				left: 10vw;
-				max-width: 80vw;
-				max-height: 70vh;
+				max-width: 100vw;
+				max-height: var(--toast-max-height, 95vh);
 				overflow: auto;
 				padding: var(--toast-padding, 0.8rem);
 				border: var(--toast-border, none);
@@ -22,6 +21,12 @@
 				z-index: var(--toast-z-index, 100);
 				scrollbar-color: var(--toast-color, #373737) var(--toast-background, #fafafa);
 				scrollbar-width: thin;
+			}
+
+			@media(min-width: 800px) {
+				:host {
+					left: calc(50vw - 400px);
+				}
 			}
 
 			button {
@@ -51,12 +56,6 @@
 
 			.block {
 				display: block;
-			}
-
-			@media(min-width: 800px) {
-				:host {
-					left: calc(50vw - 400px);
-				}
 			}
 
 			#close-toast-button {
