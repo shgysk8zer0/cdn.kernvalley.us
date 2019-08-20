@@ -9,7 +9,7 @@
 	</head>
 	<body>
 		<toast-message id="login-dialog" hidden="">
-			<form>
+			<form slot="content">
 				<fieldset>
 					<legend>
 						<slot name="legend">Login</slot>
@@ -56,7 +56,7 @@
 					</slot>
 				</button>
 			</form>
-			<button type="button" is="register-button" class="btn btn-primary" title="Register">
+			<button type="button" is="register-button" class="btn btn-primary" title="Register" slot="content">
 				<slot name="register-btn">
 					<svg class="current-color icon" viewBox="0 0 16 16">
 						<g transform="translate(-261 -727)">
