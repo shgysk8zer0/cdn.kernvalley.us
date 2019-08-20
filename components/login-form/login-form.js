@@ -1,6 +1,9 @@
 import User from '/js/User.js';
 import '/components/gravatar-img.js';
 import '/components/toast-message.js';
+import '/components/register-button.js';
+import '/components/login-button.js';
+import '/components/logout-button.js';
 
 const templateHTML = new URL('./login-form.html', import.meta.url);
 
@@ -75,7 +78,11 @@ export default class HTMLLoginFormElement extends HTMLElement {
 
 	async login() {
 		await this.ready();
-		this.toast.show();
+		await this.toast.show();
+	}
+
+	async close() {
+		await this.toast.close();
 	}
 }
 

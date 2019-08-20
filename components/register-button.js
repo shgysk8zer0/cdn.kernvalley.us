@@ -8,7 +8,15 @@ export default class HTMLRegisterButton extends HTMLButtonElement {
 		this.hidden = User.loggedIn;
 		this.addEventListener('click', async () => {
 			await customElements.whenDefined('registration-form');
-			document.querySelector('registration-form').register();
+			const form = document.querySelector('registration-form');
+			if (form instanceof HTMLElement) {
+				await form.register();
+			} else {
+				const Login = customElements.get('registration-form');
+				const form = new Login();
+				document.body.append(form);
+				await form.register();
+			}
 		});
 	}
 }

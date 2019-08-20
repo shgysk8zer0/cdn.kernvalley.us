@@ -1,11 +1,18 @@
 import User from '/js/User.js';
+import '/components/toast-message.js';
+import '/components/register-button.js';
+import '/components/login-button.js';
+import '/components/logout-button.js';
+import '/components/login-form/login-form.js';
+
 const templateHTML = new URL('./registration-form.html', import.meta.url);
 
 export default class HTMLRegistrationFormElement extends HTMLElement {
 	constructor() {
 		super();
 		this.attachShadow({mode: 'open'});
-		fetch(templateHTML).then(async resp => {
+		customElements.whenDefined('toast-message').then(async () => {
+			const resp = await fetch(templateHTML);
 			if (resp.ok) {
 				const parser = new DOMParser();
 				const html = await resp.text();
@@ -14,7 +21,6 @@ export default class HTMLRegistrationFormElement extends HTMLElement {
 				container.append(...tmp.head.children, ...tmp.body.children);
 				this.shadowRoot.append(container);
 				const form = this.form;
-				container.classList.toggle('no-dialog', document.createElement('dialog') instanceof HTMLUnknownElement);
 
 				this.shadowRoot.querySelector('[is="login-button"]').addEventListener('click', () => {
 					this.close();
@@ -30,27 +36,27 @@ export default class HTMLRegistrationFormElement extends HTMLElement {
 
 					if (await User.register(data)) {
 						this.form.reset();
-						this.dialog.close();
+						this.toast.close();
 
 					}
 				});
 
-				form.addEventListener('reset', () => container.querySelector('dialog').close());
+				form.addEventListener('reset', () => this.toast.close());
 				this.dispatchEvent(new Event('ready'));
 			}
 		});
 	}
 
-	get dialog() {
+	get toast() {
 		if (this.shadowRoot.childElementCount === 0) {
 			throw new Error('Login form not yet ready');
 		} else {
-			return this.shadowRoot.querySelector('dialog');
+			return this.shadowRoot.querySelector('toast-message');
 		}
 	}
 
 	get form() {
-		return this.dialog.querySelector('form');
+		return this.toast.querySelector('form');
 	}
 
 	async ready() {
@@ -59,9 +65,13 @@ export default class HTMLRegistrationFormElement extends HTMLElement {
 		}
 	}
 
+	async close() {
+		await this.toast.close();
+	}
+
 	async register() {
 		await this.ready();
-		this.dialog.showModal();
+		await this.toast.show();
 	}
 }
 

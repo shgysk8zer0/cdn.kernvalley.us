@@ -14,7 +14,15 @@ export default class HTMLLoginButton extends HTMLButtonElement {
 		this.addEventListener('click', async () => {
 			await customElements.whenDefined('login-form');
 			if (! await User.loginWithCreds()) {
-				document.querySelector('login-form').login();
+				const form = document.querySelector('login-form');
+				if (form instanceof HTMLElement) {
+					await form.login();
+				} else {
+					const Login = customElements.get('login-form');
+					const form = new Login();
+					document.body.append(form);
+					await form.login();
+				}
 			}
 		});
 	}
