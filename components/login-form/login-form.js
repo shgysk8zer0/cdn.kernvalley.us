@@ -1,12 +1,20 @@
 import User from '/js/User.js';
 import '/components/gravatar-img.js';
+import '/components/toast-message.js';
+import '/components/register-button.js';
+import '/components/login-button.js';
+import '/components/logout-button.js';
+
 const templateHTML = new URL('./login-form.html', import.meta.url);
+
 export default class HTMLLoginFormElement extends HTMLElement {
 	constructor() {
 		super();
 		this.attachShadow({mode: 'open'});
 
-		fetch(templateHTML).then(async resp => {
+		customElements.whenDefined('toast-message').then(async () => {
+			const resp = await fetch(templateHTML);
+
 			if (resp.ok) {
 				const parser = new DOMParser();
 				const html = await resp.text();
@@ -22,7 +30,6 @@ export default class HTMLLoginFormElement extends HTMLElement {
 					passive: true,
 				});
 				const form = this.form;
-				container.classList.toggle('no-dialog', document.createElement('dialog') instanceof HTMLUnknownElement);
 
 				this.shadowRoot.querySelector('[is="register-button"]').addEventListener('click', () => {
 					this.close();
@@ -34,31 +41,33 @@ export default class HTMLLoginFormElement extends HTMLElement {
 					const data = new FormData(this.form);
 					const username = data.get('username');
 					const password = data.get('password');
+
 					if (await User.login({username, password, store: true})) {
 						this.form.reset();
-						this.dialog.close();
+						this.toast.close();
 					}
 				});
 
 				form.addEventListener('reset', () => {
-					container.querySelector('dialog').close();
+					this.toast.close();
 					this.shadowRoot.querySelector('[is="gravatar-img"]').hash = '';
 				});
 				this.dispatchEvent(new Event('ready'));
 			}
 		});
+
 	}
 
-	get dialog() {
+	get toast() {
 		if (this.shadowRoot.childElementCount === 0) {
 			throw new Error('Login form not yet ready');
 		} else {
-			return this.shadowRoot.querySelector('dialog');
+			return this.shadowRoot.querySelector('toast-message');
 		}
 	}
 
 	get form() {
-		return this.dialog.querySelector('form');
+		return this.toast.querySelector('form');
 	}
 
 	async ready() {
@@ -69,7 +78,11 @@ export default class HTMLLoginFormElement extends HTMLElement {
 
 	async login() {
 		await this.ready();
-		this.dialog.showModal();
+		await this.toast.show();
+	}
+
+	async close() {
+		await this.toast.close();
 	}
 }
 
