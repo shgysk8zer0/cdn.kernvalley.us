@@ -1,11 +1,11 @@
 {
-  "name": "cdn.chriszuber.com",
+  "name": "cdn.kernvalley.us",
   "version": "1.0.1",
   "private": true,
   "description": "Static assets for modern web development",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/shgysk8zer0/cdn.chriszuber.com.git"
+    "url": "git+https://github.com/shgysk8zer0/cdn.kernvalley.us.git"
   },
   "keywords": [
     "cdn",
@@ -16,10 +16,10 @@
     "custom elements"
   ],
   "author": "Chris Zuber <shgysk8zer0@gmail.com>",
-  "homepage": "https://github.com/shgysk8zer0/cdn.chriszuber.com#readme",
+  "homepage": "https://github.com/shgysk8zer0/cdn.kernvalley.us#readme",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/shgysk8zer0/cdn.chriszuber.com/issues"
+    "url": "https://github.com/shgysk8zer0/cdn.kernvalley.us/issues"
   },
   "config": {
     "serve": {

@@ -1,0 +1,16 @@
+# https://www.netlify.com/docs/netlify-toml-reference/
+[build]
+  base = "./"
+  publish = "./"
+  command = "npm run build"
+  [build.environment]
+    GIT_LFS_ENABLED = "1"
+[[headers]]
+  for="/*"
+  [headers.values]
+    Access-Control-Allow-Origin = "*"
+    X-Content-Type-Options = "nosniff"
+    Strict-Transport-Security = "max-age=31536000"
+# [[redirects]]
+  # from = ""
+  # to = ""
