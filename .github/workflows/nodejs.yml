@@ -16,7 +16,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      name: npm install, build, and test
     - uses: actions/checkout@v1
     - uses: actions/setup-node@v1
       with:
