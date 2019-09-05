@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+	<head>
+		<meta charset="utf-8" />
+		<style>
+			:host {
+				display: inline-block;
+			}
+
+			input[name="year"] {
+				width: 6ch;
+			}
+
+			select, input {
+				border: none;
+				background: none;
+				padding: 0.3rem;
+				font-size: 1.2rem;
+				border-bottom: 1px solid #343434;
+			}
+
+			.current-color {
+				fill: currentColor;
+			}
+
+			.icon, .icon * {
+				color: inherit;
+				max-width: 100%;
+				max-height: 100%;
+				width: var(--icon-size, 1em);
+				height: var(--icon-size, 1em);
+				vertical-align: middle;
+			}
+
+			button:not([hidden]), [role="button"]:not([hidden]), .btn:not([hidden]) {
+				padding: var(--button-padding, 0.3em);
+				background: var(--button-background, initial);
+				font-family: var(--button-font, inherit);
+				color: var(--button-color, initial);
+				border: var(--button-border, none);
+				border-radius: var(--button-border-radius, initial);
+				cursor: pointer;
+			}
+
+			.selected-day {
+				background-color: var(--calendar-accent-color, #343434);
+				color: #fafafa;
+			}
+
+			thead {
+				background-color: var(--calendar-accent-color, #343434);
+				color: var(--calendar-selected-color, #fafafa);
+			}
+
+			td.day > .date-content {
+				display: none;
+			}
+
+			td:not(.empty-cell), th {
+				padding: 0.1rem;
+				border: 1px solid var(--calendar-accent-color, #343434);
+				border-radius: 2px;
+			}
+
+			td:not(.empty-cell) {
+				cursor: pointer;
+				text-align: center;
+			}
+
+			hr {
+				color: var(--calendar-accent-color, #343434);
+			}
+		</style>
+	</head>
+	<body>
+		<header>
+			<button type="button" id="prev" title="Previous month">
+				<slot name="prev-icon">
+					<svg class="current-color icon" viewBox="0 0 8 16">
+						<path fill-rule="evenodd" d="M5.5 3L7 4.5 3.25 8 7 11.5 5.5 13l-5-5 5-5z"/>
+					</svg>
+				</slot>
+			</button>
+			<button type="button" id="today" title="Today">
+				<slot name="today-icon">
+					<svg class="current-color icon" viewBox="0 0 14 16">
+						<path fill-rule="evenodd" d="M13 2h-1v1.5c0 .28-.22.5-.5.5h-2c-.28 0-.5-.22-.5-.5V2H6v1.5c0 .28-.22.5-.5.5h-2c-.28 0-.5-.22-.5-.5V2H2c-.55 0-1 .45-1 1v11c0 .55.45 1 1 1h11c.55 0 1-.45 1-1V3c0-.55-.45-1-1-1zm0 12H2V5h11v9zM5 3H4V1h1v2zm6 0h-1V1h1v2zM6 7H5V6h1v1zm2 0H7V6h1v1zm2 0H9V6h1v1zm2 0h-1V6h1v1zM4 9H3V8h1v1zm2 0H5V8h1v1zm2 0H7V8h1v1zm2 0H9V8h1v1zm2 0h-1V8h1v1zm-8 2H3v-1h1v1zm2 0H5v-1h1v1zm2 0H7v-1h1v1zm2 0H9v-1h1v1zm2 0h-1v-1h1v1zm-8 2H3v-1h1v1zm2 0H5v-1h1v1zm2 0H7v-1h1v1zm2 0H9v-1h1v1z"/>
+					</svg>
+				</slot>
+			</button>
+			<select name="month">
+				<option value="1">January</option>
+				<option value="2">February</option>
+				<option value="3">March</option>
+				<option value="4">April</option>
+				<option value="5">May</option>
+				<option value="6">June</option>
+				<option value="7">July</option>
+				<option value="8">August</option>
+				<option value="9">September</option>
+				<option value="10">October</option>
+				<option value="11">November</option>
+				<option value="12">December</option>
+			</select>
+			<input type="number" name="year" placeholder="Year" required="" />
+			<button type="button" id="next" title="Next month">
+				<slot name="next-icon">
+					<svg class="current-color icon" viewBox="0 0 8 16">
+						<path fill-rule="evenodd" d="M7.5 8l-5 5L1 11.5 4.75 8 1 4.5 2.5 3l5 5z"/>
+					</svg>
+				</slot>
+			</button>
+			<hr />
+			<table>
+				<thead>
+					<tr>
+						<th><slot name="Sunday">Sun.</slot></th>
+						<th><slot name="Monday">Mon.</slot></th>
+						<th><slot name="Tuesday">Tue.</slot></th>
+						<th><slot name="Wednesday">Wed.</slot></th>
+						<th><slot name="Thursday">Thu.</slot></th>
+						<th><slot name="Friday">Fri.</slot></th>
+						<th><slot name="Saturday">Sat.</slot></th>
+					</tr>
+				</thead>
+				<tbody></tbody>
+			</table>
+		</header>
+	</body>
+</html>
