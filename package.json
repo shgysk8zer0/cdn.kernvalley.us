@@ -36,7 +36,7 @@
   },
   "scripts": {
     "preinstall": "git submodule update --init --recursive",
-    "start": "http-server ${npm_package_config_serve_path} -p ${npm_package_config_serve_port} -a ${npm_package_config_serve_domain} -o",
+    "start": "http-server ${npm_package_config_serve_path} -p ${npm_package_config_serve_port} -a ${npm_package_config_serve_domain}",
     "test": "npm run lint:js && npm run lint:css",
     "lint:css": "stylelint ${npm_package_config_dir_css}",
     "lint:js": "eslint ${npm_package_config_dir_js}",
