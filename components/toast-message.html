@@ -8,8 +8,8 @@
 				position: fixed;
 				height: var(--toast-height, auto);
 				bottom: calc(-1 * var(--toast-height, 8rem));
-				background: var(--toast-background, #fafafa);
-				color: var(--toast-color, #373737);
+				background: var(--toast-background, var(--primary-color, #fafafa));
+				color: var(--toast-color, var(--default-color, #373737));
 				width: 800px;
 				max-width: 100vw;
 				max-height: var(--toast-max-height, 95vh);
@@ -47,7 +47,7 @@
 			}
 
 			slot[name="close-icon"] {
-				color: var(--toast-color, #373737);
+				color: var(--toast-color, var(--default-color, #373737));
 			}
 
 			.center {
