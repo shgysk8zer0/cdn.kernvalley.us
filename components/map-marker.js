@@ -1,4 +1,4 @@
-import { marker, icon, Icon } from 'https://unpkg.com/leaflet@1.6.0/dist/leaflet-src.esm.js';
+import { marker, icon } from 'https://unpkg.com/leaflet@1.6.0/dist/leaflet-src.esm.js';
 
 export default class HTMLMapMarkerElement extends HTMLElement {
 	constructor({
