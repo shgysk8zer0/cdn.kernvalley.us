@@ -10,9 +10,13 @@ export default class HTMLMapMarkerElement extends HTMLElement {
 		super();
 		this.attachShadow({mode: 'open'});
 		const popup = document.createElement('slot');
+		const iconEl = document.createElement('slot');
+
 		popup.name = 'popup';
-		this.shadowRoot.append(popup);
+		iconEl.name = 'icon';
 		this.slot      = 'markers';
+
+		this.shadowRoot.append(popup, iconEl);
 
 		if (! Number.isNaN(longitude)) {
 			this.longitude = longitude;
@@ -64,21 +68,26 @@ export default class HTMLMapMarkerElement extends HTMLElement {
 		}
 	}
 
-	get icon() {
-		if (this.hasAttribute('icon')) {
-			return icon({
-				iconUrl: new URL(this.getAttribute('icon'), document.baseURI).href,
-			});
-		} else {
-			return Icon.Default;
-		}
+	get iconImg() {
+		const slot = this.shadowRoot.querySelector('slot[name="icon"]');
+		const nodes = slot.assignedNodes();
+		return nodes.length === 1 ? nodes[0] : null;
 	}
 
-	set icon(val) {
+	set iconImg(val) {
+		const current = this.iconImg;
+		if (current instanceof HTMLImageElement) {
+			current.remove();
+		}
+
 		if (typeof val === 'string' && val !== '') {
-			this.setAttribute('icon', val);
-		} else {
-			this.removeAttribute('icon');
+			const img = document.createElememnt('img');
+			img.src = val;
+			img.slot = 'icon';
+			this.append(img);
+		} else if (val instanceof HTMLImageElement) {
+			val.slot = 'icon';
+			this.append(val);
 		}
 	}
 
@@ -100,8 +109,20 @@ export default class HTMLMapMarkerElement extends HTMLElement {
 	}
 
 	make() {
-		const {latitude, longitude, title, icon, popup} = this;
-		const m = marker([latitude, longitude], {title, icon});
+		const {latitude, longitude, title, iconImg, popup} = this;
+		let m;
+
+		if (iconImg instanceof HTMLImageElement) {
+			const icn = {
+				iconUrl: iconImg.src,
+				iconSize: [iconImg.height || 32, iconImg.width || 32],
+			};
+			console.info(icn);
+			m = marker([latitude, longitude], {title, icon: icon(icn)});
+		} else {
+			m = marker([latitude, longitude], {title});
+		}
+
 		if (popup instanceof HTMLElement) {
 			m.bindPopup(popup);
 		}
