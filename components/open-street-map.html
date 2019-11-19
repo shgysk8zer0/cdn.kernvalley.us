@@ -1,0 +1,35 @@
+<!DOCTYPE HTML>
+<html lang="en" dir="ltr">
+	<head>
+		<meta charset="utf-8" />
+		<link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css"
+				integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="
+				crossorigin=""/>
+		<style>
+			:host {
+					display: block;
+				}
+
+				* {
+					box-sizing: border-box;
+				}
+
+				#map-fallback, ::slotted([slot="map"]) {
+					height: var(--map-height, 400px);
+					width: var(--map-width, 600px);
+				}
+
+				::slotted([slot="markers"]), ::slotted([slot="attribution"]), slot[name="attribution"] {
+					display: none;
+				}
+		</style>
+	</head>
+	<body>
+		<slot name="map">
+			<div id="map-fallback"></div>
+		</slot>
+		<slot name="attribution">
+			<span>&copy; OpenStreetMap contributors | <a href="www.openstreetmap.org/copyright" rel="noopener external">License</a></span>
+		<slot name="markers"></slot>
+	</body>
+</html>
