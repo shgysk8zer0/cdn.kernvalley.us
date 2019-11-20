@@ -113,12 +113,10 @@ export default class HTMLMapMarkerElement extends HTMLElement {
 		let m;
 
 		if (iconImg instanceof HTMLImageElement) {
-			const icn = {
+			m = marker([latitude, longitude], {title, icon: icon({
 				iconUrl: iconImg.src,
 				iconSize: [iconImg.height || 32, iconImg.width || 32],
-			};
-			console.info(icn);
-			m = marker([latitude, longitude], {title, icon: icon(icn)});
+			})});
 		} else {
 			m = marker([latitude, longitude], {title});
 		}
