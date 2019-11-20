@@ -71,12 +71,12 @@ export default class HTMLOpenStreetMapElement extends HTMLElement {
 		return new Promise(async resolve => {
 			if (this.shadowRoot.childElementCount === 0) {
 				this.addEventListener('ready', () => {
-					this.map.whenReady(() => resolve());
+					this.map.whenReady(() => resolve(this));
 				}, {
 					once: true
 				});
 			} else {
-				resolve();
+				resolve(this);
 			}
 		});
 	}
@@ -94,6 +94,45 @@ export default class HTMLOpenStreetMapElement extends HTMLElement {
 		}
 	}
 
+	get minZoom() {
+		return parseInt(this.getAttribute('minzoom')) || 1;
+	}
+
+	set minZoom(val) {
+		this.setAttribute('minzoom', val);
+	}
+
+	get maxZoom() {
+		return parseInt(this.getAttribute('maxzoom')) || 20;
+	}
+
+	set maxZoom(val) {
+		this.setAttribute('minzoom', val);
+	}
+
+	get center() {
+		if (this.hasAttribute('center')) {
+			const [latitude, longitude] = this.getAttribute('center').split(',');
+			return {
+				latitude: parseFloat(latitude),
+				longitude: parseFloat(longitude),
+			};
+		} else {
+			return {
+				latitude: NaN,
+				longitude: NaN,
+			};
+		}
+	}
+
+	set center({latitude, longitude}) {
+		if (typeof latitude === 'number' && typeof longitude === 'number') {
+			this.setAttribute('center', `${latitude},${longitude}`);
+		} else {
+			throw new Error('{latitude, longitude} must be numbers');
+		}
+	}
+
 	get zoomControl() {
 		return this.hasAttribute('zoom-control');
 	}
@@ -103,7 +142,17 @@ export default class HTMLOpenStreetMapElement extends HTMLElement {
 	}
 
 	get tileSrc() {
-		return this.getAttribute('tilesrc') || '//{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+		if (this.hasAttribute('tilesrc')) {
+			const url = new URL(this.getAttribute('tilesrc'));
+
+			if (url.searchParams.has('token')) {
+				url.searchParams.set('token', this.token);
+			}
+
+			return url.href;
+		} else {
+			return 'https://maps.wikimedia.org/osm-intl/{z}/{x}/{y}{r}.png';
+		}
 	}
 
 	get attribution() {
@@ -218,42 +267,39 @@ export default class HTMLOpenStreetMapElement extends HTMLElement {
 			zoomControl: this.zoomControl,
 		});
 
-		const { latitude, longitude } = await this.hasGeoPermission()
-			? await this.coords
-			: { latitude: 37.217206113254996, longitude: -119.33898925781251 };
+		const { latitude, longitude } = this.center;
 
-		map.setView([latitude, longitude], 7);
+		if (! Number.isNaN(latitude) && ! Number.isNaN(longitude)) {
+			map.setView([latitude, longitude], this.zoom);
+		} else if (await this.hasGeoPermission()) {
+			const { latitude, longitude } = await this.coords;
+			map.setView([latitude, longitude], this.zoom);
+		} else {
+			map.setView([33.811137945997444, -117.91675329208375], this.zoom);
+		}
 
-		// this.layers.setMap(map);
-		// this.markers.setMap(map);
 		Leaflet.tileLayer(this.tileSrc, {
 			attribution: this.attribution,
-			maxZoon: 20,
-			minZoom: 0,
+			minZoom: this.minZoom,
+			maxZoom: this.maxZoom,
 			label: 'OpenStreetMap',
 		}).addTo(map);
 
-		// this.markers.add({
-		// 	coords: [latitude, longitude],
-		// 	options: {
-		// 		title: 'Center',
-		// 		icon: marker,
-		// 	}
-		// });
-
 		this.dispatchEvent(new Event('ready'));
-	}
-
-	async connectedCallback() {
-		this.addEventListener('click', this.init, { once: true });
 	}
 
 	async attributeChangedCallback(name) {
 		switch (name) {
 		case 'zoom':
-			if (map !== null) {
+			this.ready.then(() => {
 				map.setZoom(this.zoom);
-			}
+			});
+			break;
+
+		case 'center':
+			this.ready.then(() => {
+				this.setCenter(this.center);
+			});
 			break;
 
 		default:
@@ -264,6 +310,7 @@ export default class HTMLOpenStreetMapElement extends HTMLElement {
 	static get observedAttributes() {
 		return [
 			'zoom',
+			'center',
 		];
 	}
 }
