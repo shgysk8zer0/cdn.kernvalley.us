@@ -11,7 +11,7 @@ export default class HTMLMapMarkerElement extends HTMLElement {
 	} = {}) {
 		super();
 		this._map = null;
-		this.attachShadow({mode: 'open'});
+		this._shadow = this.attachShadow({mode: 'closed'});
 		const popup = document.createElement('slot');
 		const iconEl = document.createElement('slot');
 
@@ -19,7 +19,7 @@ export default class HTMLMapMarkerElement extends HTMLElement {
 		iconEl.name = 'icon';
 		this.slot   = 'markers';
 
-		this.shadowRoot.append(popup, iconEl);
+		this._shadow.append(popup, iconEl);
 
 		if (! Number.isNaN(longitude)) {
 			this.longitude = longitude;
@@ -97,7 +97,7 @@ export default class HTMLMapMarkerElement extends HTMLElement {
 	}
 
 	get iconImg() {
-		const slot = this.shadowRoot.querySelector('slot[name="icon"]');
+		const slot = this._shadow.querySelector('slot[name="icon"]');
 		const nodes = slot.assignedNodes();
 		return nodes.length === 1 ? nodes[0] : null;
 	}
@@ -120,7 +120,7 @@ export default class HTMLMapMarkerElement extends HTMLElement {
 	}
 
 	get popup() {
-		const slot = this.shadowRoot.querySelector('slot[name="popup"]');
+		const slot = this._shadow.querySelector('slot[name="popup"]');
 		const nodes = slot.assignedNodes();
 		return nodes.length === 1 ? nodes[0] : null;
 	}

@@ -1,11 +1,13 @@
 // @TODO Only import what is needed from Leaflet
 import * as Leaflet from 'https://unpkg.com/leaflet@1.6.0/dist/leaflet-src.esm.js';
 import HTMLMapMarkerElement from './map-marker.js';
+import HTMLImageOverlayElement from './image-overlay.js';
 import { getLocation } from '../js/std-js/functions.js';
 
 let map = null;
 
 customElements.define(HTMLMapMarkerElement.tagName, HTMLMapMarkerElement);
+customElements.define(HTMLImageOverlayElement.tagName, HTMLImageOverlayElement);
 
 /**
  * @see https://leafletjs.com/reference-1.5.0.html#map-factory
@@ -13,21 +15,21 @@ customElements.define(HTMLMapMarkerElement.tagName, HTMLMapMarkerElement);
 export default class HTMLOpenStreetMapElement extends HTMLElement {
 	constructor() {
 		super();
-		this.attachShadow({ mode: 'open' });
+		this._shadow = this.attachShadow({ mode: 'open' });
 
 		Promise.resolve().then(async () => {
 			const resp = await fetch(new URL('open-street-map.html', import.meta.url));
 			const html = await resp.text();
 			const parser = new DOMParser();
 			const doc = parser.parseFromString(html, 'text/html');
-			this.shadowRoot.append(...doc.head.children, ...doc.body.children);
+			this._shadow.append(...doc.head.children, ...doc.body.children);
 			await this.init();
 		});
 	}
 
 	get ready() {
 		return new Promise(async resolve => {
-			if (this.shadowRoot.childElementCount === 0) {
+			if (this._shadow.childElementCount === 0) {
 				this.addEventListener('ready', () => {
 					this.map.whenReady(() => resolve(this));
 				}, {
@@ -114,7 +116,7 @@ export default class HTMLOpenStreetMapElement extends HTMLElement {
 	}
 
 	get attribution() {
-		const slot = this.shadowRoot.querySelector('slot[name="attribution"]');
+		const slot = this._shadow.querySelector('slot[name="attribution"]');
 		const nodes = slot.assignedNodes();
 
 		if (nodes.length === 1) {
@@ -132,13 +134,13 @@ export default class HTMLOpenStreetMapElement extends HTMLElement {
 	}
 
 	get mapElement() {
-		const slot = this.shadowRoot.querySelector('slot[name="map"]');
+		const slot = this._shadow.querySelector('slot[name="map"]');
 		const nodes = slot.assignedNodes();
 		return nodes.length === 1 ? nodes[0] : slot.firstElementChild;
 	}
 
 	set mapElement(el) {
-		const slot = this.shadowRoot.querySelector('slot[name="map"]');
+		const slot = this._shadow.querySelector('slot[name="map"]');
 		slot.assignedNodes().forEach(el => el.remove());
 		el.slot = 'map';
 		this.append(el);
@@ -179,13 +181,22 @@ export default class HTMLOpenStreetMapElement extends HTMLElement {
 		return map;
 	}
 
-	get layers() {
-		return [];
-		// return layers;
+	get overlays() {
+		if (this._shadow.childElementCount === 0) {
+			return [];
+		} else {
+			const slot = this._shadow.querySelector('slot[name="overlays"]');
+			return slot.assignedNodes();
+		}
 	}
 
 	get markers() {
-		return this.shadowRoot.querySelector('slot[name="markers"]').assignedNodes();
+		if (this._shadow.childElementCount === 0) {
+			return [];
+		} else {
+			const slot = this._shadow.querySelector('slot[name="markers"]');
+			return slot.assignedNodes();
+		}
 	}
 
 	get token() {
