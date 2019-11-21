@@ -17,7 +17,8 @@
 				width: var(--map-width, 600px);
 			}
 
-			::slotted([slot="markers"]), ::slotted([slot="attribution"]), ::slotted([slot="icon"]), slot[name="attribution"] {
+			::slotted([slot="markers"]), ::slotted([slot="attribution"]),
+			::slotted([slot="icon"]), slot[name="attribution"], ::slotted([slot="overlays"]) {
 				display: none;
 			}
 		</style>
@@ -30,5 +31,6 @@
 			<a href="https://wikimediafoundation.org/wiki/Maps_Terms_of_Use">Wikimedia</a>
 		</slot>
 		<slot name="markers"></slot>
+		<slot name="overlays"></slot>
 	</body>
 </html>

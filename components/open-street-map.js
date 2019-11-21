@@ -1,11 +1,13 @@
 // @TODO Only import what is needed from Leaflet
 import * as Leaflet from 'https://unpkg.com/leaflet@1.6.0/dist/leaflet-src.esm.js';
 import HTMLMapMarkerElement from './map-marker.js';
+import HTMLImageOverlayElement from './image-overlay.js';
 import { getLocation } from '../js/std-js/functions.js';
 
 let map = null;
 
 customElements.define(HTMLMapMarkerElement.tagName, HTMLMapMarkerElement);
+customElements.define(HTMLImageOverlayElement.tagName, HTMLImageOverlayElement);
 
 /**
  * @see https://leafletjs.com/reference-1.5.0.html#map-factory
@@ -13,63 +15,21 @@ customElements.define(HTMLMapMarkerElement.tagName, HTMLMapMarkerElement);
 export default class HTMLOpenStreetMapElement extends HTMLElement {
 	constructor() {
 		super();
-		this.attachShadow({ mode: 'open' });
-		this._markers = new Map();
-
-		const observer = new MutationObserver(mutations => {
-			mutations.forEach(mutation => {
-				switch(mutation.type) {
-				case 'childList':
-					this.ready.then(async () => {
-						mutation.addedNodes.forEach( el => {
-							if (el.make instanceof Function) {
-								const marker = el.make();
-								this._markers.set(el, marker);
-								marker.addTo(map);
-							}
-						});
-
-						mutation.removedNodes.forEach(el => {
-							const marker = this._markers.get(el);
-							if (marker !== undefined) {
-								marker.remove();
-								this._markers.delete(el);
-							}
-						});
-					});
-					break;
-
-				default:
-					console.error(`Unhandled mutation type: ${mutation.type}`);
-				}
-			});
-		});
-
-		observer.observe(this, {
-			childList: true,
-		});
+		this._shadow = this.attachShadow({ mode: 'open' });
 
 		Promise.resolve().then(async () => {
 			const resp = await fetch(new URL('open-street-map.html', import.meta.url));
 			const html = await resp.text();
 			const parser = new DOMParser();
 			const doc = parser.parseFromString(html, 'text/html');
-			this.shadowRoot.append(...doc.head.children, ...doc.body.children);
+			this._shadow.append(...doc.head.children, ...doc.body.children);
 			await this.init();
-
-			this.markers.forEach(el => {
-				if (el.make instanceof Function) {
-					const marker = el.make();
-					this._markers.set(el, marker);
-					marker.addTo(map);
-				}
-			});
 		});
 	}
 
 	get ready() {
 		return new Promise(async resolve => {
-			if (this.shadowRoot.childElementCount === 0) {
+			if (this._shadow.childElementCount === 0) {
 				this.addEventListener('ready', () => {
 					this.map.whenReady(() => resolve(this));
 				}, {
@@ -134,11 +94,11 @@ export default class HTMLOpenStreetMapElement extends HTMLElement {
 	}
 
 	get zoomControl() {
-		return this.hasAttribute('zoom-control');
+		return this.hasAttribute('zoomcontrol');
 	}
 
 	set zoomControl(val) {
-		this.toggleAttribute('zoom-control', val);
+		this.toggleAttribute('zoomcontrol', val);
 	}
 
 	get tileSrc() {
@@ -156,7 +116,7 @@ export default class HTMLOpenStreetMapElement extends HTMLElement {
 	}
 
 	get attribution() {
-		const slot = this.shadowRoot.querySelector('slot[name="attribution"]');
+		const slot = this._shadow.querySelector('slot[name="attribution"]');
 		const nodes = slot.assignedNodes();
 
 		if (nodes.length === 1) {
@@ -174,13 +134,13 @@ export default class HTMLOpenStreetMapElement extends HTMLElement {
 	}
 
 	get mapElement() {
-		const slot = this.shadowRoot.querySelector('slot[name="map"]');
+		const slot = this._shadow.querySelector('slot[name="map"]');
 		const nodes = slot.assignedNodes();
 		return nodes.length === 1 ? nodes[0] : slot.firstElementChild;
 	}
 
 	set mapElement(el) {
-		const slot = this.shadowRoot.querySelector('slot[name="map"]');
+		const slot = this._shadow.querySelector('slot[name="map"]');
 		slot.assignedNodes().forEach(el => el.remove());
 		el.slot = 'map';
 		this.append(el);
@@ -221,13 +181,22 @@ export default class HTMLOpenStreetMapElement extends HTMLElement {
 		return map;
 	}
 
-	get layers() {
-		return [];
-		// return layers;
+	get overlays() {
+		if (this._shadow.childElementCount === 0) {
+			return [];
+		} else {
+			const slot = this._shadow.querySelector('slot[name="overlays"]');
+			return slot.assignedNodes();
+		}
 	}
 
 	get markers() {
-		return this.shadowRoot.querySelector('slot[name="markers"]').assignedNodes();
+		if (this._shadow.childElementCount === 0) {
+			return [];
+		} else {
+			const slot = this._shadow.querySelector('slot[name="markers"]');
+			return slot.assignedNodes();
+		}
 	}
 
 	get token() {
@@ -262,6 +231,44 @@ export default class HTMLOpenStreetMapElement extends HTMLElement {
 		return 'open-street-map';
 	}
 
+	async filterMarkers(callback) {
+		await this.ready;
+		if (callback instanceof Function) {
+			return this.markers.filter(callback);
+		}
+	}
+
+	async findMarker(callback) {
+		await this.ready;
+
+		if (callback instanceof Function) {
+			return this.markers.find(callback);
+		} else {
+			throw new Error('`findMarker` accepts a callback');
+		}
+	}
+
+	async hideMarkers() {
+		await this.ready;
+		const markers = this.markers;
+		markers.forEach(el => el.hidden = true);
+		return markers;
+	}
+
+	async showMarkers() {
+		await this.ready;
+		const markers = this.markers;
+		markers.forEach(el => el.hidden = false);
+		return markers;
+	}
+
+	async clearMarkers() {
+		await this.ready;
+		const markers = this.markers;
+		markers.forEach(el => el.remove());
+		return markers;
+	}
+
 	async init() {
 		map = Leaflet.map(this.mapElement, {
 			zoomControl: this.zoomControl,
@@ -275,6 +282,7 @@ export default class HTMLOpenStreetMapElement extends HTMLElement {
 			const { latitude, longitude } = await this.coords;
 			map.setView([latitude, longitude], this.zoom);
 		} else {
+			// It's Disneyland
 			map.setView([33.811137945997444, -117.91675329208375], this.zoom);
 		}
 
@@ -291,15 +299,11 @@ export default class HTMLOpenStreetMapElement extends HTMLElement {
 	async attributeChangedCallback(name) {
 		switch (name) {
 		case 'zoom':
-			this.ready.then(() => {
-				map.setZoom(this.zoom);
-			});
+			this.ready.then(() => this.map.setZoom(this.zoom));
 			break;
 
 		case 'center':
-			this.ready.then(() => {
-				this.setCenter(this.center);
-			});
+			this.ready.then(() => this.setCenter(this.center));
 			break;
 
 		default:
