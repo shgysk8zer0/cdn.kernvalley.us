@@ -4,11 +4,53 @@
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width" />
 		<link rel="icon" href="https://kernvalley.us/favicon.ico" />
+		<style>
+			:root {
+				--map-height: 100vh;
+				--map-width: 100vw;
+				margin: 0;
+				padding: 0;
+			}
+
+			body {
+				margin: 0;
+				padding: 0;
+			}
+		</style>
+		<script type="module">
+			import OpenStreetMapElement from '/components/open-street-map.js';
+			import '/components/bacon-ipsum.js';
+
+			customElements.define(OpenStreetMapElement.tagName, OpenStreetMapElement);
+		</script>
 		<title>KernValley.us | CDN</title>
 	</head>
 	<body>
-		<p>This is the <abbr title="Content Delivery Network">CDN</abbr> for <a href="https://kernvalley.us">KernValley.us</a></p>
-		<blockquote>
+		<p hidden="">This is the <abbr title="Content Delivery Network">CDN</abbr> for <a href="https://kernvalley.us">KernValley.us</a></p>
+		<open-street-map center="35.756003,-118.4206114" zoom="15" zoomcontrol>
+			<map-marker slot="markers" longitude="-118.4206114" latitude="35.756003" title="Kernville Cowork" itemtype="https://schema.org/Organization" itemscope="">
+				<img src="/img/octicons/organization.svg" width="32" height="32" slot="icon" />
+				<div slot="popup">
+					<h4 itemprop="name">Kernville Cowork</h4>
+					<img itemprop="image" src="https://lh5.googleusercontent.com/p/AF1QipMxQJcb7_090Gkke0WPu92xeXgl_zdLS9XtC8BI=w203-h152-k-no" crossorigin="anonymous" />
+					<hr />
+					<address itemprop="address" itemtype="https://schema.org/PostalAddress" itemscope="">
+						<div itemprop="streetAddress">21 Sierra Dr.</div>
+						<div itemprop="postOfficeBoxNumber">Box 1417</div>
+						<div>
+							<span itemprop="addressRegion">Kernville</span>,
+							<span itemprop="addressLocality">CA</span>
+							<span itemprop="postalCode">93238</span>
+						</div>
+					</address>
+					<blockquote itemprop="description">Kernville Cowork's vision is to: * Create a community for collaboration, innovation, and continuous learning * Create a pathway for local students to become interested and get involved with careers in technology that they can utilize while staying in the valley * Create a destination for skilled distributed workers that have a desire to live and work in a small thriving community with access to outdoor adventure.</blockquote>
+					<a itemprop="url" href="https://kernvillecowork.com/en" rel="noopener external">Website</a>
+					<br />
+					<a itemprop="telephone" href="tel:+1-760-549-0423">760 549-0423</a>
+				</div>
+			</map-marker>
+		</open-street-map>
+		<blockquote hidden="">
 			This site is not intended for regular browsing. Rather, its resources
 			<i>(JavaScript, Stylesheets, Images, &amp; Fonts)</i> are shared and accessible
 			on a number of different sites.

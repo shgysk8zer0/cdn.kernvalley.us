@@ -1,4 +1,6 @@
 import { marker, icon } from 'https://unpkg.com/leaflet@1.6.0/dist/leaflet-src.esm.js';
+const map = new Map();
+window.markerMap = map;
 
 export default class HTMLMapMarkerElement extends HTMLElement {
 	constructor({
@@ -8,13 +10,14 @@ export default class HTMLMapMarkerElement extends HTMLElement {
 		title     = null,
 	} = {}) {
 		super();
+		this._map = null;
 		this.attachShadow({mode: 'open'});
 		const popup = document.createElement('slot');
 		const iconEl = document.createElement('slot');
 
 		popup.name = 'popup';
 		iconEl.name = 'icon';
-		this.slot      = 'markers';
+		this.slot   = 'markers';
 
 		this.shadowRoot.append(popup, iconEl);
 
@@ -32,6 +35,31 @@ export default class HTMLMapMarkerElement extends HTMLElement {
 
 		if (typeof icon === 'string') {
 			this.icon = icon;
+		}
+	}
+
+	async connectedCallback() {
+		if (this.parentElement.tagName === 'OPEN-STREET-MAP') {
+			this._map = this.parentElement;
+
+			if (! map.has(this)) {
+				map.set(this, await this._make());
+			}
+
+			if (! this.hidden) {
+				await this._map.ready;
+				map.get(this).addTo(this._map.map);
+			}
+		}
+	}
+
+	async disconnectedCallback() {
+		if (this._map instanceof HTMLElement) {
+			await this._map.ready;
+			const marker = map.get(this);
+			marker.remove();
+			map.delete(this);
+			this._map = null;
 		}
 	}
 
@@ -108,7 +136,7 @@ export default class HTMLMapMarkerElement extends HTMLElement {
 		}
 	}
 
-	make() {
+	_make() {
 		const {latitude, longitude, title, iconImg, popup} = this;
 		let m;
 
@@ -126,6 +154,30 @@ export default class HTMLMapMarkerElement extends HTMLElement {
 		}
 
 		return m;
+	}
+
+	attributeChangedCallback(name) {
+		const marker = map.get(this);
+		if (marker) {
+			switch(name) {
+			case 'hidden':
+				if (this.hidden) {
+					marker.remove();
+				} else if (this._map instanceof HTMLElement) {
+					this._map.ready.then(el => marker.addTo(el.map));
+				}
+				break;
+
+			default:
+				throw new Error(`Unhandled attribute changed: ${name}`);
+			}
+		}
+	}
+
+	static get observedAttributes() {
+		return [
+			'hidden',
+		];
 	}
 
 	static get tagName() {

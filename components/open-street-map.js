@@ -14,40 +14,6 @@ export default class HTMLOpenStreetMapElement extends HTMLElement {
 	constructor() {
 		super();
 		this.attachShadow({ mode: 'open' });
-		this._markers = new Map();
-
-		const observer = new MutationObserver(mutations => {
-			mutations.forEach(mutation => {
-				switch(mutation.type) {
-				case 'childList':
-					this.ready.then(async () => {
-						mutation.addedNodes.forEach( el => {
-							if (el.make instanceof Function) {
-								const marker = el.make();
-								this._markers.set(el, marker);
-								marker.addTo(map);
-							}
-						});
-
-						mutation.removedNodes.forEach(el => {
-							const marker = this._markers.get(el);
-							if (marker !== undefined) {
-								marker.remove();
-								this._markers.delete(el);
-							}
-						});
-					});
-					break;
-
-				default:
-					console.error(`Unhandled mutation type: ${mutation.type}`);
-				}
-			});
-		});
-
-		observer.observe(this, {
-			childList: true,
-		});
 
 		Promise.resolve().then(async () => {
 			const resp = await fetch(new URL('open-street-map.html', import.meta.url));
@@ -56,14 +22,6 @@ export default class HTMLOpenStreetMapElement extends HTMLElement {
 			const doc = parser.parseFromString(html, 'text/html');
 			this.shadowRoot.append(...doc.head.children, ...doc.body.children);
 			await this.init();
-
-			this.markers.forEach(el => {
-				if (el.make instanceof Function) {
-					const marker = el.make();
-					this._markers.set(el, marker);
-					marker.addTo(map);
-				}
-			});
 		});
 	}
 
@@ -134,11 +92,11 @@ export default class HTMLOpenStreetMapElement extends HTMLElement {
 	}
 
 	get zoomControl() {
-		return this.hasAttribute('zoom-control');
+		return this.hasAttribute('zoomcontrol');
 	}
 
 	set zoomControl(val) {
-		this.toggleAttribute('zoom-control', val);
+		this.toggleAttribute('zoomcontrol', val);
 	}
 
 	get tileSrc() {
@@ -262,6 +220,44 @@ export default class HTMLOpenStreetMapElement extends HTMLElement {
 		return 'open-street-map';
 	}
 
+	async filterMarkers(callback) {
+		await this.ready;
+		if (callback instanceof Function) {
+			return this.markers.filter(callback);
+		}
+	}
+
+	async findMarker(callback) {
+		await this.ready;
+
+		if (callback instanceof Function) {
+			return this.markers.find(callback);
+		} else {
+			throw new Error('`findMarker` accepts a callback');
+		}
+	}
+
+	async hideMarkers() {
+		await this.ready;
+		const markers = this.markers;
+		markers.forEach(el => el.hidden = true);
+		return markers;
+	}
+
+	async showMarkers() {
+		await this.ready;
+		const markers = this.markers;
+		markers.forEach(el => el.hidden = false);
+		return markers;
+	}
+
+	async clearMarkers() {
+		await this.ready;
+		const markers = this.markers;
+		markers.forEach(el => el.remove());
+		return markers;
+	}
+
 	async init() {
 		map = Leaflet.map(this.mapElement, {
 			zoomControl: this.zoomControl,
@@ -275,6 +271,7 @@ export default class HTMLOpenStreetMapElement extends HTMLElement {
 			const { latitude, longitude } = await this.coords;
 			map.setView([latitude, longitude], this.zoom);
 		} else {
+			// It's Disneyland
 			map.setView([33.811137945997444, -117.91675329208375], this.zoom);
 		}
 
@@ -291,15 +288,11 @@ export default class HTMLOpenStreetMapElement extends HTMLElement {
 	async attributeChangedCallback(name) {
 		switch (name) {
 		case 'zoom':
-			this.ready.then(() => {
-				map.setZoom(this.zoom);
-			});
+			this.ready.then(() => this.map.setZoom(this.zoom));
 			break;
 
 		case 'center':
-			this.ready.then(() => {
-				this.setCenter(this.center);
-			});
+			this.ready.then(() => this.setCenter(this.center));
 			break;
 
 		default:
