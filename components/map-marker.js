@@ -188,12 +188,16 @@ export default class HTMLMapMarkerElement extends HTMLElement {
 				if (this._map instanceof HTMLElement) {
 					this._map.ready.then(() => {
 						const marker = map.get(this);
-						if (this.open && ! marker.isPopupOpen()) {
+						const open = this.open;
+						const isOpen = marker.isPopupOpen();
+
+						if (open && ! isOpen) {
 							marker.openPopup();
-						} else if (! this.open && marker.isPopupOpen()) {
+						} else if (! open && isOpen) {
 							marker.closePopup();
 						}
-						this.dispatchEvent(new Event(this.open ? 'open' : 'close'));
+
+						this.dispatchEvent(new Event(open ? 'open' : 'close'));
 					});
 				}
 				break;
