@@ -1,6 +1,5 @@
 import { marker, icon } from 'https://unpkg.com/leaflet@1.6.0/dist/leaflet-src.esm.js';
 const map = new Map();
-window.markerMap = map;
 
 export default class HTMLMapMarkerElement extends HTMLElement {
 	constructor({
@@ -41,6 +40,7 @@ export default class HTMLMapMarkerElement extends HTMLElement {
 	async connectedCallback() {
 		if (this.parentElement.tagName === 'OPEN-STREET-MAP') {
 			this._map = this.parentElement;
+			await this._map.ready;
 
 			if (! map.has(this)) {
 				map.set(this, await this._make());
@@ -48,7 +48,12 @@ export default class HTMLMapMarkerElement extends HTMLElement {
 
 			if (! this.hidden) {
 				await this._map.ready;
-				map.get(this).addTo(this._map.map);
+				const marker = map.get(this);
+				marker.addTo(this._map.map);
+
+				if (this.open) {
+					setTimeout(() => marker.openPopup(), 500);
+				}
 			}
 		}
 	}
@@ -136,6 +141,14 @@ export default class HTMLMapMarkerElement extends HTMLElement {
 		}
 	}
 
+	get open() {
+		return this.hasAttribute('open');
+	}
+
+	set open(val) {
+		this.toggleAttribute('open', val);
+	}
+
 	_make() {
 		const {latitude, longitude, title, iconImg, popup} = this;
 		let m;
@@ -151,12 +164,15 @@ export default class HTMLMapMarkerElement extends HTMLElement {
 
 		if (popup instanceof HTMLElement) {
 			m.bindPopup(popup);
+			m.on('popupopen', () => this.open = true);
+
+			m.on('popupclose', () => this.open = false);
 		}
 
 		return m;
 	}
 
-	attributeChangedCallback(name) {
+	attributeChangedCallback(name/*, oldVal, newVal*/) {
 		const marker = map.get(this);
 		if (marker) {
 			switch(name) {
@@ -168,6 +184,19 @@ export default class HTMLMapMarkerElement extends HTMLElement {
 				}
 				break;
 
+			case 'open':
+				if (this._map instanceof HTMLElement) {
+					this._map.ready.then(() => {
+						const marker = map.get(this);
+						if (this.open && ! marker.isPopupOpen()) {
+							marker.openPopup();
+						} else if (! this.open && marker.isPopupOpen()) {
+							marker.closePopup();
+						}
+					});
+				}
+				break;
+
 			default:
 				throw new Error(`Unhandled attribute changed: ${name}`);
 			}
@@ -176,6 +205,7 @@ export default class HTMLMapMarkerElement extends HTMLElement {
 
 	static get observedAttributes() {
 		return [
+			'open',
 			'hidden',
 		];
 	}
