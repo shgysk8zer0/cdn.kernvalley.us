@@ -193,6 +193,7 @@ export default class HTMLMapMarkerElement extends HTMLElement {
 						} else if (! this.open && marker.isPopupOpen()) {
 							marker.closePopup();
 						}
+						this.dispatchEvent(new Event(this.open ? 'open' : 'close'));
 					});
 				}
 				break;
