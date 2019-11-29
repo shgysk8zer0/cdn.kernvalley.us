@@ -4,7 +4,7 @@ import HTMLMapMarkerElement from './map-marker.js';
 import HTMLImageOverlayElement from './image-overlay.js';
 import { getLocation } from '../js/std-js/functions.js';
 
-let map = null;
+let map = new Map();
 
 customElements.define(HTMLMapMarkerElement.tagName, HTMLMapMarkerElement);
 customElements.define(HTMLImageOverlayElement.tagName, HTMLImageOverlayElement);
@@ -15,7 +15,7 @@ customElements.define(HTMLImageOverlayElement.tagName, HTMLImageOverlayElement);
 export default class HTMLOpenStreetMapElement extends HTMLElement {
 	constructor() {
 		super();
-		this._shadow = this.attachShadow({ mode: 'open' });
+		this._shadow = this.attachShadow({ mode: 'closed' });
 
 		Promise.resolve().then(async () => {
 			const resp = await fetch(new URL('open-street-map.html', import.meta.url));
@@ -23,16 +23,66 @@ export default class HTMLOpenStreetMapElement extends HTMLElement {
 			const parser = new DOMParser();
 			const doc = parser.parseFromString(html, 'text/html');
 			this._shadow.append(...doc.head.children, ...doc.body.children);
-			await this.init();
+			this.dispatchEvent(new Event('populated'));
 		});
+
+		this._populated.then(() => console.info('populated'));
+		this.ready.then(() => console.info('ready'));
+	}
+
+	async connectedCallback() {
+		await this._populated;
+		const m = Leaflet.map(this.mapElement, {
+			zoomControl: this.zoomControl,
+		});
+
+		const { latitude, longitude } = this.center;
+
+		if (! Number.isNaN(latitude) && ! Number.isNaN(longitude)) {
+			m.setView([latitude, longitude], this.zoom);
+		} else if (await this.hasGeoPermission()) {
+			const { latitude, longitude } = await this.coords;
+			m.setView([latitude, longitude], this.zoom);
+		} else {
+			// It's Disneyland
+			m.setView([33.811137945997444, -117.91675329208375], this.zoom);
+		}
+
+		Leaflet.tileLayer(this.tileSrc, {
+			attribution: this.attribution,
+			minZoom: this.minZoom,
+			maxZoom: this.maxZoom,
+			label: 'OpenStreetMap',
+		}).addTo(m);
+
+		map.set(this, m);
+
+		this.dispatchEvent(new Event('ready'));
+	}
+
+	disconnectedCallback() {
+		map.delete(this);
 	}
 
 	get ready() {
 		return new Promise(async resolve => {
-			if (this._shadow.childElementCount === 0) {
+			await this._populated;
+			if (! map.has(this)) {
 				this.addEventListener('ready', () => {
 					this.map.whenReady(() => resolve(this));
 				}, {
+					once: true
+				});
+			} else {
+				resolve(this);
+			}
+		});
+	}
+
+	get _populated() {
+		return new Promise(async resolve => {
+			if (this._shadow.childElementCount === 0) {
+				this.addEventListener('populated', () => resolve(this), {
 					once: true
 				});
 			} else {
@@ -147,11 +197,11 @@ export default class HTMLOpenStreetMapElement extends HTMLElement {
 	}
 
 	async zoomIn() {
-		map.zoomIn();
+		this.map.zoomIn();
 	}
 
 	async zoomOut() {
-		map.zoomOut();
+		this.map.zoomOut();
 	}
 
 	async setCenter({ latitude, longitude, title = 'Center', icon = null, zoom = null }) {
@@ -164,12 +214,12 @@ export default class HTMLOpenStreetMapElement extends HTMLElement {
 				});
 			}
 
-			map.setView([latitude, longitude], zoom || this.zoom);
+			this.map.setView([latitude, longitude], zoom || this.zoom);
 		}
 	}
 
 	async flyTo({ latitude, longitude }, zoomlevel) {
-		map.flyTo([latitude, longitude], zoomlevel);
+		this.map.flyTo([latitude, longitude], zoomlevel);
 	}
 
 	async hasGeoPermission() {
@@ -178,7 +228,7 @@ export default class HTMLOpenStreetMapElement extends HTMLElement {
 	}
 
 	get map() {
-		return map;
+		return map.get(this);
 	}
 
 	get overlays() {
@@ -267,33 +317,6 @@ export default class HTMLOpenStreetMapElement extends HTMLElement {
 		const markers = this.markers;
 		markers.forEach(el => el.remove());
 		return markers;
-	}
-
-	async init() {
-		map = Leaflet.map(this.mapElement, {
-			zoomControl: this.zoomControl,
-		});
-
-		const { latitude, longitude } = this.center;
-
-		if (! Number.isNaN(latitude) && ! Number.isNaN(longitude)) {
-			map.setView([latitude, longitude], this.zoom);
-		} else if (await this.hasGeoPermission()) {
-			const { latitude, longitude } = await this.coords;
-			map.setView([latitude, longitude], this.zoom);
-		} else {
-			// It's Disneyland
-			map.setView([33.811137945997444, -117.91675329208375], this.zoom);
-		}
-
-		Leaflet.tileLayer(this.tileSrc, {
-			attribution: this.attribution,
-			minZoom: this.minZoom,
-			maxZoom: this.maxZoom,
-			label: 'OpenStreetMap',
-		}).addTo(map);
-
-		this.dispatchEvent(new Event('ready'));
 	}
 
 	async attributeChangedCallback(name) {
