@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+	<head>
+		<meta charset="utf-8" />
+		<style>
+			:host {
+				display: inline-block;
+				padding: 1.2rem 0.8rem;
+				border-radius: 6px;
+				overflow: hidden;
+				max-width: calc(8.3rem + 400px);
+			}
+
+			#wrapper {
+				grid-template-areas: "current forecast" "conditions forecast";
+				grid-template-rows: 10rem 3rem;
+				grid-template-columns: 8.3rem minmax(30rem, 400px);
+				grid-gap: 0.8em;
+				box-sizing: border-box;
+			}
+
+			#current {
+				grid-area: current;
+			}
+
+			#conditions {
+				grid-area: conditions;
+			}
+
+			#forecast {
+				grid-area: forecast;
+			}
+
+			.grid {
+				display: grid;
+			}
+
+			.inline-grid {
+				display: inline-grid;
+			}
+
+			.inline-block {
+				display: inline-block;
+			}
+
+			.float-right {
+				float: right;
+			}
+
+			.clearfix::after {
+				display: block;
+				content: '';
+				clear: both;
+			}
+
+			.center {
+				text-align: center;
+			}
+
+			.color-inherit {
+				color: inherit;
+			}
+
+			.current-color {
+				fill: currentColor;
+			}
+
+			.overflow-x-auto {
+				overflow-x: auto;
+			}
+		</style>
+	</head>
+	<body>
+		<header id="header" class="clearfix">
+			<b>Weather for <slot name="city">Unknown</slot></b>
+			<span class="float-right">
+				<span>More at</span>
+				<a href="https://openweathermap.org" rel="noopener external">OpenWeatherMap</a>
+			</span>
+			<hr />
+		</header>
+		<div id="wrapper" class="inline-grid">
+			<div id="current">
+				<span id="icon" class="inline-block">
+					<slot name="icon">
+						<svg class="current-color" viewBox="0 0 16 16">
+							<use xlink:href="#sunny" />
+						</svg>
+					</slot>
+				</span>
+				<span id="temp" class="inline-block">
+					<slot name="temp">?</slot>&deg;<slot name="tempUnits">F</slot>
+				</span>
+			</div>
+			<div id="conditions">
+				<h4 class="center"><slot name="conditions">Unknown</slot></h4>
+				<div>
+					<span>Wind:</span>
+					<slot name="windSpeed">?</slot>
+					<slot name="speedUnits"><abbr title="Miles Per Hour">m/h</abbr></slot>
+				</div>
+			</div>
+			<div id="forecast" class="overflow-x-auto">
+				<table>
+					<thead>
+						<tr>
+							<th>Sun</th>
+							<th>Mon</th>
+							<th>Tue</th>
+							<th>Wed</th>
+							<th>Thu</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr></tr>
+						<tr></tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+		<svg hidden="">
+			<symbol id="sunny" class="current-color" viewBox="0 0 16 16">
+				<path d="M7.996 2.994C5.246 2.994 2.989 5.25 2.989 8c0 2.75 2.257 5.006 5.007 5.006 2.75 0 5.006-2.256 5.006-5.006 0-2.75-2.257-5.006-5.006-5.006zM14 7c.138.713.112 1.37 0 2l2-1zM2 7a5.387 5.387 0 0 0 0 2L0 8zm7 7a5.387 5.387 0 0 1-2 0l1 2zM9 2a5.387 5.387 0 0 0-2 0l1-2zM4.465 12.95a5.387 5.387 0 0 1-1.415-1.414l-.707 2.12zm8.485-8.486a5.387 5.387 0 0 0-1.414-1.414l2.121-.707zm-9.9 0A5.387 5.387 0 0 1 4.465 3.05l-2.122-.707zm8.486 8.486a5.387 5.387 0 0 0 1.414-1.414l.707 2.12z" overflow="visible"/>
+			</symbol>
+		</svg>
+	</body>
+</html>
