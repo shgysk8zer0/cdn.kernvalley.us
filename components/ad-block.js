@@ -35,10 +35,12 @@ async function log(event) {
 	}
 }
 
+const shadows = new Map();
+
 customElements.define('ad-block', class HTMLAddBlockElement extends HTMLElement {
 	constructor() {
 		super();
-		this._shadow = this.attachShadow({mode: 'open'});
+		const shadow = this.attachShadow({mode: 'closed'});
 		const container = document.createElement('a');
 		const logo = document.createElement('div');
 		const logoSlot = document.createElement('slot');
@@ -153,7 +155,8 @@ customElements.define('ad-block', class HTMLAddBlockElement extends HTMLElement 
 		link.append(linkSlot);
 
 		container.append(logo, label, description, link);
-		this._shadow.append(style, container);
+		shadow.append(style, container);
+		shadows.set(this, shadow);
 		this.dispatchEvent(new Event('ready'));
 	}
 
@@ -178,15 +181,15 @@ customElements.define('ad-block', class HTMLAddBlockElement extends HTMLElement 
 		await this.ready;
 		switch(name) {
 		case 'background':
-			this._shadow.childNodes.item(1).style.setProperty('--background', newVal);
+			shadows.get(this).childNodes.item(1).style.setProperty('--background', newVal);
 			break;
 
 		case 'color':
-			this._shadow.childNodes.item(1).style.setProperty('--color', newVal);
+			shadows.get(this).childNodes.item(1).style.setProperty('--color', newVal);
 			break;
 
 		case 'url':
-			this._shadow.childNodes.item(1).href = newVal;
+			shadows.get(this).childNodes.item(1).href = newVal;
 			break;
 
 		default:
@@ -245,7 +248,8 @@ customElements.define('ad-block', class HTMLAddBlockElement extends HTMLElement 
 
 	get ready() {
 		return new Promise(resolve => {
-			if (this._shadow && this._shadow.childElementCount !== 0) {
+			const shadow = shadows.get(this);
+			if (shadow && shadow.childElementCount !== 0) {
 				resolve();
 			} else {
 				this.addEventListener('ready', () => resolve(), {once: true});
