@@ -162,6 +162,7 @@ customElements.define('ad-block', class HTMLAddBlockElement extends HTMLElement 
 			const entry = entries.find(el => el.target === this);
 			if (entry instanceof IntersectionObserverEntry && entry.isIntersecting) {
 				this.classList.add('shown');
+				this.dispatchEvent(new Event('shown'));
 				log(entry);
 				observer.unobserve(this);
 			}
@@ -248,6 +249,16 @@ customElements.define('ad-block', class HTMLAddBlockElement extends HTMLElement 
 				resolve();
 			} else {
 				this.addEventListener('ready', () => resolve(), {once: true});
+			}
+		});
+	}
+
+	get shown() {
+		return new Promise(resolve => {
+			if (this.classList.contains('shown')) {
+				resolve();
+			} else {
+				this.addEventListener('shown', () => resolve(), {once: true});
 			}
 		});
 	}
