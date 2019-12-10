@@ -48,7 +48,7 @@ customElements.define('ad-block', class HTMLAddBlockElement extends HTMLElement 
 		const labelSlot = document.createElement('slot');
 		const link = document.createElement('span');
 		const linkSlot = document.createElement('slot');
-		const description = document.createElement('p');
+		const description = document.createElement('div');
 		const descriptionSlot = document.createElement('slot');
 		const style = document.createElement('style');
 
@@ -59,7 +59,7 @@ customElements.define('ad-block', class HTMLAddBlockElement extends HTMLElement 
 
 		style.textContent = `
 			:host {
-				display: inline-block;
+				display: block;
 				margin: 1.3em 0.8em;
 				--fallback-background: #ececec;
 				--fallback-color: #3e3e3e;
@@ -87,8 +87,8 @@ customElements.define('ad-block', class HTMLAddBlockElement extends HTMLElement 
 				background-color: var(--background, var(--fallback-background));
 				color: var(--color, var(--fallback-color));
 				grid-template-areas: "image label" "image description" "image link";
-				grid-template-rows: 2rem minmax(20px, 5em) 1.2rem;
-				grid-template-columns: minmax(24px, 8rem) minmax(120px, 15vw);
+				grid-template-rows: auto;
+				grid-template-columns: minmax(24px, 8rem) auto;
 				grid-gap: 3px 0.8em;
 				text-decoration: none;
 			}
@@ -138,7 +138,7 @@ customElements.define('ad-block', class HTMLAddBlockElement extends HTMLElement 
 		linkSlot.textContent = 'Check here to learn more';
 		label.id = 'label';
 		labelSlot.textContent = 'Your ad here';
-		linkSlot.name = 'link';
+		linkSlot.name = 'calltoaction';
 		link.id = 'link';
 		descriptionSlot.name = 'description';
 		description.id = 'description';
@@ -239,10 +239,10 @@ customElements.define('ad-block', class HTMLAddBlockElement extends HTMLElement 
 		this.append(el);
 	}
 
-	set link(val) {
+	set callToAction(val) {
 		const el = document.createElement('span');
 		el.textContent = val;
-		el.slot = 'link';
+		el.slot = 'calltoaction';
 		this.append(el);
 	}
 
