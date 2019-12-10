@@ -1,7 +1,5 @@
 import {shadows, clearSlot, getWeatherByPostalCode, createIcon, getIcon} from './weather-helper.js';
 
-
-
 function getSprite(icon) {
 	// @SEE https://openweathermap.org/weather-conditions
 	switch(icon) {
@@ -53,13 +51,13 @@ customElements.define('weather-current', class HTMLWeatherForecastElement extend
 
 	async update() {
 		this.ready.then(async () => {
-			const weather = await getWeatherByPostalCode(this.appId, this.postalCode);
-			this.city = weather.name;
-			this.temp = weather.main.temp;
-			this.conditions = weather.weather[0].description;
-			this.windSpeed = weather.wind.speed;
-			this.icon = createIcon(getSprite(weather.weather[0].icon), shadows.get(this));
-			this.updated = weather.dt;
+			const {name, main, wind, dt, weather} = await getWeatherByPostalCode(this.appId, this.postalCode);
+			this.city = name;
+			this.temp = main.temp;
+			this.conditions = weather[0].description;
+			this.windSpeed = wind.speed;
+			this.icon = createIcon(getSprite(weather[0].icon), shadows.get(this));
+			this.updated = dt;
 		});
 	}
 

@@ -1,50 +1,6 @@
-// const shadows = new Map();
-// const ENDPOINT = 'https://api.openweathermap.org';
-// const VERSION = 2.5;
 import {shadows, clearSlot, getForecastByPostalCode} from './weather-helper.js';
-
-// async function getForecaseByPostalCode(appId, postalCode, {units = 'imperial', country = 'us', lang = 'en'} = {}) {
-// 	const url = new URL(`/data/${VERSION}/forecast`, ENDPOINT);
-// 	url.searchParams.set('appid', appId);
-// 	url.searchParams.set('zip', `${postalCode},${country}`);
-// 	url.searchParams.set('units', units);
-// 	url.searchParams.set('lang', lang);
-
-// 	const resp = await fetch(url, {
-// 		headers: new Headers({Accept: 'application/json'}),
-// 		mode: 'cors',
-// 		credentials: 'omit',
-// 	});
-
-// 	if (resp.ok) {
-// 		return await resp.json();
-// 	} else {
-// 		throw new Error(`${resp.url} [${resp.status} ${resp.statusText}]`);
-// 	}
-// }
-
-// async function getSlot(el, name) {
-// 	await el.ready;
-// 	if (shadows.has(el)) {
-// 		return shadows.get(el).querySelector(`slot[name="${name}"]`);
-// 	} else {
-// 		return null;
-// 	}
-// }
-
-// async function getAssigned(el, name) {
-// 	const slot = await getSlot(el, name);
-// 	if (slot instanceof HTMLElement) {
-// 		return slot.assignedNodes();
-// 	} else {
-// 		return [];
-// 	}
-// }
-
-// async function clearSlot(el, name) {
-// 	const assigned = await getAssigned(el, name);
-// 	assigned.forEach(el => el.remove());
-// }
+// @TODO update
+// This has mostly been moved to <weather-current>
 
 customElements.define('weather-forecast', class HTMLWeatherForecastElement extends HTMLElement {
 	constructor() {
