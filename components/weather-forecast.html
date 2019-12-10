@@ -13,9 +13,9 @@
 
 			#wrapper {
 				grid-template-areas: "current forecast" "conditions forecast";
-				grid-template-rows: 10rem 3rem;
+				grid-template-rows: 10rem 6rem;
 				grid-template-columns: 8.3rem minmax(30rem, 400px);
-				grid-gap: 0.8em;
+				grid-gap: 0 0.8em;
 				box-sizing: border-box;
 			}
 
@@ -57,6 +57,10 @@
 				text-align: center;
 			}
 
+			.capitalize {
+				text-transform: capitalize;
+			}
+
 			.color-inherit {
 				color: inherit;
 			}
@@ -67,6 +71,10 @@
 
 			.overflow-x-auto {
 				overflow-x: auto;
+			}
+
+			svg[hidden] {
+				display: none;
 			}
 		</style>
 	</head>
@@ -79,7 +87,7 @@
 			</span>
 			<hr />
 		</header>
-		<div id="wrapper" class="inline-grid">
+		<div id="wrapper" class="grid">
 			<div id="current">
 				<span id="icon" class="inline-block">
 					<slot name="icon">
@@ -93,11 +101,11 @@
 				</span>
 			</div>
 			<div id="conditions">
-				<h4 class="center"><slot name="conditions">Unknown</slot></h4>
+				<h4 class="center capitalize"><slot name="conditions">Unknown</slot></h4>
 				<div>
 					<span>Wind:</span>
 					<slot name="windSpeed">?</slot>
-					<slot name="speedUnits"><abbr title="Miles Per Hour">m/h</abbr></slot>
+					<slot name="speedUnits"><abbr title="Miles Per Hour">mph</abbr></slot>
 				</div>
 			</div>
 			<div id="forecast" class="overflow-x-auto">
@@ -121,6 +129,10 @@
 		<svg hidden="">
 			<symbol id="sunny" class="current-color" viewBox="0 0 16 16">
 				<path d="M7.996 2.994C5.246 2.994 2.989 5.25 2.989 8c0 2.75 2.257 5.006 5.007 5.006 2.75 0 5.006-2.256 5.006-5.006 0-2.75-2.257-5.006-5.006-5.006zM14 7c.138.713.112 1.37 0 2l2-1zM2 7a5.387 5.387 0 0 0 0 2L0 8zm7 7a5.387 5.387 0 0 1-2 0l1 2zM9 2a5.387 5.387 0 0 0-2 0l1-2zM4.465 12.95a5.387 5.387 0 0 1-1.415-1.414l-.707 2.12zm8.485-8.486a5.387 5.387 0 0 0-1.414-1.414l2.121-.707zm-9.9 0A5.387 5.387 0 0 1 4.465 3.05l-2.122-.707zm8.486 8.486a5.387 5.387 0 0 0 1.414-1.414l.707 2.12z" overflow="visible"/>
+			</symbol>
+			<symbol id="weather-few-clouds" class="current-color" viewBox="0 0 16 16">
+				<path d="M8 3C5.25 3 3 5.25 3 8c0 1.783.958 3.363 2.375 4.25a3.4 3.4 0 0 1 .531-.188c.229-1.816 1.72-3.25 3.594-3.25 1.003 0 1.839.474 2.5 1.126.175-.034.308-.126.5-.126h.125C12.849 9.246 13 8.643 13 8c0-2.75-2.25-5-5-5z" overflow="visible"/>
+				<path d="M9.5 10A2.5 2.5 0 0 0 7 12.5c0 .218.041.423.094.625A1.549 1.549 0 0 0 6.5 13a1.5 1.5 0 1 0 0 3h8a1.5 1.5 0 1 0 0-3 2 2 0 0 0-2-2c-.316 0-.61.088-.875.219A2.47 2.47 0 0 0 9.5 10zM14 7c.138.713.112 1.37 0 2l2-1zM2 7a5.387 5.387 0 0 0 0 2L0 8zm7-5a5.387 5.387 0 0 0-2 0l1-2zM4.465 12.95a5.387 5.387 0 0 1-1.415-1.414l-.707 2.12zm8.485-8.486a5.387 5.387 0 0 0-1.414-1.414l2.121-.707zm-9.9 0A5.387 5.387 0 0 1 4.465 3.05l-2.122-.707z" overflow="visible"/>
 			</symbol>
 		</svg>
 	</body>

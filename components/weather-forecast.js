@@ -1,26 +1,50 @@
-const shadows = new Map();
-const ENDPOINT = 'https://api.openweathermap.org';
-const VERSION = 2.5;
+// const shadows = new Map();
+// const ENDPOINT = 'https://api.openweathermap.org';
+// const VERSION = 2.5;
+import {shadows, clearSlot, getForecastByPostalCode} from './weather-helper.js';
 
-async function getForecaseByPostalCode(appId, postalCode, {units = 'imperial', country = 'us', lang = 'en'} = {}) {
-	const url = new URL(`/data/${VERSION}/forecast`, ENDPOINT);
-	url.searchParams.set('appid', appId);
-	url.searchParams.set('zip', `${postalCode},${country}`);
-	url.searchParams.set('units', units);
-	url.searchParams.set('lang', lang);
+// async function getForecaseByPostalCode(appId, postalCode, {units = 'imperial', country = 'us', lang = 'en'} = {}) {
+// 	const url = new URL(`/data/${VERSION}/forecast`, ENDPOINT);
+// 	url.searchParams.set('appid', appId);
+// 	url.searchParams.set('zip', `${postalCode},${country}`);
+// 	url.searchParams.set('units', units);
+// 	url.searchParams.set('lang', lang);
 
-	const resp = await fetch(url, {
-		headers: new Headers({Accept: 'application/json'}),
-		mode: 'cors',
-		credentials: 'omit',
-	});
+// 	const resp = await fetch(url, {
+// 		headers: new Headers({Accept: 'application/json'}),
+// 		mode: 'cors',
+// 		credentials: 'omit',
+// 	});
 
-	if (resp.ok) {
-		return await resp.json();
-	} else {
-		throw new Error(`${resp.url} [${resp.status} ${resp.statusText}]`);
-	}
-}
+// 	if (resp.ok) {
+// 		return await resp.json();
+// 	} else {
+// 		throw new Error(`${resp.url} [${resp.status} ${resp.statusText}]`);
+// 	}
+// }
+
+// async function getSlot(el, name) {
+// 	await el.ready;
+// 	if (shadows.has(el)) {
+// 		return shadows.get(el).querySelector(`slot[name="${name}"]`);
+// 	} else {
+// 		return null;
+// 	}
+// }
+
+// async function getAssigned(el, name) {
+// 	const slot = await getSlot(el, name);
+// 	if (slot instanceof HTMLElement) {
+// 		return slot.assignedNodes();
+// 	} else {
+// 		return [];
+// 	}
+// }
+
+// async function clearSlot(el, name) {
+// 	const assigned = await getAssigned(el, name);
+// 	assigned.forEach(el => el.remove());
+// }
 
 customElements.define('weather-forecast', class HTMLWeatherForecastElement extends HTMLElement {
 	constructor() {
@@ -42,13 +66,14 @@ customElements.define('weather-forecast', class HTMLWeatherForecastElement exten
 		});
 
 		this.ready.then(async () => {
-			const forecast = await getForecaseByPostalCode(this.appId, this.postalCode);
+			const forecast = await getForecastByPostalCode(this.appId, this.postalCode);
+			this.city = forecast.city.name;
 			console.info(forecast);
 		});
 	}
 
 	async connectedCallback() {
-
+		//
 	}
 
 	get appId() {
@@ -57,6 +82,13 @@ customElements.define('weather-forecast', class HTMLWeatherForecastElement exten
 
 	set appid(val) {
 		this.setAttribute('appid', val);
+	}
+
+	set city(val) {
+		const el = document.createElement('span');
+		el.textContent = val;
+		el.slot = 'city';
+		clearSlot(this, 'city').then(() => this.append(el));
 	}
 
 	get postalCode() {
