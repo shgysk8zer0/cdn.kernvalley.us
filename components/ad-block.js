@@ -40,6 +40,8 @@ const shadows = new Map();
 customElements.define('ad-block', class HTMLAddBlockElement extends HTMLElement {
 	constructor() {
 		super();
+		this.setAttribute('itemtype', 'https://schema.org/WPAdBlock');
+		this.setAttribute('itemscope', '');
 		const shadow = this.attachShadow({mode: 'closed'});
 		const container = document.createElement('a');
 		const logo = document.createElement('div');
@@ -135,7 +137,7 @@ customElements.define('ad-block', class HTMLAddBlockElement extends HTMLElement 
 			}
 		`;
 		labelSlot.name = 'label';
-		linkSlot.textContent = 'Check here to learn more';
+		linkSlot.textContent = 'Click here to learn more';
 		label.id = 'label';
 		labelSlot.textContent = 'Your ad here';
 		linkSlot.name = 'calltoaction';
@@ -153,6 +155,7 @@ customElements.define('ad-block', class HTMLAddBlockElement extends HTMLElement 
 		label.append(labelSlot);
 		description.append(descriptionSlot);
 		link.append(linkSlot);
+		container.rel = 'noopener external nofollow';
 
 		container.append(logo, label, description, link);
 		shadow.append(style, container);
