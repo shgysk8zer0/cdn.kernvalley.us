@@ -100,10 +100,10 @@ customElements.define('weather-current', class HTMLWeatherForecastElement extend
 			el.textContent = date.toLocaleTimeString();
 			el.dateTime = date.toISOString();
 			el.slot = 'updated';
-			clearSlot('updated').then(() => this.append(el));
+			clearSlot(this, 'updated').then(() => this.append(el));
 		} else if (val instanceof HTMLElement) {
 			val.slot = 'updated';
-			clearSlot('updated').then(() => this.append(val));
+			clearSlot(this, 'updated').then(() => this.append(val));
 		}
 	}
 
