@@ -1,5 +1,5 @@
 export const ENDPOINT = 'https://api.openweathermap.org';
-export const ICON_SRC = 'https://openweathermap.org/img/wn/'
+export const ICON_SRC = 'https://openweathermap.org/img/wn/';
 export const VERSION = 2.5;
 const SVGNS = 'http://www.w3.org/2000/svg';
 export const shadows = new Map();
