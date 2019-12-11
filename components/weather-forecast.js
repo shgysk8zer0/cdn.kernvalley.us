@@ -1,6 +1,4 @@
-import {shadows, clearSlot, getForecastByPostalCode} from './weather-helper.js';
-// @TODO update
-// This has mostly been moved to <weather-current>
+import {shadows, clearSlot, clearSlots, getForecastByPostalCode, createIcon, getSprite} from './weather-helper.js';
 
 customElements.define('weather-forecast', class HTMLWeatherForecastElement extends HTMLElement {
 	constructor() {
@@ -20,16 +18,11 @@ customElements.define('weather-forecast', class HTMLWeatherForecastElement exten
 			shadows.set(this, shadow);
 			this.dispatchEvent(new Event('ready'));
 		});
-
-		this.ready.then(async () => {
-			const forecast = await getForecastByPostalCode(this.appId, this.postalCode);
-			this.city = forecast.city.name;
-			console.info(forecast);
-		});
 	}
 
 	async connectedCallback() {
-		//
+		await this.ready;
+		this.update();
 	}
 
 	get appId() {
@@ -80,6 +73,42 @@ customElements.define('weather-forecast', class HTMLWeatherForecastElement exten
 			break;
 		default: throw new Error(`Unhandled attribute changed: ${name}`);
 		}
+	}
+
+	async update() {
+		const {city, forecast} = await getForecastByPostalCode(this.appId, this.postalCode);
+		await this.ready;
+		this.city = city.name;
+		const shadow = shadows.get(this);
+		const days = Object.values(forecast).map((day, i) => {
+			i++;
+			clearSlots(this, `high${i}`, `low${i}`, `date${i}`, `icon${i}`, `summary${i}`).then(() => {
+				const high = document.createElement('span');
+				const low = document.createElement('span');
+				const date = document.createElement('time');
+				const icon = createIcon(getSprite(day.icon), shadow);
+				const summary = document.createElement('b');
+				summary.slot = `summary${i}`;
+				summary.textContent = day.conditions;
+				icon.slot = `icon${i}`;
+				date.textContent = day.date.toLocaleDateString();
+				date.dateTime = day.date.toISOString();
+				date.slot = `date${i}`;
+				high.slot = `high${i}`;
+				low.slot = `low${i}`;
+				high.textContent = Math.round(day.high);
+				low.textContent = Math.round(day.low);
+				this.append(date, icon, summary, high, low);
+			});
+
+			const el = document.createElement('b');
+
+			el.slot = `dow${i}`;
+			el.textContent = day.dow;
+			return el;
+		});
+		await clearSlots(this, 'dow1', 'dow2', 'dow3', 'dow4', 'dow5');
+		this.append(...days);
 	}
 
 	static get observedAttributes() {
