@@ -22,7 +22,13 @@
 				}
 			}
 
+			* {
+				box-sizing: inherit;
+			}
+
 			#wrapper {
+				max-width: 100vw;
+				overflow-x: auto;
 				padding: 1.2rem 0.8rem;
 				box-sizing: border-box;
 				border-radius: 6px;
@@ -68,8 +74,9 @@
 				overflow-x: auto;
 			}
 
-			.day {
+			.cell {
 				width: 25ch;
+				max-width: 23vw;
 				padding: 0.4em;
 			}
 
@@ -107,20 +114,20 @@
 	</head>
 	<body>
 		<div id="wrapper" class="forecast inline-block overflow-x-auto">
-			<table>
+			<table class="overflow-x-auto">
 				<caption><h3 class="center">Forecast for <slot name="city">Unknown</slot></h3><hr /></caption>
 				<thead>
 					<tr>
-						<th><slot name="dow1">Sunday</slot></th>
-						<th><slot name="dow2">Monday</slot></th>
-						<th><slot name="dow3">Tuesday</slot></th>
-						<th><slot name="dow4">Wednesday</slot></th>
-						<th><slot name="dow5">Thursday</slot></th>
+						<th class="cell dow"><slot name="dow1">Sunday</slot></th>
+						<th class="cell dow"><slot name="dow2">Monday</slot></th>
+						<th class="cell dow"><slot name="dow3">Tuesday</slot></th>
+						<th class="cell dow"><slot name="dow4">Wednesday</slot></th>
+						<th class="cell dow"><slot name="dow5">Thursday</slot></th>
 					</tr>
 				</thead>
 				<tbody>
 					<tr>
-						<td class="day">
+						<td class="cell day">
 							<div class="date center">
 								<slot name="date1"></slot>
 							</div>
@@ -138,7 +145,7 @@
 							<span class="high-low high" title="Forecasted High"><slot name="high1">?</slot>&deg;</span>
 							<span class="high-low low" title="Forecasted Low"><slot name="low1">?</slot>&deg;</span>
 						</td>
-						<td class="day">
+						<td class="cell day">
 							<div class="date center">
 								<slot name="date2"></slot>
 							</div>
@@ -156,7 +163,7 @@
 							<span class="high-low high" title="Forecasted High"><slot name="high2">?</slot>&deg;</span>
 							<span class="high-low low" title="Forecasted Low"><slot name="low2">?</slot>&deg;</span>
 						</td>
-						<td class="day">
+						<td class="cell day">
 							<div class="date center">
 								<slot name="date3"></slot>
 							</div>
@@ -174,7 +181,7 @@
 							<span class="high-low high" title="Forecasted High"><slot name="high3">?</slot></span>
 							<span class="high-low low" title="Forecasted Low"><slot name="low3">?</slot>&deg;</span>
 						</td>
-						<td class="day">
+						<td class="cell day">
 							<div class="date center">
 								<slot name="date4"></slot>
 							</div>
@@ -192,7 +199,7 @@
 							<span class="high-low high" title="Forecasted High"><slot name="high4">?</slot>&deg;</span>
 							<span class="high-low low" title="Forecasted Low"><slot name="low4">?</slot>&deg;</span>
 						</td>
-						<td class="day">
+						<td class="cell day">
 							<div class="date center">
 								<slot name="date5"></slot>
 							</div>
