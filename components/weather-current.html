@@ -8,6 +8,22 @@
 				padding: 1.2rem 2rem;
 				margin: 1.2em;
 				overflow: hidden;
+				--background: #fafafa;
+				--color: #343434;
+				background-color: var(--background);
+				color: var(--color);
+			}
+
+			:host([theme="dark"]) {
+				--background: #343434;
+				--color: #fefefe;
+			}
+
+			@media (prefers-color-scheme: dark) {
+				:host(:not([theme="light"])) {
+					--background: #343434;
+					--color: #fefefe;
+				}
 			}
 
 			#wrapper {

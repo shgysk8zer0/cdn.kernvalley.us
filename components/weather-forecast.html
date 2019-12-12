@@ -10,8 +10,13 @@
 				--color: #343434;
 			}
 
+			:host([theme="dark"]) {
+				--background: #343434;
+				--color: #fefefe;
+			}
+
 			@media (prefers-color-scheme: dark) {
-				:host {
+				:host(:not([theme="light"])) {
 					--background: #343434;
 					--color: #fefefe;
 				}

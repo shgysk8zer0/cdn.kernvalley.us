@@ -58,6 +58,30 @@ customElements.define('weather-forecast', class HTMLWeatherForecastElement exten
 		});
 	}
 
+	get theme() {
+		return this.getAttribute('theme') || 'auto';
+	}
+
+	set theme(val) {
+		switch(val.toLowerCase()) {
+		case 'light':
+			this.setAttribute('theme', 'light');
+			break;
+
+		case 'dark':
+			this.setAttribute('theme', 'dark');
+			break;
+
+		case '':
+		case 'auto':
+			this.removeAttribute('theme');
+			break;
+
+		default:
+			throw new Error(`Unsupported theme: ${val}`);
+		}
+	}
+
 	async attributeChangedCallback(name, oldValue, newValue) {
 		await this.ready;
 		switch(name) {
@@ -68,9 +92,14 @@ customElements.define('weather-forecast', class HTMLWeatherForecastElement exten
 			this.dispatchEvent(new CustomEvent('locationchange', {detail: {oldValue, newValue}}));
 			break;
 
+		case 'theme':
+			this.dispatchEvent(new CustomEvent('themechange', {detail: {oldValue, newValue}}));
+			break;
+
 		case 'units':
 			this.dispatchEvent(new CustomEvent('unitschange', {detail: {oldValue, newValue}}));
 			break;
+
 		default: throw new Error(`Unhandled attribute changed: ${name}`);
 		}
 	}
@@ -116,6 +145,7 @@ customElements.define('weather-forecast', class HTMLWeatherForecastElement exten
 			'appid',
 			'postalcode',
 			'units',
+			'theme',
 		];
 	}
 });

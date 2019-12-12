@@ -63,22 +63,27 @@ customElements.define('ad-block', class HTMLAddBlockElement extends HTMLElement 
 			:host {
 				display: block;
 				margin: 1.3em 0.8em;
-				--fallback-background: #ececec;
-				--fallback-color: #3e3e3e;
+				--background: #ececec;
+				--color: #3e3e3e;
 				animation: adAnim 800ms ease-in-out;
 				animation-fill-mode: both;
 				box-sizing: border-box;
 				overflow: hidden;
 			}
 
-			:host:not(.shown) {
+			:host(:not(.shown)) {
 				animation-play: pause;
 			}
 
+			:host([theme="dark"]) {
+				--background: #313131;
+				--color: #e1e1e1;
+			}
+
 			@media (prefers-color-scheme: dark) {
-				:host {
-					--fallback-background: #313131;
-					--fallback-color: #e1e1e1;
+				:host(:not([theme="light"])) {
+					--background: #313131;
+					--color: #e1e1e1;
 				}
 			}
 
@@ -86,8 +91,8 @@ customElements.define('ad-block', class HTMLAddBlockElement extends HTMLElement 
 				display: grid;
 				border-radius: 4px;
 				padding: 0.6rem 0.8rem;
-				background-color: var(--background, var(--fallback-background));
-				color: var(--color, var(--fallback-color));
+				background-color: var(--background);
+				color: var(--color);
 				grid-template-areas: "image label" "image description" "image link";
 				grid-template-rows: auto;
 				grid-template-columns: minmax(24px, 8rem) auto;
@@ -180,40 +185,20 @@ customElements.define('ad-block', class HTMLAddBlockElement extends HTMLElement 
 		this.dispatchEvent(new Event('remove'));
 	}
 
-	async attributeChangedCallback(name, oldVal, newVal) {
+	async attributeChangedCallback(name, oldValue, newValue) {
 		await this.ready;
 		switch(name) {
-		case 'background':
-			shadows.get(this).childNodes.item(1).style.setProperty('--background', newVal);
-			break;
-
-		case 'color':
-			shadows.get(this).childNodes.item(1).style.setProperty('--color', newVal);
+		case 'theme':
+			this.dispatchEvent(new CustomEvent('themechange', {detail: {oldValue, newValue}}));
 			break;
 
 		case 'url':
-			shadows.get(this).childNodes.item(1).href = newVal;
+			shadows.get(this).childNodes.item(1).href = newValue;
 			break;
 
 		default:
 			throw new Error(`Unhandled attribute changed: ${name}`);
 		}
-	}
-
-	get background() {
-		return this.getAttribute('background');
-	}
-
-	set background(val) {
-		this.setAttribute('background', val);
-	}
-
-	get color() {
-		return this.getAttribute('color');
-	}
-
-	set color(val) {
-		this.setAttribute('color', val);
 	}
 
 	set description(val) {
@@ -260,6 +245,30 @@ customElements.define('ad-block', class HTMLAddBlockElement extends HTMLElement 
 		});
 	}
 
+	get theme() {
+		return this.getAttribute('theme') || 'auto';
+	}
+
+	set theme(val) {
+		switch(val.toLowerCase()) {
+		case 'light':
+			this.setAttribute('theme', 'light');
+			break;
+
+		case 'dark':
+			this.setAttribute('theme', 'dark');
+			break;
+
+		case '':
+		case 'auto':
+			this.removeAttribute('theme');
+			break;
+
+		default:
+			throw new Error(`Unsupported theme: ${val}`);
+		}
+	}
+
 	get shown() {
 		return new Promise(resolve => {
 			if (this.classList.contains('shown')) {
@@ -280,8 +289,7 @@ customElements.define('ad-block', class HTMLAddBlockElement extends HTMLElement 
 
 	static get observedAttributes() {
 		return [
-			'background',
-			'color',
+			'theme',
 			'url',
 		];
 	}
