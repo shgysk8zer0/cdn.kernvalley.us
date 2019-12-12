@@ -87,17 +87,18 @@ customElements.define('ad-block', class HTMLAddBlockElement extends HTMLElement 
 				}
 			}
 
-			#container {
+			#wrapper {
 				display: grid;
 				border-radius: 4px;
 				padding: 0.6rem 0.8rem;
 				background-color: var(--background);
 				color: var(--color);
-				grid-template-areas: "image label" "image description" "image link";
-				grid-template-rows: auto;
-				grid-template-columns: minmax(24px, 8rem) auto;
-				grid-gap: 3px 0.8em;
+				grid-template-areas: ". label" "image description" ". link";
+				grid-template-rows: auto minmax(4em, 192px) auto;
+				grid-template-columns: minmax(6em, 192px) minmax(20ch, auto);
+				grid-gap: 0.8em;
 				text-decoration: none;
+				/*! max-width: 100%; */
 			}
 
 			#label {
@@ -150,7 +151,7 @@ customElements.define('ad-block', class HTMLAddBlockElement extends HTMLElement 
 		descriptionSlot.name = 'description';
 		description.id = 'description';
 		descriptionSlot.textContent = 'Display your ad throughout the Kern River Valley!';
-		container.id = 'container';
+		container.id = 'wrapper';
 		logoSlot.name = 'image';
 		logo.id = 'image';
 		logoSlot.innerHTML = `<svg class="current-color" viewBox="0 0 12 16">
