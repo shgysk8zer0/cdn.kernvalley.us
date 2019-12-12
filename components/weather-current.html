@@ -8,6 +8,22 @@
 				padding: 1.2rem 2rem;
 				margin: 1.2em;
 				overflow: hidden;
+				--background: #fafafa;
+				--color: #343434;
+				background-color: var(--background);
+				color: var(--color);
+			}
+
+			:host([theme="dark"]) {
+				--background: #343434;
+				--color: #fefefe;
+			}
+
+			@media (prefers-color-scheme: dark) {
+				:host(:not([theme="light"])) {
+					--background: #343434;
+					--color: #fefefe;
+				}
 			}
 
 			#wrapper {
@@ -29,8 +45,8 @@
 					"icon conditions temp"
 					"icon . wind"
 					"credits credits updated";
-					grid-template-rows: auto;
-					grid-template-columns: auto;
+					grid-template-rows: auto minmax(4em, 1fr) minmax(2em, 1fr) auto;
+					grid-template-columns: minmax(6em, 1fr) auto auto;
 				}
 			}
 

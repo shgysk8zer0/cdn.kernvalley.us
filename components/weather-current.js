@@ -108,6 +108,30 @@ customElements.define('weather-current', class HTMLWeatherForecastElement extend
 		});
 	}
 
+	get theme() {
+		return this.getAttribute('theme') || 'auto';
+	}
+
+	set theme(val) {
+		switch(val.toLowerCase()) {
+		case 'light':
+			this.setAttribute('theme', 'light');
+			break;
+
+		case 'dark':
+			this.setAttribute('theme', 'dark');
+			break;
+
+		case '':
+		case 'auto':
+			this.removeAttribute('theme');
+			break;
+
+		default:
+			throw new Error(`Unsupported theme: ${val}`);
+		}
+	}
+
 	async _set(name, value, {tag = 'span', attrs = {}} = {}) {
 		const el = document.createElement(tag);
 		el.slot = name;
@@ -127,6 +151,10 @@ customElements.define('weather-current', class HTMLWeatherForecastElement extend
 			this.dispatchEvent(new CustomEvent('locationchange', {detail: {oldValue, newValue}}));
 			break;
 
+		case 'theme':
+			this.dispatchEvent(new CustomEvent('themechange', {detail: {oldValue, newValue}}));
+			break;
+
 		case 'units':
 			this.dispatchEvent(new CustomEvent('unitschange', {detail: {oldValue, newValue}}));
 			break;
@@ -140,6 +168,7 @@ customElements.define('weather-current', class HTMLWeatherForecastElement extend
 			'appid',
 			'postalcode',
 			'units',
+			'theme',
 		];
 	}
 });
