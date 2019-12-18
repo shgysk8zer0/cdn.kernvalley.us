@@ -16,7 +16,7 @@
     "custom elements"
   ],
   "author": "Chris Zuber <shgysk8zer0@gmail.com>",
-  "homepage": "https://github.com/shgysk8zer0/cdn.kernvalley.us#readme",
+  "homepage": "https://cdn.kernvalley.us",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/shgysk8zer0/cdn.kernvalley.us/issues"
@@ -36,7 +36,8 @@
   },
   "scripts": {
     "preinstall": "git submodule update --init --recursive",
-    "start": "npm run netlify:serve",
+    "start": "npm run netlify:live",
+    "build": "svg-sprite-generate -c icons.csv -o img/icons.svg",
     "test": "npm run lint:js && npm run lint:css",
     "lint:css": "stylelint ${npm_package_config_dir_css}",
     "lint:js": "eslint ${npm_package_config_dir_js}",
@@ -47,6 +48,9 @@
     "netlify:serve": "netlify dev",
     "netlify:live": "netlify dev --live"
   },
+  "dependencies": {
+    "svg-sprite-generator": "0.0.7"
+  },
   "devDependencies": {
     "babel-eslint": "^10.0.1",
     "eslint": "^5.7.0",
@@ -55,7 +59,6 @@
     "stylelint": "^9.6.0",
     "stylelint-config-recommended": "^2.1.0",
     "stylelint-config-standard": "^18.2.0",
-    "svg-sprite-generator": "0.0.7",
     "svgo": "^1.1.1"
   }
 }
