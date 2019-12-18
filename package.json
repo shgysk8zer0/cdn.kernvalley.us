@@ -36,6 +36,7 @@
   },
   "scripts": {
     "preinstall": "git submodule update --init --recursive",
+    "postinstall": "npm run build",
     "start": "npm run netlify:live",
     "build": "svg-sprite-generate -c icons.csv -o img/icons.svg",
     "test": "npm run lint:js && npm run lint:css",
