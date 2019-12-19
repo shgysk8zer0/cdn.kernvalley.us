@@ -22,3 +22,6 @@
 [submodule "css/normalize"]
 	path = css/normalize
 	url = https://github.com/necolas/normalize.css.git
+[submodule "img/kernvalley-icons"]
+	path = img/kernvalley-icons
+	url = https://github.com/kernvalley/kernvalley-icons.git

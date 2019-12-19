@@ -2,6 +2,7 @@
 [build]
   base = "./"
   publish = "./"
+  command = "npm install"
   [build.environment]
     GIT_LFS_ENABLED = "1"
 [[headers]]
