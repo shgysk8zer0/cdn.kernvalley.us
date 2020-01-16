@@ -7,10 +7,9 @@ import {
 	reddit,
 	gmail,
 	email,
-	sms,
 } from '/js/std-js/share-config.js';
 
-webShareApi(facebook, twitter, googlePlus, linkedIn, reddit, gmail, email, sms);
+webShareApi(facebook, twitter, googlePlus, linkedIn, reddit, gmail, email);
 
 export default class HTMLShareButtonElement extends HTMLButtonElement {
 	constructor() {
