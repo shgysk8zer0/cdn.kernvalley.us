@@ -65,7 +65,7 @@ customElements.define('leaflet-geojson', class HTMLLeafletGeoJSONElement extends
 		this.setAttribute('weight', val);
 	}
 
-	async attributeChangedCallback(name/*, oldVal, newVal*/) {
+	async attributeChangedCallback(name, oldVal, newVal) {
 		await this.ready;
 		const path = map.get(this);
 		switch(name) {
@@ -99,6 +99,7 @@ customElements.define('leaflet-geojson', class HTMLLeafletGeoJSONElement extends
 			// 	const data = await resp.json();
 			// 	path.addData(data);
 			// });
+			this.dispatchEvent(new CustomEvent('srcchange', {detail: {oldVal, newVal}}));
 			break;
 
 		case 'weight':
@@ -139,12 +140,10 @@ customElements.define('leaflet-geojson', class HTMLLeafletGeoJSONElement extends
 	}
 
 	async _make() {
-		const { src, _map, fill, weight, color, opacity, stroke } = this;
-		let json = {};
-		if (this.hasAttribute('src')) {
-			const resp = await fetch(src);
-			json = await resp.json();
-		}
+		const { _map, fill, weight, color, opacity, stroke } = this;
+		const src = await this.srcWhenSet();
+		const resp = await fetch(src);
+		const json = await resp.json();
 
 		if (_map instanceof HTMLElement) {
 			await _map.ready;
@@ -154,6 +153,16 @@ customElements.define('leaflet-geojson', class HTMLLeafletGeoJSONElement extends
 		} else {
 			return null;
 		}
+	}
+
+	async srcWhenSet() {
+		return await new Promise(resolve => {
+			if (this.hasAttribute('src')) {
+				resolve(this.src);
+			} else {
+				this.addEventListener('srcchange', () => resolve(this.src), {once: true});
+			}
+		});
 	}
 
 	static get observedAttributes() {
