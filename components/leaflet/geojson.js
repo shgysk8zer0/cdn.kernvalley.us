@@ -1,12 +1,18 @@
 import {geoJSON} from 'https://unpkg.com/leaflet@1.5.1/dist/leaflet-src.esm.js';
+const map = new Map();
 
 customElements.define('leaflet-geojson', class HTMLLeafletGeoJSONElement extends HTMLElement {
+	constructor() {
+		super();
+		this._map = null;
+	}
+
 	get color() {
 		return this.getAttribute('color') || '#ff7800';
 	}
 
 	set color(val) {
-		this.setAttribuite('color', val);
+		this.setAttribute('color', val);
 	}
 
 	get fill() {
@@ -23,6 +29,16 @@ customElements.define('leaflet-geojson', class HTMLLeafletGeoJSONElement extends
 
 	set opacity(val) {
 		this.setAttribute('opacity', val);
+	}
+
+	get ready() {
+		return new Promise(resolve => {
+			if ( map.has(this)) {
+				resolve();
+			} else {
+				this.addEventListener('ready', () => resolve(), {once: true});
+			}
+		});
 	}
 
 	get src() {
@@ -49,17 +65,44 @@ customElements.define('leaflet-geojson', class HTMLLeafletGeoJSONElement extends
 		this.setAttribute('weight', val);
 	}
 
-	async attributeChangedCallback(name, oldVal, newVal) {
+	async attributeChangedCallback(name/*, oldVal, newVal*/) {
+		await this.ready;
+		const path = map.get(this);
 		switch(name) {
-		case 'src':
-			console.info({oldVal, newVal});
-			fetch(this.src).then(async resp => {
-				const json = await resp.json();
-				const {color, weight, fill, opacity, stroke} = this;
-				setTimeout(() => geoJSON(json, {style: {color, weight, fill, opacity, stroke}})
-					.addTo(this.parentElement.map), 500);
+		case 'color':
+			path.setStyle({color: this.color});
+			break;
 
-			});
+		case 'fill':
+			path.setStyle({fill: this.fill});
+			break;
+
+		case 'hidden':
+			if (this.hidden) {
+				path.remove();
+			} else if (this._map instanceof HTMLElement) {
+				path.addTo(this._map.map);
+			}
+			break;
+
+		case 'opacity':
+			path.setStyle({opacity: this.opacity});
+			break;
+
+		case 'stroke':
+			path.setStyle({stroke: this.stroke});
+			break;
+
+		case 'src':
+			// console.info({oldVal, newVal});
+			// fetch(this.src).then(async resp => {
+			// 	const data = await resp.json();
+			// 	path.addData(data);
+			// });
+			break;
+
+		case 'weight':
+			path.setStyle({weight: this.weight});
 			break;
 
 		default:
@@ -67,15 +110,47 @@ customElements.define('leaflet-geojson', class HTMLLeafletGeoJSONElement extends
 		}
 	}
 
-	async _make() {
-		const { _map, image, bounds } = this;
+	async connectedCallback() {
+		if (this.parentElement.tagName === 'LEAFLET-MAP') {
+			this._map = this.parentElement;
+			await this._map.ready;
 
-		if (Array.isArray(bounds) && (image instanceof HTMLImageElement) && (_map instanceof HTMLElement)) {
+			if (! map.has(this)) {
+				map.set(this, await this._make());
+				this.dispatchEvent(new Event('ready'));
+			}
+
+			if (! this.hidden) {
+				await this._map.ready;
+				const path = map.get(this);
+				path.addTo(this._map.map);
+			}
+		}
+	}
+
+	async disconnectedCallback() {
+		if (this._map instanceof HTMLElement) {
+			await this._map.ready;
+			const path = map.get(this);
+			path.remove();
+			map.delete(this);
+			this._map = null;
+		}
+	}
+
+	async _make() {
+		const { src, _map, fill, weight, color, opacity, stroke } = this;
+		let json = {};
+		if (this.hasAttribute('src')) {
+			const resp = await fetch(src);
+			json = await resp.json();
+		}
+
+		if (_map instanceof HTMLElement) {
 			await _map.ready;
-			const {alt, crossOrigin, className} = image;
-			const layer = imageOverlay(image.currentSrc || image.src, bounds, { alt, crossOrigin, className });
-			map.set(this, layer);
-			return layer;
+
+			const path = geoJSON(json || {}, {style: {color, weight, fill, opacity, stroke}});
+			return path;
 		} else {
 			return null;
 		}
