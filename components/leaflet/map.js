@@ -1,5 +1,5 @@
 // @TODO Only import what is needed from Leaflet
-import * as Leaflet from 'https://unpkg.com/leaflet@1.5.1/dist/leaflet-src.esm.js';
+import * as Leaflet from 'https://unpkg.com/leaflet@1.6.0/dist/leaflet-src.esm.js';
 import './marker.js';
 import './image-overlay.js';
 import './geojson.js';
@@ -33,6 +33,7 @@ customElements.define('leaflet-map', class HTMLLeafletMapElement extends HTMLEle
 		await this._populated;
 		const m = Leaflet.map(this.mapElement, {
 			zoomControl: this.zoomControl,
+			tap: false,
 		});
 
 		const { latitude, longitude } = this.center;

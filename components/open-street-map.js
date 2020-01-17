@@ -34,6 +34,7 @@ export default class HTMLOpenStreetMapElement extends HTMLElement {
 		await this._populated;
 		const m = Leaflet.map(this.mapElement, {
 			zoomControl: this.zoomControl,
+			tap: false,
 		});
 
 		const { latitude, longitude } = this.center;
