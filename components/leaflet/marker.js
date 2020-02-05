@@ -151,6 +151,17 @@ customElements.define('leaflet-marker', class HTMLLeafletMarkerElement extends H
 
 	_make() {
 		const {latitude, longitude, title, iconImg, popup} = this;
+		const eventDispatcher = ({containerPoint, latlng, originalEvent, type}) => {
+			this.dispatchEvent(new CustomEvent(`marker${type}`, {detail: {
+				coordinates: {
+					latitude: latlng.lat,
+					longitude: latlng.lng,
+					x: containerPoint.x,
+					y: containerPoint.y,
+				},
+				originalEvent,
+			}}));
+		};
 		let m;
 
 		if (iconImg instanceof HTMLImageElement) {
@@ -161,6 +172,14 @@ customElements.define('leaflet-marker', class HTMLLeafletMarkerElement extends H
 		} else {
 			m = marker([latitude, longitude], {title});
 		}
+
+		m.on('click', eventDispatcher);
+		m.on('dblclick', eventDispatcher);
+		m.on('mousedown', eventDispatcher);
+		m.on('mouseup', eventDispatcher);
+		m.on('mouseover', eventDispatcher);
+		m.on('mouseout', eventDispatcher);
+		m.on('contextmenu', eventDispatcher);
 
 		if (popup instanceof HTMLElement) {
 			m.bindPopup(popup);

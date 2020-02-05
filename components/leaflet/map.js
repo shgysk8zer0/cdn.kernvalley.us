@@ -1,12 +1,8 @@
 // @TODO Only import what is needed from Leaflet
 import * as Leaflet from 'https://unpkg.com/leaflet@1.6.0/dist/leaflet-src.esm.js';
-import './marker.js';
-import './image-overlay.js';
-import './geojson.js';
 import { getLocation } from '../../js/std-js/functions.js';
 
 let map = new Map();
-
 
 /**
  * @see https://leafletjs.com/reference-1.5.0.html#map-factory
@@ -152,7 +148,9 @@ customElements.define('leaflet-map', class HTMLLeafletMapElement extends HTMLEle
 	}
 
 	get tileSrc() {
-		return this.getAttribute('tilesrc') || 'https://maps.wikimedia.org/osm-intl/{z}/{x}/{y}{r}.png';
+		/* https://{s}.tile.openstreetmap.org/{z}/{x}/{y}{r}.png */
+		/* https://maps.wikimedia.org/osm-intl/{z}/{x}/{y}{r}.png */
+		return this.getAttribute('tilesrc') || 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}{r}.png';
 	}
 
 	get attribution() {
