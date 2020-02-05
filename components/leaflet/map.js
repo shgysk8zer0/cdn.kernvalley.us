@@ -22,9 +22,6 @@ customElements.define('leaflet-map', class HTMLLeafletMapElement extends HTMLEle
 			this._shadow.append(...doc.head.children, ...doc.body.children);
 			this.dispatchEvent(new Event('populated'));
 		});
-
-		this._populated.then(() => console.info('populated'));
-		this.ready.then(() => console.info('ready'));
 	}
 
 	async connectedCallback() {
@@ -48,6 +45,8 @@ customElements.define('leaflet-map', class HTMLLeafletMapElement extends HTMLEle
 
 		LeafletTileLayer(this.tileSrc, {
 			attribution: this.attribution,
+			crossOrigin: this.crossOrigin,
+			detectRetina: this.detectRetina,
 			minZoom: this.minZoom,
 			maxZoom: this.maxZoom,
 			label: 'OpenStreetMap',
@@ -87,6 +86,22 @@ customElements.define('leaflet-map', class HTMLLeafletMapElement extends HTMLEle
 				resolve(this);
 			}
 		});
+	}
+
+	get crossOrigin() {
+		return this.getAttribute('crossorigin') || 'annonymous';
+	}
+
+	set crossOrigin(val) {
+		this.setAttribute('crossorigin', val);
+	}
+
+	get detectRetina() {
+		return this.hasAttribute('detectretina');
+	}
+
+	set detectRetina(val) {
+		this.toggleAttribute('detectretina', val);
 	}
 
 	get zoom() {
@@ -152,7 +167,7 @@ customElements.define('leaflet-map', class HTMLLeafletMapElement extends HTMLEle
 	get tileSrc() {
 		/* https://{s}.tile.openstreetmap.org/{z}/{x}/{y}{r}.png */
 		/* https://maps.wikimedia.org/osm-intl/{z}/{x}/{y}{r}.png */
-		return this.getAttribute('tilesrc') || 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}{r}.png';
+		return this.getAttribute('tilesrc') || HTMLLeafletMapElement.wikimedia;
 	}
 
 	get attribution() {
@@ -325,5 +340,13 @@ customElements.define('leaflet-map', class HTMLLeafletMapElement extends HTMLEle
 			'zoom',
 			'center',
 		];
+	}
+
+	static get wikimedia() {
+		return 'https://maps.wikimedia.org/osm-intl/{z}/{x}/{y}{r}.png';
+	}
+
+	static get osm() {
+		return 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}{r}.png';
 	}
 });

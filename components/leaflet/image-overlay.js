@@ -12,8 +12,11 @@ customElements.define('leaflet-image-overlay', class HTMLLeafletImageOverlayElem
 	}
 
 	async connectedCallback() {
-		if (this.parentElement.tagName === 'LEAFLET-MAP') {
-			this._map = this.parentElement;
+		const closestMap = this.closest('leaflet-map');
+		if (closestMap instanceof HTMLElement) {
+			await customElements.whenDefine('leaflet-map');
+			await closestMap.ready;
+			this._map = closestMap;
 
 			if (! map.has(this)) {
 				map.set(this, await this._make());
