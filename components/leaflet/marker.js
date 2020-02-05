@@ -38,18 +38,19 @@ customElements.define('leaflet-marker', class HTMLLeafletMarkerElement extends H
 	}
 
 	async connectedCallback() {
-		if (this.parentElement.tagName === 'LEAFLET-MAP') {
-			this._map = this.parentElement;
-			await this._map.ready;
+		const closestMap = this.closest('leaflet-map');
+		if (closestMap instanceof HTMLElement) {
+			await customElements.whenDefined('leaflet-map');
+			const mapEl = await closestMap.ready;
+			this._map = closestMap;
 
 			if (! map.has(this)) {
 				map.set(this, await this._make());
 			}
 
 			if (! this.hidden) {
-				await this._map.ready;
 				const marker = map.get(this);
-				marker.addTo(this._map.map);
+				marker.addTo(mapEl.map);
 
 				if (this.open) {
 					setTimeout(() => marker.openPopup(), 500);
@@ -151,6 +152,17 @@ customElements.define('leaflet-marker', class HTMLLeafletMarkerElement extends H
 
 	_make() {
 		const {latitude, longitude, title, iconImg, popup} = this;
+		const eventDispatcher = ({containerPoint, latlng, originalEvent, type}) => {
+			this.dispatchEvent(new CustomEvent(`marker${type}`, {detail: {
+				coordinates: {
+					latitude: latlng.lat,
+					longitude: latlng.lng,
+					x: containerPoint.x,
+					y: containerPoint.y,
+				},
+				originalEvent,
+			}}));
+		};
 		let m;
 
 		if (iconImg instanceof HTMLImageElement) {
@@ -161,6 +173,14 @@ customElements.define('leaflet-marker', class HTMLLeafletMarkerElement extends H
 		} else {
 			m = marker([latitude, longitude], {title});
 		}
+
+		m.on('click', eventDispatcher);
+		m.on('dblclick', eventDispatcher);
+		m.on('mousedown', eventDispatcher);
+		m.on('mouseup', eventDispatcher);
+		m.on('mouseover', eventDispatcher);
+		m.on('mouseout', eventDispatcher);
+		m.on('contextmenu', eventDispatcher);
 
 		if (popup instanceof HTMLElement) {
 			m.bindPopup(popup);
@@ -180,7 +200,7 @@ customElements.define('leaflet-marker', class HTMLLeafletMarkerElement extends H
 				if (this.hidden) {
 					marker.remove();
 				} else if (this._map instanceof HTMLElement) {
-					this._map.ready.then(el => marker.addTo(el.map));
+					this._map.ready.then(() => marker.addTo(this._map.map));
 				}
 				break;
 

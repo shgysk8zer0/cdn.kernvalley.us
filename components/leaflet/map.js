@@ -1,12 +1,10 @@
-// @TODO Only import what is needed from Leaflet
-import * as Leaflet from 'https://unpkg.com/leaflet@1.6.0/dist/leaflet-src.esm.js';
-import './marker.js';
-import './image-overlay.js';
-import './geojson.js';
 import { getLocation } from '../../js/std-js/functions.js';
+import {
+	map as LeafletMap,
+	tileLayer as LeafletTileLayer
+} from 'https://unpkg.com/leaflet@1.6.0/dist/leaflet-src.esm.js';
 
 let map = new Map();
-
 
 /**
  * @see https://leafletjs.com/reference-1.5.0.html#map-factory
@@ -24,14 +22,11 @@ customElements.define('leaflet-map', class HTMLLeafletMapElement extends HTMLEle
 			this._shadow.append(...doc.head.children, ...doc.body.children);
 			this.dispatchEvent(new Event('populated'));
 		});
-
-		this._populated.then(() => console.info('populated'));
-		this.ready.then(() => console.info('ready'));
 	}
 
 	async connectedCallback() {
 		await this._populated;
-		const m = Leaflet.map(this.mapElement, {
+		const m = LeafletMap(this.mapElement, {
 			zoomControl: this.zoomControl,
 			tap: false,
 		});
@@ -48,8 +43,10 @@ customElements.define('leaflet-map', class HTMLLeafletMapElement extends HTMLEle
 			m.setView([33.811137945997444, -117.91675329208375], this.zoom);
 		}
 
-		Leaflet.tileLayer(this.tileSrc, {
+		LeafletTileLayer(this.tileSrc, {
 			attribution: this.attribution,
+			crossOrigin: this.crossOrigin,
+			detectRetina: this.detectRetina,
 			minZoom: this.minZoom,
 			maxZoom: this.maxZoom,
 			label: 'OpenStreetMap',
@@ -89,6 +86,22 @@ customElements.define('leaflet-map', class HTMLLeafletMapElement extends HTMLEle
 				resolve(this);
 			}
 		});
+	}
+
+	get crossOrigin() {
+		return this.getAttribute('crossorigin') || 'annonymous';
+	}
+
+	set crossOrigin(val) {
+		this.setAttribute('crossorigin', val);
+	}
+
+	get detectRetina() {
+		return this.hasAttribute('detectretina');
+	}
+
+	set detectRetina(val) {
+		this.toggleAttribute('detectretina', val);
 	}
 
 	get zoom() {
@@ -152,7 +165,9 @@ customElements.define('leaflet-map', class HTMLLeafletMapElement extends HTMLEle
 	}
 
 	get tileSrc() {
-		return this.getAttribute('tilesrc') || 'https://maps.wikimedia.org/osm-intl/{z}/{x}/{y}{r}.png';
+		/* https://{s}.tile.openstreetmap.org/{z}/{x}/{y}{r}.png */
+		/* https://maps.wikimedia.org/osm-intl/{z}/{x}/{y}{r}.png */
+		return this.getAttribute('tilesrc') || HTMLLeafletMapElement.wikimedia;
 	}
 
 	get attribution() {
@@ -325,5 +340,13 @@ customElements.define('leaflet-map', class HTMLLeafletMapElement extends HTMLEle
 			'zoom',
 			'center',
 		];
+	}
+
+	static get wikimedia() {
+		return 'https://maps.wikimedia.org/osm-intl/{z}/{x}/{y}{r}.png';
+	}
+
+	static get osm() {
+		return 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}{r}.png';
 	}
 });

@@ -112,9 +112,11 @@ customElements.define('leaflet-geojson', class HTMLLeafletGeoJSONElement extends
 	}
 
 	async connectedCallback() {
-		if (this.parentElement.tagName === 'LEAFLET-MAP') {
-			this._map = this.parentElement;
-			await this._map.ready;
+		const closestMap = this.closest('leaflet-map');
+		if (closestMap instanceof HTMLElement) {
+			await customElements.whenDefined('leaflet-map');
+			await closestMap.ready;
+			this._map = closestMap;
 
 			if (! map.has(this)) {
 				map.set(this, await this._make());
