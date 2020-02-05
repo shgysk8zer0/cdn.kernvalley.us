@@ -152,17 +152,7 @@ customElements.define('leaflet-map', class HTMLLeafletMapElement extends HTMLEle
 	}
 
 	get tileSrc() {
-		if (this.hasAttribute('tilesrc')) {
-			const url = new URL(this.getAttribute('tilesrc'));
-
-			if (url.searchParams.has('token')) {
-				url.searchParams.set('token', this.token);
-			}
-
-			return url.href;
-		} else {
-			return 'https://maps.wikimedia.org/osm-intl/{z}/{x}/{y}{r}.png';
-		}
+		return this.getAttribute('tilesrc') || 'https://maps.wikimedia.org/osm-intl/{z}/{x}/{y}{r}.png';
 	}
 
 	get attribution() {
