@@ -1,6 +1,8 @@
-// @TODO Only import what is needed from Leaflet
-import * as Leaflet from 'https://unpkg.com/leaflet@1.6.0/dist/leaflet-src.esm.js';
 import { getLocation } from '../../js/std-js/functions.js';
+import {
+	map as LeafletMap,
+	tileLayer as LeafletTileLayer
+} from 'https://unpkg.com/leaflet@1.6.0/dist/leaflet-src.esm.js';
 
 let map = new Map();
 
@@ -27,7 +29,7 @@ customElements.define('leaflet-map', class HTMLLeafletMapElement extends HTMLEle
 
 	async connectedCallback() {
 		await this._populated;
-		const m = Leaflet.map(this.mapElement, {
+		const m = LeafletMap(this.mapElement, {
 			zoomControl: this.zoomControl,
 			tap: false,
 		});
@@ -44,7 +46,7 @@ customElements.define('leaflet-map', class HTMLLeafletMapElement extends HTMLEle
 			m.setView([33.811137945997444, -117.91675329208375], this.zoom);
 		}
 
-		Leaflet.tileLayer(this.tileSrc, {
+		LeafletTileLayer(this.tileSrc, {
 			attribution: this.attribution,
 			minZoom: this.minZoom,
 			maxZoom: this.maxZoom,
