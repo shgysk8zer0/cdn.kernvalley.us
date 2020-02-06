@@ -7,22 +7,23 @@ import {
 	reddit,
 	gmail,
 	email,
+	clipboard,
 } from '/js/std-js/share-config.js';
 
-webShareApi(facebook, twitter, googlePlus, linkedIn, reddit, gmail, email);
+webShareApi(facebook, twitter, googlePlus, linkedIn, reddit, gmail, email, clipboard);
 
 export default class HTMLShareButtonElement extends HTMLButtonElement {
 	constructor() {
 		super();
-		this.hidden = ! (navigator.share instanceof Function);
+		this.hidden = !(navigator.share instanceof Function);
 		this.addEventListener('click', async event => {
 			event.preventDefault();
 			event.stopPropagation();
 
 			try {
-				const {title, text, url} = this;
-				await navigator.share({title, text, url});
-			} catch(err) {
+				const { title, text, url } = this;
+				await navigator.share({ title, text, url });
+			} catch (err) {
 				console.error(err);
 			}
 		});
@@ -55,4 +56,4 @@ export default class HTMLShareButtonElement extends HTMLButtonElement {
 	}
 }
 
-customElements.define('share-button', HTMLShareButtonElement, {extends: 'button'});
+customElements.define('share-button', HTMLShareButtonElement, { extends: 'button' });
