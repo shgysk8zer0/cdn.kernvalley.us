@@ -137,7 +137,7 @@
 	</head>
 	<body>
 		<div id="wrapper" class="grid">
-			<h3 class="center" id="city">
+			<h3 class="center" part="city" id="city">
 				<span>Weather in</span>
 				<slot name="city">Unknown</slot>
 			</h3>
@@ -148,22 +148,22 @@
 					</svg>
 				</slot>
 			</div>
-			<div id="temp">
+			<div part="temp" id="temp">
 				<slot name="temp">No data</slot>&deg;<slot name="tempUnits">F</slot>
 			</div>
 			<b class="capitalize" id="conditions"><slot name="conditions">Unknown</slot></b>
-			<div id="wind">
+			<div part="wind" id="wind">
 				<div>
 					<span>Wind:</span>
 					<slot name="windSpeed">?</slot>
 					<slot name="speedUnits"><abbr title="Miles Per Hour">mph</abbr></slot>
 				</div>
 			</div>
-			<div id="updated">
+			<div part="updated" id="updated">
 				<b>Updated:</b>
 				<slot name="updated"></slot>
 			</div>
-			<div id="credits">
+			<div part="credits" id="credits">
 				<span>Weather data provided by</span>
 				<a href="https://openweathermap.org" rel="noopener extnernal" class="color-inherit">OpenWeatherMap</a>
 			</div>

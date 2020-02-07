@@ -8,6 +8,17 @@
 				position: fixed;
 				height: var(--toast-height, auto);
 				bottom: calc(-1 * var(--toast-height, 8rem));
+				z-index: var(--toast-z-index, 2147483647);
+				width: 800px;
+				max-width: 100vw;
+				max-height: var(--toast-max-height, 95vh);
+			}
+
+			.container {
+				display: block;
+				position: fixed;
+				height: var(--toast-height, auto);
+				bottom: calc(-1 * var(--toast-height, 8rem));
 				background: var(--toast-background, var(--primary-color, #fafafa));
 				color: var(--toast-color, var(--default-color, #373737));
 				width: 800px;
@@ -18,9 +29,24 @@
 				border: var(--toast-border, none);
 				box-shadow: var(--toast-shadow, 0 -4px 6px rgba(0, 0, 0, 0.7));
 				border-radius: var(--toast-radius, 4px) var(--toast-radius, 4px) 0 0;
-				z-index: var(--toast-z-index, 100);
+				z-index: var(--toast-z-index, 2147483647);
 				scrollbar-color: var(--toast-color, #373737) var(--toast-background, #fafafa);
 				scrollbar-width: thin;
+			}
+
+			:host .backdrop {
+				background: var(--backdrop-background, rgba(0, 0, 0, 0.7));
+				position: fixed;
+				z-index: 2147483646;
+				top: 0;
+				right: 0;
+				bottom: 0;
+				left: 0;
+				transition: background 300 ease-in-out;
+			}
+
+			.backdrop[hidden] {
+				background: transparent;
 			}
 
 			@media(min-width: 800px) {
@@ -71,13 +97,16 @@
 		</style>
 	</head>
 	<body>
-		<button type="button" id="close-toast-button" title="Close">
-			<slot name="close-icon">
-				<svg class="current-color icon" viewBox="0 0 10 16">
-					<path fill-rule="evenodd" d="M5 11L0 6l1.5-1.5L5 8.25 8.5 4.5 10 6l-5 5z"/>
-				</svg>
-			</slot>
-		</button>
-		<slot name="content"></slot>
+		<div class="backdrop" part="backdrop" hidden=""></div>
+		<div class="container" part="container">
+			<button type="button" id="close-toast-button" part="close-btn" title="Close">
+				<slot name="close-icon">
+					<svg class="current-color icon" viewBox="0 0 10 16">
+						<path fill-rule="evenodd" d="M5 11L0 6l1.5-1.5L5 8.25 8.5 4.5 10 6l-5 5z"/>
+					</svg>
+				</slot>
+			</button>
+			<slot name="content"></slot>
+		</div>
 	</body>
 </html>

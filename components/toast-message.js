@@ -39,6 +39,22 @@ customElements.define('toast-message', class HTMLToastMessageElement extends HTM
 		this.contentElement = el;
 	}
 
+	get backdrop() {
+		return this.hasAttribute('backdrop');
+	}
+
+	set backdrop(val) {
+		this.toggleAttribute('backdrop', val);
+	}
+
+	get timer() {
+		return parseInt(this.getAttribute('timer'));
+	}
+
+	set timer(val) {
+		this.setAttribute('timer', val);
+	}
+
 	get color() {
 		return this.getAttribute('color');
 	}
@@ -99,7 +115,10 @@ customElements.define('toast-message', class HTMLToastMessageElement extends HTM
 
 	async show() {
 		this.hidden = false;
-		const anim = this.animate([{
+		const timer = this.timer;
+		const container = this.shadowRoot.querySelector('.container');
+		const showBackdrop = this.backdrop;
+		const anim = container.animate([{
 			bottom: `-${this.height}px`,
 			opacity: 0,
 		}, {
@@ -110,13 +129,23 @@ customElements.define('toast-message', class HTMLToastMessageElement extends HTM
 			easing: 'ease-in-out',
 			fill: 'both',
 		});
+
 		this.open = true;
+
+		if (showBackdrop) {
+			this.shadowRoot.querySelector('.backdrop').hidden = false;
+		}
 		await anim.finished;
+		if (! Number.isNaN(timer)) {
+			setTimeout(() => this.close(), timer * 1000);
+		}
+
 		return this;
 	}
 
 	async close() {
-		const anim = this.animate([{
+		const container = this.shadowRoot.querySelector('.container');
+		const anim = container.animate([{
 			bottom: `-${this.height}px`,
 			opacity: 0,
 		}, {
@@ -132,6 +161,9 @@ customElements.define('toast-message', class HTMLToastMessageElement extends HTM
 		await anim.finished;
 		this.open = false;
 		this.hidden = true;
+		if (this.backdrop) {
+			this.shadowRoot.querySelector('.backdrop').hidden = true;
+		}
 		return this;
 	}
 
