@@ -18,9 +18,20 @@ customElements.define('toast-message', class HTMLToastMessageElement extends HTM
 			});
 
 			this.shadowRoot.append(frag);
+			this.dispatchEvent(new Event('ready'));
 
 			if (typeof message === 'string') {
 				this.text = message;
+			}
+		});
+	}
+
+	get ready() {
+		return new Promise(resolve => {
+			if (this.shadowRoot.childElementCount === 0) {
+				this.addEventListener('ready', () => resolve(), {once: true});
+			} else {
+				resolve();
 			}
 		});
 	}
@@ -114,6 +125,7 @@ customElements.define('toast-message', class HTMLToastMessageElement extends HTM
 	}
 
 	async show() {
+		await this.ready;
 		this.hidden = false;
 		const timer = this.timer;
 		const container = this.shadowRoot.querySelector('.container');
@@ -144,6 +156,7 @@ customElements.define('toast-message', class HTMLToastMessageElement extends HTM
 	}
 
 	async close() {
+		await this.ready;
 		const container = this.shadowRoot.querySelector('.container');
 		const anim = container.animate([{
 			bottom: `-${this.height}px`,
