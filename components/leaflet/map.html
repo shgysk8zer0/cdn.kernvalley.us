@@ -21,7 +21,8 @@
 			}
 
 			::slotted([slot="markers"]), ::slotted([slot="attribution"]),
-			::slotted([slot="icon"]), slot[name="attribution"], ::slotted([slot="overlays"]) {
+			::slotted([slot="icon"]), slot[name="attribution"], ::slotted([slot="overlays"]),
+			::slotted([slot="geojson"]) {
 				display: none;
 			}
 
@@ -40,5 +41,6 @@
 		</slot>
 		<slot name="markers"></slot>
 		<slot name="overlays"></slot>
+		<slot name="geojson"></slot>
 	</body>
 </html>

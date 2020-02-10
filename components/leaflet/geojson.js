@@ -5,6 +5,7 @@ customElements.define('leaflet-geojson', class HTMLLeafletGeoJSONElement extends
 	constructor() {
 		super();
 		this._map = null;
+		this.slot = 'geojson';
 	}
 
 	get color() {

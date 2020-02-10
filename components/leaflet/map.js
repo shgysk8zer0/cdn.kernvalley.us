@@ -7,7 +7,7 @@ import {
 let map = new Map();
 
 /**
- * @see https://leafletjs.com/reference-1.5.0.html#map-factory
+ * @see https://leafletjs.com/reference-1.6.0.html#map-factory
  */
 customElements.define('leaflet-map', class HTMLLeafletMapElement extends HTMLElement {
 	constructor() {
@@ -21,6 +21,60 @@ customElements.define('leaflet-map', class HTMLLeafletMapElement extends HTMLEle
 			const doc = parser.parseFromString(html, 'text/html');
 			this._shadow.append(...doc.head.children, ...doc.body.children);
 			this.dispatchEvent(new Event('populated'));
+
+			new MutationObserver(async (mutations) => {
+				const changes = {
+					markers:  {added: [], removed: []},
+					overlays: {added: [], removed: []},
+					geojson:  {added: [], removed: []},
+				};
+
+				mutations.forEach(({ type, addedNodes, removedNodes }) => {
+					if (type === 'childList') {
+						[...addedNodes].forEach(el => {
+							const slot = el.slot.toLowerCase();
+							if (typeof slot === 'string' && changes.hasOwnProperty(slot)) {
+								changes[slot].added.push(el);
+							}
+						});
+
+						[...removedNodes].forEach(el => {
+							const slot = el.slot.toLowerCase();
+							if (typeof slot === 'string' && changes.hasOwnProperty(slot)) {
+								changes[slot].removed.push(el);
+							}
+						});
+
+						const { markers, overlays, geojson } = changes;
+
+						if (markers.added.length !== 0 || markers.removed.length !== 0) {
+							this.dispatchEvent(new CustomEvent('markerchange', {detail: {
+								added: markers.added,
+								removed: markers.removed,
+							}}));
+						}
+
+						if (overlays.added.length !== 0 || overlays.removed.length !== 0) {
+							this.dispatchEvent(new CustomEvent('overlaychange', {detail: {
+								added: overlays.added,
+								removed: overlays.removed,
+							}}));
+						}
+
+						if (geojson.added.length !== 0 || geojson.removed.length !== 0) {
+							this.dispatchEvent(new CustomEvent('geojsonchange', {detail: {
+								added: geojson.added,
+								removed: geojson.removed,
+							}}));
+						}
+					}
+				});
+			}).observe(this, {
+				childList: true,
+				subtree: true,
+				attributes: false,
+				characterData: false,
+			});
 		});
 	}
 
@@ -250,6 +304,15 @@ customElements.define('leaflet-map', class HTMLLeafletMapElement extends HTMLEle
 			return [];
 		} else {
 			const slot = this._shadow.querySelector('slot[name="markers"]');
+			return slot.assignedNodes();
+		}
+	}
+
+	get geoJson() {
+		if (this._shadow.childElementCount === 0) {
+			return [];
+		} else {
+			const slot = this._shadow.querySelector('slot[name="geojson"]');
 			return slot.assignedNodes();
 		}
 	}
