@@ -24,6 +24,20 @@ customElements.define('leaflet-geojson', class HTMLLeafletGeoJSONElement extends
 		this.toggleAttribute('fill', val);
 	}
 
+	get marker() {
+		if (this.parentElement.tagName === 'LEAFLET-MARKER') {
+			return this.parentElement;
+		} else if (this.hasAttribute('marker')) {
+			return document.getElementById(this.getAttribute('marker'));
+		} else {
+			return null;
+		}
+	}
+
+	set marker(val) {
+		this.setAttribute('marker', val);
+	}
+
 	get opacity() {
 		return this.hasAttribute('opacity') ? parseFloat(this.getAttribute('opacity')) : 1;
 	}
@@ -118,6 +132,7 @@ customElements.define('leaflet-geojson', class HTMLLeafletGeoJSONElement extends
 			await customElements.whenDefined('leaflet-map');
 			await closestMap.ready;
 			this._map = closestMap;
+			const marker = this.marker;
 
 			if (! map.has(this)) {
 				map.set(this, await this._make());
@@ -128,6 +143,10 @@ customElements.define('leaflet-geojson', class HTMLLeafletGeoJSONElement extends
 				await this._map.ready;
 				const path = map.get(this);
 				path.addTo(this._map.map);
+			}
+
+			if (marker instanceof HTMLElement) {
+				marker.addEventListener('markerclick', () => this.toggleAttribute('hidden'));
 			}
 		}
 	}
@@ -177,6 +196,7 @@ customElements.define('leaflet-geojson', class HTMLLeafletGeoJSONElement extends
 			'src',
 			'stroke',
 			'weight',
+			'marker',
 		];
 	}
 });
