@@ -5,71 +5,105 @@
 		<style>
 			@import url("https://cdn.kernvalley.us/css/core-css/element.css");
 			@import url("https://cdn.kernvalley.us/css/core-css/class-rules.css");
+
+			input {
+				background: inherit;
+				font-size: 1.2em;
+				margin: 0.3em 0 0.3em 0;
+				color: inherit;
+				border-width: 0 0 1px 0;
+				border-color: currentColor;
+				padding: 0.2rem 0.6rem;
+			}
+
+			[part~="name"] {
+				width: 8ch;
+			}
+
+			.btns {
+				justify-content: space-around;
+			}
+
+			.flex .btn.btn-wide {
+				flex-basis: 30%;
+				flex-shrink: 1;
+				flex-grow: 0;
+			}
+
+			fieldset {
+				border: none;
+			}
 		</style>
 	</head>
 	<body>
-		<toast-message id="registration-dialog" hidden="">
-			<form slot="content">
+		<toast-message id="registration-dialog" backdrop="" hidden="">
+			<form part="form" slot="content">
 				<input type="hidden" name="@context" value="https://schema.org" readonly="" />
 				<input type="hidden" name="@type" value="Person" readonly="" />
 				<fieldset>
 					<legend>
 						<slot name="legend">Register</slot>
 					</legend>
-					<div>
-						<label for="given-name">Name</label>
-						<input type="text" autocomplete="given-name" name="givenName" placeholder="First" required="" />
-						<input type="text" autocomplete="additional-name" name="additionalName" placeholder="Middle" />
-						<input type="text" autocomplete="family-name" name="familyName" placeholder="Last" required="" />
+					<div class="input-group">
+						<label for="given-name" part="name-label label">Name</label>
+						<br />
+						<input type="text" part="name given-name input" autocomplete="given-name" name="givenName" placeholder="First" required="" />
+						<input type="text" part="name additional-name input" autocomplete="additional-name" name="additionalName" placeholder="Middle" />
+						<input type="text" part="name family-name input" autocomplete="family-name" name="familyName" placeholder="Last" required="" />
 					</div>
-					<div>
-						<label for="username">
+					<div class="input-group">
+						<label for="username" part="username-label label">
 							<slot name="username-label">Email</slot>
 						</label>
-						<input type="email" name="username" id="username" placeholder="user@example.com" autocomplete="email" required="" />
+						<input type="email" part="username input" name="username" id="username" placeholder="user@example.com" autocomplete="email" required="" />
 					</div>
-					<div>
-						<label for="password">
+					<div class="input-group">
+						<label for="password" part="password-label label">
 							<slot name="password-label">Password</slot>
 						</label>
-						<input type="password" name="password" id="password" minlength="8" maxlength="72" autocomplete="new-password" placeholder="********" required="" />
+						<input type="password" part="password input" name="password" id="password" minlength="8" maxlength="72" autocomplete="new-password" placeholder="********" required="" />
 					</div>
-					<div>
-						<label for="telephone">
+					<div class="input-group">
+						<label for="telephone" part="telephone-label label">
 							<slot name="telephone-label">Phone</slot>
 						</label>
-						<input type="tel" name="telephone" id="telephone" placeholder="555-555-5555" autocomplete="tel" />
+						<input type="tel" part="telephone input" name="telephone" id="telephone" placeholder="555-555-5555" autocomplete="tel" />
 					</div>
-					<div>
-						<label for="birth-date">Birthday</label>
-						<input type="date" id="birth-date" name="birthDate" autocomplete="bday" placeholder="yyyy-mm-dd" />
+					<div class="input-group">
+						<label for="birth-date" part="birthdate-label label">Birthday</label>
+						<input type="date" part="birthdate input" id="birth-date" name="birthDate" autocomplete="bday" placeholder="yyyy-mm-dd" />
 					</div>
 				</fieldset>
-				<button type="submit" class="btn btn-accept" title="Submit">
-					<slot name="submit-btn">
-						<svg class="current-color icon" viewBox="0 0 12 16">
-							<path fill-rule="evenodd" d="M12 5l-8 8-4-4 1.5-1.5L4 10l6.5-6.5L12 5z"/>
-						</svg>
-						<span>Submit</span>
-					</slot>
-				</button>
-				<button type="reset" class="btn btn-reject" title="Cancel">
-					<slot name="reset-btn">
-						<svg class="current-color icon" viewBox="0 0 12 16">
-							<path fill-rule="evenodd" d="M7.48 8l3.75 3.75-1.48 1.48L6 9.48l-3.75 3.75-1.48-1.48L4.52 8 .77 4.25l1.48-1.48L6 6.52l3.75-3.75 1.48 1.48L7.48 8z"/>
-						</svg>
-						<span>Cancel</span>
-					</slot>
-				</button>
+				<div class="btns flex row nowrap">
+					<button type="submit" class="btn btn-accept btn-wide" title="Submit" part="submit">
+						<slot name="submit-btn">
+							<svg class="current-color icon" viewBox="0 0 12 16">
+								<path fill-rule="evenodd" d="M12 5l-8 8-4-4 1.5-1.5L4 10l6.5-6.5L12 5z"/>
+							</svg>
+							<span>Submit</span>
+						</slot>
+					</button>
+					<button type="reset" class="btn btn-reject btn-wide" title="Cancel" part="reset">
+						<slot name="reset-btn">
+							<svg class="current-color icon" viewBox="0 0 12 16">
+								<path fill-rule="evenodd" d="M7.48 8l3.75 3.75-1.48 1.48L6 9.48l-3.75 3.75-1.48-1.48L4.52 8 .77 4.25l1.48-1.48L6 6.52l3.75-3.75 1.48 1.48L7.48 8z"/>
+							</svg>
+							<span>Cancel</span>
+						</slot>
+					</button>
+				</div>
 			</form>
-			<button type="button" is="login-button" class="btn btn-primary" title="Sign In" slot="content">
-				<slot name="login-btn">
-					<svg class="current-color icon" viewBox="0 0 14 16">
-						<path fill-rule="evenodd" d="M7 6.75V12h4V8h1v4c0 .55-.45 1-1 1H7v3l-5.45-2.72c-.33-.17-.55-.52-.55-.91V1c0-.55.45-1 1-1h9c.55 0 1 .45 1 1v3h-1V1H3l4 2v2.25L10 3v2h4v2h-4v2L7 6.75z"></path>
-					</svg>
-					<span>Sign In</span>
-				</slot>
-			</button>
+			<br slot="content" />
+			<div class="btns flex row nowrap" slot="content">
+				<button type="button" is="login-button" class="btn btn-primary btn-wide" title="Sign In" part="login">
+					<slot name="login-btn">
+						<svg class="current-color icon" viewBox="0 0 14 16">
+							<path fill-rule="evenodd" d="M7 6.75V12h4V8h1v4c0 .55-.45 1-1 1H7v3l-5.45-2.72c-.33-.17-.55-.52-.55-.91V1c0-.55.45-1 1-1h9c.55 0 1 .45 1 1v3h-1V1H3l4 2v2.25L10 3v2h4v2h-4v2L7 6.75z"></path>
+						</svg>
+						<span>Sign In</span>
+					</slot>
+				</button>
+			</div>
 		</toast-message>
 	</body>
 </html>
