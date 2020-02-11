@@ -1,4 +1,5 @@
 import webShareApi from '/js/std-js/webShareApi.js';
+import { loaded } from '/js/std-js/functions.js';
 import {
 	facebook,
 	twitter,
@@ -15,7 +16,9 @@ webShareApi(facebook, twitter, googlePlus, linkedIn, reddit, gmail, email, clipb
 export default class HTMLShareButtonElement extends HTMLButtonElement {
 	constructor() {
 		super();
-		this.hidden = !(navigator.share instanceof Function);
+
+		loaded().then(() => this.hidden = !(navigator.share instanceof Function));
+
 		this.addEventListener('click', async event => {
 			event.preventDefault();
 			event.stopPropagation();
