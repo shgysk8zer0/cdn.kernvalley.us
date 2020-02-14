@@ -1,21 +1,21 @@
 async function log(event) {
 	if ('target' in event) {
 		const data = new FormData();
-		data.set('datetime',                 Date.now());
-		data.set('user[userAgent]',          navigator.userAgent);
-		data.set('user[screen][width]',      screen.width);
-		data.set('user[screen][height]',     screen.height);
+		data.set('datetime', Date.now());
+		data.set('user[userAgent]', navigator.userAgent);
+		data.set('user[screen][width]', screen.width);
+		data.set('user[screen][height]', screen.height);
 		data.set('user[screen][colorDepth]', screen.colorDepth);
 		data.set('user[screen][pixelDepth]', screen.pixelDepth);
-		data.set('user[language]',           navigator.language);
-		data.set('user[doNotTrack]',         navigator.doNotTrack === '1');
-		data.set('context[page][url]',       `${location.origin}${location.pathname}`);
-		data.set('context[page][title]',     document.title);
-		data.set('context[page][referrer]',  document.referrer);
-		data.set('context[ad][width]',       event.target.scrollWidth || '');
-		data.set('context[ad][height]',      event.target.scrollHeight || '');
-		data.set('context[ad][id]',          event.target.id || '');
-		data.set('context[ad][url]',         event.target.url || '');
+		data.set('user[language]', navigator.language);
+		data.set('user[doNotTrack]', navigator.doNotTrack === '1');
+		data.set('context[page][url]', `${location.origin}${location.pathname}`);
+		data.set('context[page][title]', document.title);
+		data.set('context[page][referrer]', document.referrer);
+		data.set('context[ad][width]', event.target.scrollWidth || '');
+		data.set('context[ad][height]', event.target.scrollHeight || '');
+		data.set('context[ad][id]', event.target.id || '');
+		data.set('context[ad][url]', event.target.url || '');
 
 		if ('connection' in navigator) {
 			data.set('connection[type]', navigator.connection.type || 'unknown');
@@ -31,7 +31,7 @@ async function log(event) {
 			data.set('type', event.isIntersecting ? 'viewed' : 'passed');
 		}
 
-		navigator.sendBeacon('https://api.kernvalley.us/test/', data);
+		// navigator.sendBeacon('https://api.kernvalley.us/test/', data);
 	}
 }
 
@@ -42,7 +42,7 @@ customElements.define('ad-block', class HTMLAddBlockElement extends HTMLElement 
 		super();
 		this.setAttribute('itemtype', 'https://schema.org/WPAdBlock');
 		this.setAttribute('itemscope', '');
-		const shadow = this.attachShadow({mode: 'closed'});
+		const shadow = this.attachShadow({ mode: 'closed' });
 		const container = document.createElement('a');
 		const logo = document.createElement('div');
 		const logoSlot = document.createElement('slot');
@@ -54,10 +54,10 @@ customElements.define('ad-block', class HTMLAddBlockElement extends HTMLElement 
 		const descriptionSlot = document.createElement('slot');
 		const style = document.createElement('style');
 
-		this.addEventListener('mouseenter',  log, {passive: true, once: true});
-		this.addEventListener('click',       log, {passive: true, once: true});
-		this.addEventListener('contextmenu', log, {passive: true, once: true});
-		this.addEventListener('remove',      log, {passive: true, once: true});
+		this.addEventListener('mouseenter', log, { passive: true, once: true });
+		this.addEventListener('click', log, { passive: true, once: true });
+		this.addEventListener('contextmenu', log, { passive: true, once: true });
+		this.addEventListener('remove', log, { passive: true, once: true });
 
 		style.textContent = `
 			:host {
@@ -188,9 +188,9 @@ customElements.define('ad-block', class HTMLAddBlockElement extends HTMLElement 
 
 	async attributeChangedCallback(name, oldValue, newValue) {
 		await this.ready;
-		switch(name) {
+		switch (name) {
 		case 'theme':
-			this.dispatchEvent(new CustomEvent('themechange', {detail: {oldValue, newValue}}));
+			this.dispatchEvent(new CustomEvent('themechange', { detail: { oldValue, newValue } }));
 			break;
 
 		case 'url':
@@ -241,7 +241,7 @@ customElements.define('ad-block', class HTMLAddBlockElement extends HTMLElement 
 			if (shadow && shadow.childElementCount !== 0) {
 				resolve();
 			} else {
-				this.addEventListener('ready', () => resolve(), {once: true});
+				this.addEventListener('ready', () => resolve(), { once: true });
 			}
 		});
 	}
@@ -251,7 +251,7 @@ customElements.define('ad-block', class HTMLAddBlockElement extends HTMLElement 
 	}
 
 	set theme(val) {
-		switch(val.toLowerCase()) {
+		switch (val.toLowerCase()) {
 		case 'light':
 			this.setAttribute('theme', 'light');
 			break;
@@ -275,7 +275,7 @@ customElements.define('ad-block', class HTMLAddBlockElement extends HTMLElement 
 			if (this.classList.contains('shown')) {
 				resolve();
 			} else {
-				this.addEventListener('shown', () => resolve(), {once: true});
+				this.addEventListener('shown', () => resolve(), { once: true });
 			}
 		});
 	}
