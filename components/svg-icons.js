@@ -52,7 +52,7 @@ customElements.define('svg-icons', class SVGIconsElement extends HTMLElement {
 	}
 
 	get src() {
-		return new URL(this.getAttribute('src', document.baseURI));
+		return new URL(this.getAttribute('src'), document.baseURI);
 	}
 
 	set src(val) {
