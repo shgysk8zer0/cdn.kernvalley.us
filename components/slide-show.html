@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+	<head>
+		<meta charset="utf-8" />
+		<style>
+			:host {
+				display: block;
+				width: var(--slideshow-width, 100%);
+				height: var(--slideshow-height, 100%);
+				position: relative;
+				contain: strict;
+				background-color: inherit;
+				color: inherit;
+			}
+
+			* {
+				box-sizing: border-box;
+			}
+
+			.background-transparent {
+				background-color: transparent;
+			}
+
+			.icon {
+				color: inherit;
+				max-width: 100%;
+				max-height: 100%;
+				width: 1em;
+				height: 1em;
+				vertical-align: baseline;
+			}
+
+			.current-color {
+				fill: currentColor;
+			}
+
+			.relative {
+				position: relative;
+			}
+
+			.btn {
+				cursor: pointer;
+			}
+
+			.btn-nav {
+				font-size: 3em;
+				padding: 0;
+				height: 1em;
+				width: 1em;
+				position: absolute;
+				top: calc(var(--slideshow-height, 100%) / 2 - .5em);
+				bottom: calc(var(--slideshow-height, 100%) / 2 - .5em);
+				color: inherit;
+				border: none;
+			}
+
+			.btn-next {
+				right: 0;
+			}
+
+			.btn-prev {
+				left: 0;
+			}
+
+			.img-container {
+				height: var(--slideshow-height, 100%);
+				max-height: 100%;
+			}
+
+			.img-container .btn {
+				opacity: 0;
+				z-index: 2;
+				transition: opacity 300ms ease-in-out;
+			}
+
+			.img-container:hover .btn {
+				opacity: 1;
+			}
+
+			::slotted([slot="current-img"]) {
+				max-width: 100%;
+				width: auto;
+				height: var(--slideshow-height, 100%);
+				object-fit: contain;
+				object-position: center top;
+				transform: none;
+				animation: animateIn 400ms ease-in-out;
+			}
+
+			[part~="current"] {
+				position: absolute;
+				top: 0;
+				left: auto;
+				right: auto;
+				width: 100%;
+				height: inherit;
+				text-align: center;
+				display: flex;
+				flex-direction: column;
+				justify-content: center;
+			}
+
+			@keyframes animateIn {
+				from: {
+					transform: scale(0.4);
+				}
+
+				to {
+					transform: none;
+				}
+			}
+		</style>
+	</head>
+	<body>
+		<div class="img-container realtive" part="viewer">
+			<button type="button" part="nav-btn prev-btn" class="background-transparent btn btn-nav btn-prev" data-action="prev" title="Previous image">
+				<svg class="current-color icon" viewBox="0 0 16 16">
+						<path d="M4.56 8l5.719 5.719c.196.196.463.281.719.281h1v-1a1.01 1.01 0 0 0-.282-.719l-4.28-4.28 4.28-4.282A1.01 1.01 0 0 0 11.998 3V2h-1a1.01 1.01 0 0 0-.72.281z"/>
+				</svg>
+			</button>
+			<div part="current">
+				<slot name="current-img"></slot>
+			</div>
+			<button type="button" part="nav-btn next-btn" class="background-transparent btn btn-nav btn-next" data-action="next" title="Next image">
+				<svg class="current-color icon" viewBox="0 0 16 16">
+						<path d="M11.44 8l-5.719 5.719a1.01 1.01 0 0 1-.719.281h-1v-1c0-.256.086-.523.282-.719l4.28-4.28-4.28-4.282A1.01 1.01 0 0 1 4.002 3V2h1c.256 0 .523.086.72.281z"/>
+				</svg>
+			</button>
+		</div>
+		<slot id="images" name="images" hidden=""></slot>
+	</body>
+</html>
