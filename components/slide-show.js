@@ -2,6 +2,12 @@ async function sleep(ms = 1000) {
 	await new Promise(resolve => setTimeout(() => resolve(), ms));
 }
 
+async function visible() {
+	if (document.visibilityState === 'hidden') {
+		await new Promise(resolve => document.addEventListener('visibilitychange', () => resolve(), {once: true}));
+	}
+}
+
 customElements.define('slide-show', class HTMLSlideShowElement extends HTMLElement {
 	constructor() {
 		super();
@@ -131,7 +137,7 @@ customElements.define('slide-show', class HTMLSlideShowElement extends HTMLEleme
 	}
 
 	loopImages() {
-		return (async function *imgGenerator() {
+		return (async function* imgGenerator() {
 			await this.ready;
 			while (true) {
 				const images = this.images;
@@ -139,7 +145,12 @@ customElements.define('slide-show', class HTMLSlideShowElement extends HTMLEleme
 				for (const img of images) {
 					img.decoding = 'auto';
 					const image = await Promise.race([
-						Promise.all([img.decode instanceof Function ? img.decode() : Promise.resolve(), sleep(this.interval), this.playing()])
+						Promise.all([
+							this.playing(),
+							visible(),
+							img.decode instanceof Function ? img.decode() : Promise.resolve(),
+							sleep(this.interval),
+						])
 							.then(() => i === images.length - 1 ? i = 0 : i++)
 							.then(() => img),
 						new Promise(resolve => {
