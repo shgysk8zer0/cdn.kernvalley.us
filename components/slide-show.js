@@ -4,7 +4,11 @@ async function sleep(ms = 1000) {
 
 async function visible() {
 	if (document.visibilityState === 'hidden') {
-		await new Promise(resolve => document.addEventListener('visibilitychange', () => resolve(), {once: true}));
+		await new Promise(resolve => {
+			document.addEventListener('visibilitychange', () => resolve());
+		}, {
+			once: true,
+		});
 	}
 }
 
@@ -46,6 +50,7 @@ customElements.define('slide-show', class HTMLSlideShowElement extends HTMLEleme
 			/**
 			 * Check for amimation support & reduced motion preferences
 			 */
+			await this.ready;
 			const anim = Element.prototype.animate instanceof Function && Animation.prototype.hasOwnProperty('finished')
 			&& ! matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -61,25 +66,30 @@ customElements.define('slide-show', class HTMLSlideShowElement extends HTMLEleme
 				const current = currentSlot.assignedNodes();
 
 				if (anim) {
+					const duration = this.duration;
 					this.prepend(copy);
 					await Promise.all([
 						...current.map(el => el.animate([{
 							transform: 'none',
+							opacity: 1,
 						}, {
-							transform: 'translateX(100%) scale(0.4)'
+							transform: 'translateX(100%) scale(0.2) rotate(0.02turn)',
+							opacity: 0,
 						}], {
-							duration: 400,
+							duration,
 							easing: 'ease-in-out',
+							fill: 'forwards',
 						}).finished),
 						copy.animate([{
-							transform: 'translateX(-100%) scale(0.4) rotate(0.02turn)',
+							transform: 'translateX(-100%) scale(0.2) rotate(0.02turn)',
 							opacity: 0,
 						}, {
 							transform: 'none',
 							opacity: 1,
 						}], {
-							duration: 400,
+							duration,
 							easing: 'ease-in-out',
+							fill: 'forwards',
 						}).finished,
 					]);
 					current.forEach(el => el.remove());
@@ -90,6 +100,10 @@ customElements.define('slide-show', class HTMLSlideShowElement extends HTMLEleme
 				this.dispatchEvent(new Event('imgchange'));
 			}
 		});
+	}
+
+	get duration() {
+		return parseInt(this.getAttribute('duration')) || 400;
 	}
 
 	get interval() {
@@ -132,45 +146,59 @@ customElements.define('slide-show', class HTMLSlideShowElement extends HTMLEleme
 
 	async playing() {
 		if (this.paused) {
-			await new Promise(resolve => this.addEventListener('playing', () => resolve(this)), {once: true});
+			await new Promise(resolve => {
+				this.addEventListener('playing', () => resolve(this));
+			}, {
+				once: true,
+			});
 		}
 	}
 
 	loopImages() {
 		return (async function* imgGenerator() {
 			await this.ready;
+
 			while (true) {
 				const images = this.images;
 				let i = 0;
+
 				for (const img of images) {
 					img.decoding = 'auto';
-					const image = await Promise.race([
+
+					yield await Promise.race([
 						Promise.all([
 							this.playing(),
 							visible(),
 							img.decode instanceof Function ? img.decode() : Promise.resolve(),
 							sleep(this.interval),
-						])
-							.then(() => i === images.length - 1 ? i = 0 : i++)
-							.then(() => img),
+						]).then(() => {
+							i === images.length - 1 ? i = 0 : i++;
+							return img;
+						}),
 						new Promise(resolve => {
-							function callback({detail}) {
-								if (detail === 'prev') {
+							function callback(event) {
+								if (event.detail === 'prev') {
 									i === 0 ? i = images.length - 1 : i--;
 									resolve(images[i]);
-								} else if (detail === 'next') {
+								} else if (event.detail === 'next') {
 									i === images.length - 1 ? i = 0 : i++;
 									resolve(images[i]);
 								} else {
 									resolve(this.images[0]);
 								}
 							}
+
 							callback.bind(this);
-							this.addEventListener('imgchange', () => this.removeEventListener('userchange', callback));
-							this.addEventListener('userchange', callback);
+
+							this.addEventListener('imgchange', () => {
+								this.removeEventListener('userchange', callback);
+							}, {
+								once: true,
+							});
+
+							this.addEventListener('userchange', callback, {once: true});
 						}),
 					]);
-					yield image;
 				}
 			}
 		}).bind(this)();
@@ -187,11 +215,17 @@ customElements.define('slide-show', class HTMLSlideShowElement extends HTMLEleme
 			break;
 
 		case 'width':
-			this.style.setProperty('--slideshow-width', newVal);
+			this.ready.then(() => {
+				this._shadow.querySelector('[part~="container"]')
+					.style.setProperty('--slideshow-width', newVal);
+			});
 			break;
 
 		case 'height':
-			this.style.setProperty('--slideshow-height', newVal);
+			this.ready.then(() => {
+				this._shadow.querySelector('[part~="container"]')
+					.style.setProperty('--slideshow-height', newVal);
+			});
 			break;
 		}
 	}

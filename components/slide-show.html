@@ -4,11 +4,8 @@
 		<meta charset="utf-8" />
 		<style>
 			:host {
-				display: block;
-				width: var(--slideshow-width, 100%);
-				height: var(--slideshow-height, 100%);
+				display: inline-block;
 				position: relative;
-				contain: strict;
 				background-color: inherit;
 				color: inherit;
 			}
@@ -38,6 +35,14 @@
 				position: relative;
 			}
 
+			.absolute {
+				position: absolute;
+			}
+
+			.flex {
+				display: flex;
+			}
+
 			.btn {
 				cursor: pointer;
 			}
@@ -47,8 +52,7 @@
 				padding: 0;
 				height: 1em;
 				width: 1em;
-				position: absolute;
-				top: calc(var(--slideshow-height, 100%) / 2 - .5em);
+				top: calc(var(--slideshow-height, 320px) / 2 - .5em);
 				bottom: calc(var(--slideshow-height, 100%) / 2 - .5em);
 				color: inherit;
 				border: none;
@@ -62,11 +66,6 @@
 				left: 0;
 			}
 
-			.img-container {
-				height: var(--slideshow-height, 100%);
-				max-height: 100%;
-			}
-
 			.img-container .btn {
 				opacity: 0;
 				z-index: 2;
@@ -78,26 +77,40 @@
 			}
 
 			::slotted([slot="current-img"]) {
-				max-width: 100%;
-				width: auto;
-				height: var(--slideshow-height, 100%);
-				object-fit: contain;
-				object-position: center top;
-				transform: none;
-				animation: animateIn 400ms ease-in-out;
-			}
-
-			[part~="current"] {
 				position: absolute;
 				top: 0;
 				left: auto;
 				right: auto;
+				max-width: var(--slideshow-width, 100%);
+				width: auto;
+				height: var(--slideshow-height, 320px);
+				object-fit: contain;
+				object-position: center top;
+				display: inline-block;
+				transform: none;
+				transform-origin: center;
+			}
+
+			[part~="container"] {
+				contain: strict;
+				width: var(--slideshow-width, 568px);
+				height: var(--slideshow-height, 320px);
+			}
+
+			[part~="current"] {
+				position: absolute;
+				overflow: hidden;
+				top: 0;
+				bottom: 0;
+				left: auto;
+				right: auto;
 				width: 100%;
-				height: inherit;
-				text-align: center;
+				height: var(--slideshow-height, 320px);
 				display: flex;
 				flex-direction: column;
 				justify-content: center;
+				transform-origin: center;
+				clear: both;
 			}
 
 			@keyframes animateIn {
@@ -112,18 +125,18 @@
 		</style>
 	</head>
 	<body>
-		<div class="img-container realtive" part="viewer">
-			<button type="button" part="nav-btn prev-btn" class="background-transparent btn btn-nav btn-prev" data-action="prev" title="Previous image">
+		<div part="container" class="img-container realtive">
+			<button type="button" part="nav-btn prev-btn" class="background-transparent absolute btn btn-nav btn-prev" data-action="prev" title="Previous image">
 				<svg class="current-color icon" viewBox="0 0 16 16">
-						<path d="M4.56 8l5.719 5.719c.196.196.463.281.719.281h1v-1a1.01 1.01 0 0 0-.282-.719l-4.28-4.28 4.28-4.282A1.01 1.01 0 0 0 11.998 3V2h-1a1.01 1.01 0 0 0-.72.281z"/>
+					<path d="M4.56 8l5.719 5.719c.196.196.463.281.719.281h1v-1a1.01 1.01 0 0 0-.282-.719l-4.28-4.28 4.28-4.282A1.01 1.01 0 0 0 11.998 3V2h-1a1.01 1.01 0 0 0-.72.281z"/>
 				</svg>
 			</button>
-			<div part="current">
+			<div part="current" class="relative">
 				<slot name="current-img"></slot>
 			</div>
-			<button type="button" part="nav-btn next-btn" class="background-transparent btn btn-nav btn-next" data-action="next" title="Next image">
+			<button type="button" part="nav-btn next-btn" class="background-transparent absolute btn btn-nav btn-next" data-action="next" title="Next image">
 				<svg class="current-color icon" viewBox="0 0 16 16">
-						<path d="M11.44 8l-5.719 5.719a1.01 1.01 0 0 1-.719.281h-1v-1c0-.256.086-.523.282-.719l4.28-4.28-4.28-4.282A1.01 1.01 0 0 1 4.002 3V2h1c.256 0 .523.086.72.281z"/>
+					<path d="M11.44 8l-5.719 5.719a1.01 1.01 0 0 1-.719.281h-1v-1c0-.256.086-.523.282-.719l4.28-4.28-4.28-4.282A1.01 1.01 0 0 1 4.002 3V2h1c.256 0 .523.086.72.281z"/>
 				</svg>
 			</button>
 		</div>
