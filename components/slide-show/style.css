@@ -1,0 +1,127 @@
+:host {
+	display: inline-block;
+	position: relative;
+	background-color: inherit;
+	color: inherit;
+}
+
+* {
+	box-sizing: border-box;
+}
+
+.background-transparent {
+	background-color: transparent;
+}
+
+.icon {
+	color: inherit;
+	max-width: 100%;
+	max-height: 100%;
+	width: 1em;
+	height: 1em;
+	vertical-align: baseline;
+}
+
+.current-color {
+	fill: currentColor;
+}
+
+.relative {
+	position: relative;
+}
+
+.absolute {
+	position: absolute;
+}
+
+.flex {
+	display: flex;
+}
+
+.btn {
+	cursor: pointer;
+}
+
+[part~="nav-btn"] {
+	font-size: 3em;
+	padding: 0;
+	height: 1em;
+	width: 1em;
+	top: calc(var(--slideshow-height, 320px) / 2 - .5em);
+	bottom: calc(var(--slideshow-height, 100%) / 2 - .5em);
+	color: inherit;
+	border: none;
+}
+
+.btn-next {
+	right: 0;
+}
+
+.btn-prev {
+	left: 0;
+}
+
+.img-container .btn {
+	opacity: 0;
+	z-index: 2;
+	transition: opacity 300ms ease-in-out;
+}
+
+.img-container:hover .btn {
+	opacity: 1;
+}
+
+::slotted([slot="displayed"]) {
+	position: absolute;
+	top: 0;
+	left: auto;
+	right: auto;
+	max-width: var(--slideshow-width, 100%);
+	width: auto;
+	min-height: 100%;
+	max-height: 100%;
+	object-fit: contain;
+	object-position: center top;
+	display: inline-block;
+	transform: none;
+	transform-origin: center;
+	overflow: auto;
+}
+
+/* Overwrite styles to ensure proper alignment for nav-btn icons */
+::slotted(svg.icon) {
+	vertical-align: baseline !important;
+}
+
+[part~="container"] {
+	contain: strict;
+	width: var(--slideshow-width, 568px);
+	height: var(--slideshow-height, 320px);
+}
+
+[part~="current"] {
+	position: absolute;
+	overflow: hidden;
+	top: 0;
+	bottom: 0;
+	left: auto;
+	right: auto;
+	width: 100%;
+	height: var(--slideshow-height, 320px);
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	transform-origin: center;
+	clear: both;
+}
+
+@keyframes animateIn {
+	from: {
+		transform: scale(0.4);
+	}
+
+	to {
+		transform: none;
+	}
+}
