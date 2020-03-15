@@ -66,7 +66,7 @@ if ('customElements' in self && ! (customElements.get('slide-show') instanceof H
 				&& ! matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 				if (! anim) {
-					this.shadowRoot.querySelector('.img-container').classList.add('animated');
+					this.shadowRoot.querySelector('.slide-container').classList.add('animated');
 				}
 
 				for await(const img of await this.loopImages()) {

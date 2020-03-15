@@ -1,6 +1,7 @@
 :host {
 	display: inline-block;
 	position: relative;
+	max-width: 100%;
 	background-color: inherit;
 	color: inherit;
 }
@@ -61,13 +62,13 @@
 	left: 0;
 }
 
-.img-container .btn {
+.slide-container .btn {
 	opacity: 0;
 	z-index: 2;
 	transition: opacity 300ms ease-in-out;
 }
 
-.img-container:hover .btn {
+.slide-container:hover .btn {
 	opacity: 1;
 }
 
@@ -76,12 +77,12 @@
 	top: 0;
 	left: auto;
 	right: auto;
-	max-width: var(--slideshow-width, 100%);
 	width: auto;
+	max-width: 100%;
 	min-height: 100%;
 	max-height: 100%;
 	object-fit: contain;
-	object-position: center top;
+	object-position: center;
 	display: inline-block;
 	transform: none;
 	transform-origin: center;
@@ -95,6 +96,7 @@
 
 [part~="container"] {
 	contain: strict;
+	max-width: 100%;
 	width: var(--slideshow-width, 568px);
 	height: var(--slideshow-height, 320px);
 }
@@ -107,6 +109,7 @@
 	left: auto;
 	right: auto;
 	width: 100%;
+	max-width: 100%;
 	height: var(--slideshow-height, 320px);
 	display: flex;
 	flex-direction: column;
