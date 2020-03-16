@@ -160,6 +160,14 @@ if ('customElements' in self && ! (customElements.get('slide-show') instanceof H
 			});
 		}
 
+		async next() {
+			this.dispatchEvent(new CustomEvent('userchange', {detail: 'next'}));
+		}
+
+		async prev() {
+			this.dispatchEvent(new CustomEvent('userchange', {detail: 'prev'}));
+		}
+
 		pause() {
 			this.removeAttribute('playing');
 		}
