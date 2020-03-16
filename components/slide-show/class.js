@@ -32,10 +32,30 @@ if ('customElements' in self && ! (customElements.get('slide-show') instanceof H
 					btn.addEventListener('click', ({target}) => {
 						if (this.contains(target)) {
 							const action = target.closest('[slot]').assignedSlot.closest('[data-action]').dataset.action;
-							this.dispatchEvent(new CustomEvent('userchange', {detail: action}));
+							switch(action) {
+							case 'next':
+								this.next();
+								break;
+
+							case 'prev':
+								this.prev();
+								break;
+
+							default: throw new Error(`Unhandled action requested: ${action}`);
+							}
 						} else {
 							const action = target.closest('[data-action]').dataset.action;
-							this.dispatchEvent(new CustomEvent('userchange', {detail: action}));
+							switch(action) {
+							case 'next':
+								this.next();
+								break;
+
+							case 'prev':
+								this.prev();
+								break;
+
+							default: throw new Error(`Unhandled action requested: ${action}`);
+							}
 						}
 					}, {
 						passive: true,
