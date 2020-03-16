@@ -91,6 +91,7 @@ if ('customElements' in self && ! (customElements.get('slide-show') instanceof H
 
 				for await(const slide of await this.loopSlides()) {
 					const current = this.currentSlides;
+					const direction = slide.dataset.direction || 'normal';
 					slide.loading = 'auto';
 					slide.slot = 'displayed';
 					slide.hidden = false;
@@ -103,7 +104,9 @@ if ('customElements' in self && ! (customElements.get('slide-show') instanceof H
 								transform: 'none',
 								opacity: 1,
 							}, {
-								transform: 'translateX(100%) scale(0.2) rotate(0.02turn)',
+								transform: direction === 'normal'
+									? 'translateX(100%) scale(0.2) rotate(0.02turn)'
+									: 'translateX(-100%) scale(0.2) rotate(0.02turn)',
 								opacity: 0,
 							}], {
 								duration,
@@ -111,7 +114,9 @@ if ('customElements' in self && ! (customElements.get('slide-show') instanceof H
 								fill: 'forwards',
 							}).finished),
 							slide.animate([{
-								transform: 'translateX(-100%) scale(0.2) rotate(0.02turn)',
+								transform: direction === 'normal'
+									? 'translateX(-100%) scale(0.2) rotate(0.02turn)'
+									: 'translateX(100%) scale(0.2) rotate(0.02turn)',
 								opacity: 0,
 							}, {
 								transform: 'none',
@@ -246,6 +251,7 @@ if ('customElements' in self && ! (customElements.get('slide-show') instanceof H
 					const slides = this.slides;
 
 					while (i < slides.length) {
+						let direction = 'normal';
 						let slide = slides[i];
 						// Keep copy of iterator index at beginning, before modifications
 						const n = i;
@@ -268,6 +274,7 @@ if ('customElements' in self && ! (customElements.get('slide-show') instanceof H
 							new Promise(resolve => {
 								function callback(event) {
 									if (event.detail === 'prev') {
+										direction = 'reverse';
 										// Set to previous index, or end if at the beginning
 										n === 0 ? i = slides.length - 1 : i = n - 1;
 									} else if (event.detail === 'next') {
@@ -280,8 +287,9 @@ if ('customElements' in self && ! (customElements.get('slide-show') instanceof H
 										i = 0;
 									}
 
-									slide = slides[i];
-									resolve(slide.cloneNode(true));
+									slide = slides[i].cloneNode(true);
+									slide.dataset.direction = direction;
+									resolve(slide);
 								}
 
 								callback.bind(this);
