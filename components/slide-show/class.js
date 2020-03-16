@@ -30,11 +30,11 @@ if ('customElements' in self && ! (customElements.get('slide-show') instanceof H
 
 				this.shadowRoot.querySelectorAll('[data-action]').forEach(btn => {
 					btn.addEventListener('click', ({target}) => {
-						if (this.shadowRoot.contains(target)) {
-							const action = target.closest('[data-action]').dataset.action;
+						if (this.contains(target)) {
+							const action = target.closest('[slot]').assignedSlot.closest('[data-action]').dataset.action;
 							this.dispatchEvent(new CustomEvent('userchange', {detail: action}));
 						} else {
-							const action = target.closest('[slot]').assignedSlot.closest('[data-action]');
+							const action = target.closest('[data-action]').dataset.action;
 							this.dispatchEvent(new CustomEvent('userchange', {detail: action}));
 						}
 					}, {
@@ -45,10 +45,10 @@ if ('customElements' in self && ! (customElements.get('slide-show') instanceof H
 				const currentSlot = this.shadowRoot.querySelector('slot[name="displayed"]');
 
 				if (currentSlot.assignedNodes().length === 0) {
-					const imgs = this.images;
+					const slides = this.slides;
 
-					if (imgs.length !== 0) {
-						const current = imgs[0].cloneNode(true);
+					if (slides.length !== 0) {
+						const current = slides[0].cloneNode(true);
 						current.slot = 'displayed';
 						this.append(current);
 					}
@@ -69,8 +69,8 @@ if ('customElements' in self && ! (customElements.get('slide-show') instanceof H
 					this.shadowRoot.querySelector('.slide-container').classList.add('animated');
 				}
 
-				for await(const img of await this.loopImages()) {
-					const copy = img.cloneNode(true);
+				for await(const slide of await this.loopSlides()) {
+					const copy = slide.cloneNode(true);
 					const currentSlot = this.shadowRoot.querySelector('slot[name="displayed"]');
 					const current = currentSlot.assignedNodes();
 					copy.slot = 'displayed';
@@ -112,9 +112,18 @@ if ('customElements' in self && ! (customElements.get('slide-show') instanceof H
 							this.append(copy);
 						});
 					}
-					this.dispatchEvent(new Event('imgchange'));
+					this.dispatchEvent(new Event('slidechange'));
 				}
 			});
+		}
+
+		get currentSlide() {
+			if (this.shadowRoot.childElementCount > 0) {
+				const displayed = this.shadowRoot.querySelector('slot[name="displayed"]');
+				return displayed.length !== 0 ? displayed[0] : null;
+			} else {
+				return null;
+			}
 		}
 
 		get duration() {
@@ -133,8 +142,8 @@ if ('customElements' in self && ! (customElements.get('slide-show') instanceof H
 			}
 		}
 
-		get images() {
-			return this.shadowRoot.getElementById('images').assignedNodes();
+		get slides() {
+			return this.shadowRoot.getElementById('slides').assignedNodes();
 		}
 
 		get paused() {
@@ -169,43 +178,43 @@ if ('customElements' in self && ! (customElements.get('slide-show') instanceof H
 			}
 		}
 
-		loopImages() {
-			return (async function* imgGenerator() {
+		loopSlides() {
+			return (async function* slideGenerator() {
 				await this.ready;
 
 				while (true) {
-					const images = this.images;
+					const slides = this.slides;
 					let i = 0;
 
-					for (const img of images) {
-						img.decoding = 'auto';
+					for (const slide of slides) {
+						slide.decoding = 'auto';
 
 						yield await Promise.race([
 							Promise.all([
 								this.playing(),
 								visible(),
-								img.decode instanceof Function ? img.decode() : Promise.resolve(),
+								slide.decode instanceof Function ? slide.decode() : Promise.resolve(),
 								sleep(this.interval),
 							]).then(() => {
-								i === images.length - 1 ? i = 0 : i++;
-								return img;
+								i === slides.length - 1 ? i = 0 : i++;
+								return slide;
 							}),
 							new Promise(resolve => {
 								function callback(event) {
 									if (event.detail === 'prev') {
-										i === 0 ? i = images.length - 1 : i--;
-										resolve(images[i]);
+										i === 0 ? i = slides.length - 1 : i--;
+										resolve(slides[i]);
 									} else if (event.detail === 'next') {
-										i === images.length - 1 ? i = 0 : i++;
-										resolve(images[i]);
+										i === slides.length - 1 ? i = 0 : i++;
+										resolve(slides[i]);
 									} else {
-										resolve(this.images[0]);
+										resolve(this.slides[0]);
 									}
 								}
 
 								callback.bind(this);
 
-								this.addEventListener('imgchange', () => {
+								this.addEventListener('slidechange', () => {
 									this.removeEventListener('userchange', callback);
 								}, {
 									once: true,

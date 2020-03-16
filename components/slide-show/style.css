@@ -63,13 +63,7 @@
 }
 
 .slide-container .btn {
-	opacity: 0;
 	z-index: 2;
-	transition: opacity 300ms ease-in-out;
-}
-
-.slide-container:hover .btn {
-	opacity: 1;
 }
 
 ::slotted([slot="displayed"]) {
@@ -119,12 +113,13 @@
 	clear: both;
 }
 
-@keyframes animateIn {
-	from: {
-		transform: scale(0.4);
+@media (any-hover: hover) {
+	.slide-container .btn {
+		opacity: 0;
+		transition: opacity 300ms ease-in-out;
 	}
 
-	to {
-		transform: none;
+	.slide-container:hover .btn {
+		opacity: 1;
 	}
 }
