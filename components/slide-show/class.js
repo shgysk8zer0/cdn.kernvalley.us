@@ -91,8 +91,8 @@ if ('customElements' in self && ! (customElements.get('slide-show') instanceof H
 
 				for await(const slide of await this.loopSlides()) {
 					const copy = slide.cloneNode(true);
-					const currentSlot = this.shadowRoot.querySelector('slot[name="displayed"]');
-					const current = currentSlot.assignedNodes();
+					const current = this.currentSlides;
+					copy.loading = 'auto';
 					copy.slot = 'displayed';
 					copy.hidden = false;
 
@@ -137,12 +137,11 @@ if ('customElements' in self && ! (customElements.get('slide-show') instanceof H
 			});
 		}
 
-		get currentSlide() {
+		get currentSlides() {
 			if (this.shadowRoot.childElementCount > 0) {
-				const displayed = this.shadowRoot.querySelector('slot[name="displayed"]');
-				return displayed.length !== 0 ? displayed[0] : null;
+				return this.shadowRoot.querySelector('slot[name="displayed"]').assignedNodes();
 			} else {
-				return null;
+				return [];
 			}
 		}
 
