@@ -19,12 +19,12 @@ if ('customElements' in self && ! (customElements.get('slide-show') instanceof H
 			this.attachShadow({mode: 'open'});
 
 			fetch(new URL('./template.html', import.meta.url)).then(async resp => {
-				const html = await resp.text();
+				const html   = await resp.text();
 				const parser = new DOMParser();
-				const doc = parser.parseFromString(html, 'text/html');
-				const style = document.createElement('link');
-				style.href = new URL('./style.css', import.meta.url);
-				style.rel = 'stylesheet';
+				const doc    = parser.parseFromString(html, 'text/html');
+				const style  = document.createElement('link');
+				style.href   = new URL('./style.css', import.meta.url);
+				style.rel    = 'stylesheet';
 
 				this.shadowRoot.append(style, ...doc.head.children, ...doc.body.children);
 
@@ -90,29 +90,33 @@ if ('customElements' in self && ! (customElements.get('slide-show') instanceof H
 				}
 
 				for await(const slide of await this.loopSlides()) {
-					const copy = slide.cloneNode(true);
 					const current = this.currentSlides;
-					copy.loading = 'auto';
-					copy.slot = 'displayed';
-					copy.hidden = false;
+					const direction = slide.dataset.direction || 'normal';
+					slide.loading = 'auto';
+					slide.slot = 'displayed';
+					slide.hidden = false;
 
 					if (anim) {
 						const duration = this.duration;
-						requestAnimationFrame(() => this.prepend(copy));
+						requestAnimationFrame(() => this.prepend(slide));
 						await Promise.all([
 							...current.map(el => el.animate([{
 								transform: 'none',
 								opacity: 1,
 							}, {
-								transform: 'translateX(100%) scale(0.2) rotate(0.02turn)',
+								transform: direction === 'normal'
+									? 'translateX(100%) scale(0.2) rotate(0.02turn)'
+									: 'translateX(-100%) scale(0.2) rotate(0.02turn)',
 								opacity: 0,
 							}], {
 								duration,
 								easing: 'ease-in-out',
 								fill: 'forwards',
 							}).finished),
-							copy.animate([{
-								transform: 'translateX(-100%) scale(0.2) rotate(0.02turn)',
+							slide.animate([{
+								transform: direction === 'normal'
+									? 'translateX(-100%) scale(0.2) rotate(0.02turn)'
+									: 'translateX(100%) scale(0.2) rotate(0.02turn)',
 								opacity: 0,
 							}, {
 								transform: 'none',
@@ -129,7 +133,7 @@ if ('customElements' in self && ! (customElements.get('slide-show') instanceof H
 					} else {
 						requestAnimationFrame(() => {
 							current.forEach(el => el.remove());
-							this.append(copy);
+							this.append(slide);
 						});
 					}
 					this.dispatchEvent(new Event('slidechange'));
@@ -149,6 +153,25 @@ if ('customElements' in self && ! (customElements.get('slide-show') instanceof H
 			return parseInt(this.getAttribute('duration')) || 400;
 		}
 
+		get hasSlides() {
+			return new Promise(async resolve => {
+				await this.ready;
+				const slot = this.shadowRoot.querySelector('slot[name="slide"]');
+
+				if (slot.assignedNodes().length === 0) {
+					const callback = event => {
+						if (event.target.assignedNodes().length !== 0) {
+							event.target.removeEventListener(event.type, callback);
+							resolve();
+						}
+					};
+					slot.addEventListener('slotchange', callback);
+				} else {
+					resolve();
+				}
+			});
+		}
+
 		get interval() {
 			return parseInt(this.getAttribute('interval')) || 5000;
 		}
@@ -162,7 +185,19 @@ if ('customElements' in self && ! (customElements.get('slide-show') instanceof H
 		}
 
 		get slides() {
-			return this.shadowRoot.getElementById('slides').assignedNodes();
+			if (this.shadowRoot.childElementCount === 0) {
+				return [];
+			} else {
+				return this.shadowRoot.getElementById('slides').assignedNodes();
+			}
+		}
+
+		get slideChanged() {
+			return new Promise(async resolve => {
+				await this.ready;
+				this.shadowRoot.querySelector('slot[name="displayed"]')
+					.addEventListener('slotchange', () => resolve(), {once: true});
+			});
 		}
 
 		get paused() {
@@ -181,10 +216,12 @@ if ('customElements' in self && ! (customElements.get('slide-show') instanceof H
 
 		async next() {
 			this.dispatchEvent(new CustomEvent('userchange', {detail: 'next'}));
+			await this.slideChanged;
 		}
 
 		async prev() {
 			this.dispatchEvent(new CustomEvent('userchange', {detail: 'prev'}));
+			await this.slideChanged;
 		}
 
 		pause() {
@@ -207,36 +244,52 @@ if ('customElements' in self && ! (customElements.get('slide-show') instanceof H
 
 		loopSlides() {
 			return (async function* slideGenerator() {
-				await this.ready;
+				let i = 0;
 
 				while (true) {
+					await this.hasSlides;
 					const slides = this.slides;
-					let i = 0;
 
-					for (const slide of slides) {
+					while (i < slides.length) {
+						let direction = 'normal';
+						let slide = slides[i];
+						// Keep copy of iterator index at beginning, before modifications
+						const n = i;
 						slide.decoding = 'auto';
-
 						yield await Promise.race([
 							Promise.all([
+								// Wait until slideshow is playing
 								this.playing(),
+								// And tab is visible
 								visible(),
+								// And image is decoded / loaded, if applicable
 								slide.decode instanceof Function ? slide.decode() : Promise.resolve(),
+								// And slide interval has passed
 								sleep(this.interval),
 							]).then(() => {
 								i === slides.length - 1 ? i = 0 : i++;
+								slide = slides[i];
 								return slide;
 							}),
 							new Promise(resolve => {
 								function callback(event) {
 									if (event.detail === 'prev') {
-										i === 0 ? i = slides.length - 1 : i--;
-										resolve(slides[i]);
+										direction = 'reverse';
+										// Set to previous index, or end if at the beginning
+										n === 0 ? i = slides.length - 1 : i = n - 1;
 									} else if (event.detail === 'next') {
-										i === slides.length - 1 ? i = 0 : i++;
-										resolve(slides[i]);
+										// Set to next index or back to beginning,
+										// but only if index has not already been changed
+										if (i === n) {
+											n === slides.length - 1 ? i = 0 : i = n + 1;
+										}
 									} else {
-										resolve(this.slides[0]);
+										i = 0;
 									}
+
+									slide = slides[i].cloneNode(true);
+									slide.dataset.direction = direction;
+									resolve(slide);
 								}
 
 								callback.bind(this);
@@ -290,4 +343,3 @@ if ('customElements' in self && ! (customElements.get('slide-show') instanceof H
 		}
 	});
 }
-

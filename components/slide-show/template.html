@@ -13,7 +13,10 @@
 				</slot>
 			</button>
 			<div part="current" class="relative">
-				<slot name="displayed"></slot>
+				<slot name="displayed">
+					<p>No slides to display.</p>
+					<p>Please add content with <code>slot="slide"</code>.</p>
+				</slot>
 			</div>
 			<button type="button" part="nav-btn next-btn" class="background-transparent absolute btn btn-nav btn-next" data-action="next" aria-label="Next slide" title="Next slide">
 				<slot name="next-icon">
