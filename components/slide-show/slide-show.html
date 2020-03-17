@@ -5,8 +5,8 @@
 	</head>
 	<body>
 		<div part="container" class="slide-container realtive">
-			<button type="button" part="nav-btn prev-btn controls" class="background-transparent absolute btn btn-nav btn-prev" data-action="prev" title="Previous slide">
-				<slot name="prev-icon">
+			<button type="button" part="nav-btn prev-btn controls" class="background-transparent no-border absolute color-inherit btn btn-nav btn-prev" data-action="prev" title="Previous slide">
+				<slot name="prev-icon" >
 					<svg class="current-color icon" viewBox="0 0 16 16" role="img" aria-hidden="true">
 						<path d="M4.56 8l5.719 5.719c.196.196.463.281.719.281h1v-1a1.01 1.01 0 0 0-.282-.719l-4.28-4.28 4.28-4.282A1.01 1.01 0 0 0 11.998 3V2h-1a1.01 1.01 0 0 0-.72.281z"/>
 					</svg>
@@ -18,14 +18,30 @@
 					<p>Please add content with <code>slot="slide"</code>.</p>
 				</slot>
 			</div>
-			<button type="button" part="nav-btn next-btn controls" class="background-transparent absolute btn btn-nav btn-next" data-action="next" title="Next slide">
-				<slot name="next-icon">
+			<button type="button" part="playback-btn controls" class="background-transparent no-border absolute color-inherit btn btn-playback" data-action="toggle-playback" title="Toggle play">
+				<span part="play-btn" >
+					<slot name="play-icon">
+						<svg class="current-color icon" viewBox="0 0 16 16">
+							<path d="M4 3v10h1a1 1 0 0 0 .5-.125l7-4c.31-.172.469-.523.469-.875s-.158-.703-.469-.875l-7-4A.996.996 0 0 0 5 3h-.094z"/>
+						</svg>
+					</slot>
+				</span>
+				<span part="pause-btn" >
+					<slot name="pause-icon">
+						<svg class="current-color icon" viewBox="0 0 16 16">
+							<path d="M4 4v8h3V4H4zm5 0v8h3V4H9z"/>
+						</svg>
+					</slot>
+				</span>
+			</button>
+			<button type="button" part="nav-btn next-btn controls" class="background-transparent no-border absolute color-inherit btn btn-nav btn-next" data-action="next" title="Next slide">
+				<slot name="next-icon" >
 					<svg class="current-color icon" viewBox="0 0 16 16" role="img" aria-hidden="true">
 						<path d="M11.44 8l-5.719 5.719a1.01 1.01 0 0 1-.719.281h-1v-1c0-.256.086-.523.282-.719l4.28-4.28-4.28-4.282A1.01 1.01 0 0 1 4.002 3V2h1c.256 0 .523.086.72.281z"/>
 					</svg>
 				</slot>
 			</button>
-			<button type="button" part="fullscreen-btn controls" class="btn background-transparent absolute" data-action="toggle-fullscreen" title="Toggle fullscreen">
+			<button type="button" part="fullscreen-btn controls" class="btn background-transparent no-border absolute color-inherit" data-action="toggle-fullscreen" title="Toggle fullscreen">
 				<span class="inline-block" part="enter-fullscreen-icon">
 					<slot name="enter-fullscreen-icon">
 						<svg class="current-color icon" viewBox="0 0 14 16">
