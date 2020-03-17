@@ -172,6 +172,10 @@
 	top: 0.4em;
 }
 
+[part~="controls"] {
+	filter: drop-shadow(var(--shadow-x, 0) var(--shadow-y, 0) var(--shadow-blur, 8px) var(--shadow-color, rgba(0,0,0,.2)));
+}
+
 @media (any-hover: hover) {
 	[part~="container"] [part~="controls"] {
 		opacity: 0;
