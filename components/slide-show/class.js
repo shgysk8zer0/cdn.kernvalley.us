@@ -141,6 +141,14 @@ if ('customElements' in self && ! (customElements.get('slide-show') instanceof H
 			});
 		}
 
+		get controls() {
+			return this.hasAttribute('controls');
+		}
+
+		set controls(val) {
+			this.toggleAttribute('controls', val);
+		}
+
 		get currentSlides() {
 			if (this.shadowRoot.childElementCount > 0) {
 				return this.shadowRoot.querySelector('slot[name="displayed"]').assignedNodes();
