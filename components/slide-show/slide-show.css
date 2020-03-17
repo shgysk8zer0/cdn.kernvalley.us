@@ -57,10 +57,6 @@
 	vertical-align: baseline;
 }
 
-.filter-shadow {
-	filter: drop-shadow(var(--shadow-x, 0) var(--shadow-y, 2px) var(--shadow-blur, 10px) var(--shadow-spread, 0) var(--shadow-color, rgba(0,0,0,.2)));
-}
-
 .current-color {
 	fill: currentColor;
 }
