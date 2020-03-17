@@ -6,6 +6,10 @@
 	color: inherit;
 }
 
+:host(:not([controls])) [part~="nav-btn"] {
+	display: none;
+}
+
 * {
 	box-sizing: border-box;
 }
