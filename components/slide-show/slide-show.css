@@ -4,7 +4,6 @@
 	max-width: 100%;
 	background-color: inherit;
 	color: inherit;
-	--shadow-color: red;
 }
 
 :host(:not([controls])) [part~="nav-btn"] {
