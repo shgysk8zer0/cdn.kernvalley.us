@@ -41,6 +41,14 @@ if ('customElements' in self && !(customElements.get('slide-show') instanceof HT
 								this.prev();
 								break;
 
+							case 'toggle-fullscreen':
+								if (document.fullscreenElement === this) {
+									document.exitFullscreen();
+								} else {
+									this.requestFullscreen();
+								}
+								break;
+
 							default: throw new Error(`Unhandled action requested: ${action}`);
 							}
 						} else {
@@ -52,6 +60,14 @@ if ('customElements' in self && !(customElements.get('slide-show') instanceof HT
 
 							case 'prev':
 								this.prev();
+								break;
+
+							case 'toggle-fullscreen':
+								if (document.fullscreenElement === this) {
+									document.exitFullscreen();
+								} else {
+									this.requestFullscreen();
+								}
 								break;
 
 							default: throw new Error(`Unhandled action requested: ${action}`);
@@ -139,6 +155,14 @@ if ('customElements' in self && !(customElements.get('slide-show') instanceof HT
 					this.dispatchEvent(new Event('slidechange'));
 				}
 			});
+		}
+
+		get allowFullscreen() {
+			return this.hasAttribute('allowfullscreen');
+		}
+
+		set allowFullscreen(val) {
+			this.toggleAttribute('allowfullscreen', val);
 		}
 
 		get controls() {
