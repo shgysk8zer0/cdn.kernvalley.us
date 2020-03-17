@@ -12,27 +12,27 @@ async function visible() {
 	}
 }
 
-if ('customElements' in self && ! (customElements.get('slide-show') instanceof HTMLElement)) {
+if ('customElements' in self && !(customElements.get('slide-show') instanceof HTMLElement)) {
 	customElements.define('slide-show', class HTMLSlideShowElement extends HTMLElement {
 		constructor() {
 			super();
-			this.attachShadow({mode: 'open'});
+			this.attachShadow({ mode: 'open' });
 
-			fetch(new URL('./template.html', import.meta.url)).then(async resp => {
-				const html   = await resp.text();
+			fetch(new URL('./slide-show.html', import.meta.url)).then(async resp => {
+				const html = await resp.text();
 				const parser = new DOMParser();
-				const doc    = parser.parseFromString(html, 'text/html');
-				const style  = document.createElement('link');
-				style.href   = new URL('./style.css', import.meta.url);
-				style.rel    = 'stylesheet';
+				const doc = parser.parseFromString(html, 'text/html');
+				const style = document.createElement('link');
+				style.href = new URL('./slide-show.css', import.meta.url);
+				style.rel = 'stylesheet';
 
 				this.shadowRoot.append(style, ...doc.head.children, ...doc.body.children);
 
 				this.shadowRoot.querySelectorAll('[data-action]').forEach(btn => {
-					btn.addEventListener('click', ({target}) => {
+					btn.addEventListener('click', ({ target }) => {
 						if (this.contains(target)) {
 							const action = target.closest('[slot]').assignedSlot.closest('[data-action]').dataset.action;
-							switch(action) {
+							switch (action) {
 							case 'next':
 								this.next();
 								break;
@@ -45,7 +45,7 @@ if ('customElements' in self && ! (customElements.get('slide-show') instanceof H
 							}
 						} else {
 							const action = target.closest('[data-action]').dataset.action;
-							switch(action) {
+							switch (action) {
 							case 'next':
 								this.next();
 								break;
@@ -83,13 +83,13 @@ if ('customElements' in self && ! (customElements.get('slide-show') instanceof H
 				 */
 				await this.ready;
 				const anim = Element.prototype.animate instanceof Function && Animation.prototype.hasOwnProperty('finished')
-				&& ! matchMedia('(prefers-reduced-motion: reduce)').matches;
+					&& !matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-				if (! anim) {
+				if (!anim) {
 					this.shadowRoot.querySelector('.slide-container').classList.add('animated');
 				}
 
-				for await(const slide of await this.loopSlides()) {
+				for await (const slide of await this.loopSlides()) {
 					const current = this.currentSlides;
 					const direction = slide.dataset.direction || 'normal';
 					slide.loading = 'auto';
@@ -204,18 +204,18 @@ if ('customElements' in self && ! (customElements.get('slide-show') instanceof H
 			return new Promise(async resolve => {
 				await this.ready;
 				this.shadowRoot.querySelector('slot[name="displayed"]')
-					.addEventListener('slotchange', () => resolve(), {once: true});
+					.addEventListener('slotchange', () => resolve(), { once: true });
 			});
 		}
 
 		get paused() {
-			return ! this.hasAttribute('playing');
+			return !this.hasAttribute('playing');
 		}
 
 		get ready() {
 			return new Promise(resolve => {
 				if (this.shadowRoot.childElementCount === 0) {
-					this.addEventListener('ready', () => resolve(), {once: true});
+					this.addEventListener('ready', () => resolve(), { once: true });
 				} else {
 					resolve();
 				}
@@ -223,12 +223,12 @@ if ('customElements' in self && ! (customElements.get('slide-show') instanceof H
 		}
 
 		async next() {
-			this.dispatchEvent(new CustomEvent('userchange', {detail: 'next'}));
+			this.dispatchEvent(new CustomEvent('userchange', { detail: 'next' }));
 			await this.slideChanged;
 		}
 
 		async prev() {
-			this.dispatchEvent(new CustomEvent('userchange', {detail: 'prev'}));
+			this.dispatchEvent(new CustomEvent('userchange', { detail: 'prev' }));
 			await this.slideChanged;
 		}
 
@@ -308,7 +308,7 @@ if ('customElements' in self && ! (customElements.get('slide-show') instanceof H
 									once: true,
 								});
 
-								this.addEventListener('userchange', callback, {once: true});
+								this.addEventListener('userchange', callback, { once: true });
 							}),
 						]);
 					}
@@ -317,7 +317,7 @@ if ('customElements' in self && ! (customElements.get('slide-show') instanceof H
 		}
 
 		attributeChangedCallback(name, oldVal, newVal) {
-			switch(name) {
+			switch (name) {
 			case 'playing':
 				if (newVal === null) {
 					this.dispatchEvent(new Event('paused'));
