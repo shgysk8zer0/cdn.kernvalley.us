@@ -43,6 +43,14 @@
 	cursor: pointer;
 }
 
+.btn-next {
+	right: 0;
+}
+
+.btn-prev {
+	left: 0;
+}
+
 [part~="nav-btn"] {
 	font-size: 3em;
 	padding: 0;
@@ -54,15 +62,7 @@
 	border: none;
 }
 
-.btn-next {
-	right: 0;
-}
-
-.btn-prev {
-	left: 0;
-}
-
-.slide-container .btn {
+[part~="container"] [part~="nav-btn"] {
 	z-index: 2;
 }
 
@@ -114,12 +114,14 @@
 }
 
 @media (any-hover: hover) {
-	.slide-container .btn {
+	[part~="container"] [part~="nav-btn"] {
 		opacity: 0;
 		transition: opacity 300ms ease-in-out;
 	}
 
-	.slide-container:hover .btn {
+	[part~="container"]:hover [part~="nav-btn"],
+	[part~="container"]:focus-within [part~="nav-btn"],
+	[part~="container"] [part~="nav-btn"]:focus {
 		opacity: 1;
 	}
 }
