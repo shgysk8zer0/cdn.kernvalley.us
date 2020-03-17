@@ -28,50 +28,43 @@ if ('customElements' in self && !(customElements.get('slide-show') instanceof HT
 
 				this.shadowRoot.append(style, ...doc.head.children, ...doc.body.children);
 
+				const actionHandler = async action => {
+					switch (action) {
+					case 'next':
+						this.next();
+						break;
+
+					case 'prev':
+						this.prev();
+						break;
+
+					case 'toggle-fullscreen':
+						if (document.fullscreenElement === this) {
+							document.exitFullscreen();
+						} else {
+							this.requestFullscreen();
+						}
+						break;
+					case 'toggle-playback':
+						if (this.paused) {
+							this.play();
+						} else {
+							this.pause();
+						}
+						break;
+
+					default: throw new Error(`Unhandled action requested: ${action}`);
+					}
+				};
+
 				this.shadowRoot.querySelectorAll('[data-action]').forEach(btn => {
 					btn.addEventListener('click', ({ target }) => {
 						if (this.contains(target)) {
 							const action = target.closest('[slot]').assignedSlot.closest('[data-action]').dataset.action;
-							switch (action) {
-							case 'next':
-								this.next();
-								break;
-
-							case 'prev':
-								this.prev();
-								break;
-
-							case 'toggle-fullscreen':
-								if (document.fullscreenElement === this) {
-									document.exitFullscreen();
-								} else {
-									this.requestFullscreen();
-								}
-								break;
-
-							default: throw new Error(`Unhandled action requested: ${action}`);
-							}
+							actionHandler(action);
 						} else {
 							const action = target.closest('[data-action]').dataset.action;
-							switch (action) {
-							case 'next':
-								this.next();
-								break;
-
-							case 'prev':
-								this.prev();
-								break;
-
-							case 'toggle-fullscreen':
-								if (document.fullscreenElement === this) {
-									document.exitFullscreen();
-								} else {
-									this.requestFullscreen();
-								}
-								break;
-
-							default: throw new Error(`Unhandled action requested: ${action}`);
-							}
+							actionHandler(action);
 						}
 					}, {
 						passive: true,

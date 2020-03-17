@@ -4,6 +4,7 @@
 	max-width: 100%;
 	background-color: inherit;
 	color: inherit;
+	--shadow-color: red;
 }
 
 :host(:not([controls])) [part~="nav-btn"] {
@@ -25,6 +26,10 @@
 	--slideshow-height: 100vh;
 	width: 100vw;
 	height: 100vh;
+}
+
+:host([playing]) [part~="play-btn"], :host(:not([playing])) [part~="pause-btn"] {
+	display: none;
 }
 
 :host(:not([allowfullscreen])) [part~="fullscreen-btn"] {
@@ -53,8 +58,20 @@
 	vertical-align: baseline;
 }
 
+.filter-shadow {
+	filter: drop-shadow(var(--shadow-x, 0) var(--shadow-y, 2px) var(--shadow-blur, 10px) var(--shadow-spread, 0) var(--shadow-color, rgba(0,0,0,.2)));
+}
+
 .current-color {
 	fill: currentColor;
+}
+
+.color-inherit {
+	color: inherit;
+}
+
+.no-border {
+	border: none;
 }
 
 .relative {
@@ -96,8 +113,15 @@
 
 [part~="nav-btn"], [part~="fullscreen-btn"] {
 	color: inherit;
-	border: none;
 	z-index: 2;
+}
+
+[part~="playback-btn"] {
+	bottom: 0.2em;
+	font-size: 3em;
+	z-index: 4;
+	left: calc(50% - 0.5em);
+	right: calc(50% - 0.5em);
 }
 
 ::slotted([slot="displayed"]) {
