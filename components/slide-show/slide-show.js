@@ -92,7 +92,7 @@ if ('customElements' in self && !(customElements.get('slide-show') instanceof HT
 				 */
 				await this.ready;
 				const anim = Element.prototype.animate instanceof Function && Animation.prototype.hasOwnProperty('finished')
-					&& !matchMedia('(prefers-reduced-motion: reduce)').matches;
+					&& ! matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 				if (!anim) {
 					this.shadowRoot.querySelector('.slide-container').classList.add('animated');
@@ -114,8 +114,8 @@ if ('customElements' in self && !(customElements.get('slide-show') instanceof HT
 								opacity: 1,
 							}, {
 								transform: direction === 'normal'
-									? 'translateX(100%) scale(0.2) rotate(0.02turn)'
-									: 'translateX(-100%) scale(0.2) rotate(0.02turn)',
+									? 'translateX(-100%) scale(0.2) rotate(0.02turn)'
+									: 'translateX(100%) scale(0.2) rotate(0.02turn)',
 								opacity: 0,
 							}], {
 								duration,
@@ -124,8 +124,8 @@ if ('customElements' in self && !(customElements.get('slide-show') instanceof HT
 							}).finished),
 							slide.animate([{
 								transform: direction === 'normal'
-									? 'translateX(-100%) scale(0.2) rotate(0.02turn)'
-									: 'translateX(100%) scale(0.2) rotate(0.02turn)',
+									? 'translateX(100%) scale(0.2) rotate(0.02turn)'
+									: 'translateX(-100%) scale(0.2) rotate(0.02turn)',
 								opacity: 0,
 							}, {
 								transform: 'none',
@@ -239,14 +239,21 @@ if ('customElements' in self && !(customElements.get('slide-show') instanceof HT
 			});
 		}
 
-		async next() {
-			this.dispatchEvent(new CustomEvent('userchange', { detail: 'next' }));
+		async navigate({dir = 'next', pause = true} = {}) {
+			this.dispatchEvent(new CustomEvent('userchange', { detail: dir }));
+
+			if (pause) {
+				this.pause();
+			}
 			await this.slideChanged;
 		}
 
-		async prev() {
-			this.dispatchEvent(new CustomEvent('userchange', { detail: 'prev' }));
-			await this.slideChanged;
+		async next(pause = false) {
+			await this.navigate({dir: 'next', pause});
+		}
+
+		async prev(pause = true) {
+			await this.navigate({dir: 'prev', pause});
 		}
 
 		pause() {
@@ -281,6 +288,7 @@ if ('customElements' in self && !(customElements.get('slide-show') instanceof HT
 						// Keep copy of iterator index at beginning, before modifications
 						const n = i;
 						slide.decoding = 'auto';
+
 						yield await Promise.race([
 							Promise.all([
 								// Wait until slideshow is playing
