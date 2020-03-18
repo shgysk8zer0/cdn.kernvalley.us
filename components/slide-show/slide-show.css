@@ -6,7 +6,7 @@
 	color: inherit;
 }
 
-:host(:not([controls])) [part~="nav-btn"] {
+:host(:not([controls])) [part~="controls"]:not([part~="fullscreen-btn"]) {
 	display: none;
 }
 
@@ -112,7 +112,7 @@
 }
 
 [part~="playback-btn"] {
-	bottom: 0.2em;
+	bottom: 10px;
 	font-size: 3em;
 	z-index: 4;
 	left: calc(50% - 0.5em);
@@ -176,15 +176,21 @@
 	filter: drop-shadow(var(--shadow-x, 0) var(--shadow-y, 0) var(--shadow-blur, 8px) var(--shadow-color, rgba(0,0,0,.2)));
 }
 
+@media (any-hover: none) {
+	:host([swipe]) [part~="controls"]:not([part~="fullscreen-btn"]) {
+		display: none;
+	}
+}
+
 @media (any-hover: hover) {
-	[part~="container"] [part~="controls"] {
+	[part~="controls"] {
 		opacity: 0;
 		transition: opacity 300ms ease-in-out;
 	}
 
-	[part~="container"]:hover [part~="controls"],
-	[part~="container"]:focus-within [part~="controls"],
-	[part~="container"] [part~="controls"]:focus {
+	:host(:hover) [part~="controls"],
+	:host(:focus-within) [part~="controls"],
+	[part~="controls"]:focus {
 		opacity: 1;
 	}
 }
