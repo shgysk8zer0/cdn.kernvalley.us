@@ -15,7 +15,7 @@ if (('customElements' in self) && customElements.get('match-media') === undefine
 			const callback = ({matches}) => {
 				this.shadowRoot.querySelector('slot[name="match"]').hidden = ! matches;
 				this.shadowRoot.querySelector('slot[name="miss"]').hidden = matches;
-			}
+			};
 
 			callback(media);
 			media.addListener(callback);
