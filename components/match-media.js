@@ -13,8 +13,12 @@ if (('customElements' in self) && customElements.get('match-media') === undefine
 		connectedCallback() {
 			const media = matchMedia(this.media);
 			const callback = ({matches}) => {
-				this.shadowRoot.querySelector('slot[name="match"]').hidden = ! matches;
-				this.shadowRoot.querySelector('slot[name="miss"]').hidden = matches;
+				requestAnimationFrame(() => {
+					this.shadowRoot.querySelector('slot[name="match"]').assignedNodes()
+						.forEach(el => el.hidden = ! matches);
+					this.shadowRoot.querySelector('slot[name="miss"]').assignedNodes()
+						.forEach(el => el.hidden = matches);
+				});
 			};
 
 			callback(media);
