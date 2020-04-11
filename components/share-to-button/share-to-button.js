@@ -176,6 +176,14 @@ customElements.define('share-to-button', class HTMLShareToButtonElement extends 
 		this.setAttribute('sharetitle', val);
 	}
 
+	get stack() {
+		return this.hasAttribute('stack');
+	}
+
+	set stack(val) {
+		this.toggleAttribute('stack', val);
+	}
+
 	async attributeChangedCallback(name, oldValue, newValue) {
 		switch (name) {
 		case 'target':
