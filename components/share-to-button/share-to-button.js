@@ -3,6 +3,7 @@ const urls = {
 	twitter: 'https://twitter.com/intent/tweet/?text&url',
 	reddit: 'https://www.reddit.com/submit/?url&title',
 	linkedIn: 'https://www.linkedin.com/shareArticle/?title&summary&url',
+	gmail: 'https://mail.google.com/mail/u/0/?view=cm&fs=1&tf=1&su=&body=',
 };
 
 async function openPopup(url, {
@@ -57,6 +58,19 @@ async function share({
 		})();
 		break;
 
+	case 'gmail':
+		(() => {
+			const link = new URL(urls.gmail);
+			link.searchParams.set('su', title);
+			if (typeof text === 'string' && text !== '') {
+				link.searchParams.set('body', `${title} <${url}>\n${text}`);
+			} else {
+				link.searchParams.set('body', `${title} <${url}>`);
+			}
+			openPopup(link);
+		})();
+		break;
+
 	case 'clipboard':
 		if (typeof text === 'string' && text.length !== 0) {
 			navigator.clipboard.writeText(`${title} <${url}>\n${text}`)
@@ -65,8 +79,8 @@ async function share({
 			navigator.clipboard.writeText(`${title} <${url}>`)
 				.then(() => alert('Copied to clipboard'));
 		}
-
 		break;
+
 	case 'email':
 		(() => {
 			const link = new URL('mailto:');
