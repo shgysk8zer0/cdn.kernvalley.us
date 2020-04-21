@@ -81,6 +81,10 @@ async function share({
 		}
 		break;
 
+	case 'print':
+		window.print();
+		break;
+
 	case 'email':
 		(() => {
 			const link = new URL('mailto:');
