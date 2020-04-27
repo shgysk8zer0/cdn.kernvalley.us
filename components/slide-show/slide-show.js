@@ -1,3 +1,5 @@
+import { meta } from '../../import.meta.js';
+
 async function sleep(ms = 1000) {
 	await new Promise(resolve => setTimeout(() => resolve(), ms));
 }
@@ -18,12 +20,12 @@ if ('customElements' in self && !(customElements.get('slide-show') instanceof HT
 			super();
 			this.attachShadow({ mode: 'open' });
 
-			fetch(new URL('./slide-show.html', import.meta.url)).then(async resp => {
+			fetch(new URL('./components/slide-show/slide-show.html', meta.url)).then(async resp => {
 				const html = await resp.text();
 				const parser = new DOMParser();
 				const doc = parser.parseFromString(html, 'text/html');
 				const style = document.createElement('link');
-				style.href = new URL('./slide-show.css', import.meta.url);
+				style.href = new URL('./components/slide-show/slide-show.css', meta.url);
 				style.rel = 'stylesheet';
 
 				this.shadowRoot.append(style, ...doc.head.children, ...doc.body.children);

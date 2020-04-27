@@ -1,10 +1,5 @@
-export const base = new URL('../', import.meta.url);
+const url = import.meta.url.endsWith('.min.js')
+	? new URL('https://cdn.kernvalley.us').href
+	: new URL(import.meta.url).href;
 
-export const {
-	origin,
-	host,
-	hostname,
-	port,
-	protocol,
-	href,
-} = base;
+export const meta = { url };

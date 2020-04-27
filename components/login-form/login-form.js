@@ -1,11 +1,12 @@
 import User from '/js/User.js';
+import { meta } from '../../import.meta.js';
 import '/components/gravatar-img.js';
 import '/components/toast-message.js';
 import '/components/register-button.js';
 import '/components/login-button.js';
 import '/components/logout-button.js';
 
-const templateHTML = new URL('./login-form.html', import.meta.url);
+const templateHTML = new URL('./components/login-form/login-form.html', meta.url);
 
 export default class HTMLLoginFormElement extends HTMLElement {
 	constructor() {

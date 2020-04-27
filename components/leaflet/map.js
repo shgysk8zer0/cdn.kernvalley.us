@@ -1,4 +1,5 @@
 import { getLocation } from '../../js/std-js/functions.js';
+import { meta } from '../../import.meta.js';
 import {
 	map as LeafletMap,
 	tileLayer as LeafletTileLayer
@@ -15,7 +16,7 @@ customElements.define('leaflet-map', class HTMLLeafletMapElement extends HTMLEle
 		this._shadow = this.attachShadow({ mode: 'closed' });
 
 		Promise.resolve().then(async () => {
-			const resp = await fetch(new URL('map.html', import.meta.url));
+			const resp = await fetch(new URL('./components/leaflet/map.html', meta.url));
 			const html = await resp.text();
 			const parser = new DOMParser();
 			const doc = parser.parseFromString(html, 'text/html');

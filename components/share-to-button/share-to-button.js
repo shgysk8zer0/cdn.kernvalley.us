@@ -1,3 +1,5 @@
+import { meta } from '../../import.meta.js';
+
 const urls = {
 	facebook: 'https://www.facebook.com/sharer/sharer.php?u&t',
 	twitter: 'https://twitter.com/intent/tweet/?text&url',
@@ -109,7 +111,7 @@ customElements.define('share-to-button', class HTMLShareToButtonElement extends 
 		this.setAttribute('tabindex', '0');
 		this.attachShadow({mode: 'open'});
 
-		fetch(new URL('./share-to-button.html', import.meta.url)).then(async resp => {
+		fetch(new URL('./share-to-button.html', meta.url)).then(async resp => {
 			const parser = new DOMParser();
 			const html = await resp.text();
 			const doc = parser.parseFromString(html, 'text/html');

@@ -1,3 +1,5 @@
+import { meta } from '../../import.meta.js';
+
 const now = new Date();
 
 customElements.define('calendar-view', class CalendarElement extends HTMLElement {
@@ -13,7 +15,7 @@ customElements.define('calendar-view', class CalendarElement extends HTMLElement
 			this.year = year;
 		}
 
-		fetch(new URL('calendar-view.html', import.meta.url)).then(async resp => {
+		fetch(new URL('./components/calendar-view.html', meta.url)).then(async resp => {
 			const parser = new DOMParser();
 			const html = await resp.text();
 			const doc = parser.parseFromString(html, 'text/html');

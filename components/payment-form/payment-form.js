@@ -1,3 +1,5 @@
+import { meta } from '../../import.meta.js';
+
 function uuidv4() {
 	return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
 		(c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
@@ -171,7 +173,7 @@ if ('customElements' in window) {
 		}
 
 		async connectedCallback() {
-			const resp = await fetch(new URL('./payment-form.html', import.meta.url));
+			const resp = await fetch(new URL('./components/payment-form/payment-form.html', meta.url));
 			if (resp.ok) {
 				const parser = new DOMParser();
 				const frag = document.createDocumentFragment();
