@@ -1,3 +1,4 @@
+import { meta } from '../../import.meta.js';
 import User from '/js/User.js';
 import '/components/toast-message.js';
 import '/components/register-button.js';
@@ -5,7 +6,7 @@ import '/components/login-button.js';
 import '/components/logout-button.js';
 import '/components/login-form/login-form.js';
 
-const templateHTML = new URL('./registration-form.html', import.meta.url);
+const templateHTML = new URL('./components/registration-form/registration-form.html', meta.url);
 
 export default class HTMLRegistrationFormElement extends HTMLElement {
 	constructor() {

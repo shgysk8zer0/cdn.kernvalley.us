@@ -1,3 +1,4 @@
+import { meta } from '../../import.meta.js';
 import {shadows, clearSlot, getWeatherByPostalCode, createIcon, getIcon, getSprite} from './weather-helper.js';
 
 customElements.define('weather-current', class HTMLWeatherForecastElement extends HTMLElement {
@@ -10,7 +11,7 @@ customElements.define('weather-current', class HTMLWeatherForecastElement extend
 		}
 
 		Promise.resolve(this.attachShadow({mode: 'closed'})).then(async shadow => {
-			const resp = await fetch(new URL('weather-current.html', import.meta.url));
+			const resp = await fetch(new URL('weather-current.html', meta.url));
 			const html = await resp.text();
 			const parser = new DOMParser();
 			const doc = parser.parseFromString(html, 'text/html');

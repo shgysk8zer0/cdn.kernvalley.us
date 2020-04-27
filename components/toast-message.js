@@ -1,10 +1,11 @@
+import { meta } from '../import.meta.js';
 customElements.define('toast-message', class HTMLToastMessageElement extends HTMLElement {
 	constructor(message = null) {
 		super();
 		this.hidden = ! this.open;
 		this.attachShadow({mode: 'open'});
 
-		fetch(new URL('toast-message.html', import.meta.url)).then(async resp => {
+		fetch(new URL('./components/toast-message.html', meta.url)).then(async resp => {
 			const parser = new DOMParser();
 			const html = await resp.text();
 			const doc = parser.parseFromString(html, 'text/html');

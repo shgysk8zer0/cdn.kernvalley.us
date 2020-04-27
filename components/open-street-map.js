@@ -1,4 +1,5 @@
 // @TODO Only import what is needed from Leaflet
+import { meta } from '../../import.meta.js';
 import * as Leaflet from 'https://unpkg.com/leaflet@1.6.0/dist/leaflet-src.esm.js';
 import HTMLMapMarkerElement from './map-marker.js';
 import HTMLImageOverlayElement from './image-overlay.js';
@@ -18,7 +19,7 @@ export default class HTMLOpenStreetMapElement extends HTMLElement {
 		this._shadow = this.attachShadow({ mode: 'closed' });
 
 		Promise.resolve().then(async () => {
-			const resp = await fetch(new URL('open-street-map.html', import.meta.url));
+			const resp = await fetch(new URL('./components/open-street-map.html', meta.url));
 			const html = await resp.text();
 			const parser = new DOMParser();
 			const doc = parser.parseFromString(html, 'text/html');
