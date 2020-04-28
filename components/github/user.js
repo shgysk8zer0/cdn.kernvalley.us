@@ -84,21 +84,9 @@ customElements.define('github-user', class HTMLGitHubUserElement extends HTMLEle
 		case 'user':
 			if (typeof newVal === 'string' && newVal.length !== 0) {
 				this.ready.then(async () => {
-					// const url = new URL(`/users/${newVal}`, 'https://api.github.com');
-					// const resp = await fetch(url, {
-					// 	mode: 'cors',
-					// 	referrerPolicy: 'no-referrer',
-					// 	crossorigin: 'anonymous',
-					// 	cache: 'default',
-					// 	headers: new Headers({
-					// 		Accept: 'application/json',
-					// 	})
-					// });
-
 					try {
 						const shadow = this.shadowRoot;
 						const user = await getUser(this.user);
-						const blog = new URL(user.blog);
 
 						$('[part~="avatar"]', shadow).attr({
 							src: `${user.avatar_url}&s=64`,
@@ -143,11 +131,12 @@ customElements.define('github-user', class HTMLGitHubUserElement extends HTMLEle
 							$('[part~="company-container"]', shadow).hide();
 						}
 
-						if (user.blog !== null) {
+						if (typeof user.blog === 'string' && user.blog.length !== 0) {
+							const blog = new URL(user.blog);
 							$('[part~="blog"]', shadow).attr({href: blog.href});
 							$('[part~="blog"]', shadow).text(blog.hostname);
 						} else {
-							$('[part~="blog"]', shadow).remove();
+							$('[part~="blog-container"]', shadow).remove();
 						}
 						this.hidden = false;
 					} catch(err) {
