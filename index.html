@@ -9,6 +9,7 @@
 		<script type="module" src="/components/share-button.js" async=""></script>
 		<script type="module" src="/components/current-year.js" async=""></script>
 		<script type="module" src="/components/match-media.js" async=""></script>
+		<script type="module" src="/components/github/user.js" async=""></script>
 		<link rel="stylesheet" href="/css/core-css/theme/default/index.css" media="screen" />
 		<link rel="stylesheet" href="/css/core-css/rem.css" media="screen" />
 		<link rel="stylesheet" href="/css/core-css/viewport.css" media="screen" />
@@ -21,16 +22,12 @@
 		<title>KernValley.us | CDN</title>
 	</head>
 	<body class="grid border-box background-primary color-default font-main">
-		<header id="header" class="contain-content">
+		<header id="header" class="contain-content center">
 			<h1 class="center">This is the <abbr title="Content Delivery Network">CDN</abbr> for <a class="underline" href="https://kernvalley.us">KernValley.us</a></h1>
+			<github-user user="kernvalley"></github-user>
 		</header>
 		<nav id="nav" class="contain-content"></nav>
 		<main id="main" class="contain-content card shadow">
-			<match-media media="(orientation: portrait)" class="block">
-				<span slot="match" hidden="">Portrait</span>
-				<span slot="miss" hidden="">Landscape</span>
-				<span>Not supported</span>
-			</match-media>
 			<blockquote>
 				This site is not intended for regular browsing. Rather, its resources
 				<i>(JavaScript, Stylesheets, Images, &amp; Fonts)</i> are shared and accessible
@@ -38,10 +35,9 @@
 			</blockquote>
 		</main>
 		<footer id="footer" class="contain-content">
-			<p>
-				<span>&copy;</span>
-				<time is="current-year">2020</time>
-			</p>
+			<span>&copy;</span>
+			<time is="current-year">2020</time>
+			<a href="https://kernvalley.us" rel="noopener external">KernValley.US</a>
 		</footer>
 		<button type="button" is="share-button" class="btn btn-primary share-btn fixed bottom right round" text="The CDN for KernValley.US" aria-label="Share page" hidden="">
 			<svg class="current-color icon" viewBox="0 0 16 16" role="img" aria-label="Share icon" aria-hidden="">
