@@ -1,5 +1,36 @@
 import { $ } from '../../js/std-js/functions.js';
 import { meta } from '../../import.meta.js';
+const ENDPOINT = 'https://api.github.com';
+
+async function getUser(user) {
+	const key = `github-user-${user}`;
+
+	if (sessionStorage.hasOwnProperty(key)) {
+		return JSON.parse(sessionStorage.getItem(key));
+	} else {
+		const url = new URL(`/users/${user}`, ENDPOINT);
+		const resp = await fetch(url, {
+			mode: 'cors',
+			referrerPolicy: 'no-referrer',
+			crossorigin: 'anonymous',
+			cache: 'default',
+			headers: new Headers({
+				Accept: 'application/json',
+			})
+		});
+
+		if (resp.ok) {
+			sessionStorage.setItem(key, await resp.clone().text());
+			return await resp.json();
+		} else {
+			/**
+			 * @TODO Handle API errors (service down, rate limit, etc.
+			 */
+			throw new Error(`${resp.url} [${resp.status} ${resp.statusText}]`);
+		}
+	}
+
+}
 
 customElements.define('github-user', class HTMLGitHubUserElement extends HTMLElement {
 	constructor(user = null) {
@@ -53,19 +84,20 @@ customElements.define('github-user', class HTMLGitHubUserElement extends HTMLEle
 		case 'user':
 			if (typeof newVal === 'string' && newVal.length !== 0) {
 				this.ready.then(async () => {
-					const url = new URL(`/users/${newVal}`, 'https://api.github.com');
-					const resp = await fetch(url, {
-						mode: 'cors',
-						referrerPolicy: 'no-referrer',
-						crossorigin: 'anonymous',
-						headers: new Headers({
-							Accept: 'application/json',
-						})
-					});
+					// const url = new URL(`/users/${newVal}`, 'https://api.github.com');
+					// const resp = await fetch(url, {
+					// 	mode: 'cors',
+					// 	referrerPolicy: 'no-referrer',
+					// 	crossorigin: 'anonymous',
+					// 	cache: 'default',
+					// 	headers: new Headers({
+					// 		Accept: 'application/json',
+					// 	})
+					// });
 
-					if (resp.ok) {
+					try {
 						const shadow = this.shadowRoot;
-						const user = await resp.json();
+						const user = await getUser(this.user);
 						const blog = new URL(user.blog);
 
 						$('[part~="avatar"]', shadow).attr({
@@ -118,7 +150,8 @@ customElements.define('github-user', class HTMLGitHubUserElement extends HTMLEle
 							$('[part~="blog"]', shadow).remove();
 						}
 						this.hidden = false;
-					} else {
+					} catch(err) {
+						console.error(err);
 						this.hidden = true;
 					}
 				});
