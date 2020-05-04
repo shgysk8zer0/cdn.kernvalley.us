@@ -166,6 +166,12 @@
 	clear: both;
 }
 
+[part~="default-icon"] {
+	fill: #343434;
+	stroke: #fafafa;
+	stroke-width: 0.25;
+}
+
 [part~="fullscreen-btn"] {
 	font-size: 1.3em;
 	right: 0.4em;
