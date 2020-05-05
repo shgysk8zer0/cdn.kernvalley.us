@@ -1,3 +1,4 @@
+import CustomElement from '../custom-element.js';
 import { meta } from '../../import.meta.js';
 
 async function sleep(ms = 1000) {
@@ -15,20 +16,16 @@ async function visible() {
 }
 
 if ('customElements' in self && !(customElements.get('slide-show') instanceof HTMLElement)) {
-	customElements.define('slide-show', class HTMLSlideShowElement extends HTMLElement {
+	customElements.define('slide-show', class HTMLSlideShowElement extends CustomElement {
 		constructor() {
 			super();
 			this.attachShadow({ mode: 'open' });
 
-			fetch(new URL('./components/slide-show/slide-show.html', meta.url)).then(async resp => {
-				const html = await resp.text();
-				const parser = new DOMParser();
-				const doc = parser.parseFromString(html, 'text/html');
+			this.getTemplate('./components/slide-show/slide-show.html').then(async tmp => {
 				const style = document.createElement('link');
 				style.href = new URL('./components/slide-show/slide-show.css', meta.url);
 				style.rel = 'stylesheet';
-
-				this.shadowRoot.append(style, ...doc.head.children, ...doc.body.children);
+				tmp.append(style);
 
 				const actionHandler = async action => {
 					switch (action) {
@@ -59,7 +56,7 @@ if ('customElements' in self && !(customElements.get('slide-show') instanceof HT
 					}
 				};
 
-				this.shadowRoot.querySelectorAll('[data-action]').forEach(btn => {
+				tmp.querySelectorAll('[data-action]').forEach(btn => {
 					btn.addEventListener('click', ({ target }) => {
 						if (this.contains(target)) {
 							const action = target.closest('[slot]').assignedSlot.closest('[data-action]').dataset.action;
@@ -72,6 +69,8 @@ if ('customElements' in self && !(customElements.get('slide-show') instanceof HT
 						passive: true,
 					});
 				});
+
+				this.shadowRoot.append(tmp);
 
 				const currentSlot = this.shadowRoot.querySelector('slot[name="displayed"]');
 

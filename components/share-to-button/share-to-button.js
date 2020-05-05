@@ -1,4 +1,4 @@
-import { meta } from '../../import.meta.js';
+import CustomElement from '../custom-element.js';
 
 const urls = {
 	facebook: 'https://www.facebook.com/sharer/sharer.php?u&t',
@@ -105,27 +105,23 @@ async function share({
 	}
 }
 
-customElements.define('share-to-button', class HTMLShareToButtonElement extends HTMLElement {
+customElements.define('share-to-button', class HTMLShareToButtonElement extends CustomElement {
 	constructor() {
 		super();
 		this.setAttribute('tabindex', '0');
 		this.attachShadow({mode: 'open'});
 
-		fetch(new URL('./components/share-to-button/share-to-button.html', meta.url)).then(async resp => {
-			const parser = new DOMParser();
-			const html = await resp.text();
-			const doc = parser.parseFromString(html, 'text/html');
-			this.shadowRoot.append(...doc.head.children, ...doc.body.children);
-
-			this.addEventListener('click', () => share({
-				target: this.target,
-				title: this.shareTitle,
-				text: this.text,
-				url: this.url,
-			}));
-
+		this.getTemplate('./components/share-to-button/share-to-button.html').then(tmp => {
+			this.shadowRoot.append(tmp);
 			this.dispatchEvent(new Event('ready'));
 		});
+
+		this.addEventListener('click', () => share({
+			target: this.target,
+			title: this.shareTitle,
+			text: this.text,
+			url: this.url,
+		}));
 
 
 	}
