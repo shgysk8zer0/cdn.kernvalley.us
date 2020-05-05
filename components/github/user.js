@@ -1,6 +1,6 @@
 import { $ } from '../../js/std-js/functions.js';
-import { meta } from '../../import.meta.js';
 const ENDPOINT = 'https://api.github.com';
+import CustomElement from '../custom-element.js';
 
 async function getUser(user) {
 	const key = `github-user-${user}`;
@@ -32,30 +32,19 @@ async function getUser(user) {
 
 }
 
-customElements.define('github-user', class HTMLGitHubUserElement extends HTMLElement {
+customElements.define('github-user', class HTMLGitHubUserElement extends CustomElement {
 	constructor(user = null) {
 		super();
 		this.hidden = true;
 		this.attachShadow({mode: 'open'});
+
 		if (typeof user === 'string') {
 			this.user = user;
 		}
 
-		fetch(new URL('./components/github/user.html', meta.url)).then(async resp => {
-			const parser = new DOMParser();
-			const doc = parser.parseFromString(await resp.text(), 'text/html');
-			this.shadowRoot.append(...doc.head.children, ...doc.body.children);
+		this.getTemplate('./components/github/user.html').then(tmp => {
+			this.shadowRoot.append(tmp);
 			this.dispatchEvent(new Event('ready'));
-		});
-	}
-
-	get ready() {
-		return new Promise(resolve => {
-			if (this.shadowRoot.childElementCount === 0) {
-				this.addEventListener('ready', () => resolve(this), {once: true});
-			} else {
-				resolve(this);
-			}
 		});
 	}
 
