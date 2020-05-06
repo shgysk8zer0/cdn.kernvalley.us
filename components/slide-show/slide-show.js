@@ -17,9 +17,23 @@ async function visible() {
 
 if ('customElements' in self && !(customElements.get('slide-show') instanceof HTMLElement)) {
 	customElements.define('slide-show', class HTMLSlideShowElement extends CustomElement {
-		constructor() {
+		constructor(...slides) {
 			super();
 			this.attachShadow({ mode: 'open' });
+
+			slides.forEach(item => {
+				if (item instanceof Element) {
+					item.slot = 'slide';
+					this.append(item);
+				} else if ((typeof item === 'string') || item instanceof URL) {
+					const img = document.createElement('img');
+					img.src = item;
+					img.slot = 'slide';
+					img.decoding = 'async';
+					img.loading = 'lazy';
+					this.append(img);
+				}
+			});
 
 			this.getTemplate('./components/slide-show/slide-show.html').then(async tmp => {
 				const style = document.createElement('link');
