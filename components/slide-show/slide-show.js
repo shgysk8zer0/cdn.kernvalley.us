@@ -1,5 +1,5 @@
 import CustomElement from '../custom-element.js';
-import { meta } from '../../import.meta.js';
+// import { meta } from '../../import.meta.js';
 
 async function sleep(ms = 1000) {
 	await new Promise(resolve => setTimeout(() => resolve(), ms));
@@ -36,11 +36,6 @@ if ('customElements' in self && !(customElements.get('slide-show') instanceof HT
 			});
 
 			this.getTemplate('./components/slide-show/slide-show.html').then(async tmp => {
-				const style = document.createElement('link');
-				style.href = new URL('./components/slide-show/slide-show.css', meta.url);
-				style.rel = 'stylesheet';
-				tmp.append(style);
-
 				const actionHandler = async action => {
 					switch (action) {
 					case 'next':
@@ -89,10 +84,21 @@ if ('customElements' in self && !(customElements.get('slide-show') instanceof HT
 				const displayed = await this.getSlotted('displayed');
 
 				if (displayed.length === 0) {
-					await this.stylesLoaded;
 					if (this.paused) {
-						this.play();
-						this.next(true);
+						const slides = await this.slides;
+						if (slides.length !== 0) {
+							const slide = slides[0].cloneNode(true);
+							if ('sizes' in slide) {
+								slide.sizes = (document.fullscreen && document.fullscreenElement == this)
+									? '100vw'
+									: `${this.getBoundingClientRect().width}px`;
+							}
+							if ('loading' in slide) {
+								slide.loading = 'auto';
+							}
+							slide.slot = 'displayed';
+							this.append(slide);
+						}
 					}
 				}
 
@@ -158,7 +164,7 @@ if ('customElements' in self && !(customElements.get('slide-show') instanceof HT
 							this.append(slide);
 						});
 					}
-					this.dispatchEvent(new Event('slidechange'));
+					this.dispatchEvent(new CustomEvent('slidechange', {detail: slide}));
 				}
 			});
 		}
@@ -185,6 +191,18 @@ if ('customElements' in self && !(customElements.get('slide-show') instanceof HT
 
 		get duration() {
 			return parseInt(this.getAttribute('duration')) || 400;
+		}
+
+		set duration(val) {
+			if (typeof val !== 'number') {
+				val = parseInt(val);
+			}
+
+			if (Number.isNaN(val)) {
+				throw new Error('Duration must be a number');
+			} else {
+				this.setAttribute('duratoin', val);
+			}
 		}
 
 		get hasSlides() {
