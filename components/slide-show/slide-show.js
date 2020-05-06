@@ -87,9 +87,9 @@ if ('customElements' in self && !(customElements.get('slide-show') instanceof HT
 				this.shadowRoot.append(tmp);
 
 				const displayed = await this.getSlotted('displayed');
-				console.info({displayed});
 
 				if (displayed.length === 0) {
+					await this.stylesLoaded;
 					if (this.paused) {
 						this.play();
 						this.next(true);
@@ -276,7 +276,7 @@ if ('customElements' in self && !(customElements.get('slide-show') instanceof HT
 
 					while (i < slides.length) {
 						let direction = 'normal';
-						let slide = slides[i];
+						let slide = slides[i].cloneNode(true);
 						// Keep copy of iterator index at beginning, before modifications
 						const n = i;
 						slide.decoding = 'auto';
@@ -284,7 +284,7 @@ if ('customElements' in self && !(customElements.get('slide-show') instanceof HT
 						if ('sizes' in slide) {
 							slide.sizes = (document.fullscreen && document.fullscreenElement === this)
 								? '100vw'
-								: `${this.getBoundingClientRect().width}px`;
+								: `${parseInt(this.getBoundingClientRect().width)}px`;
 						}
 
 						yield await Promise.race([
@@ -299,7 +299,6 @@ if ('customElements' in self && !(customElements.get('slide-show') instanceof HT
 								sleep(this.interval),
 							]).then(() => {
 								i === slides.length - 1 ? i = 0 : i++;
-								slide = slides[i];
 								return slide;
 							}),
 							new Promise(resolve => {
@@ -320,6 +319,12 @@ if ('customElements' in self && !(customElements.get('slide-show') instanceof HT
 
 									slide = slides[i].cloneNode(true);
 									slide.dataset.direction = direction;
+									if ('sizes' in slide) {
+										slide.sizes = (document.fullscreen && document.fullscreenElement === this)
+											? '100vw'
+											: `${parseInt(this.getBoundingClientRect().width)}px`;
+									}
+
 									resolve(slide);
 								}
 
