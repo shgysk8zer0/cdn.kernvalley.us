@@ -86,15 +86,13 @@ if ('customElements' in self && !(customElements.get('slide-show') instanceof HT
 
 				this.shadowRoot.append(tmp);
 
-				const currentSlot = this.shadowRoot.querySelector('slot[name="displayed"]');
+				const displayed = await this.getSlotted('displayed');
+				console.info({displayed});
 
-				if (currentSlot.assignedNodes().length === 0) {
-					const slides = this.slides;
-
-					if (slides.length !== 0) {
-						const current = slides[0].cloneNode(true);
-						current.slot = 'displayed';
-						this.append(current);
+				if (displayed.length === 0) {
+					if (this.paused) {
+						this.play();
+						this.next(true);
 					}
 				}
 
@@ -114,7 +112,7 @@ if ('customElements' in self && !(customElements.get('slide-show') instanceof HT
 				}
 
 				for await (const slide of await this.loopSlides()) {
-					const current = this.currentSlides;
+					const current = await this.currentSlides;
 					const direction = slide.dataset.direction || 'normal';
 					slide.loading = 'auto';
 					slide.slot = 'displayed';
@@ -182,11 +180,7 @@ if ('customElements' in self && !(customElements.get('slide-show') instanceof HT
 		}
 
 		get currentSlides() {
-			if (this.shadowRoot.childElementCount > 0) {
-				return this.shadowRoot.querySelector('slot[name="displayed"]').assignedNodes();
-			} else {
-				return [];
-			}
+			return this.getSlotted('displayed');
 		}
 
 		get duration() {
@@ -195,8 +189,7 @@ if ('customElements' in self && !(customElements.get('slide-show') instanceof HT
 
 		get hasSlides() {
 			return new Promise(async resolve => {
-				await this.ready;
-				const slot = this.shadowRoot.querySelector('slot[name="slide"]');
+				const slot = await this.getSlot('slide');
 
 				if (slot.assignedNodes().length === 0) {
 					const callback = event => {
@@ -225,18 +218,14 @@ if ('customElements' in self && !(customElements.get('slide-show') instanceof HT
 		}
 
 		get slides() {
-			if (this.shadowRoot.childElementCount === 0) {
-				return [];
-			} else {
-				return this.shadowRoot.getElementById('slides').assignedNodes();
-			}
+			return this.getSlotted('slide');
 		}
 
 		get slideChanged() {
 			return new Promise(async resolve => {
 				await this.ready;
-				this.shadowRoot.querySelector('slot[name="displayed"]')
-					.addEventListener('slotchange', () => resolve(), { once: true });
+				const displayed = await this.getSlot('displayed');
+				displayed.addEventListener('slotchange', () => resolve(), { once: true });
 			});
 		}
 
@@ -244,20 +233,11 @@ if ('customElements' in self && !(customElements.get('slide-show') instanceof HT
 			return !this.hasAttribute('playing');
 		}
 
-		get ready() {
-			return new Promise(resolve => {
-				if (this.shadowRoot.childElementCount === 0) {
-					this.addEventListener('ready', () => resolve(), { once: true });
-				} else {
-					resolve();
-				}
-			});
-		}
-
 		async navigate({dir = 'next', pause = true} = {}) {
 			this.dispatchEvent(new CustomEvent('userchange', { detail: dir }));
 
 			if (pause) {
+				await this.slideChanged;
 				this.pause();
 			}
 			await this.slideChanged;
@@ -289,13 +269,10 @@ if ('customElements' in self && !(customElements.get('slide-show') instanceof HT
 			}
 		}
 
-		loopSlides() {
+		loopSlides(i = 0) {
 			return (async function* slideGenerator() {
-				let i = 0;
-
 				while (true) {
-					await this.hasSlides;
-					const slides = this.slides;
+					const slides = await this.slides;
 
 					while (i < slides.length) {
 						let direction = 'normal';
@@ -303,6 +280,12 @@ if ('customElements' in self && !(customElements.get('slide-show') instanceof HT
 						// Keep copy of iterator index at beginning, before modifications
 						const n = i;
 						slide.decoding = 'auto';
+
+						if ('sizes' in slide) {
+							slide.sizes = (document.fullscreen && document.fullscreenElement === this)
+								? '100vw'
+								: `${this.getBoundingClientRect().width}px`;
+						}
 
 						yield await Promise.race([
 							Promise.all([
