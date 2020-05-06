@@ -68,7 +68,8 @@ if ('customElements' in self && !(customElements.get('slide-show') instanceof HT
 				tmp.querySelectorAll('[data-action]').forEach(btn => {
 					btn.addEventListener('click', ({ target }) => {
 						if (this.contains(target)) {
-							const action = target.closest('[slot]').assignedSlot.closest('[data-action]').dataset.action;
+							const action = target.closest('[slot]').assignedSlot
+								.closest('[data-action]').dataset.action;
 							actionHandler(action);
 						} else {
 							const action = target.closest('[data-action]').dataset.action;
@@ -80,25 +81,26 @@ if ('customElements' in self && !(customElements.get('slide-show') instanceof HT
 				});
 
 				this.shadowRoot.append(tmp);
-
 				const displayed = await this.getSlotted('displayed');
 
 				if (displayed.length === 0) {
-					if (this.paused) {
-						const slides = await this.slides;
-						if (slides.length !== 0) {
-							const slide = slides[0].cloneNode(true);
-							if ('sizes' in slide) {
-								slide.sizes = (document.fullscreen && document.fullscreenElement == this)
-									? '100vw'
-									: `${this.getBoundingClientRect().width}px`;
-							}
-							if ('loading' in slide) {
-								slide.loading = 'auto';
-							}
-							slide.slot = 'displayed';
-							this.append(slide);
+					const slides = await this.slides;
+
+					if (slides.length !== 0) {
+						const slide = slides[0].cloneNode(true);
+
+						if ('sizes' in slide) {
+							slide.sizes = (document.fullscreenElement === this)
+								? '100vw'
+								: `${this.getBoundingClientRect().width}px`;
 						}
+
+						if ('loading' in slide) {
+							slide.loading = 'auto';
+						}
+
+						slide.slot = 'displayed';
+						this.append(slide);
 					}
 				}
 
@@ -110,7 +112,8 @@ if ('customElements' in self && !(customElements.get('slide-show') instanceof HT
 				 * Check for amimation support & reduced motion preferences
 				 */
 				await this.ready;
-				const anim = Element.prototype.animate instanceof Function && Animation.prototype.hasOwnProperty('finished')
+				const anim = Element.prototype.animate instanceof Function
+					&& Animation.prototype.hasOwnProperty('finished')
 					&& ! matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 				if (!anim) {
@@ -337,8 +340,9 @@ if ('customElements' in self && !(customElements.get('slide-show') instanceof HT
 
 									slide = slides[i].cloneNode(true);
 									slide.dataset.direction = direction;
+
 									if ('sizes' in slide) {
-										slide.sizes = (document.fullscreen && document.fullscreenElement === this)
+										slide.sizes = (document.fullscreenElement === this)
 											? '100vw'
 											: `${parseInt(this.getBoundingClientRect().width)}px`;
 									}
