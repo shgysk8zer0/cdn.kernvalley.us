@@ -11,9 +11,31 @@ let map = new Map();
  * @see https://leafletjs.com/reference-1.6.0.html#map-factory
  */
 customElements.define('leaflet-map', class HTMLLeafletMapElement extends HTMLElement {
-	constructor() {
+	constructor({
+		longitude    = NaN,
+		latitude     = NaN,
+		zoom         = NaN,
+		crossOrigin  = null,
+		detectRetina = null,
+	} = {}) {
 		super();
 		this._shadow = this.attachShadow({ mode: 'closed' });
+
+		if (! Number.isNaN(latitude) && ! Number.isNaN(longitude)) {
+			this.center = { latitude, longitude };
+		}
+
+		if (! Number.isNaN(zoom)) {
+			this.zoom = zoom;
+		}
+
+		if (typeof crossOrigin === 'string') {
+			this.crossOrigin = crossOrigin;
+		}
+
+		if (typeof detectRetina === 'boolean') {
+			this.detectRetina = detectRetina;
+		}
 
 		Promise.resolve().then(async () => {
 			const resp = await fetch(new URL('./components/leaflet/map.html', meta.url));
