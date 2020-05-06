@@ -11,7 +11,7 @@ customElements.define('weather-forecast', class HTMLWeatherForecastElement exten
 		}
 
 		Promise.resolve(this.attachShadow({mode: 'closed'})).then(async shadow => {
-			const resp = await fetch(new URL('weather-forecast.html', meta.url));
+			const resp = await fetch(new URL('./components/weather-forecast.html', meta.url));
 			const html = await resp.text();
 			const parser = new DOMParser();
 			const doc = parser.parseFromString(html, 'text/html');
