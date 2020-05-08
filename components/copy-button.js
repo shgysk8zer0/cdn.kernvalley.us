@@ -1,4 +1,4 @@
-export default class HTMLCopyButtonElement extends HTMLButtonElement {
+class HTMLCopyButtonElement extends HTMLButtonElement {
 	constructor({
 		text     = null,
 		selector = null,
