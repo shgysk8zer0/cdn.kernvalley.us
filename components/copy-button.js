@@ -1,45 +1,78 @@
-export default class HTMLCopyButtonElement extends HTMLButtonElement {
-	connectedCallback() {
+class HTMLCopyButtonElement extends HTMLButtonElement {
+	constructor({
+		text     = null,
+		selector = null,
+		property = null,
+	} = {}) {
+		super();
+
 		if (navigator.clipboard && navigator.clipboard.writeText instanceof Function) {
-			this.addEventListener('click', async () => await navigator.clipboard.writeText(this.text));
+			if (typeof text === 'string') {
+				this.text = text;
+			}
+
+			if (typeof selector === 'string') {
+				this.selector = selector;
+			}
+
+			if (typeof property === 'string') {
+				this.property = property;
+			}
+
+			this.addEventListener('click', async () => {
+				const { element, property, text } = this;
+
+				if (typeof text === 'string') {
+					await navigator.clipboard.writeText(text);
+				} else if (element instanceof Element) {
+					await navigator.clipboard.writeText(element[property] || this.getAttribute(property));
+				} else {
+					throw new Error('Text not set and selector is invalid');
+				}
+			});
 		} else {
 			this.remove();
 		}
 	}
 
-	get text() {
-		if (this.hasAttribute('text')) {
-			return this.getAttribute('text');
-		} else if (this.selector !== null) {
-			const el = document.querySelector(this.selector);
-			if (el instanceof HTMLElement) {
-				return this.html ? el.innerHTML : el.textContent;
-			} else {
-				throw new Error(`No element matching ${this.selector}`);
-			}
+	get element() {
+		return document.querySelector(this.selector) || this;
+	}
+
+	get property() {
+		return this.getAttribute('property') || 'textContent';
+	}
+
+	set property(val) {
+		if (typeof val === 'string') {
+			this.setAttribute('property', val);
 		} else {
-			throw new Error('No text or selector attribute set');
+			this.removeAttribute('property');
 		}
 	}
 
+	get text() {
+		return this.getAttribute('text');
+	}
+
 	set text(text) {
-		this.setAttribute('text', text);
+		if (typeof text === 'string') {
+			this.setAttribute('text', text);
+		} else {
+			this.removeAttribute('text');
+		}
 	}
 
 	get selector() {
 		return this.getAttribute('selector');
 	}
 
-	set selector(selector) {
-		this.setAttribute('selector');
-	}
-
-	get html() {
-		return this.hasAttribute('html');
-	}
-
-	set html(enabled) {
-		this.toggleAttribute('html', enabled);
+	set selector(val) {
+		if (typeof val === 'string') {
+			this.setAttribute('selector', val);
+		} else {
+			this.removeAttribute(val);
+		}
 	}
 }
 
