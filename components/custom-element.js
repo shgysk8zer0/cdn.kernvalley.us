@@ -1,5 +1,7 @@
 import { meta } from '../import.meta.js';
 
+let base = meta.url;
+
 function setAttrs(el = null, {
 	attrs     = {},
 	data      = {},
@@ -133,16 +135,36 @@ export default class HTMLCustomElement extends HTMLElement {
 	}
 
 	async getTemplate(url, {
-		cache   = 'default',
-		mode    = 'cors',
-		headers = new Headers({
-			Accept: 'text/html',
-		})
+		cache          = 'default',
+		mode           = 'cors',
+		headers        = new Headers(),
+		referrer       = document.referrer,
+		referrerPolicy = 'origin-when-cross-origin',
+		redirect       = 'follow',
+		credentials    = 'omit',
+		timeout        = 5000,
+		integrity,
 	} = {}) {
-		const resp = await fetch(new URL(url, meta.url), { cache, mode, headers });
+		const init = { cache, mode, headers, referrer, referrerPolicy, redirect, credentials, integrity };
+
+		if (Request.prototype.hasOwnProperty('signal')) {
+			const controller = new AbortController();
+			setTimeout(() => controller.abort(), timeout);
+			init.signal = controller.signal;
+		}
+
+		const resp = await fetch(new URL(url, HTMLCustomElement.base), init);
 		const doc = new DOMParser().parseFromString(await resp.text(), 'text/html');
 		const frag = document.createDocumentFragment();
 		frag.append(...doc.head.children, ...doc.body.children);
 		return frag;
+	}
+
+	static get base() {
+		return base;
+	}
+
+	static set base(val) {
+		base = val;
 	}
 }
