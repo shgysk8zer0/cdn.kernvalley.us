@@ -5,9 +5,12 @@
 		<style>
 			:host {
 				display: inline-block;
+				box-sizing: border-box;
 				width: 300px;
 				min-height: 80px;
 				contain: strict;
+				text-align: left;
+				font-size: 18px;
 			}
 
 			:host([large]) {
@@ -17,6 +20,10 @@
 			::slotted(iframe) {
 				border: none;
 				width: 100%;
+			}
+
+			* {
+				box-sizing: inherit;
 			}
 
 			.current-color {
@@ -36,13 +43,8 @@
 			[part~="fallback"] {
 				color: #fefefe;
 				background-image: linear-gradient(#929292, #282828);
-				box-sizing: border-box;
 				display: flex;
 				flex-direction: row;
-			}
-
-			[part~="fallback"] * {
-				box-sizing: inherit;
 			}
 
 			[part~="fallback-icon"] {
@@ -53,7 +55,6 @@
 			}
 
 			[part~="fallback-body"] {
-				vertcal-align: middle;
 				height: 80px;
 				flex: 220px 0 0;
 				padding-top: calc(40px - 0.5em);
