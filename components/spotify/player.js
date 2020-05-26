@@ -10,6 +10,40 @@ const TYPES = [
 	'track',
 ];
 
+function linkToUri(link) {
+	if (typeof link === 'string' && link.startsWith('https:')) {
+		const url = new URL(link);
+		const [type = null, id = null] = url.pathname.substr(1).split('/');
+
+		if (
+			url.host.toLowerCase() === 'open.spotify.com'
+			&& typeof type === 'string'
+			&& typeof id === 'string'
+		) {
+			return `spotify:${type}:${id}`;
+		} else {
+			return null;
+		}
+	} else {
+		return null;
+	}
+}
+
+function uriToLink(uri) {
+	if (typeof uri === 'string' && uri.startsWith('spotify:')) {
+		const [, type = null, id = null] = uri.split(':');
+
+		if (typeof type == 'string' && typeof id === 'string') {
+			const url = new URL(`${type}/${id}`, 'https://open.spotify.com');
+			return url.href;
+		} else {
+			return null;
+		}
+	} else {
+		return null;
+	}
+}
+
 function createPlayer(large = null) {
 	const iframe = document.createElement('iframe');
 	iframe.height = large === true ? 380 : 80;
@@ -70,15 +104,51 @@ customElements.define('spotify-player', class HTMLSpotifyTrackElement extends Cu
 		this.toggleAttribute('large', val);
 	}
 
+	get link() {
+		if (this.hasAttribute('link')) {
+			return this.getAttribute('link');
+		} else if (this.hasAttribute('uri')) {
+			return uriToLink(this.getAttribute('uri'));
+		} else {
+			return null;
+		}
+	}
+
+	set link(val) {
+		if (typeof val === 'string' && val.startsWith('https:')) {
+			this.uri = null;
+			this.setAttribute('link', val);
+		} else {
+			this.removeAttribute('link');
+		}
+	}
+
 	get uri() {
-		return this.getAttribute('uri');
+		if (this.hasAttribute('uri')) {
+			return this.getAttribute('uri');
+		} else if (this.hasAttribute('link')) {
+			return linkToUri(this.getAttribute('link'));
+		} else {
+			return null;
+		}
 	}
 
 	set uri(val) {
-		if (typeof val === 'string' && val !== '') {
+		if (typeof val === 'string' && val.startsWith('spotify:')) {
+			this.link = null;
 			this.setAttribute('uri', val);
 		} else {
 			this.removeAttribute('uri');
+		}
+	}
+
+	open() {
+		const link = this.link;
+		if (typeof link === 'string') {
+			window.open(link, '_blank', 'noopener,noreferrer');
+			return true;
+		} else {
+			return false;
 		}
 	}
 
@@ -93,9 +163,10 @@ customElements.define('spotify-player', class HTMLSpotifyTrackElement extends Cu
 			break;
 
 		case 'uri':
+		case 'link':
 			this.ready.then(async () => {
-				if (typeof newValue === 'string' && newValue.startsWith('spotify:')) {
-					const {type, id} = parseURI(newValue);
+				if (typeof newValue === 'string') {
+					const {type, id} = parseURI(this.uri);
 
 					const iframe = createPlayer(this.large);
 
@@ -127,6 +198,7 @@ customElements.define('spotify-player', class HTMLSpotifyTrackElement extends Cu
 		return [
 			'uri',
 			'large',
+			'link',
 		];
 	}
 });
