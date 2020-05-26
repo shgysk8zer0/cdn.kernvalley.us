@@ -3,10 +3,11 @@ import { loaded } from '../../js/std-js/functions.js';
 
 const SPOTIFY = 'https://open.spotify.com/embed/';
 const TYPES = [
-	'track',
 	'album',
-	'playlist',
 	'artist',
+	'playlist',
+	'show',
+	'track',
 ];
 
 function createPlayer(large = null) {
