@@ -1,5 +1,4 @@
 function getIframe({uri, details, theme, followers}) {
-	console.info({ theme, details, uri, followers });
 	const iframe = document.createElement('iframe');
 	const url = new URL('https://open.spotify.com/follow/1/');
 	url.searchParams.set('uri', uri);
