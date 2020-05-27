@@ -7,7 +7,9 @@
 				display: inline-block;
 				box-sizing: border-box;
 				width: 300px;
+				max-width: 100%;
 				min-height: 80px;
+				overflow: hidden;
 				contain: strict;
 				text-align: left;
 				font-size: 18px;
@@ -15,6 +17,17 @@
 
 			:host([large]) {
 				height: 380px;
+			}
+
+			:host([uri^="spotify:show:"]),
+			:host([link^="https://open.spotify.com/show"]) {
+				min-width: 360px;
+				height: 232px;
+			}
+
+			:host([uri^="spotify:show:"]) ::slotted(iframe),
+			:host([link^="https://open.spotify.com/show"]) ::slotted(iframe) {
+				height: 232px;
 			}
 
 			::slotted(iframe) {
