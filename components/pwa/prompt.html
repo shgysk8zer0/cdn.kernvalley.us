@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<style>
+			:host {
+				display: block;
+				contain: strict;
+				z-index: var(--z-top, 100);
+				background-color: transparent;
+				width: 100vw;
+				height: 100vh;
+				overflow: auto;
+				position: fixed;
+				left: 0;
+				right: 0;
+				top: 0;
+				bottom: 0;
+				box-sizing: border-box;
+				background-color: rgba(0,0,0,0.7);
+				text-align: left;
+			}
+
+			:host(:not([open])) {
+				display: none;
+			}
+
+			:host([open]) #container {
+				animation-name: open;
+			}
+
+			* {
+				box-sizing: border-box;
+			}
+
+			::slotted([slot="icons"]) {
+				width: 100%;
+				height: 100%;
+				object-fit: contain;
+			}
+
+			#header {
+				grid-template-areas: "icon title close" "icon details install";
+				grid-template-rows: 2.5em minmax(96px, auto);
+				grid-template-columns: 192px 1fr auto;
+				grid-column-gap: 2em;
+			}
+
+			@media (max-width: 600px) {
+				#header {
+					grid-template-areas: "icon title title" "icon . install";
+					grid-template-rows: 96px auto;
+					grid-template-columns: 96px 30px auto;
+					grid-column-gap: 0.4em;
+				}
+
+				#title {
+					text-align: center;
+				}
+
+				#details {
+					display: none;
+				}
+
+				#close-btn-icon {
+					display: none;
+				}
+			}
+
+			#icon {
+				grid-area: icon;
+				font-size: 32px;
+				color: #515151;
+			}
+
+			#install {
+				grid-area: install;
+				text-align: right;
+			}
+
+			#title {
+				grid-area: title;
+			}
+
+			#details {
+				grid-area: details;
+				margin: 0;
+			}
+
+			#close-btn-icon {
+				grid-area: close;
+			}
+
+			#container {
+				border-radius: 12px;
+				overflow-y: auto;
+				overflow-x: hidden;
+				position: absolute;
+				left: 3vw;
+				right: 3vw;
+				top: 1vh;
+				bottom: 1vh;
+				height: 98vh;
+				width: 94vw;
+				box-sizing: border-box;
+				background-color: #fafafa;
+				padding: 24px;
+				font-family: 'Roboto', sans-serif;
+				color: #212121;
+				animation-duration: 300ms;
+				animation-timing-function: ease-in;
+			}
+
+			#details, ::slotted([slot="description"]) {
+				color: #646060;
+			}
+
+			#details::first-letter, ::slotted([slot="description"]) {
+				margin-left: 1.2em;
+			}
+
+			@media (prefers-reduced-motion: reduce) {
+				:host([open]) #container {
+					animation-duration: 80ms;
+				}
+			}
+
+			@media (prefers-color-scheme: dark) {
+				#container {
+					background-color: #232323;
+					color: #fefefe;
+				}
+
+				#details, ::slotted([slot="description"]) {
+					color: #bababa;
+				}
+			}
+
+			button:not([hidden]) {
+				display: inline-block;
+				cursor: pointer;
+				background: var(--button-background, initial);
+				color: var(--button-color, initial);
+				border: var(--button-border, 1px solid #aaa);
+				border-radius: var(--button-border-radius, initial);
+				box-sizing: border-box;
+			}
+
+			button:active {
+				background: var(--button-active-background, var(--button-background, initial));
+				color: var(--button-active-color, var(--button-color, inherit));
+				border: var(--button-active-border, var(--button-border, 0.2rem inset black));
+			}
+
+			button:focus {
+				outline-width: var(--focus-outline-width, 1px);
+				outline-style: var(--focus-outline-style, dotted);
+				outline-color: var(--focus-outline-color, currentColor);
+			}
+
+			.btn {
+				padding: 8px 18px;
+			}
+
+			#cancel-btn {
+				border-radius: 18px;
+				min-width: 10%;
+				font-size: 20px;
+				font-weight: bold;
+				background-color: #cd3434;
+				color: #fafafa;
+				float: right;
+				margin-top: 1.5em;
+			}
+
+			@media (max-width: 600px) {
+				#cancel-btn {
+					margin-left: auto;
+					width: 80vw;
+				}
+			}
+
+			.no-border, button.no-border {
+				border: none;
+			}
+
+			.no-background, button.no-background {
+				background: transparent;
+			}
+
+			.no-margin {
+				margin: 0;
+			}
+
+			.color-inherit, button.color-inherit {
+				color: inherit;
+			}
+
+			.grid {
+				display: grid;
+			}
+
+			@media (min-width: 800px) {
+				#details-container {
+					display: flex;
+					flex-direction: row;
+					justify-content: space-around;
+				}
+
+				::slotted([slot="screenshots"]) {
+					max-width: 45%;
+					object-fit: contain;
+				}
+			}
+
+			.flex {
+				display: flex;
+			}
+
+			.flex.row {
+				flex-direction: row;
+			}
+
+			.flex.space-around {
+				justify-content: space-around;
+			}
+
+			.float-right {
+				float: right;
+			}
+
+			.icon, .icon * {
+				color: inherit;
+				max-width: 100%;
+				max-height: 100%;
+				width: auto;
+				height: var(--icon-size, 1em);
+				vertical-align: middle;
+			}
+
+			.current-color {
+				fill: currentColor;
+			}
+
+			.clearfix::after {
+				display: block;
+				clear: both;
+				content: "";
+			}
+
+			@keyframes open {
+				from {
+					opacity: 0.4;
+					transform: scale(0.1);
+				}
+
+				to {
+					opacity: 1;
+					transform: none;
+				}
+			}
+		</style>
+	</head>
+	<body>
+		<div id="container">
+			<header id="header" class="grid" part="header">
+				<span id="icon" part="icon">
+					<slot name="icons">
+						<svg width="192" height="192" viewBox="0 0 12 16">
+							<path fill-rule="evenodd" fill="currentColor" d="M6 5h2v2H6V5zm6-.5V14c0 .55-.45 1-1 1H1c-.55 0-1-.45-1-1V2c0-.55.45-1 1-1h7.5L12 4.5zM11 5L8 2H1v11l3-5 2 4 2-2 3 3V5z"/>
+						</svg>
+					</slot>
+				</span>
+				<h2 id="title" class="no-margin" part="title">
+					<slot name="name">Unknown App</slot>
+				</h2>
+				<span id="install">
+					<button type="button" class="btn header-btn install-btn" title="Install app" part="button install-button" data-click="install">
+						<slot name="install-icon">
+							<svg class="current-color" height="20" width="20" viewBox="0 0 16 16">
+								<path d="M3 8h10v7.059c0 .492-.472.937-.996.937H4c-.539 0-1-.43-1-1z" overflow="visible"/>
+								<path d="M6.688 2.969a1 1 0 0 0-.657.375L3.22 6.812a1 1 0 0 0-.22.625v1a1 1 0 1 0 2 0v-.656l2.594-3.156a1 1 0 0 0-.907-1.656zm2.218 3a1 1 0 1 0-.031 2l2.156.375V8.5a1 1 0 1 0 2 0v-1a1 1 0 0 0-.812-1l-3-.5a1 1 0 0 0-.313-.031z" overflow="visible"/>
+							</svg>
+						</slot>
+						<span>Install</span>
+					</button>
+				</span>
+				<p id="details" part="details">
+					<slot name="details">
+						This app can be installed on your PC or mobile device. This will allow this web app to look and behave like any other installed app. You will find it in your app lists and be able to pin it to your home screen, start menus or task bars. This installed web app will also be able to safely interact with other apps and your operating system.
+					</slot>
+				</p>
+				<button id="close-btn-icon" type="button" class="bo-border no-background color-inherit" title="Close install prompt" part="x-button" data-click="close">
+					<svg class="icon" viewBox="0 0 12 16">
+						<path fill-rule="evenodd" fill="currentColor" d="M7.48 8l3.75 3.75-1.48 1.48L6 9.48l-3.75 3.75-1.48-1.48L4.52 8 .77 4.25l1.48-1.48L6 6.52l3.75-3.75 1.48 1.48L7.48 8z"/>
+					</svg>
+				</button>
+			</header>
+			<section part="body">
+				<div id="details-container">
+					<div class="features">
+						<h4 id="features-header" class="no-margin" part="features-header">
+							<slot name="features-heading">Key Features</slot>
+						</h4>
+						<span part="features-list">
+							<slot name="features">No features listed</slot>
+						</span>
+					</div>
+					<div part="screenshots">
+						<slot name="screenshots"></slot>
+					</div>
+				</div>
+				<br class="clearfix" />
+				<div part="description-container">
+					<h4 id="description-header" class="no-margin" part="description-header">
+						<slot name="description-heading">Description</slot>
+					</h4>
+					<div id="description" part="description-text">
+						<slot name="description">No description available</slot>
+					</div>
+				</div>
+			</section>
+			<footer id="footer" class="clearfix">
+				<button type="button" id="cancel-btn" class="btn footer-btn footer-cancel-btn" title="Close install prompt" part="button cancel-button" data-click="close">
+					<slot name="cancel-icon">
+						<svg class="icon" viewBox="0 0 12 16">
+							<path fill-rule="evenodd" fill="currentColor" d="M7.48 8l3.75 3.75-1.48 1.48L6 9.48l-3.75 3.75-1.48-1.48L4.52 8 .77 4.25l1.48-1.48L6 6.52l3.75-3.75 1.48 1.48L7.48 8z"/>
+						</svg>
+					</slot>
+					<span>Cancel</span>
+				</button>
+			</footer>
+		</div>
+	</body>
+</html>

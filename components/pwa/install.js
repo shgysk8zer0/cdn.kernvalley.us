@@ -1,3 +1,4 @@
+import './prompt.js';
 customElements.define('pwa-install', class HTMLPWAInstallButton extends HTMLButtonElement {
 	constructor(src = null, {
 		scope = null
@@ -16,7 +17,7 @@ customElements.define('pwa-install', class HTMLPWAInstallButton extends HTMLButt
 		this.addEventListener('updatefound', async event => {
 			await event.detail.update();
 
-			if (this.reloadOnUpdate && confirm('Update installed. Reload page?')) {
+			if (this.reloadOnUpdate && confirm(this.updateMessage)) {
 				location.reload();
 			}
 		}, {once: true});
@@ -33,19 +34,46 @@ customElements.define('pwa-install', class HTMLPWAInstallButton extends HTMLButt
 
 		window.addEventListener('beforeinstallprompt', event => {
 			event.preventDefault();
+			const prompt = event.prompt;
 			this.dispatchEvent(new Event('shown'));
 			this.hidden = false;
 
 			this.addEventListener('click', async () => {
 				this.dispatchEvent(new Event('prompt'));
-				const { outcome } = await event.prompt();
-				const detail = {outcome, playforms: event.platforms};
-				this.hidden = true;
-				this.dispatchEvent(new CustomEvent('install', {detail}));
+				const manifest = await this.manifest;
+				await customElements.whenDefined('pwa-prompt');
+				const PWAPrompt = customElements.get('pwa-prompt');
+
+				if (manifest) {
+					const el = new PWAPrompt(manifest);
+					document.body.append(el);
+					const { install } = await el.prompt();
+
+					el.remove();
+
+					if (install === true) {
+						const { outcome } = await prompt();
+						const detail = {outcome, playforms: event.platforms};
+						this.hidden = true;
+						this.dispatchEvent(new CustomEvent('install', {detail}));
+					} else {
+						this.dispatchEvent(new Event('decined'));
+					}
+				}
 			});
 		}, {
 			once: true,
 		});
+	}
+
+	get manifest() {
+		const link = document.querySelector('link[rel="manifest"][href]');
+
+		if (link instanceof HTMLLinkElement) {
+			return fetch(link.href).then(resp => resp.json());
+		} else {
+			return Promise.reject(new Error('No webapp manifest found'));
+		}
 	}
 
 	get reloadOnUpdate() {
@@ -106,6 +134,18 @@ customElements.define('pwa-install', class HTMLPWAInstallButton extends HTMLButt
 				}
 			}
 		});
+	}
+
+	get updateMessage() {
+		return this.getAttribute('updatemessage') || 'Update installed. Reload page?';
+	}
+
+	set updateMessage(val) {
+		if (typeof val === 'string' && val.length !== 0) {
+			this.setAttribute('updatemessage', val);
+		} else {
+			this.removeAttribute('updatemessage');
+		}
 	}
 
 	async update(reg = null) {
