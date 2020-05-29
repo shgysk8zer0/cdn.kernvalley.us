@@ -3,7 +3,7 @@ import CustomElement from '../custom-element.js';
 customElements.define('pwa-prompt', class HTMLPWAPromptElement extends CustomElement {
 	constructor({
 		name        = null,
-		short_name  = null,
+		// short_name  = null,
 		description = null,
 		icons       = null,
 		screenshots = null,
