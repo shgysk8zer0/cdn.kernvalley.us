@@ -34,7 +34,6 @@ customElements.define('pwa-install', class HTMLPWAInstallButton extends HTMLButt
 
 		window.addEventListener('beforeinstallprompt', event => {
 			event.preventDefault();
-			const prompt = event.prompt;
 			this.dispatchEvent(new Event('shown'));
 			this.hidden = false;
 
@@ -52,10 +51,11 @@ customElements.define('pwa-install', class HTMLPWAInstallButton extends HTMLButt
 					el.remove();
 
 					if (install === true) {
-						const { outcome } = await prompt();
+						const { outcome } = await event.prompt();
 						const detail = {outcome, playforms: event.platforms};
-						this.hidden = true;
 						this.dispatchEvent(new CustomEvent('install', {detail}));
+						this.hidden = true;
+						setTimeout(() => this.remove(), 500);
 					} else {
 						this.dispatchEvent(new Event('decined'));
 					}
