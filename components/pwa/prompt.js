@@ -2,12 +2,13 @@ import CustomElement from '../custom-element.js';
 
 customElements.define('pwa-prompt', class HTMLPWAPromptElement extends CustomElement {
 	constructor({
-		name        = null,
-		// short_name  = null,
-		description = null,
-		icons       = null,
-		screenshots = null,
-		features    = null,
+		name                 = null,
+		// short_name        = null,
+		description          = null,
+		icons                = null,
+		screenshots          = null,
+		features             = null,
+		related_applications = [],
 	} = {}) {
 		super();
 		this.attachShadow({mode: 'open'});
@@ -48,6 +49,21 @@ customElements.define('pwa-prompt', class HTMLPWAPromptElement extends CustomEle
 			ul.append(...lis);
 
 			this.setSlot('features', ul);
+		}
+
+		if (Array.isArray(related_applications)) {
+			this.ready.then(() => {
+				related_applications.forEach(({platform, id}) => {
+					const btn = this.shadowRoot.querySelector(`[data-platform="${platform}"]`);
+
+					if (btn instanceof HTMLAnchorElement) {
+						const link = new URL(btn.href);
+						link.searchParams.set('id', id);
+						btn.href = link.href;
+						btn.hidden = false;
+					}
+				});
+			});
 		}
 
 		if (Array.isArray(screenshots) && screenshots.length !==0) {
