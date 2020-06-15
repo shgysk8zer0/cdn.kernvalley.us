@@ -28,7 +28,6 @@ customElements.define('pwa-prompt', class HTMLPWAPromptElement extends CustomEle
 
 			this.shadowRoot.append(tmp);
 			this.dispatchEvent(new Event('ready'));
-			this.addEventListener('close', console.info);
 		});
 
 		if (typeof name === 'string') {
@@ -53,14 +52,21 @@ customElements.define('pwa-prompt', class HTMLPWAPromptElement extends CustomEle
 
 		if (Array.isArray(related_applications)) {
 			this.ready.then(() => {
-				related_applications.forEach(({platform, id}) => {
+				related_applications.forEach(({platform, id, url}) => {
 					const btn = this.shadowRoot.querySelector(`[data-platform="${platform}"]`);
 
 					if (btn instanceof HTMLAnchorElement) {
-						const link = new URL(btn.href);
-						link.searchParams.set('id', id);
-						btn.href = link.href;
-						btn.hidden = false;
+						if (typeof url === 'string') {
+							btn.href = url;
+							btn.hidden = false;
+						} else if (typeof id === 'string') {
+							const link = new URL(btn.href);
+							link.searchParams.set('id', id);
+							btn.href = link.href;
+							btn.hidden = false;
+						} else {
+							console.error(`Invalid entry for platform: ${platform}`);
+						}
 					}
 				});
 			});
