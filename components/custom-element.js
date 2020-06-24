@@ -167,4 +167,18 @@ export default class HTMLCustomElement extends HTMLElement {
 	static set base(val) {
 		base = val;
 	}
+
+	static register(tag, cls, ...rest) {
+		if (!( window.customElements instanceof Object)) {
+			console.error(new Error('`customElements` not supported'));
+			return false;
+		} else if (typeof customElements.get(tag) !== 'undefined') {
+			console.warn(new Error(`<${tag}> is already defined`));
+			// Returns true/false if element being registered matches given class
+			return customElements.get(tag) === cls;
+		} else {
+			customElements.define(tag, cls, ...rest);
+			return true;
+		}
+	}
 }
