@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+	<head>
+		<meta charset="utf-8" />
+		<style>
+			:host {
+				display: inline-block;
+				padding: 0.4em 0.8em;
+				border: 1px solid currentColor;
+				border-radius: 7px;
+				background: inherit;
+				color: inherit;
+			}
+
+			[part~="section"] {
+				padding: 0.4em 0.8em;
+				border-color: currentColor;
+				border-style: solid;
+				border-width: 0 0 1px 0;
+			}
+
+			[part~="section"]:not(:last-of-type) {
+				margin-bottom: 0.6em;
+			}
+		</style>
+	</head>
+	<body id="river-flows-template">
+		<div part="container">
+			<header part="header">
+				<slot name="header-label">
+					<h3>Kern River Flow</h3>
+				</slot>
+			</header>
+			<div part="section storage">
+				<b>Storage:</b>
+				<slot name="storage-value">Unavailable</slot>
+				<slot name="storage-units">
+					<abbr title="Acre Feet">AC-FT</abbr>
+				</slot>
+			</div>
+			<div part="section upper-river">
+				<b>North Fork</b>
+				<slot name="upper-flow">NA</slot>
+				<slot name="upper-units">
+					<abbr title="Cubic Feet per Second">CFS</abbr>
+				</slot>
+			</div>
+			<div part="section lower-river">
+				<b>Outflow</b>
+				<slot name="lower-flow">NA</slot>
+				<slot name="lower-units">
+					<abbr title="Cubic Feet per Second">CFS</abbr>
+				</slot>
+			</div>
+			<hr />
+			<footer part="footer">
+				<div part="section updated">
+					<b>Updated at:</b>
+					<slot name="time">NA</slot>
+				</div>
+				<slot name="footer-content"></slot>
+			</footer>
+		</div>
+	</body>
+</html>
