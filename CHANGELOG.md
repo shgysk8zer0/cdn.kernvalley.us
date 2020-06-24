@@ -15,6 +15,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Add `HTMLCustomElement.register()` for safer custom element registration
 
+### Changed
+- `<share-to-button>` registration now avoids throwing on duplicate registration
+
 ## [v1.0.0] 2020-06-23
 
 ### Added
