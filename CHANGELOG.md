@@ -11,6 +11,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Add `<river-levels>`
 - Implement Super Linter
-- Update README with badges
 - Add CHANGELOG
+
+### Changed
+- Update README with badges
+
+### Removed
+- Remove Travis-CI config
 <!-- markdownlint-restore -->
