@@ -4,7 +4,7 @@ function fmt(num) {
 	return new Intl.NumberFormat(navigator.language).format(num);
 }
 
-customElements.define('river-flows', class HTMLRiverFlowsElement extends CustomElement {
+CustomElement.register('river-levels', class HTMLRiverLevelsElement extends CustomElement {
 	constructor() {
 		super();
 		this.attachShadow({mode: 'open'});
