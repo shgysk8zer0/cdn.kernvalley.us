@@ -105,7 +105,7 @@ async function share({
 	}
 }
 
-customElements.define('share-to-button', class HTMLShareToButtonElement extends CustomElement {
+CustomElement.register('share-to-button', class HTMLShareToButtonElement extends CustomElement {
 	constructor() {
 		super();
 		this.setAttribute('tabindex', '0');
