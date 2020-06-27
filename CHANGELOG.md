@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <!-- markdownlint-disable -->
 ## [Unreleased]
 
+## [v1.0.3] - 2020-06-27
+
+### Added
+- GitHub Actions updater for Dependabot
+
+### Changed
+- Update to Dependabot v2 syntax
+- Numerous dependency updates
+
+### Removed
+- Old Dependabot config directory
+
 ## [v1.0.2] 2020-06-25
 
 ### Added
