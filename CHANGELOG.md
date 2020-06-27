@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - GitHub Actions updater for Dependabot
+- Dependabot status badge
 
 ### Changed
 - Update to Dependabot v2 syntax
