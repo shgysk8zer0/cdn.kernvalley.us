@@ -16,9 +16,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - Update to Dependabot v2 syntax
 - Numerous dependency updates
+- `eslint` config (use 2019 modules)
 
 ### Removed
 - Old Dependabot config directory
+- All `babel` plugins
 
 ## [v1.0.2] 2020-06-25
 
