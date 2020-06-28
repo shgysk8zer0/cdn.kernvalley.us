@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <!-- markdownlint-disable -->
 ## [Unreleased]
 
+### Changes
+- Popup (`[slot="popup"]`) in `<leaflet-map>`s now have `part="popup"` appended
+
+### Fixes
+- Overflow issue of `<leaflet-map>` images
+
 ## [v1.0.3] - 2020-06-27
 
 ### Added
