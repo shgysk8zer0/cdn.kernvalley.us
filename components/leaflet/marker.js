@@ -183,6 +183,9 @@ customElements.define('leaflet-marker', class HTMLLeafletMarkerElement extends H
 		m.on('contextmenu', eventDispatcher);
 
 		if (popup instanceof HTMLElement) {
+			if ('part' in popup) {
+				popup.part.add('popup');
+			}
 			m.bindPopup(popup);
 			m.on('popupopen', () => this.open = true);
 
