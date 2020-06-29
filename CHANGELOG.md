@@ -7,8 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <!-- markdownlint-disable -->
 ## [Unreleased]
 
-### Changes
+## [v1.0.4] - 2020-06-29
+
+### Added
+- Default assignees to issues
+
+### Changed
 - Popup (`[slot="popup"]`) in `<leaflet-map>`s now have `part="popup"` appended
+- Add fullscreen support for `<leaflet-map>` [#170](https://github.com/shgysk8zer0/cdn.kernvalley.us/issues/170)
+- Dependency updates
 
 ### Fixes
 - Overflow issue of `<leaflet-map>` images
