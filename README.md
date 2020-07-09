@@ -1,6 +1,5 @@
 # [cdn.kernvalley.us](https://cdn.kernvalley.us)
 
-[![Dependabot Status](https://api.dependabot.com/badges/status?host=github&repo=shgysk8zer0/cdn.kernvalley.us)](https://dependabot.com)
 [![Node CI](https://github.com/shgysk8zer0/cdn.kernvalley.us/workflows/Node%20CI/badge.svg)](https://github.com/shgysk8zer0/cdn.kernvalley.us/actions)
 [![Super Linter](https://github.com/shgysk8zer0/cdn.kernvalley.us/workflows/Lint%20Code%20Base/badge.svg)](https://github.com/shgysk8zer0/cdn.kernvalley.us/actions?query=workflow%3A%22Lint+Code+Base%22)
 [![Netlify Status](https://api.netlify.com/api/v1/badges/85d259fa-ea7b-4de4-ae8f-7adf5237b807/deploy-status)](https://app.netlify.com/sites/hardcore-bhaskara-69a703/deploys)
