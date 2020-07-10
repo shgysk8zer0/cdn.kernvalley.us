@@ -50,7 +50,7 @@ CustomElement.register('river-levels', class HTMLRiverLevelsElement extends Cust
 				}
 			});
 
-			this.append(time, upperFlow, lowerFlow, storage);
+			this.replaceChildren(time, upperFlow, lowerFlow, storage);
 		} else {
 			throw new Error(`${resp.url} [${resp.status} ${resp.statusText}]`);
 		}
