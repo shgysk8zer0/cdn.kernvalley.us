@@ -25,8 +25,8 @@ export default class HTMLBaconIpsumElement extends HTMLElement {
 					throw new TypeError('Attempting to set line to a non-string non-element');
 				}
 			});
-			this.clear();
-			this.append(...els);
+
+			this.replaceChildren(...els);
 		}
 	}
 
@@ -55,7 +55,7 @@ export default class HTMLBaconIpsumElement extends HTMLElement {
 	}
 
 	clear() {
-		this.lines.forEach(el => el.remove());
+		this.replaceChildren();
 	}
 
 	async update() {
