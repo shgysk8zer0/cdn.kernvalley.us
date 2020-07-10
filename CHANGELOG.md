@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <!-- markdownlint-disable -->
 ## [Unreleased]
 
+## [v1.0.5] - 2020-07-10
+
+### Added
+- `<time is="...">` components for formatting dates
+
+### Changed
+- Make use of `ParentNode.replaceChildren()` instead of `Element.remove()` and `Element.append()`
+- Enhance `<match-media>` with events and ability to change `media` correctly
+
+### Removed
+- Misc. classes for old map element
+
 ## [v1.0.4] - 2020-06-29
 
 ### Added
