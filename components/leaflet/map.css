@@ -1,0 +1,40 @@
+:host {
+	display: inline-block;
+	height: var(--map-height, 400px);
+	width: var(--map-width, 600px);
+	contain: strict;
+}
+
+:host(:fullscreen) ::slotted([slot="map"]), :host(:fullscreen) #map-fallback {
+	width: 100%;
+	height: 100%;
+}
+
+* {
+	box-sizing: border-box;
+}
+
+#map-fallback, ::slotted([slot="map"]) {
+	height: var(--map-height, 400px);
+	width: var(--map-width, 600px);
+}
+
+::slotted([slot="markers"]), ::slotted([slot="attribution"]),
+::slotted([slot="icon"]), slot[name="attribution"], ::slotted([slot="overlays"]),
+::slotted([slot="geojson"]) {
+	display: none;
+}
+
+slot[name="map"] {
+	contain: content;
+}
+
+[slot="popup"] img, [slot="popup"] svg {
+	max-width: 100%;
+	height: auto;
+}
+
+[slot="popup"] pre {
+	max-width: 100%;
+	overflow: auto;
+}

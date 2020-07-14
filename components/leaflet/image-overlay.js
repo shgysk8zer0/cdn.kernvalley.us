@@ -1,7 +1,8 @@
 import { imageOverlay } from 'https://unpkg.com/leaflet@1.6.0/dist/leaflet-src.esm.js';
 const map = new Map();
+import CustomElement from '../custom-element.js';
 
-customElements.define('leaflet-image-overlay', class HTMLLeafletImageOverlayElement extends HTMLElement {
+CustomElement.register('leaflet-image-overlay', class HTMLLeafletImageOverlayElement extends HTMLElement {
 	constructor() {
 		super();
 		this._map = null;
