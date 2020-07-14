@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <!-- markdownlint-disable -->
 ## [Unreleased]
 
+## [v1.0.6] - 2020-07-14
+
+### Changed
+- *Most* custom elements now use external stylesheets rather than inline CSS
+- More use of `CustomElements.register()` rather than `customElements.define()`
+- Wait for `<leaflet-map>` stylesheet load events before considering ready
+
 ## [v1.0.5] - 2020-07-10
 
 ### Added
