@@ -32,7 +32,7 @@ async function getUser(user) {
 
 }
 
-customElements.define('github-user', class HTMLGitHubUserElement extends CustomElement {
+CustomElement.register('github-user', class HTMLGitHubUserElement extends CustomElement {
 	constructor(user = null) {
 		super();
 		this.hidden = true;

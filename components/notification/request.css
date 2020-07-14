@@ -1,0 +1,29 @@
+:host {
+	color: inherit;
+	background: transparent;
+	display: inline-block;
+	cursor: pointer;
+}
+
+.inline-block {
+	display: inline-block;
+}
+
+.clearfix::after {
+	display: block;
+	clear: both;
+	content: "";
+}
+
+.current-color {
+	fill: currentColor;
+}
+
+.center {
+	text-align: center;
+}
+
+.icon {
+	height: 1em;
+	width: auto;
+}

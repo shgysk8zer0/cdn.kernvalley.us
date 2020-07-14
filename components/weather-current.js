@@ -15,6 +15,7 @@ customElements.define('weather-current', class HTMLWeatherForecastElement extend
 			const html = await resp.text();
 			const parser = new DOMParser();
 			const doc = parser.parseFromString(html, 'text/html');
+			doc.querySelectorAll('link[href]').forEach(link => link.href = new URL(link.getAttribute('href'), resp.url));
 			shadow.append(...doc.head.children, ...doc.body.children);
 			shadows.set(this, shadow);
 			this.dispatchEvent(new Event('ready'));

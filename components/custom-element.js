@@ -156,6 +156,10 @@ export default class HTMLCustomElement extends HTMLElement {
 		const resp = await fetch(new URL(url, HTMLCustomElement.base), init);
 		const doc = new DOMParser().parseFromString(await resp.text(), 'text/html');
 		const frag = document.createDocumentFragment();
+
+		doc.querySelectorAll('link[href]').forEach(link => link.href = new URL(link.getAttribute('href'), resp.url).href);
+		doc.querySelectorAll('img[src]').forEach(img => img.src = new URL(img.getAttribute('src'), resp.url).href);
+		doc.querySelectorAll('script[src]').forEach(script => script.src = new URL(script.getAttribute('src'), resp.url).href);
 		frag.append(...doc.head.children, ...doc.body.children);
 		return frag;
 	}

@@ -77,7 +77,7 @@ function parseURI(uri) {
 	}
 }
 
-customElements.define('spotify-player', class HTMLSpotifyTrackElement extends CustomElement {
+CustomElement.register('spotify-player', class HTMLSpotifyTrackElement extends CustomElement {
 	constructor(uri = null, large = null) {
 		super();
 		this.attachShadow({mode: 'open'});
