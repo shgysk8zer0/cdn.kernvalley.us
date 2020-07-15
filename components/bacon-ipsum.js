@@ -1,4 +1,5 @@
 const ENDPOINT = 'https://baconipsum.com/api/';
+import { registerCustomElement } from '../js/std-js/functions.js';
 
 export default class HTMLBaconIpsumElement extends HTMLElement {
 	constructor() {
@@ -114,4 +115,4 @@ export default class HTMLBaconIpsumElement extends HTMLElement {
 	}
 }
 
-customElements.define('bacon-ipsum', HTMLBaconIpsumElement);
+registerCustomElement('bacon-ipsum', HTMLBaconIpsumElement);

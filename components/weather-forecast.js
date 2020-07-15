@@ -1,7 +1,8 @@
 import { meta } from '../../import.meta.js';
 import {shadows, clearSlot, clearSlots, getForecastByPostalCode, createIcon, getSprite} from './weather-helper.js';
+import HTMLCustomElement from './custom-element.js';
 
-customElements.define('weather-forecast', class HTMLWeatherForecastElement extends HTMLElement {
+HTMLCustomElement.register('weather-forecast', class HTMLWeatherForecastElement extends HTMLElement {
 	constructor() {
 		super();
 		const url = new URL(location.href);
@@ -15,6 +16,7 @@ customElements.define('weather-forecast', class HTMLWeatherForecastElement exten
 			const html = await resp.text();
 			const parser = new DOMParser();
 			const doc = parser.parseFromString(html, 'text/html');
+			doc.querySelectorAll('link[href]').forEach(link => link.href = new URL(link.getAttribute('href'), resp.url));
 			shadow.append(...doc.head.children, ...doc.body.children);
 			shadows.set(this, shadow);
 			this.dispatchEvent(new Event('ready'));

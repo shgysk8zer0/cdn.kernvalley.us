@@ -1,3 +1,5 @@
+import { registerCustomElement } from '../js/std-js/functions.js';
+
 export default class HTMLDrawingCanvasElement extends HTMLCanvasElement {
 	connectedCallback() {
 		this.ctx = this.getContext('2d', {alpha: this.alpha});
@@ -203,4 +205,4 @@ export default class HTMLDrawingCanvasElement extends HTMLCanvasElement {
 	}
 }
 
-customElements.define('drawing-canvas', HTMLDrawingCanvasElement, {extends: 'canvas'});
+registerCustomElement('drawing-canvas', HTMLDrawingCanvasElement, {extends: 'canvas'});

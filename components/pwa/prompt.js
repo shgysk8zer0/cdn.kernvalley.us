@@ -1,6 +1,74 @@
-import CustomElement from '../custom-element.js';
+import HTMLCustomElement from '../custom-element.js';
 
-customElements.define('pwa-prompt', class HTMLPWAPromptElement extends CustomElement {
+function getPicture({
+	opts         = [],
+	sizes        = '100%',
+	decoding     = 'async',
+	loading      = 'lazy',
+	alt          = 'image',
+	fallbackSize = '192x192',
+	slot         = null,
+} = {}) {
+	const pic = document.createElement('picture');
+	const img = document.createElement('img');
+
+	img.decoding = decoding;
+	img.loading = loading;
+	img.alt = alt;
+	img.sizes = sizes;
+	img.src = opts.find(icon => icon.sizes.split(' ').includes(fallbackSize)).src;
+
+	const srcs = opts.reduce(((srcs, {src, sizes = '', type = null} = {}) => {
+		const [width = null] = sizes.split('x', 1);
+		if (! (srcs.hasOwnProperty(type))) {
+			srcs[type] = [`${src} ${width}w`];
+		} else {
+			srcs[type].push(`${src} ${width}w`);
+		}
+
+		return srcs;
+	}), {});
+
+	if (typeof slot === 'string') {
+		pic.slot = slot;
+	}
+
+	pic.append(...Object.entries(srcs).map(([type, srcs]) => {
+		const src = document.createElement('source');
+		src.type = type;
+		src.srcset = srcs.join(', ');
+		src.sizes = img.sizes;
+		return src;
+	}), img);
+
+	return pic;
+}
+
+function getIcon(...icons) {
+	let icon = icons.find(icon => icon.type === 'image/svg+xml');
+
+	if (icon) {
+		const img = document.createElement('img');
+		img.src = icon.src;
+		img.decoding = 'async';
+		img.loading = 'lazy';
+		img.alt = 'App Icon';
+		img.height = 192;
+		img.width = 192;
+		img.slot = 'icons';
+
+		return img;
+	} else {
+		return getPicture({
+			opts: icons,
+			sizes: '10vmax',
+			alt: 'App Icon',
+			slot: 'icons',
+		});
+	}
+}
+
+HTMLCustomElement.register('pwa-prompt', class HTMLPWAPromptElement extends HTMLCustomElement {
 	constructor({
 		name                 = null,
 		// short_name        = null,
@@ -73,32 +141,18 @@ customElements.define('pwa-prompt', class HTMLPWAPromptElement extends CustomEle
 		}
 
 		if (Array.isArray(screenshots) && screenshots.length !==0) {
-			/**
-			 * TODO handle multiple screenshots
-			 */
-			[screenshots[0]].forEach(({sizes = null, src = null} = {}) => {
-				const img = document.createElement('img');
-				const [width, height] = sizes.split('x');
-				img.height = height;
-				img.width = width;
-				img.src = src;
-				img.slot = 'screenshots';
-				this.append(img);
+			const screenshot = getPicture({
+				opts:         screenshots,
+				slot:         'screenshots',
+				sizes:        '(max-width: 600px) 80vw, 40vw',
+				fallbackSize: '640x266',
 			});
+			this.append(screenshot);
 		}
 
 		if (Array.isArray(icons) && icons.length !== 0) {
-			/**
-			 * TODO Handle icons as responsive images via `<img srcset="..." sizes="...">`
-			 */
-			const icon = icons.find(icon => icon.sizes === 'any' || icon.sizes === '192x192');
-			if (icon) {
-				const img = document.createElement('img');
-				img.height = 192;
-				img.width = 192;
-				img.src = icon.src;
-				this.setSlot('icons', img);
-			}
+			const icon = getIcon(...icons);
+			this.append(icon);
 		}
 	}
 

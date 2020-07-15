@@ -1,8 +1,9 @@
 import { meta } from '../../import.meta.js';
+import { registerCustomElement } from '../js/std-js/functions.js';
 
 const now = new Date();
 
-customElements.define('calendar-view', class CalendarElement extends HTMLElement {
+registerCustomElement('calendar-view', class CalendarElement extends HTMLElement {
 	constructor(month = null, year = null) {
 		super();
 		this.attachShadow({mode: 'open'});

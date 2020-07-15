@@ -1,7 +1,8 @@
-import CustomElement from '../custom-element.js';
+import HTMLCustomElement from '../custom-element.js';
 const YOUTUBE  = 'https://www.youtube.com/embed/';
 const NOCOOKIE = 'https://www.youtube-nocookie.com/embed/';
-customElements.define('youtube-player', class HTMLYouTubeElement extends CustomElement {
+
+HTMLCustomElement.register('youtube-player', class HTMLYouTubeElement extends HTMLCustomElement {
 	constructor(video = null, {height = null, width = null} = {}) {
 		super();
 		this.attachShadow({mode: 'open'});

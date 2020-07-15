@@ -1,10 +1,10 @@
-import CustomElement from '../custom-element.js';
+import HTMLCustomElement from '../custom-element.js';
 
 function fmt(num) {
 	return new Intl.NumberFormat(navigator.language).format(num);
 }
 
-CustomElement.register('river-levels', class HTMLRiverLevelsElement extends CustomElement {
+HTMLCustomElement.register('river-levels', class HTMLRiverLevelsElement extends HTMLCustomElement {
 	constructor() {
 		super();
 		this.attachShadow({mode: 'open'});

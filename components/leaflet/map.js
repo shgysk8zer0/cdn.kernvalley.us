@@ -1,5 +1,5 @@
 import { getLocation } from '../../js/std-js/functions.js';
-import { meta } from '../../import.meta.js';
+import HTMLCustomElement from '../custom-element.js';
 import {
 	map as LeafletMap,
 	tileLayer as LeafletTileLayer
@@ -10,7 +10,7 @@ let map = new Map();
 /**
  * @see https://leafletjs.com/reference-1.6.0.html#map-factory
  */
-customElements.define('leaflet-map', class HTMLLeafletMapElement extends HTMLElement {
+HTMLCustomElement.register('leaflet-map', class HTMLLeafletMapElement extends HTMLElement {
 	constructor({
 		longitude    = NaN,
 		latitude     = NaN,
@@ -38,11 +38,20 @@ customElements.define('leaflet-map', class HTMLLeafletMapElement extends HTMLEle
 		}
 
 		Promise.resolve().then(async () => {
-			const resp = await fetch(new URL('./components/leaflet/map.html', meta.url));
+			const resp = await fetch(new URL('./components/leaflet/map.html', HTMLCustomElement.base));
 			const html = await resp.text();
 			const parser = new DOMParser();
 			const doc = parser.parseFromString(html, 'text/html');
+			const stylesheets = [...doc.querySelectorAll('link[rel="stylesheet"][href]')].map(link => {
+				return new Promise((resolve, reject) => {
+					link.addEventListener('load', () => resolve(), {once: true});
+					link.addEventListener('error', (event) => reject(event), {once: true});
+					link.href = new URL(link.getAttribute('href'), resp.url);
+				});
+			});
+
 			this._shadow.append(...doc.head.children, ...doc.body.children);
+			await Promise.all(stylesheets);
 			this.dispatchEvent(new Event('populated'));
 
 			new MutationObserver(async (mutations) => {

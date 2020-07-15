@@ -1,3 +1,5 @@
+import { registerCustomElement } from '../js/std-js/functions.js';
+
 class HTMLCopyButtonElement extends HTMLButtonElement {
 	constructor({
 		text     = null,
@@ -76,4 +78,4 @@ class HTMLCopyButtonElement extends HTMLButtonElement {
 	}
 }
 
-customElements.define('copy-button', HTMLCopyButtonElement, {extends: 'button'});
+registerCustomElement('copy-button', HTMLCopyButtonElement, {extends: 'button'});

@@ -1,4 +1,6 @@
 import User from '/js/User.js';
+import { registerCustomElement } from '../js/std-js/functions.js';
+
 import '/components/login-form/login-form.js';
 
 export default class HTMLLoginButton extends HTMLButtonElement {
@@ -28,4 +30,4 @@ export default class HTMLLoginButton extends HTMLButtonElement {
 	}
 }
 
-customElements.define('login-button', HTMLLoginButton, {extends: 'button'});
+registerCustomElement('login-button', HTMLLoginButton, {extends: 'button'});

@@ -1,7 +1,8 @@
 import { marker, icon } from 'https://unpkg.com/leaflet@1.6.0/dist/leaflet-src.esm.js';
 const map = new Map();
+import { registerCustomElement } from '../../js/std-js/functions.js';
 
-customElements.define('leaflet-marker', class HTMLLeafletMarkerElement extends HTMLElement {
+registerCustomElement('leaflet-marker', class HTMLLeafletMarkerElement extends HTMLElement {
 	constructor({
 		latitude  = NaN,
 		longitude = NaN,

@@ -1,8 +1,8 @@
 import '/components/file-input.js';
 import '/components/drawing-canvas.js';
 import '/js/std-js/shims.js';
-import {$, importLink} from '/js/std-js/functions.js';
-import {confirm} from '/js/std-js/asyncDialog.js';
+import { $, importLink, registerCustomElement } from '/js/std-js/functions.js';
+import { confirm } from '/js/std-js/asyncDialog.js';
 
 export default class HTMLPaintAppElement extends HTMLElement {
 	constructor() {
@@ -151,4 +151,4 @@ export default class HTMLPaintAppElement extends HTMLElement {
 	}
 }
 
-customElements.define('paint-app', HTMLPaintAppElement);
+registerCustomElement('paint-app', HTMLPaintAppElement);

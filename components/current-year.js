@@ -1,3 +1,5 @@
+import { registerCustomElement } from '../js/std-js/functions.js';
+
 export default class HTMLCurrentYearElement extends HTMLTimeElement {
 	constructor() {
 		super();
@@ -7,4 +9,4 @@ export default class HTMLCurrentYearElement extends HTMLTimeElement {
 	}
 }
 
-customElements.define('current-year', HTMLCurrentYearElement, {extends: 'time'});
+registerCustomElement('current-year', HTMLCurrentYearElement, {extends: 'time'});

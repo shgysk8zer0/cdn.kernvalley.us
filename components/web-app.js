@@ -9,8 +9,9 @@ import './gravatar-img.js';
 import './imgur-img.js';
 import './login-form/login-form.js';
 import './registration-form/registration-form.js';
+import { registerCustomElement } from '../js/std-js/functions.js';
 
-customElements.define('web-app', class HTMLWebAppElement extends HTMLHtmlElement {
+registerCustomElement('web-app', class HTMLWebAppElement extends HTMLHtmlElement {
 	constructor() {
 		super();
 

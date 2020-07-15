@@ -1,5 +1,6 @@
 import User from '/js/User.js';
-import {confirm} from '/js/std-js/asyncDialog.js';
+import { confirm } from '/js/std-js/asyncDialog.js';
+import { registerCustomElement } from '../js/std-js/functions.js';
 
 export default class HTMLLogoutButton extends HTMLButtonElement {
 	constructor() {
@@ -16,4 +17,4 @@ export default class HTMLLogoutButton extends HTMLButtonElement {
 	}
 }
 
-customElements.define('logout-button', HTMLLogoutButton, {extends: 'button'});
+registerCustomElement('logout-button', HTMLLogoutButton, {extends: 'button'});

@@ -1,10 +1,11 @@
 import { meta } from '../../import.meta.js';
+import { registerCustomElement } from '../../js/std-js/functions.js';
 import User from '/js/User.js';
-import '/components/toast-message.js';
-import '/components/register-button.js';
-import '/components/login-button.js';
-import '/components/logout-button.js';
-import '/components/login-form/login-form.js';
+import '../toast-message.js';
+import '../register-button.js';
+import '../login-button.js';
+import '../logout-button.js';
+import '../login-form/login-form.js';
 
 const templateHTML = new URL('./components/registration-form/registration-form.html', meta.url);
 
@@ -76,4 +77,4 @@ export default class HTMLRegistrationFormElement extends HTMLElement {
 	}
 }
 
-customElements.define('registration-form', HTMLRegistrationFormElement);
+registerCustomElement('registration-form', HTMLRegistrationFormElement);

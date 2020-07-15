@@ -1,4 +1,6 @@
-customElements.define('datetime-locale', class HTMLDatetimeLocaleElement extends HTMLTimeElement {
+import { registerCustomElement } from '../js/std-js/functions.js';
+
+registerCustomElement('datetime-locale', class HTMLDatetimeLocaleElement extends HTMLTimeElement {
 	constructor(dtime = new Date()) {
 		super();
 

@@ -1,6 +1,8 @@
 import { meta } from '../import.meta.js';
+import { registerCustomElement } from '../js/std-js/functions.js';
 
-let base = meta.url;
+let metaUrl = meta.url;
+let base    = null;
 
 function setAttrs(el = null, {
 	attrs     = {},
@@ -156,12 +158,16 @@ export default class HTMLCustomElement extends HTMLElement {
 		const resp = await fetch(new URL(url, HTMLCustomElement.base), init);
 		const doc = new DOMParser().parseFromString(await resp.text(), 'text/html');
 		const frag = document.createDocumentFragment();
+
+		doc.querySelectorAll('link[href]').forEach(link => link.href = new URL(link.getAttribute('href'), resp.url).href);
+		doc.querySelectorAll('img[src]').forEach(img => img.src = new URL(img.getAttribute('src'), resp.url).href);
+		doc.querySelectorAll('script[src]').forEach(script => script.src = new URL(script.getAttribute('src'), resp.url).href);
 		frag.append(...doc.head.children, ...doc.body.children);
 		return frag;
 	}
 
 	static get base() {
-		return base;
+		return base || metaUrl;
 	}
 
 	static set base(val) {
@@ -169,16 +175,10 @@ export default class HTMLCustomElement extends HTMLElement {
 	}
 
 	static register(tag, cls, ...rest) {
-		if (!( window.customElements instanceof Object)) {
-			console.error(new Error('`customElements` not supported'));
-			return false;
-		} else if (typeof customElements.get(tag) !== 'undefined') {
-			console.warn(new Error(`<${tag}> is already defined`));
-			// Returns true/false if element being registered matches given class
-			return customElements.get(tag) === cls;
-		} else {
-			customElements.define(tag, cls, ...rest);
-			return true;
-		}
+		return registerCustomElement(tag, cls, ...rest);
 	}
+}
+
+if (document.documentElement.dataset.hasOwnProperty('componentBase')) {
+	HTMLCustomElement.base = new URL(document.documentElement.dataset.componentBase, document.baseURI).href;
 }

@@ -1,4 +1,6 @@
-customElements.define('shipping-address', class HTMLShippingAddressFieldSetElement extends HTMLFieldSetElement {
+import { registerCustomElement } from '../js/std-js/functions.js';
+
+registerCustomElement('shipping-address', class HTMLShippingAddressFieldSetElement extends HTMLFieldSetElement {
 	toJSON() {
 		const {recipient, addressLine, city} = this;
 		return {recipient, addressLine, city};
