@@ -1,7 +1,8 @@
+import { registerCustomElement } from '../js/std-js/functions.js';
 /**
  * Imports SVG sprites from a remote src and allows getting of full `<svg>`s
  */
-customElements.define('svg-icons', class SVGIconsElement extends HTMLElement {
+registerCustomElement('svg-icons', class SVGIconsElement extends HTMLElement {
 	constructor() {
 		super();
 		this.hidden = true;

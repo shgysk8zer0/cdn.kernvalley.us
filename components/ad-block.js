@@ -1,3 +1,4 @@
+import { registerCustomElement } from '../js/std-js/functions.js';
 async function log(event) {
 	if ('target' in event) {
 		const data = new FormData();
@@ -37,7 +38,7 @@ async function log(event) {
 
 const shadows = new Map();
 
-customElements.define('ad-block', class HTMLAddBlockElement extends HTMLElement {
+registerCustomElement('ad-block', class HTMLAddBlockElement extends HTMLElement {
 	constructor() {
 		super();
 		this.setAttribute('itemtype', 'https://schema.org/WPAdBlock');

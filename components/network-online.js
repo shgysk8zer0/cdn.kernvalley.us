@@ -1,4 +1,6 @@
-customElements.define('network-online', class HTMLNetworkOfflineElement extends HTMLElement {
+import { registerCustomElement } from '../js/std-js/functions.js';
+
+registerCustomElement('network-online', class HTMLNetworkOfflineElement extends HTMLElement {
 	constructor() {
 		super();
 		this.hidden = !navigator.onLine;

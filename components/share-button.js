@@ -11,6 +11,8 @@ import {
 	clipboard,
 } from '/js/std-js/share-config.js';
 
+import { registerCustomElement } from '../js/std-js/functions.js';
+
 webShareApi(facebook, twitter, googlePlus, linkedIn, reddit, gmail, email, clipboard);
 
 export default class HTMLShareButtonElement extends HTMLButtonElement {
@@ -59,4 +61,4 @@ export default class HTMLShareButtonElement extends HTMLButtonElement {
 	}
 }
 
-customElements.define('share-button', HTMLShareButtonElement, { extends: 'button' });
+registerCustomElement('share-button', HTMLShareButtonElement, { extends: 'button' });

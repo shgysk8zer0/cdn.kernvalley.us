@@ -1,17 +1,12 @@
-import { meta } from '../import.meta.js';
-customElements.define('toast-message', class HTMLToastMessageElement extends HTMLElement {
+import HTMLCustomElement from './custom-element.js';
+
+HTMLCustomElement.register('toast-message', class HTMLToastMessageElement extends HTMLCustomElement {
 	constructor(message = null) {
 		super();
 		this.hidden = ! this.open;
 		this.attachShadow({mode: 'open'});
 
-		fetch(new URL('./components/toast-message.html', meta.url)).then(async resp => {
-			const parser = new DOMParser();
-			const html = await resp.text();
-			const doc = parser.parseFromString(html, 'text/html');
-			const frag = document.createDocumentFragment();
-			frag.append(...doc.head.children, ...doc.body.children);
-
+		this.getTemplate(('./components/toast-message.html')).then(async frag => {
 			frag.getElementById('close-toast-button').addEventListener('click', () => {
 				this.close();
 			}, {
@@ -23,16 +18,6 @@ customElements.define('toast-message', class HTMLToastMessageElement extends HTM
 
 			if (typeof message === 'string') {
 				this.text = message;
-			}
-		});
-	}
-
-	get ready() {
-		return new Promise(resolve => {
-			if (this.shadowRoot.childElementCount === 0) {
-				this.addEventListener('ready', () => resolve(), {once: true});
-			} else {
-				resolve();
 			}
 		});
 	}
@@ -105,11 +90,8 @@ customElements.define('toast-message', class HTMLToastMessageElement extends HTM
 
 	set contentNodes(nodes) {
 		if (Array.isArray(nodes)) {
-			nodes.forEach(node => {
-				node.slot = 'content';
-			});
-			this.contentNodes.forEach(el => el.remove());
-			this.append(...nodes);
+			nodes.forEach(node => node.slot = 'content');
+			this.replaceChildren(...nodes);
 		} else {
 			throw new Error('contentNodes must be an array of Nodes');
 		}
@@ -117,8 +99,7 @@ customElements.define('toast-message', class HTMLToastMessageElement extends HTM
 
 	set contentElement(el) {
 		el.slot = 'content';
-		this.contentNodes.forEach(el => el.remove());
-		this.append(el);
+		this.replaceChildren(el);
 	}
 
 	get height() {
@@ -149,6 +130,7 @@ customElements.define('toast-message', class HTMLToastMessageElement extends HTM
 			this.shadowRoot.querySelector('.backdrop').hidden = false;
 		}
 		await anim.finished;
+
 		if (! Number.isNaN(timer)) {
 			setTimeout(() => this.close(), timer * 1000);
 		}
@@ -252,6 +234,7 @@ customElements.define('toast-message', class HTMLToastMessageElement extends HTM
 		background = null,
 	} = {}) {
 		const toast = new HTMLToastMessageElement(text);
+
 		if (Number.isInteger(duration)) {
 			toast.duration = duration;
 		}
@@ -263,6 +246,7 @@ customElements.define('toast-message', class HTMLToastMessageElement extends HTM
 		if (typeof background === 'string') {
 			toast.background = background;
 		}
+
 		document.body.append(toast);
 		await toast.show();
 		await toast.closed;

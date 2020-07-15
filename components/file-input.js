@@ -1,3 +1,4 @@
+import { registerCustomElement } from '../js/std-js/functions.js';
 export default class HTMLFileInputElement extends HTMLInputElement {
 	constructor() {
 		super();
@@ -69,4 +70,4 @@ export default class HTMLFileInputElement extends HTMLInputElement {
 	}
 }
 
-customElements.define('file-input', HTMLFileInputElement, {extends: 'input'});
+registerCustomElement('file-input', HTMLFileInputElement, {extends: 'input'});

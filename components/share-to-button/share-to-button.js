@@ -1,4 +1,4 @@
-import CustomElement from '../custom-element.js';
+import HTMLCustomElement from '../custom-element.js';
 
 const urls = {
 	facebook: 'https://www.facebook.com/sharer/sharer.php?u&t',
@@ -105,7 +105,7 @@ async function share({
 	}
 }
 
-CustomElement.register('share-to-button', class HTMLShareToButtonElement extends CustomElement {
+HTMLCustomElement.register('share-to-button', class HTMLShareToButtonElement extends HTMLCustomElement {
 	constructor() {
 		super();
 		this.setAttribute('tabindex', '0');

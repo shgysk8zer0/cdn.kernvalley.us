@@ -1,4 +1,4 @@
-import CustomElement from '../custom-element.js';
+import HTMLCustomElement from '../custom-element.js';
 import { loaded } from '../../js/std-js/functions.js';
 
 const SPOTIFY = 'https://open.spotify.com/embed/';
@@ -77,7 +77,7 @@ function parseURI(uri) {
 	}
 }
 
-customElements.define('spotify-player', class HTMLSpotifyTrackElement extends CustomElement {
+HTMLCustomElement.register('spotify-player', class HTMLSpotifyTrackElement extends HTMLCustomElement {
 	constructor(uri = null, large = null) {
 		super();
 		this.attachShadow({mode: 'open'});

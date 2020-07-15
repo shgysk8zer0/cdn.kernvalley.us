@@ -1,6 +1,6 @@
 import { $ } from '../../js/std-js/functions.js';
 const ENDPOINT = 'https://api.github.com';
-import CustomElement from '../custom-element.js';
+import HTMLCustomElement from '../custom-element.js';
 
 async function getUser(user) {
 	const key = `github-user-${user}`;
@@ -32,7 +32,7 @@ async function getUser(user) {
 
 }
 
-customElements.define('github-user', class HTMLGitHubUserElement extends CustomElement {
+HTMLCustomElement.register('github-user', class HTMLGitHubUserElement extends HTMLCustomElement {
 	constructor(user = null) {
 		super();
 		this.hidden = true;

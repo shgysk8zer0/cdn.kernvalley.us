@@ -1,4 +1,5 @@
 import md5 from '/js/std-js/md5.js';
+import { registerCustomElement } from '../js/std-js/functions.js';
 
 const GRAVATAR = 'https://secure.gravatar.com/avatar/';
 const SIZES = [
@@ -209,4 +210,4 @@ export default class HTMLGravatarImageElement extends HTMLImageElement {
 	}
 }
 
-customElements.define('gravatar-img', HTMLGravatarImageElement, {extends: 'img'});
+registerCustomElement('gravatar-img', HTMLGravatarImageElement, {extends: 'img'});

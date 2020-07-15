@@ -1,5 +1,5 @@
-import {wait, importLink} from '/js/std-js/functions.js';
-import {pageVisible} from '/js/std-js/functions.js';
+import { wait, importLink, registerCustomElement } from '../../js/std-js/functions.js';
+import { pageVisible } from '../../js/std-js/functions.js';
 
 export default class HTMLImgurGalleryElement extends HTMLElement {
 	constructor() {
@@ -228,4 +228,4 @@ export default class HTMLImgurGalleryElement extends HTMLElement {
 	}
 }
 
-customElements.define('imgur-gallery', HTMLImgurGalleryElement);
+registerCustomElement('imgur-gallery', HTMLImgurGalleryElement);

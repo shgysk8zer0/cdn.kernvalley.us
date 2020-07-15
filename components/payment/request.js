@@ -1,3 +1,4 @@
+import { registerCustomElement } from '../../js/std-js/functions.js';
 export default class HTMLPaymentRequestElement extends HTMLElement {
 	constructor() {
 		super();
@@ -78,4 +79,4 @@ export default class HTMLPaymentRequestElement extends HTMLElement {
 	}
 }
 
-customElements.define('payment-request', HTMLPaymentRequestElement);
+registerCustomElement('payment-request', HTMLPaymentRequestElement);

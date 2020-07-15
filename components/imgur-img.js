@@ -1,3 +1,4 @@
+import { registerCustomElement } from '../js/std-js/functions.js';
 const ENDPOINT = 'https://i.imgur.com';
 
 export default class HTMLImgurImgElement extends HTMLPictureElement {
@@ -215,4 +216,4 @@ export default class HTMLImgurImgElement extends HTMLPictureElement {
 	}
 }
 
-customElements.define('imgur-img', HTMLImgurImgElement, {extends: 'picture'});
+registerCustomElement('imgur-img', HTMLImgurImgElement, {extends: 'picture'});

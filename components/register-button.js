@@ -1,4 +1,5 @@
 import User from '/js/User.js';
+import { registerCustomElement } from '../js/std-js/functions.js';
 
 export default class HTMLRegisterButton extends HTMLButtonElement {
 	constructor() {
@@ -21,4 +22,4 @@ export default class HTMLRegisterButton extends HTMLButtonElement {
 	}
 }
 
-customElements.define('register-button', HTMLRegisterButton, {extends: 'button'});
+registerCustomElement('register-button', HTMLRegisterButton, {extends: 'button'});

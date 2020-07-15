@@ -1,7 +1,8 @@
-import {geoJSON} from 'https://unpkg.com/leaflet@1.6.0/dist/leaflet-src.esm.js';
+import { geoJSON } from 'https://unpkg.com/leaflet@1.6.0/dist/leaflet-src.esm.js';
 const map = new Map();
+import { registerCustomElement } from '../../js/std-js/functions.js';
 
-customElements.define('leaflet-geojson', class HTMLLeafletGeoJSONElement extends HTMLElement {
+registerCustomElement('leaflet-geojson', class HTMLLeafletGeoJSONElement extends HTMLElement {
 	constructor() {
 		super();
 		this._map = null;

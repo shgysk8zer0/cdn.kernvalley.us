@@ -1,3 +1,5 @@
+import { registerCustomElement } from '../../js/std-js/functions.js';
+
 function getIframe({uri, details, theme, followers}) {
 	const iframe = document.createElement('iframe');
 	const url = new URL('https://open.spotify.com/follow/1/');
@@ -30,7 +32,7 @@ function getIframe({uri, details, theme, followers}) {
 	return iframe;
 }
 
-customElements.define('spotify-follow', class HTMLFollowElement extends HTMLElement {
+registerCustomElement('spotify-follow', class HTMLFollowElement extends HTMLElement {
 	constructor(artist = null, {
 		details   = null,
 		theme     = null,
