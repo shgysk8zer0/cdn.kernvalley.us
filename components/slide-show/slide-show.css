@@ -6,6 +6,10 @@
 	color: inherit;
 }
 
+:host(.card:fullscreen) {
+	border: none !important;
+}
+
 :host(:not([controls])) [part~="controls"]:not([part~="fullscreen-btn"]) {
 	display: none;
 }

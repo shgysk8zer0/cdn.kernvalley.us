@@ -1,0 +1,20 @@
+slot[name="gallery"] {
+	margin-left: 0.4em;
+}
+
+button.nav-button {
+	border: none;
+	background: none;
+	color: var(--alt-color, #cecece);
+	position: absolute;
+	bottom: 0.2em;
+	font-size: 3rem;
+}
+
+button.nav-button.prev {
+	left: 0.4em;
+}
+
+button.nav-button.next {
+	right: 0.4em;
+}
