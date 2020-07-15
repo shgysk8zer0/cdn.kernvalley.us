@@ -1,0 +1,67 @@
+:host {
+	display: inline-block;
+}
+
+input[name="year"] {
+	width: 6ch;
+}
+
+select, input {
+	border: none;
+	background: none;
+	padding: 0.3rem;
+	font-size: 1.2rem;
+	border-bottom: 1px solid #343434;
+}
+
+.current-color {
+	fill: currentColor;
+}
+
+.icon, .icon * {
+	color: inherit;
+	max-width: 100%;
+	max-height: 100%;
+	width: var(--icon-size, 1em);
+	height: var(--icon-size, 1em);
+	vertical-align: middle;
+}
+
+button:not([hidden]), [role="button"]:not([hidden]), .btn:not([hidden]) {
+	padding: var(--button-padding, 0.3em);
+	background: var(--button-background, initial);
+	font-family: var(--button-font, inherit);
+	color: var(--button-color, initial);
+	border: var(--button-border, none);
+	border-radius: var(--button-border-radius, initial);
+	cursor: pointer;
+}
+
+.selected-day {
+	background-color: var(--calendar-accent-color, #343434);
+	color: #fafafa;
+}
+
+thead {
+	background-color: var(--calendar-accent-color, #343434);
+	color: var(--calendar-selected-color, #fafafa);
+}
+
+td.day > .date-content {
+	display: none;
+}
+
+td:not(.empty-cell), th {
+	padding: 0.1rem;
+	border: 1px solid var(--calendar-accent-color, #343434);
+	border-radius: 2px;
+}
+
+td:not(.empty-cell) {
+	cursor: pointer;
+	text-align: center;
+}
+
+hr {
+	color: var(--calendar-accent-color, #343434);
+}

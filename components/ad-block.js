@@ -1,4 +1,5 @@
-import { registerCustomElement } from '../js/std-js/functions.js';
+import HTMLCustomElement from './custom-element.js';
+
 async function log(event) {
 	if ('target' in event) {
 		const data = new FormData();
@@ -38,7 +39,7 @@ async function log(event) {
 
 const shadows = new Map();
 
-registerCustomElement('ad-block', class HTMLAddBlockElement extends HTMLElement {
+HTMLCustomElement.register('ad-block', class HTMLAddBlockElement extends HTMLElement {
 	constructor() {
 		super();
 		this.setAttribute('itemtype', 'https://schema.org/WPAdBlock');
@@ -53,96 +54,16 @@ registerCustomElement('ad-block', class HTMLAddBlockElement extends HTMLElement 
 		const linkSlot = document.createElement('slot');
 		const description = document.createElement('div');
 		const descriptionSlot = document.createElement('slot');
-		const style = document.createElement('style');
+		const style = document.createElement('link');
 
 		this.addEventListener('mouseenter', log, { passive: true, once: true });
 		this.addEventListener('click', log, { passive: true, once: true });
 		this.addEventListener('contextmenu', log, { passive: true, once: true });
 		this.addEventListener('remove', log, { passive: true, once: true });
 
-		style.textContent = `
-			:host {
-				display: block;
-				margin: 1.3em 0.8em;
-				--background: #ececec;
-				--color: #3e3e3e;
-				animation: adAnim 800ms ease-in-out;
-				animation-fill-mode: both;
-				box-sizing: border-box;
-				overflow: hidden;
-			}
-
-			:host(:not(.shown)) {
-				animation-play: pause;
-			}
-
-			:host([theme="dark"]) {
-				--background: #313131;
-				--color: #e1e1e1;
-			}
-
-			@media (prefers-color-scheme: dark) {
-				:host(:not([theme="light"])) {
-					--background: #313131;
-					--color: #e1e1e1;
-				}
-			}
-
-			#wrapper {
-				display: grid;
-				border-radius: 4px;
-				padding: 0.6rem 0.8rem;
-				background-color: var(--background);
-				color: var(--color);
-				grid-template-areas: ". label" "image description" ". link";
-				grid-template-rows: auto minmax(4em, 192px) auto;
-				grid-template-columns: minmax(6em, 192px) minmax(20ch, auto);
-				grid-gap: 0.8em;
-				text-decoration: none;
-				/*! max-width: 100%; */
-			}
-
-			#label {
-				grid-area: label;
-				text-decoration: none;
-				margin: 0;
-			}
-
-			#image {
-				grid-area: image;
-			}
-
-			#description {
-				grid-area: description;
-				text-decoration: none;
-				margin: 0;
-			}
-
-			#link {
-				grid-area: link;
-				text-decoration: underline;
-				color: var(--link-color);
-			}
-
-			.color-inherit {
-				color: inherit;
-			}
-
-			.current-color {
-				fill: currentColor;
-			}
-
-			svg, img, ::slotted(svg), ::slotted(img) {
-				max-height: 100%;
-				width: auto;
-			}
-
-			@keyframes adAnim {
-				from {
-					opacity: 0;
-				}
-			}
-		`;
+		style.rel = 'stylesheet';
+		style.crossOrigin = 'anonymous';
+		style.href = new  URL('/components/ad-block.css', HTMLCustomElement.base);
 		labelSlot.name = 'label';
 		linkSlot.textContent = 'Click here to learn more';
 		label.id = 'label';
