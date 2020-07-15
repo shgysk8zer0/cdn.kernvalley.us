@@ -1,4 +1,5 @@
 import { registerCustomElement } from '../../js/std-js/functions.js';
+
 export default class HTMLPaymentRequestElement extends HTMLElement {
 	constructor() {
 		super();
