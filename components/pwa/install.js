@@ -1,5 +1,5 @@
 import './prompt.js';
-import { registerCustomElement } from '../js/std-js/functions.js';
+import { registerCustomElement } from '../../js/std-js/functions.js';
 
 registerCustomElement('pwa-install', class HTMLPWAInstallButton extends HTMLButtonElement {
 	constructor(src = null, {
