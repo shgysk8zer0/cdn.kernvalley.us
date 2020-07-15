@@ -36,6 +36,7 @@
 	grid-template-columns: minmax(6em, 192px) minmax(20ch, auto);
 	grid-gap: 0.8em;
 	text-decoration: none;
+
 	/*! max-width: 100%; */
 }
 
