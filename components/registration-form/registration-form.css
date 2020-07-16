@@ -1,0 +1,27 @@
+input {
+	background: inherit;
+	font-size: 1.2em;
+	margin: 0.3em 0 0.3em 0;
+	color: inherit;
+	border-width: 0 0 1px 0;
+	border-color: currentColor;
+	padding: 0.2rem 0.6rem;
+}
+
+[part~="name"] {
+	width: 8ch;
+}
+
+.btns {
+	justify-content: space-around;
+}
+
+.flex .btn.btn-wide {
+	flex-basis: 30%;
+	flex-shrink: 1;
+	flex-grow: 0;
+}
+
+fieldset {
+	border: none;
+}
