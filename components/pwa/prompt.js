@@ -1,13 +1,22 @@
 import HTMLCustomElement from '../custom-element.js';
 
+function getBySize(opts, width) {
+	if (Array.isArray(opts)) {
+		const match = opts.find(opt => opt.sizes.startsWith(`${width}x`));
+		return match || {src: null};
+	} else {
+		return {src: null};
+	}
+}
+
 function getPicture({
-	opts         = [],
-	sizes        = '100%',
-	decoding     = 'async',
-	loading      = 'lazy',
-	alt          = 'image',
-	fallbackSize = '192x192',
-	slot         = null,
+	opts          = [],
+	sizes         = '100%',
+	decoding      = 'async',
+	loading       = 'lazy',
+	alt           = 'image',
+	fallbackWidth = 192,
+	slot          = null,
 } = {}) {
 	const pic = document.createElement('picture');
 	const img = document.createElement('img');
@@ -16,7 +25,7 @@ function getPicture({
 	img.loading = loading;
 	img.alt = alt;
 	img.sizes = sizes;
-	img.src = opts.find(icon => icon.sizes.split(' ').includes(fallbackSize)).src;
+	img.src = getBySize(opts, fallbackWidth).src;
 
 	const srcs = opts.reduce(((srcs, {src, sizes = '', type = null} = {}) => {
 		const [width = null] = sizes.split('x', 1);
@@ -145,7 +154,7 @@ HTMLCustomElement.register('pwa-prompt', class HTMLPWAPromptElement extends HTML
 				opts:         screenshots,
 				slot:         'screenshots',
 				sizes:        '(max-width: 600px) 80vw, 40vw',
-				fallbackSize: '640x266',
+				fallbackWidth: 640,
 			});
 			this.append(screenshot);
 		}
