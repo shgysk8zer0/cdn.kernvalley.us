@@ -200,34 +200,34 @@ registerCustomElement('leaflet-marker', class HTMLLeafletMarkerElement extends H
 		const marker = map.get(this);
 		if (marker) {
 			switch(name) {
-			case 'hidden':
-				if (this.hidden) {
-					marker.remove();
-				} else if (this._map instanceof HTMLElement) {
-					this._map.ready.then(() => marker.addTo(this._map.map));
-				}
-				break;
+				case 'hidden':
+					if (this.hidden) {
+						marker.remove();
+					} else if (this._map instanceof HTMLElement) {
+						this._map.ready.then(() => marker.addTo(this._map.map));
+					}
+					break;
 
-			case 'open':
-				if (this._map instanceof HTMLElement) {
-					this._map.ready.then(() => {
-						const marker = map.get(this);
-						const open = this.open;
-						const isOpen = marker.isPopupOpen();
+				case 'open':
+					if (this._map instanceof HTMLElement) {
+						this._map.ready.then(() => {
+							const marker = map.get(this);
+							const open = this.open;
+							const isOpen = marker.isPopupOpen();
 
-						if (open && ! isOpen) {
-							marker.openPopup();
-						} else if (! open && isOpen) {
-							marker.closePopup();
-						}
+							if (open && ! isOpen) {
+								marker.openPopup();
+							} else if (! open && isOpen) {
+								marker.closePopup();
+							}
 
-						this.dispatchEvent(new Event(open ? 'open' : 'close'));
-					});
-				}
-				break;
+							this.dispatchEvent(new Event(open ? 'open' : 'close'));
+						});
+					}
+					break;
 
-			default:
-				throw new Error(`Unhandled attribute changed: ${name}`);
+				default:
+					throw new Error(`Unhandled attribute changed: ${name}`);
 			}
 		}
 	}

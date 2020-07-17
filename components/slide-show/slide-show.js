@@ -37,30 +37,30 @@ HTMLCustomElement.register('slide-show', class HTMLSlideShowElement extends HTML
 		this.getTemplate('./components/slide-show/slide-show.html').then(async tmp => {
 			const actionHandler = async action => {
 				switch (action) {
-				case 'next':
-					this.next();
-					break;
+					case 'next':
+						this.next();
+						break;
 
-				case 'prev':
-					this.prev();
-					break;
+					case 'prev':
+						this.prev();
+						break;
 
-				case 'toggle-fullscreen':
-					if (document.fullscreenElement === this) {
-						document.exitFullscreen();
-					} else {
-						this.requestFullscreen();
-					}
-					break;
-				case 'toggle-playback':
-					if (this.paused) {
-						this.play();
-					} else {
-						this.pause();
-					}
-					break;
+					case 'toggle-fullscreen':
+						if (document.fullscreenElement === this) {
+							document.exitFullscreen();
+						} else {
+							this.requestFullscreen();
+						}
+						break;
+					case 'toggle-playback':
+						if (this.paused) {
+							this.play();
+						} else {
+							this.pause();
+						}
+						break;
 
-				default: throw new Error(`Unhandled action requested: ${action}`);
+					default: throw new Error(`Unhandled action requested: ${action}`);
 				}
 			};
 
@@ -367,27 +367,27 @@ HTMLCustomElement.register('slide-show', class HTMLSlideShowElement extends HTML
 
 	attributeChangedCallback(name, oldVal, newVal) {
 		switch (name) {
-		case 'playing':
-			if (newVal === null) {
-				this.dispatchEvent(new Event('paused'));
-			} else {
-				this.dispatchEvent(new Event('playing'));
-			}
-			break;
+			case 'playing':
+				if (newVal === null) {
+					this.dispatchEvent(new Event('paused'));
+				} else {
+					this.dispatchEvent(new Event('playing'));
+				}
+				break;
 
-		case 'width':
-			this.ready.then(() => {
-				this.shadowRoot.querySelector('[part~="container"]')
-					.style.setProperty('--slideshow-width', newVal);
-			});
-			break;
+			case 'width':
+				this.ready.then(() => {
+					this.shadowRoot.querySelector('[part~="container"]')
+						.style.setProperty('--slideshow-width', newVal);
+				});
+				break;
 
-		case 'height':
-			this.ready.then(() => {
-				this.shadowRoot.querySelector('[part~="container"]')
-					.style.setProperty('--slideshow-height', newVal);
-			});
-			break;
+			case 'height':
+				this.ready.then(() => {
+					this.shadowRoot.querySelector('[part~="container"]')
+						.style.setProperty('--slideshow-height', newVal);
+				});
+				break;
 		}
 	}
 

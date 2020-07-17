@@ -182,17 +182,17 @@ export default class HTMLDrawingCanvasElement extends HTMLCanvasElement {
 	async attributeChangedCallback(name, oldValue, newValue) {
 		await this.ready();
 		switch(name) {
-		case 'fill':
-			this.ctx.fillStyle = newValue;
-			break;
-		case 'stroke':
-			this.ctx.strokeStyle = newValue;
-			break;
-		case 'line-width':
-			this.ctx.lineWidth = newValue;
-			break;
-		default:
-			throw new Error(`Unhandled attribute change: "${name}"`);
+			case 'fill':
+				this.ctx.fillStyle = newValue;
+				break;
+			case 'stroke':
+				this.ctx.strokeStyle = newValue;
+				break;
+			case 'line-width':
+				this.ctx.lineWidth = newValue;
+				break;
+			default:
+				throw new Error(`Unhandled attribute change: "${name}"`);
 		}
 	}
 

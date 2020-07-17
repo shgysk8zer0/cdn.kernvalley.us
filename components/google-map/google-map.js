@@ -142,11 +142,11 @@ export default class GoogleMapElement extends HTMLElement {
 		if (this.isConnected) {
 			await this.ready();
 			switch(name) {
-			case 'zoom':
-				this.gMap.zoom = parseFloat(newValue);
-				break;
-			default:
-				console.error(`Unhandled attribute change: ${name}`);
+				case 'zoom':
+					this.gMap.zoom = parseFloat(newValue);
+					break;
+				default:
+					console.error(`Unhandled attribute change: ${name}`);
 			}
 		}
 	}

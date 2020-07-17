@@ -54,19 +54,19 @@ registerCustomElement('theme-toggle', class HTMLThemeToggleElement extends HTMLE
 
 		this.addEventListener('themechange', ({detail}) => {
 			switch (detail) {
-			case 'light':
-				light.disabled = true;
-				dark.disabled = false;
-				document.documentElement.dataset.theme = 'light';
-				break;
+				case 'light':
+					light.disabled = true;
+					dark.disabled = false;
+					document.documentElement.dataset.theme = 'light';
+					break;
 
-			case 'dark':
-				light.disabled = false;
-				dark.disabled = true;
-				document.documentElement.dataset.theme = 'dark';
-				break;
+				case 'dark':
+					light.disabled = false;
+					dark.disabled = true;
+					document.documentElement.dataset.theme = 'dark';
+					break;
 
-			default: throw new Error(`Unsupported theme: ${detail}`);
+				default: throw new Error(`Unsupported theme: ${detail}`);
 			}
 		});
 	}

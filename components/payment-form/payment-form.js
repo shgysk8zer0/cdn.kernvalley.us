@@ -193,42 +193,42 @@ registerCustomElement('payment-form', class HTMLPaymentFormElement extends HTMLF
 		const showContactInfo = requestPayerName || requestPayerPhone || requestPayerEmail;
 
 		switch(attr.toLowerCase()) {
-		case 'requestpayeremail':
-			var email = this.elements.payerEmail;
-			email.hidden = ! requestPayerEmail;
-			email.disabled = ! requestPayerEmail;
-			contactInfo.disabled = ! showContactInfo;
-			contactInfo.hidden = ! showContactInfo;
-			break;
+			case 'requestpayeremail':
+				var email = this.elements.payerEmail;
+				email.hidden = ! requestPayerEmail;
+				email.disabled = ! requestPayerEmail;
+				contactInfo.disabled = ! showContactInfo;
+				contactInfo.hidden = ! showContactInfo;
+				break;
 
-		case 'requestpayername':
-			var name = this.elements.payerName;
-			name.hidden = newVal === null;
-			name.disabled = newVal === null;
-			contactInfo.disabled = ! showContactInfo;
-			contactInfo.hidden = ! showContactInfo;
-			break;
+			case 'requestpayername':
+				var name = this.elements.payerName;
+				name.hidden = newVal === null;
+				name.disabled = newVal === null;
+				contactInfo.disabled = ! showContactInfo;
+				contactInfo.hidden = ! showContactInfo;
+				break;
 
-		case 'requestpayerphone':
-			var phone = this.elements.payerPhone;
-			phone.hidden = newVal === null;
-			phone.disabled = newVal === null;
-			contactInfo.disabled = ! showContactInfo;
-			contactInfo.hidden = ! showContactInfo;
-			break;
+			case 'requestpayerphone':
+				var phone = this.elements.payerPhone;
+				phone.hidden = newVal === null;
+				phone.disabled = newVal === null;
+				contactInfo.disabled = ! showContactInfo;
+				contactInfo.hidden = ! showContactInfo;
+				break;
 
-		case 'requestshipping':
-			var shipping = this.shippingAddress;
-			var method = this.elements.shippingMethod;
-			shipping.hidden = newVal === null;
-			shipping.disabled = newVal === null;
-			method.disabled = newVal === null;
-			method.hidden = newVal === null;
-			break;
+			case 'requestshipping':
+				var shipping = this.shippingAddress;
+				var method = this.elements.shippingMethod;
+				shipping.hidden = newVal === null;
+				shipping.disabled = newVal === null;
+				method.disabled = newVal === null;
+				method.hidden = newVal === null;
+				break;
 
-		case 'shippingtype':
-			[...this.querySelectorAll('.shipping-type-label')].forEach(el => el.textContent = this.shippingType);
-			break;
+			case 'shippingtype':
+				[...this.querySelectorAll('.shipping-type-label')].forEach(el => el.textContent = this.shippingType);
+				break;
 		}
 
 	}

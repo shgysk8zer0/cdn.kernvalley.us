@@ -66,19 +66,19 @@ registerCustomElement('match-media', class HTMLMatchMediaElement extends HTMLEle
 
 	attributeChangedCallback(name, oldValue, newValue) {
 		switch(name) {
-		case 'media':
-			this.dispatchEvent(new CustomEvent('mediachange', {detail: {oldValue, newValue}}));
+			case 'media':
+				this.dispatchEvent(new CustomEvent('mediachange', {detail: {oldValue, newValue}}));
 
-			if (newValue !== null) {
-				const media = matchMedia(newValue);
-				const callback = () => this.dispatchEvent(new CustomEvent('matchmediachange', {detail: media}));
-				callback(media);
-				media.addListener(callback);
-				this.mediaChanged.then(() => media.removeListener(callback));
-			}
-			break;
+				if (newValue !== null) {
+					const media = matchMedia(newValue);
+					const callback = () => this.dispatchEvent(new CustomEvent('matchmediachange', {detail: media}));
+					callback(media);
+					media.addListener(callback);
+					this.mediaChanged.then(() => media.removeListener(callback));
+				}
+				break;
 
-		default: throw new Error(`Unhandled attribute changed: ${name}`);
+			default: throw new Error(`Unhandled attribute changed: ${name}`);
 		}
 	}
 

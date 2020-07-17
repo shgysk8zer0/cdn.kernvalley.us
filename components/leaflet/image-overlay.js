@@ -100,16 +100,16 @@ registerCustomElement('leaflet-image-overlay', class HTMLLeafletImageOverlayElem
 		const marker = map.get(this);
 		if (marker) {
 			switch(name) {
-			case 'hidden':
-				if (this.hidden) {
-					marker.remove();
-				} else if (this._map instanceof HTMLElement) {
-					this._map.ready.then(el => marker.addTo(el.map));
-				}
-				break;
+				case 'hidden':
+					if (this.hidden) {
+						marker.remove();
+					} else if (this._map instanceof HTMLElement) {
+						this._map.ready.then(el => marker.addTo(el.map));
+					}
+					break;
 
-			default:
-				throw new Error(`Unhandled attribute changed: ${name}`);
+				default:
+					throw new Error(`Unhandled attribute changed: ${name}`);
 			}
 		}
 	}

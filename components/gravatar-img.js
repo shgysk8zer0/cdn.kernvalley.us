@@ -187,19 +187,19 @@ export default class HTMLGravatarImageElement extends HTMLImageElement {
 
 	attributeChangedCallback(name, oldValue, newValue) {
 		switch (name) {
-		case 'hash':
-			if (newValue !== null) {
-				update(this);
-			}
-			break;
-		case 'email':
-			if (newValue !== null) {
-				this.hash = md5(newValue);
-				this.removeAttribute('email');
-			}
-			break;
-		default:
-			throw new Error(`Unhandled attribute change: "${name}"`);
+			case 'hash':
+				if (newValue !== null) {
+					update(this);
+				}
+				break;
+			case 'email':
+				if (newValue !== null) {
+					this.hash = md5(newValue);
+					this.removeAttribute('email');
+				}
+				break;
+			default:
+				throw new Error(`Unhandled attribute change: "${name}"`);
 		}
 	}
 

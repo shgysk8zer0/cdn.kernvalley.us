@@ -111,16 +111,16 @@ HTMLCustomElement.register('ad-block', class HTMLAddBlockElement extends HTMLEle
 	async attributeChangedCallback(name, oldValue, newValue) {
 		await this.ready;
 		switch (name) {
-		case 'theme':
-			this.dispatchEvent(new CustomEvent('themechange', { detail: { oldValue, newValue } }));
-			break;
+			case 'theme':
+				this.dispatchEvent(new CustomEvent('themechange', { detail: { oldValue, newValue } }));
+				break;
 
-		case 'url':
-			shadows.get(this).childNodes.item(1).href = newValue;
-			break;
+			case 'url':
+				shadows.get(this).childNodes.item(1).href = newValue;
+				break;
 
-		default:
-			throw new Error(`Unhandled attribute changed: ${name}`);
+			default:
+				throw new Error(`Unhandled attribute changed: ${name}`);
 		}
 	}
 
@@ -174,21 +174,21 @@ HTMLCustomElement.register('ad-block', class HTMLAddBlockElement extends HTMLEle
 
 	set theme(val) {
 		switch (val.toLowerCase()) {
-		case 'light':
-			this.setAttribute('theme', 'light');
-			break;
+			case 'light':
+				this.setAttribute('theme', 'light');
+				break;
 
-		case 'dark':
-			this.setAttribute('theme', 'dark');
-			break;
+			case 'dark':
+				this.setAttribute('theme', 'dark');
+				break;
 
-		case '':
-		case 'auto':
-			this.removeAttribute('theme');
-			break;
+			case '':
+			case 'auto':
+				this.removeAttribute('theme');
+				break;
 
-		default:
-			throw new Error(`Unsupported theme: ${val}`);
+			default:
+				throw new Error(`Unsupported theme: ${val}`);
 		}
 	}
 

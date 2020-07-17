@@ -105,14 +105,14 @@ registerCustomElement('spotify-follow', class HTMLFollowElement extends HTMLElem
 
 	get theme() {
 		switch(this.getAttribute('theme')) {
-		case 'dark':
-			return 'dark';
+			case 'dark':
+				return 'dark';
 
-		case 'light':
-			return 'light';
+			case 'light':
+				return 'light';
 
-		default:
-			return matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+			default:
+				return matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
 		}
 	}
 
@@ -127,17 +127,17 @@ registerCustomElement('spotify-follow', class HTMLFollowElement extends HTMLElem
 	async attributeChangedCallback(name) {
 		const { theme, details, artist, followers } = this;
 		switch(name) {
-		case 'artist':
-		case 'details':
-		case 'theme':
-			this.shadowRoot.childNodes.forEach(el => el.remove());
-			this.shadowRoot.append(getIframe({
-				theme,
-				details,
-				uri: `spotify:artist:${artist}`,
-				followers,
-			}));
-			break;
+			case 'artist':
+			case 'details':
+			case 'theme':
+				this.shadowRoot.childNodes.forEach(el => el.remove());
+				this.shadowRoot.append(getIframe({
+					theme,
+					details,
+					uri: `spotify:artist:${artist}`,
+					followers,
+				}));
+				break;
 		}
 	}
 

@@ -154,43 +154,43 @@ HTMLCustomElement.register('spotify-player', class HTMLSpotifyTrackElement exten
 
 	async attributeChangedCallback(name, oldValue, newValue) {
 		switch(name) {
-		case 'large':
-			this.ready.then(async () => {
-				const size = newValue === null ? 80 : 380;
-				const nodes = await this.getSlotted('player');
-				nodes.forEach(el => el.height = size);
-			});
-			break;
+			case 'large':
+				this.ready.then(async () => {
+					const size = newValue === null ? 80 : 380;
+					const nodes = await this.getSlotted('player');
+					nodes.forEach(el => el.height = size);
+				});
+				break;
 
-		case 'uri':
-		case 'link':
-			this.ready.then(async () => {
-				if (typeof newValue === 'string') {
-					const {type, id} = parseURI(this.uri);
+			case 'uri':
+			case 'link':
+				this.ready.then(async () => {
+					if (typeof newValue === 'string') {
+						const {type, id} = parseURI(this.uri);
 
-					const iframe = createPlayer(this.large);
+						const iframe = createPlayer(this.large);
 
-					iframe.addEventListener('load', async () => {
-						this.dispatchEvent(new CustomEvent('trackchange', {detail: {
-							from: oldValue,
-							to: newValue,
-						}}));
-					}, {once: true});
+						iframe.addEventListener('load', async () => {
+							this.dispatchEvent(new CustomEvent('trackchange', {detail: {
+								from: oldValue,
+								to: newValue,
+							}}));
+						}, {once: true});
 
-					iframe.addEventListener('error', console.error, {once: true});
+						iframe.addEventListener('error', console.error, {once: true});
 
-					iframe.src = new URL(`${type}/${id}`, SPOTIFY).href;
+						iframe.src = new URL(`${type}/${id}`, SPOTIFY).href;
 
-					await loaded();
-					this.setSlot('player', iframe);
-				} else {
-					this.clearSlot('player');
-				}
-			});
-			break;
+						await loaded();
+						this.setSlot('player', iframe);
+					} else {
+						this.clearSlot('player');
+					}
+				});
+				break;
 
-		default:
-			throw new Error(`Unknown attribute changed: ${name}`);
+			default:
+				throw new Error(`Unknown attribute changed: ${name}`);
 		}
 	}
 

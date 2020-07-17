@@ -185,37 +185,37 @@ HTMLCustomElement.register('toast-message', class HTMLToastMessageElement extend
 
 	async attributeChangedCallback(attr, oldVal, newVal) {
 		switch(attr) {
-		case 'open':
-			if (newVal !== null) {
-				await this.show();
-				this.dispatchEvent(new Event('open'));
-			} else {
-				await this.close();
-				this.dispatchEvent(new Event('close'));
-			}
-			break;
-		case 'color':
-			if (newVal !== null) {
-				this.style.setProperty('--toast-color', newVal);
-			} else {
-				this.style.removeProperty('--toast-color');
-			}
-			break;
-		case 'background':
-			if (newVal !== null) {
-				this.style.setProperty('--toast-background', newVal);
-			} else {
-				this.style.removeProperty('--toast-background');
-			}
-			break;
+			case 'open':
+				if (newVal !== null) {
+					await this.show();
+					this.dispatchEvent(new Event('open'));
+				} else {
+					await this.close();
+					this.dispatchEvent(new Event('close'));
+				}
+				break;
+			case 'color':
+				if (newVal !== null) {
+					this.style.setProperty('--toast-color', newVal);
+				} else {
+					this.style.removeProperty('--toast-color');
+				}
+				break;
+			case 'background':
+				if (newVal !== null) {
+					this.style.setProperty('--toast-background', newVal);
+				} else {
+					this.style.removeProperty('--toast-background');
+				}
+				break;
 
-		case 'height':
-			if (newVal !== null) {
-				this.style.setProperty('--toast-height', newVal);
-			} else {
-				this.style.removeProperty('--toast-height');
-			}
-			break;
+			case 'height':
+				if (newVal !== null) {
+					this.style.setProperty('--toast-height', newVal);
+				} else {
+					this.style.removeProperty('--toast-height');
+				}
+				break;
 		}
 	}
 

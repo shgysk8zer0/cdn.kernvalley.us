@@ -85,45 +85,45 @@ registerCustomElement('leaflet-geojson', class HTMLLeafletGeoJSONElement extends
 		await this.ready;
 		const path = map.get(this);
 		switch(name) {
-		case 'color':
-			path.setStyle({color: this.color});
-			break;
+			case 'color':
+				path.setStyle({color: this.color});
+				break;
 
-		case 'fill':
-			path.setStyle({fill: this.fill});
-			break;
+			case 'fill':
+				path.setStyle({fill: this.fill});
+				break;
 
-		case 'hidden':
-			if (this.hidden) {
-				path.remove();
-			} else if (this._map instanceof HTMLElement) {
-				path.addTo(this._map.map);
-			}
-			break;
+			case 'hidden':
+				if (this.hidden) {
+					path.remove();
+				} else if (this._map instanceof HTMLElement) {
+					path.addTo(this._map.map);
+				}
+				break;
 
-		case 'opacity':
-			path.setStyle({opacity: this.opacity});
-			break;
+			case 'opacity':
+				path.setStyle({opacity: this.opacity});
+				break;
 
-		case 'stroke':
-			path.setStyle({stroke: this.stroke});
-			break;
+			case 'stroke':
+				path.setStyle({stroke: this.stroke});
+				break;
 
-		case 'src':
+			case 'src':
 			// console.info({oldVal, newVal});
 			// fetch(this.src).then(async resp => {
 			// 	const data = await resp.json();
 			// 	path.addData(data);
 			// });
-			this.dispatchEvent(new CustomEvent('srcchange', {detail: {oldVal, newVal}}));
-			break;
+				this.dispatchEvent(new CustomEvent('srcchange', {detail: {oldVal, newVal}}));
+				break;
 
-		case 'weight':
-			path.setStyle({weight: this.weight});
-			break;
+			case 'weight':
+				path.setStyle({weight: this.weight});
+				break;
 
-		default:
-			throw new Error(`Invalid attribute changed: ${name}`);
+			default:
+				throw new Error(`Invalid attribute changed: ${name}`);
 		}
 	}
 

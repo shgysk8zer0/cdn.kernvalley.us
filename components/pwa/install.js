@@ -163,16 +163,16 @@ registerCustomElement('pwa-install', class HTMLPWAInstallButton extends HTMLButt
 	attributeChangedCallback(name, oldValue, newValue) {
 		const detail = {oldValue, newValue};
 		switch(name) {
-		case 'scope':
-			this.dispatchEvent(new CustomEvent('scopechange', detail));
-			break;
+			case 'scope':
+				this.dispatchEvent(new CustomEvent('scopechange', detail));
+				break;
 
-		case 'src':
-			this.dispatchEvent(new CustomEvent('srcchange', detail));
-			break;
+			case 'src':
+				this.dispatchEvent(new CustomEvent('srcchange', detail));
+				break;
 
-		default:
-			throw new Error(`Unhandled attribute change: ${name}`);
+			default:
+				throw new Error(`Unhandled attribute change: ${name}`);
 		}
 	}
 

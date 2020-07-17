@@ -50,20 +50,20 @@ export default class HTMLFileInputElement extends HTMLInputElement {
 				});
 
 				switch(as) {
-				case 'data':
-					reader.readAsDataURL(file);
-					break;
-				case 'text':
-					reader.readAsText(file);
-					break;
-				case 'binary':
-					reader.readAsBinaryString(file);
-					break;
-				case 'arraybuffer':
-					reader.readAsArrayBuffer(file);
-					break;
-				default:
-					throw new Error(`Invalid option for "as" attribute: ${as}`);
+					case 'data':
+						reader.readAsDataURL(file);
+						break;
+					case 'text':
+						reader.readAsText(file);
+						break;
+					case 'binary':
+						reader.readAsBinaryString(file);
+						break;
+					case 'arraybuffer':
+						reader.readAsArrayBuffer(file);
+						break;
+					default:
+						throw new Error(`Invalid option for "as" attribute: ${as}`);
 				}
 			});
 		}

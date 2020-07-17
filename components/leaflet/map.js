@@ -417,16 +417,16 @@ HTMLCustomElement.register('leaflet-map', class HTMLLeafletMapElement extends HT
 
 	async attributeChangedCallback(name) {
 		switch (name) {
-		case 'zoom':
-			this.ready.then(() => this.map.setZoom(this.zoom));
-			break;
+			case 'zoom':
+				this.ready.then(() => this.map.setZoom(this.zoom));
+				break;
 
-		case 'center':
-			this.ready.then(() => this.setCenter(this.center));
-			break;
+			case 'center':
+				this.ready.then(() => this.setCenter(this.center));
+				break;
 
-		default:
-			throw new Error(`Unhandled attribute changed: ${name}`);
+			default:
+				throw new Error(`Unhandled attribute changed: ${name}`);
 		}
 	}
 

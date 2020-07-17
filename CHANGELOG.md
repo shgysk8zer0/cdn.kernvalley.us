@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <!-- markdownlint-disable -->
 ## [Unreleased]
 
+## [v1.0.6] - 2020-07-17
+
+### Changed
+- Indent `switch` / `case` rule for eslint
+- Update `.editorconfig` to specify tab style and width
+- Run `npm run fix` with new linting rules
+- Update submodules
+- Rename stylelint config file
+
 ## [v1.0.5] - 2020-07-10
 
 ### Added
