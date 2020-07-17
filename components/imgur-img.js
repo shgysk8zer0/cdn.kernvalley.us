@@ -201,17 +201,17 @@ export default class HTMLImgurImgElement extends HTMLPictureElement {
 
 	static getType(ext) {
 		switch(ext.toLowerCase()) {
-		case '.jpg':
-		case '.jpeg':
-			return 'image/jpeg';
-		case '.png':
-			return 'image/png';
-		case '.webp':
-			return 'image/webp';
-		case '.gif':
-			return 'image/gif';
-		default:
-			throw new Error(`Unknown image extension: "${ext}"`);
+			case '.jpg':
+			case '.jpeg':
+				return 'image/jpeg';
+			case '.png':
+				return 'image/png';
+			case '.webp':
+				return 'image/webp';
+			case '.gif':
+				return 'image/gif';
+			default:
+				throw new Error(`Unknown image extension: "${ext}"`);
 		}
 	}
 }

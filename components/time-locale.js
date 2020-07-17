@@ -19,11 +19,11 @@ registerCustomElement('time-locale', class HTMLTimeLocaleElement extends HTMLTim
 
 	attributeChangedCallback(name) {
 		switch(name) {
-		case 'datetime':
-			this.textContent = new Date(this.dateTime).toLocaleTimeString();
-			break;
+			case 'datetime':
+				this.textContent = new Date(this.dateTime).toLocaleTimeString();
+				break;
 
-		default: throw new Error(`Unhandled attribute changed: ${name}`);
+			default: throw new Error(`Unhandled attribute changed: ${name}`);
 		}
 	}
 

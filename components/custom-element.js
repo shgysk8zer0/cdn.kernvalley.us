@@ -18,16 +18,16 @@ function setAttrs(el = null, {
 
 	Object.entries(attrs).forEach(([key, val]) => {
 		switch(typeof val) {
-		case 'string':
-			el.setAttribute(key, val);
-			break;
+			case 'string':
+				el.setAttribute(key, val);
+				break;
 
-		case 'boolean':
-			el.toggleAttribute(key, val);
-			break;
+			case 'boolean':
+				el.toggleAttribute(key, val);
+				break;
 
-		default:
-			el.setAttribute(key, '');
+			default:
+				el.setAttribute(key, '');
 		}
 	});
 

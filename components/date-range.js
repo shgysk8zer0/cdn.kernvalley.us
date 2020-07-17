@@ -71,13 +71,13 @@ registerCustomElement('date-range', class HTMLDateRangeElement extends HTMLEleme
 
 	attributeChangedCallback(name) {
 		switch (name) {
-		case 'date':
-		case 'end':
-		case 'start':
-			this.hidden = ! this.inRange;
-			break;
+			case 'date':
+			case 'end':
+			case 'start':
+				this.hidden = ! this.inRange;
+				break;
 
-		default: throw new Error(`Invalid attribute changed: ${name}`);
+			default: throw new Error(`Invalid attribute changed: ${name}`);
 		}
 	}
 

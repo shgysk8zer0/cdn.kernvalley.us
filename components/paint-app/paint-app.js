@@ -112,29 +112,29 @@ export default class HTMLPaintAppElement extends HTMLElement {
 	async attributeChangedCallback(name, oldValue, newValue) {
 		await this.ready();
 		switch(name) {
-		case 'fill':
-			this.canvas.fill = newValue;
-			break;
-		case 'stroke':
-			this.ctx.stroke = newValue;
-			break;
-		case 'line-width':
-			this.canvas.lineWidth = newValue;
-			break;
-		case 'export-format':
-			this.canvas.exportFormat = newValue;
-			break;
-		case 'export-quality':
-			this.canvas.exportQuality = newValue;
-			break;
-		case 'height':
-			this.canvas.height = newValue;
-			break;
-		case 'width':
-			this.canvas.width = newValue;
-			break;
-		default:
-			throw new Error(`Unhandled attribute change: "${name}"`);
+			case 'fill':
+				this.canvas.fill = newValue;
+				break;
+			case 'stroke':
+				this.ctx.stroke = newValue;
+				break;
+			case 'line-width':
+				this.canvas.lineWidth = newValue;
+				break;
+			case 'export-format':
+				this.canvas.exportFormat = newValue;
+				break;
+			case 'export-quality':
+				this.canvas.exportQuality = newValue;
+				break;
+			case 'height':
+				this.canvas.height = newValue;
+				break;
+			case 'width':
+				this.canvas.width = newValue;
+				break;
+			default:
+				throw new Error(`Unhandled attribute change: "${name}"`);
 		}
 	}
 

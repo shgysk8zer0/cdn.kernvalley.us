@@ -139,10 +139,10 @@ registerCustomElement('calendar-view', class CalendarElement extends HTMLElement
 
 	attributeChangedCallback(name/*, oldVal, newVal*/) {
 		switch(name) {
-		case 'year':
-		case 'month':
-			this.render();
-			break;
+			case 'year':
+			case 'month':
+				this.render();
+				break;
 		}
 	}
 

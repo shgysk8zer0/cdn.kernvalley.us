@@ -117,21 +117,21 @@ HTMLCustomElement.register('weather-current', class HTMLWeatherForecastElement e
 
 	set theme(val) {
 		switch(val.toLowerCase()) {
-		case 'light':
-			this.setAttribute('theme', 'light');
-			break;
+			case 'light':
+				this.setAttribute('theme', 'light');
+				break;
 
-		case 'dark':
-			this.setAttribute('theme', 'dark');
-			break;
+			case 'dark':
+				this.setAttribute('theme', 'dark');
+				break;
 
-		case '':
-		case 'auto':
-			this.removeAttribute('theme');
-			break;
+			case '':
+			case 'auto':
+				this.removeAttribute('theme');
+				break;
 
-		default:
-			throw new Error(`Unsupported theme: ${val}`);
+			default:
+				throw new Error(`Unsupported theme: ${val}`);
 		}
 	}
 
@@ -146,23 +146,23 @@ HTMLCustomElement.register('weather-current', class HTMLWeatherForecastElement e
 
 	async attributeChangedCallback(name, oldValue, newValue) {
 		switch(name) {
-		case 'appid':
-			this.dispatchEvent(new CustomEvent('appidchange', {detail: {oldValue, newValue}}));
-			break;
+			case 'appid':
+				this.dispatchEvent(new CustomEvent('appidchange', {detail: {oldValue, newValue}}));
+				break;
 
-		case 'postalcode':
-			this.dispatchEvent(new CustomEvent('locationchange', {detail: {oldValue, newValue}}));
-			break;
+			case 'postalcode':
+				this.dispatchEvent(new CustomEvent('locationchange', {detail: {oldValue, newValue}}));
+				break;
 
-		case 'theme':
-			this.dispatchEvent(new CustomEvent('themechange', {detail: {oldValue, newValue}}));
-			break;
+			case 'theme':
+				this.dispatchEvent(new CustomEvent('themechange', {detail: {oldValue, newValue}}));
+				break;
 
-		case 'units':
-			this.dispatchEvent(new CustomEvent('unitschange', {detail: {oldValue, newValue}}));
-			break;
+			case 'units':
+				this.dispatchEvent(new CustomEvent('unitschange', {detail: {oldValue, newValue}}));
+				break;
 
-		default: throw new Error(`Unhandled attribute changed: ${name}`);
+			default: throw new Error(`Unhandled attribute changed: ${name}`);
 		}
 	}
 

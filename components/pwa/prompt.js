@@ -93,13 +93,13 @@ HTMLCustomElement.register('pwa-prompt', class HTMLPWAPromptElement extends HTML
 		this.getTemplate('./components/pwa/prompt.html').then(tmp => {
 			tmp.querySelectorAll('[data-click]').forEach(el => {
 				switch(el.dataset.click) {
-				case 'close':
-					el.addEventListener('click', () => this.close({install: false}));
-					break;
+					case 'close':
+						el.addEventListener('click', () => this.close({install: false}));
+						break;
 
-				case 'install':
-					el.addEventListener('click', () => this.close({install: true}));
-					break;
+					case 'install':
+						el.addEventListener('click', () => this.close({install: true}));
+						break;
 				}
 			});
 
@@ -167,14 +167,14 @@ HTMLCustomElement.register('pwa-prompt', class HTMLPWAPromptElement extends HTML
 
 	attributeChangedCallback(name, newValue) {
 		switch(name) {
-		case 'open':
-			if (newValue !== null) {
-				this.dispatchEvent(new Event('open'));
-			}
-			break;
+			case 'open':
+				if (newValue !== null) {
+					this.dispatchEvent(new Event('open'));
+				}
+				break;
 
-		default:
-			throw new Error(`Unhandled event change: ${name}`);
+			default:
+				throw new Error(`Unhandled event change: ${name}`);
 		}
 	}
 

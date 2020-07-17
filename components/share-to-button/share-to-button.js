@@ -23,85 +23,85 @@ async function share({
 	url = location.href,
 }) {
 	switch(target.toLowerCase()) {
-	case 'facebook':
-		(() => {
-			const link = new URL(urls.facebook);
-			link.searchParams.set('u', url);
-			link.searchParams.set('t', title);
-			openPopup(link);
-		})();
-		break;
+		case 'facebook':
+			(() => {
+				const link = new URL(urls.facebook);
+				link.searchParams.set('u', url);
+				link.searchParams.set('t', title);
+				openPopup(link);
+			})();
+			break;
 
-	case 'twitter':
-		(() => {
-			const link = new URL(urls.twitter);
-			link.searchParams.set('text', title);
-			link.searchParams.set('url', url);
-			openPopup(link);
-		})();
-		break;
+		case 'twitter':
+			(() => {
+				const link = new URL(urls.twitter);
+				link.searchParams.set('text', title);
+				link.searchParams.set('url', url);
+				openPopup(link);
+			})();
+			break;
 
-	case 'reddit':
-		(() => {
-			const link = new URL(urls.reddit);
-			link.searchParams.set('url', url);
-			link.searchParams.set('title', title);
-			openPopup(link);
-		})();
-		break;
+		case 'reddit':
+			(() => {
+				const link = new URL(urls.reddit);
+				link.searchParams.set('url', url);
+				link.searchParams.set('title', title);
+				openPopup(link);
+			})();
+			break;
 
-	case 'linkedin':
-		(() => {
-			const link = new URL(urls.linkedIn);
-			link.searchParams.set('title', title);
-			link.searchParams.set('summary', text);
-			link.searchParams.set('url', url);
-			openPopup(link);
-		})();
-		break;
+		case 'linkedin':
+			(() => {
+				const link = new URL(urls.linkedIn);
+				link.searchParams.set('title', title);
+				link.searchParams.set('summary', text);
+				link.searchParams.set('url', url);
+				openPopup(link);
+			})();
+			break;
 
-	case 'gmail':
-		(() => {
-			const link = new URL(urls.gmail);
-			link.searchParams.set('su', title);
-			if (typeof text === 'string' && text !== '') {
-				link.searchParams.set('body', `${title} <${url}>\n${text}`);
+		case 'gmail':
+			(() => {
+				const link = new URL(urls.gmail);
+				link.searchParams.set('su', title);
+				if (typeof text === 'string' && text !== '') {
+					link.searchParams.set('body', `${title} <${url}>\n${text}`);
+				} else {
+					link.searchParams.set('body', `${title} <${url}>`);
+				}
+				openPopup(link);
+			})();
+			break;
+
+		case 'clipboard':
+			if (typeof text === 'string' && text.length !== 0) {
+				navigator.clipboard.writeText(`${title} <${url}>\n${text}`)
+					.then(() => alert('Copied to clipboard'));
 			} else {
-				link.searchParams.set('body', `${title} <${url}>`);
+				navigator.clipboard.writeText(`${title} <${url}>`)
+					.then(() => alert('Copied to clipboard'));
 			}
-			openPopup(link);
-		})();
-		break;
+			break;
 
-	case 'clipboard':
-		if (typeof text === 'string' && text.length !== 0) {
-			navigator.clipboard.writeText(`${title} <${url}>\n${text}`)
-				.then(() => alert('Copied to clipboard'));
-		} else {
-			navigator.clipboard.writeText(`${title} <${url}>`)
-				.then(() => alert('Copied to clipboard'));
-		}
-		break;
+		case 'print':
+			window.print();
+			break;
 
-	case 'print':
-		window.print();
-		break;
+		case 'email':
+			(() => {
+				const link = new URL('mailto:');
+				link.searchParams.set('subject', title);
+				if (typeof text === 'string' && text.length > 0) {
+					link.searchParams.set('body', `${title} <${url}>\n${text}`);
+				} else {
+					link.searchParams.set('body', `${title} <${url}>`);
+				}
+				location.href = link;
+			})();
+			break;
 
-	case 'email':
-		(() => {
-			const link = new URL('mailto:');
-			link.searchParams.set('subject', title);
-			if (typeof text === 'string' && text.length > 0) {
-				link.searchParams.set('body', `${title} <${url}>\n${text}`);
-			} else {
-				link.searchParams.set('body', `${title} <${url}>`);
-			}
-			location.href = link;
-		})();
-		break;
-
-	default:
-		throw new Error(`Unknown share target: ${target}`);
+		default:
+			throw new Error(`Unknown share target: ${target}`);
 	}
 }
 
@@ -188,18 +188,18 @@ HTMLCustomElement.register('share-to-button', class HTMLShareToButtonElement ext
 
 	async attributeChangedCallback(name, oldValue, newValue) {
 		switch (name) {
-		case 'target':
-			if (typeof newValue !== 'string' || newValue.length === 0) {
-				this.hidden = true;
-			} else if (newValue.toLowerCase() === 'clipboard') {
-				this.hidden = ! (('clipboard' in navigator) && navigator.clipboard.writeText instanceof Function);
-			} else {
-				this.hidden = false;
-			}
-			break;
+			case 'target':
+				if (typeof newValue !== 'string' || newValue.length === 0) {
+					this.hidden = true;
+				} else if (newValue.toLowerCase() === 'clipboard') {
+					this.hidden = ! (('clipboard' in navigator) && navigator.clipboard.writeText instanceof Function);
+				} else {
+					this.hidden = false;
+				}
+				break;
 
-		default:
-			throw new Error(`Unhandled attribute change: ${name}`);
+			default:
+				throw new Error(`Unhandled attribute change: ${name}`);
 		}
 	}
 

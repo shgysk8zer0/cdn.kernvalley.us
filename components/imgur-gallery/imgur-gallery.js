@@ -222,8 +222,8 @@ export default class HTMLImgurGalleryElement extends HTMLElement {
 
 	async attributeChangedCallback(name, oldValue, newValue) {
 		switch(name) {
-		default:
-			console.log({name, oldValue, newValue});
+			default:
+				console.log({name, oldValue, newValue});
 		}
 	}
 }
