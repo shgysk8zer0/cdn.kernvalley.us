@@ -175,7 +175,7 @@ HTMLCustomElement.register('leaflet-map', class HTMLLeafletMapElement extends HT
 	}
 
 	get crossOrigin() {
-		return this.getAttribute('crossorigin') || 'annonymous';
+		return this.getAttribute('crossorigin') || 'anonymous';
 	}
 
 	set crossOrigin(val) {
@@ -221,11 +221,8 @@ HTMLCustomElement.register('leaflet-map', class HTMLLeafletMapElement extends HT
 
 	get center() {
 		if (this.hasAttribute('center')) {
-			const [latitude, longitude] = this.getAttribute('center').split(',');
-			return {
-				latitude: parseFloat(latitude),
-				longitude: parseFloat(longitude),
-			};
+			const [latitude = NaN, longitude = NaN] = this.getAttribute('center').split(',', 2).map(parseFloat);
+			return { latitude, longitude };
 		} else {
 			return {
 				latitude: NaN,

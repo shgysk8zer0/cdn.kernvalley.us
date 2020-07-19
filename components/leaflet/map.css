@@ -38,3 +38,8 @@ slot[name="map"] {
 	max-width: 100%;
 	overflow: auto;
 }
+
+[part~="popup"] {
+	max-height: var(--marker-max-height, calc(0.6 * var(--map-height, 400px)));
+	overflow: auto;
+}

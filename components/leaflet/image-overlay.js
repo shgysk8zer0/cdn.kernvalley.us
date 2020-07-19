@@ -61,8 +61,13 @@ registerCustomElement('leaflet-image-overlay', class HTMLLeafletImageOverlayElem
 	get image() {
 		const slot = this._shadow.querySelector('slot[name="image"]');
 		const nodes = slot.assignedNodes();
-		if (nodes.length === 1) {
-			return nodes[0];
+		if (nodes.length === 1 && nodes[0] instanceof HTMLElement) {
+			const img = nodes[0];
+			if (img.tagName === 'TEMPLATE') {
+				return img.cloneNode(true).firstElementChild;
+			} else {
+				return img;
+			}
 		} else {
 			return null;
 		}
