@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <!-- markdownlint-disable -->
 ## [Unreleased]
 
+### Changed
+- Add support for `<template>`s for `<leaflet-marker>` popups
+
 ## [v1.0.6] - 2020-07-17
 
 ### Changed
