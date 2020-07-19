@@ -91,24 +91,15 @@ registerCustomElement('leaflet-marker', class HTMLLeafletMarkerElement extends H
 		this.setAttribute('longitude', val);
 	}
 
-	get title() {
-		return this.getAttribute('title');
-	}
-
-	set title(val) {
-		if (typeof val === 'string' && val !== '') {
-			this.setAttribute('title', val);
-		} else {
-			this.removeAttribute('title');
-		}
-	}
-
 	get iconImg() {
 		const slot = this._shadow.querySelector('slot[name="icon"]');
 		const nodes = slot.assignedNodes();
 		return nodes.length === 1 ? nodes[0] : null;
 	}
 
+	/**
+	 * @TODO support SVG icons
+	 */
 	set iconImg(val) {
 		const current = this.iconImg;
 		if (current instanceof HTMLImageElement) {
@@ -129,13 +120,24 @@ registerCustomElement('leaflet-marker', class HTMLLeafletMarkerElement extends H
 	get popup() {
 		const slot = this._shadow.querySelector('slot[name="popup"]');
 		const nodes = slot.assignedNodes();
-		return nodes.length === 1 ? nodes[0] : null;
+		const popup = nodes.length === 1 ? nodes[0] : null;
+
+		if (! (popup instanceof HTMLElement)) {
+			return null;
+		} else if (popup.tagName === 'TEMPLATE') {
+			const container = document.createElement('div');
+			container.append(popup.content.cloneNode(true));
+			return container;
+		} else {
+			return popup;
+		}
 	}
 
 	set popup(el) {
 		if (el instanceof HTMLElement) {
 			el.slot = 'popup';
 			const current = this.popup;
+
 			if (current instanceof HTMLElement) {
 				current.remove();
 			}
@@ -152,8 +154,8 @@ registerCustomElement('leaflet-marker', class HTMLLeafletMarkerElement extends H
 	}
 
 	_make() {
-		const {latitude, longitude, title, iconImg, popup} = this;
-		const eventDispatcher = ({containerPoint, latlng, originalEvent, type}) => {
+		const { latitude, longitude, title, iconImg, popup } = this;
+		const eventDispatcher = ({ containerPoint, latlng, originalEvent, type }) => {
 			this.dispatchEvent(new CustomEvent(`marker${type}`, {detail: {
 				coordinates: {
 					latitude: latlng.lat,
