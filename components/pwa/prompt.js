@@ -86,7 +86,7 @@ HTMLCustomElement.register('pwa-prompt', class HTMLPWAPromptElement extends HTML
 		screenshots          = null,
 		features             = null,
 		related_applications = [],
-	} = {}) {
+	} = {}, event) {
 		super();
 		this.attachShadow({mode: 'open'});
 
@@ -98,7 +98,15 @@ HTMLCustomElement.register('pwa-prompt', class HTMLPWAPromptElement extends HTML
 						break;
 
 					case 'install':
-						el.addEventListener('click', () => this.close({install: true}));
+						if (event instanceof Event && event.prompt instanceof Function) {
+							el.addEventListener('click', async () => {
+								await event.prompt();
+								this.close({install: true});
+							});
+						} else {
+							console.info({event});
+							el.addEventListener('click', () => this.close({install: false}));
+						}
 						break;
 				}
 			});
