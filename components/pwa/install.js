@@ -46,15 +46,13 @@ registerCustomElement('pwa-install', class HTMLPWAInstallButton extends HTMLButt
 				const PWAPrompt = customElements.get('pwa-prompt');
 
 				if (manifest) {
-					const el = new PWAPrompt(manifest);
+					const el = new PWAPrompt(manifest, event);
 					document.body.append(el);
 					const { install } = await el.prompt();
 
 					el.remove();
-
 					if (install === true) {
-						const { outcome } = await event.prompt();
-						const detail = {outcome, playforms: event.platforms};
+						const detail = {install, playforms: event.platforms};
 						this.dispatchEvent(new CustomEvent('install', {detail}));
 						this.hidden = true;
 						setTimeout(() => this.remove(), 500);

@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <!-- markdownlint-disable -->
 ## [Unreleased]
 
+### Fixed
+- Delegate `beforeinstallprompt` event handling to `<pwa-prompt>` and `event.prompt()` on install button click
+
 ### Changed
 - Add support for `<template>`s for `<leaflet-marker>` popups
 
