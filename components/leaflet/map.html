@@ -2,19 +2,22 @@
 <html lang="en" dir="ltr">
 	<head>
 		<meta charset="utf-8" />
-		<link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css" integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ==" crossorigin=""/>
+		<link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css" integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ==" crossorigin="" />
 		<link rel="stylesheet" href="./map.css" media="all" crossorigin="" />
 	</head>
 	<body>
-		<slot name="map">
-			<!-- Be sure to load Leaflet CSS if assigning this slot -->
-			<div id="map-fallback" part="map"></div>
-		</slot>
-		<slot name="attribution">
-			<a part="attribution" href="https://wikimediafoundation.org/wiki/Maps_Terms_of_Use">Wikimedia</a>
-		</slot>
-		<slot name="markers"></slot>
-		<slot name="overlays"></slot>
-		<slot name="geojson"></slot>
+		<div part="container">
+			<slot name="toolbar"></slot>
+			<slot name="map">
+				<!-- Be sure to load Leaflet CSS if assigning this slot -->
+				<div id="map-fallback" part="map"></div>
+			</slot>
+			<slot name="attribution">
+				<a part="attribution" href="https://wikimediafoundation.org/wiki/Maps_Terms_of_Use">Wikimedia</a>
+			</slot>
+			<slot name="markers"></slot>
+			<slot name="overlays"></slot>
+			<slot name="geojson"></slot>
+		</div>
 	</body>
 </html>
