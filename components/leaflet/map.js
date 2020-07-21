@@ -50,6 +50,17 @@ HTMLCustomElement.register('leaflet-map', class HTMLLeafletMapElement extends HT
 				});
 			});
 
+			doc.querySelectorAll('slot[name]').forEach(slot => {
+				slot.addEventListener('slotchange', ({target}) => {
+					this.dispatchEvent(new CustomEvent('change', {
+						detail: {
+							slot: target.name,
+							nodes: target.assignedElements(),
+						}
+					}));
+				});
+			});
+
 			this._shadow.append(...doc.head.children, ...doc.body.children);
 			await Promise.all(stylesheets);
 			this.dispatchEvent(new Event('populated'));
