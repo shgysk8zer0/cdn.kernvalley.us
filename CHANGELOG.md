@@ -7,8 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <!-- markdownlint-disable -->
 ## [Unreleased]
 
+## [v1.0.7] - 2020-07-20
+
 ### Fixed
 - Delegate `beforeinstallprompt` event handling to `<pwa-prompt>` and `event.prompt()` on install button click
+- Do not set `referrer`, etc. by default when `fetch`ing templates, instead default to `undefined`
+- Fix accessibility for `<share-to-button>` [#194](https://github.com/shgysk8zer0/cdn.kernvalley.us/issues/194)
 
 ### Changed
 - Add support for `<template>`s for `<leaflet-marker>` popups
