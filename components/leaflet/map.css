@@ -12,8 +12,8 @@
 	contain: strict;
 }
 
-:host([toolbar])::slotted([slot="toolbar"]) {
-	display: flex;
+:host([toolbar]) ::slotted([slot="toolbar"]) {
+	display: inline-flex;
 	flex-direction: row;
 	flex-wrap: nowrap;
 	gap: 0.4em;
