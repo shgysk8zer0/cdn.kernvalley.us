@@ -264,6 +264,14 @@ HTMLCustomElement.register('leaflet-map', class HTMLLeafletMapElement extends HT
 		return this.getAttribute('tilesrc') || HTMLLeafletMapElement.wikimedia;
 	}
 
+	get toolbar() {
+		return this.hasAttribute('toolbar');
+	}
+
+	set toolbar(val) {
+		this.toggleAttribute('toolbar', val);
+	}
+
 	get attribution() {
 		const slot = this._shadow.querySelector('slot[name="attribution"]');
 		const nodes = slot.assignedNodes();
