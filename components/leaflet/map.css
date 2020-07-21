@@ -12,19 +12,16 @@
 	contain: strict;
 }
 
-::slotted([slot="toolbar"]) {
+:host([toolbar])::slotted([slot="toolbar"]) {
 	display: flex;
 	flex-direction: row;
 	flex-wrap: nowrap;
 	gap: 0.4em;
-	overflow-x: auto;
 	overflow-y: hidden;
-	width: 100%;
 	height: var(--map-toolbar-height, 4rem);
 	position: fixed;
 	z-index: 401;
 	top: 0;
-	left: 0;
 	right: 0;
 	opacity: 0.2;
 	transition: opacity 400ms ease-in-out;
