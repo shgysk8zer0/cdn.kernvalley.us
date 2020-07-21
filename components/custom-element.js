@@ -138,16 +138,15 @@ export default class HTMLCustomElement extends HTMLElement {
 
 	async getTemplate(url, {
 		cache          = 'default',
-		mode           = 'cors',
+		mode           = undefined,
 		headers        = new Headers(),
-		referrer       = document.referrer,
-		referrerPolicy = 'origin-when-cross-origin',
-		redirect       = 'follow',
-		credentials    = 'omit',
+		referrerPolicy = undefined,
+		redirect       = undefined,
+		credentials    = undefined,
 		timeout        = 5000,
-		integrity,
+		integrity      = undefined,
 	} = {}) {
-		const init = { cache, mode, headers, referrer, referrerPolicy, redirect, credentials, integrity };
+		const init = { cache, mode, headers, referrerPolicy, redirect, credentials, integrity };
 
 		if (Request.prototype.hasOwnProperty('signal')) {
 			const controller = new AbortController();

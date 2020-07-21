@@ -5,20 +5,24 @@
 		<meta name="viewport" content="width=device-width" />
 		<meta name="referrer" content="origin-when-cross-origin" />
 		<link rel="icon" href="https://kernvalley.us/favicon.ico" />
-		<script type="module" src="./js/std-js/deprefixer.js" async=""></script>
-		<script type="module" src="./js/std-js/shims.js" async=""></script>
-		<script type="module" src="./components/current-year.js" async=""></script>
-		<script type="module" src="./components/github/user.js" async=""></script>
-		<link rel="preload" href="./components/gitub/user.html" as="document" type="text/html" />
-		<link rel="stylesheet" href="./css/core-css/theme/default/index.css" media="screen" />
-		<link rel="stylesheet" href="./css/core-css/rem.css" media="screen" />
-		<link rel="stylesheet" href="./css/core-css/viewport.css" media="screen" />
-		<link rel="stylesheet" href="./css/core-css/element.css" media="screen" />
-		<link rel="stylesheet" href="./css/core-css/class-rules.css" media="screen" />
-		<link rel="stylesheet" href="./css/core-css/fonts.css" media="screen" />
-		<link rel="stylesheet" href="./css/core-css/scrollbar.css" media="screen" />
-		<link rel="stylesheet" href="./css/accessibility.css" media="screen" />
-		<link rel="stylesheet" href="./css/core-css/layout/wide/index.css" media="screen" />
+		<script type="module" src="/js/std-js/deprefixer.js" async=""></script>
+		<script type="module" src="/js/std-js/shims.js" async=""></script>
+		<script type="module" src="/components/current-year.js" async=""></script>
+		<script type="module" src="/components/github/user.js" async=""></script>
+		<script type="module" src="/components/share-to-button/share-to-button.js" async=""></script>
+		<link rel="preload" href="/components/github/user.html" as="fetch" type="text/html" crossorigin="anonymous" />
+		<link rel="preload" href="/components/github/user.css" as="style" type="text/css" crossorigin="anonymous" />
+		<link rel="preload" href="/components/share-to-button/share-to-button.html" as="fetch" type="text/html" crossorigin="anonymous" />
+		<link rel="preload" href="/components/share-to-button/share-to-button.css" as="style" type="text/css" crossorigin="anonymous" />
+		<link rel="stylesheet" href="/css/core-css/theme/default/index.css" media="screen" />
+		<link rel="stylesheet" href="/css/core-css/rem.css" media="screen" />
+		<link rel="stylesheet" href="/css/core-css/viewport.css" media="screen" />
+		<link rel="stylesheet" href="/css/core-css/element.css" media="screen" />
+		<link rel="stylesheet" href="/css/core-css/class-rules.css" media="screen" />
+		<link rel="stylesheet" href="/css/core-css/fonts.css" media="screen" />
+		<link rel="stylesheet" href="/css/core-css/scrollbar.css" media="screen" />
+		<link rel="stylesheet" href="/css/accessibility.css" media="screen" />
+		<link rel="stylesheet" href="/css/core-css/layout/wide/index.css" media="screen" />
 		<title>KernValley.us | CDN</title>
 	</head>
 	<body class="grid border-box background-primary color-default font-main">
@@ -26,7 +30,13 @@
 			<h1 class="center">This is the <abbr title="Content Delivery Network">CDN</abbr> for <a class="underline" href="https://kernvalley.us">KernValley.us</a></h1>
 			<github-user user="kernvalley"></github-user>
 		</header>
-		<nav id="nav" class="contain-content"></nav>
+		<nav id="nav" class="contain-content">
+			<share-to-button target="facebook"></share-to-button>
+			<share-to-button target="twitter"></share-to-button>
+			<share-to-button target="gmail"></share-to-button>
+			<share-to-button target="linkedin"></share-to-button>
+			<share-to-button target="reddit"></share-to-button>
+		</nav>
 		<main id="main" class="contain-content card shadow">
 			<blockquote>
 				This site is not intended for regular browsing. Rather, its resources

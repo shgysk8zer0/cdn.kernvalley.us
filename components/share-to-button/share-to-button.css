@@ -1,10 +1,28 @@
-:host {
+:host, :host([role="button"]) {
 	display: inline-block;
 	max-width: 100%;
 	max-height: 100%;
 	vertical-align: middle;
 	padding: 0;
+	background: none;
 	border: none;
+}
+
+:host([disabled]) {
+	background: ;
+	pointer-events: none;
+}
+
+:host([disabled][target]) [part~="container"] {
+	background-color: #585858;
+}
+
+button:focus, [role="button"]:focus, .btn:focus, summary:focus, input:focus,
+select:focus, textarea:focus, .input:focus, [tabindex]:focus, a:focus, [tabindex]:focus {
+	outline-width: var(--focus-outline-width, thin);
+	outline-style: var(--focus-outline-style, dotted);
+	outline-color: var(--focus-outline-color, currentColor);
+	outline-offset: var(--focus-outline-offset, 3px);
 }
 
 [part="container"] {
