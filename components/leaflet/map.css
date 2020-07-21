@@ -27,7 +27,7 @@
 	transition: opacity 400ms ease-in-out;
 }
 
-::slotted([slot="toolbar"]:hover) {
+:host([toolbar]) ::slotted([slot="toolbar"]:hover) {
 	opacity: 1;
 }
 
