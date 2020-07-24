@@ -25,15 +25,27 @@
 	 * Necessary because Android plops the URL at the end of text
 	 * instead of setting url correctly for the share API
 	 */
-	function parseValues({title, text = null, url = null, files} = {}) {
-		if (typeof text === 'string' && text.length !== 0 && url === null) {
+	function parseValues({title, text = null, url = null, files, params = {}} = {}) {
+		console.info({ text, url , params });
+		if (('text' in params) && ('url' in params) && typeof text === 'string' && text.length !== 0 && (typeof url !== 'string' || url.length === 0)) {
 			const words = text.trim().split(' ');
 			const end = words.splice(-1)[0];
 
+			/**
+			 * Check if `text` ends with a URL
+			 */
 			if (end.startsWith('https://') || end.startsWith('http://')) {
 				url = end;
 				text = words.join(' ');
 			}
+		} else if (('text' in params) && typeof url === 'string' && url !== '' && ! (typeof text === 'string' && text.endsWith(url))) {
+			/**
+			 * No URL in params, but URL has been set and text does not end with URL already
+			 */
+			text = (typeof text === 'string' && text !== '' && ! text.endsWith(url)) ? `${text} ${url}` : url;
+			url = null;
+		} else if ((typeof url === 'string') && (typeof text === 'string') && text.endsWith(url)) {
+			text = text.substr(0, text.length - url.length).trim();
 		}
 
 		return { title, text, url, files };
@@ -75,11 +87,13 @@
 							title: url.searchParams.get(params.title || 'title'),
 							text: url.searchParams.get(params.text || 'text'),
 							url: url.searchParams.get(params.url || 'url'),
+							params,
 						}));
 
 						url.searchParams.delete(params.title || 'title');
 						url.searchParams.delete(params.text || 'text');
 						url.searchParams.delete(params.url || 'url');
+
 						history.replaceState(history.state, document.title, url.href);
 					} else if (method === 'POST') {
 						const post = await postData;
@@ -89,6 +103,7 @@
 							text: post[params.text || 'text'],
 							url: post[params.url || 'url'],
 							files: post.files,
+							params,
 						}));
 					}
 				}
