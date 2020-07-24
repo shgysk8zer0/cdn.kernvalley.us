@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <!-- markdownlint-disable -->
 ## [Unreleased]
 
+## [v1.0.8] - 2020-07-24
+
 ### Added
 - `<slot name="toolbar">` to `<leaflet-map>`
 - `<form is="share-target">` for handling shares using the Share Trarget API
