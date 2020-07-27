@@ -1,5 +1,4 @@
 import HTMLCustomElement from '../custom-element.js';
-import { loaded } from '../../js/std-js/functions.js';
 
 const SPOTIFY = 'https://open.spotify.com/embed/';
 const TYPES = [
@@ -42,22 +41,6 @@ function uriToLink(uri) {
 	} else {
 		return null;
 	}
-}
-
-function createPlayer(large = null) {
-	const iframe = document.createElement('iframe');
-	iframe.height = large === true ? 380 : 80;
-	iframe.width = 300;
-	iframe.setAttribute('allowtransparency', 'true');
-	iframe.allow = 'encrypted-media';
-	iframe.referrerPolicy = 'origin';
-	iframe.loading = 'lazy';
-
-	if ('sandbox' in iframe) {
-		iframe.sandbox.add('allow-scripts', 'allow-popups', 'allow-same-origin');
-	}
-
-	return iframe;
 }
 
 function parseURI(uri) {
@@ -166,9 +149,25 @@ HTMLCustomElement.register('spotify-player', class HTMLSpotifyTrackElement exten
 			case 'link':
 				this.ready.then(async () => {
 					if (typeof newValue === 'string') {
-						const {type, id} = parseURI(this.uri);
+						const {type = null, id = null} = parseURI(this.uri);
 
-						const iframe = createPlayer(this.large);
+						const iframe = await this.setSlot('player', null, {
+							tag: 'iframe',
+							attrs: {
+								height: this.large ? 380 : 80,
+								width: 300,
+								allowtransparency: 'true',
+							},
+						});
+
+						iframe.allow = 'encrypted-media';
+						iframe.referrerPolicy = 'origin';
+						iframe.loading = 'lazy';
+						iframe.src = new URL(`${type}/${id}`, SPOTIFY).href;
+
+						if ('sandbox' in iframe) {
+							iframe.sandbox.add('allow-scripts', 'allow-popups', 'allow-same-origin');
+						}
 
 						iframe.addEventListener('load', async () => {
 							this.dispatchEvent(new CustomEvent('trackchange', {detail: {
@@ -180,9 +179,6 @@ HTMLCustomElement.register('spotify-player', class HTMLSpotifyTrackElement exten
 						iframe.addEventListener('error', console.error, {once: true});
 
 						iframe.src = new URL(`${type}/${id}`, SPOTIFY).href;
-
-						await loaded();
-						this.setSlot('player', iframe);
 					} else {
 						this.clearSlot('player');
 					}
