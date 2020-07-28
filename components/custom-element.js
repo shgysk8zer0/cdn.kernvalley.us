@@ -4,51 +4,6 @@ import { registerCustomElement } from '../js/std-js/functions.js';
 let metaUrl = meta.url;
 let base    = null;
 
-function setAttrs(el = null, {
-	attrs     = {},
-	data      = {},
-	css       = {},
-	classList = [],
-	slot      = null,
-	text      = null,
-} = {}) {
-	if (typeof el === 'string') {
-		el = document.createElement(el);
-	}
-
-	Object.entries(attrs).forEach(([key, val]) => {
-		switch(typeof val) {
-			case 'string':
-				el.setAttribute(key, val);
-				break;
-
-			case 'boolean':
-				el.toggleAttribute(key, val);
-				break;
-
-			default:
-				el.setAttribute(key, '');
-		}
-	});
-
-	Object.entries(data).forEach(([key, val]) => el.dataset[key] = val);
-	Object.entries(css).forEach(([key, val]) => el.style.setProperty(key, val));
-
-	if (classList.length !== 0) {
-		el.classList.add(...classList);
-	}
-
-	if (typeof text === 'string') {
-		el.textContent = text;
-	}
-
-	if (typeof slot === 'string') {
-		el.slot = slot;
-	}
-
-	return el;
-}
-
 export default class HTMLCustomElement extends HTMLElement {
 	get ready() {
 		return new Promise(resolve => {
@@ -70,6 +25,8 @@ export default class HTMLCustomElement extends HTMLElement {
 							link.addEventListener('load', () => res(), {once: true});
 							link.addEventListener('error', () => rej(`Error loading ${link.href}`), {once: true});
 						});
+					} else {
+						return Promise.resolve();
 					}
 					// @TODO Wait for `@import` loading
 					// link.sheet.rules.filter(rule => rule.type === CSSRule.IMPORT_RULE)
@@ -88,7 +45,7 @@ export default class HTMLCustomElement extends HTMLElement {
 		const el = await this.getSlot(slot);
 
 		if (el instanceof HTMLElement) {
-			return el.assignedNodes();
+			return el.assignedElements();
 		} else {
 			return [];
 		}
@@ -106,34 +63,50 @@ export default class HTMLCustomElement extends HTMLElement {
 		data      = {},
 		css       = {},
 		classList = [],
+		parts     = [],
 	} = {}) {
-		if (replace) {
-			await this.clearSlot(slot);
+		let el = null;
+
+		if (content instanceof HTMLElement) {
+			el = content;
+		} else if (typeof content === 'string') {
+			el = document.createElement(tag);
+			el.textContent = content;
+		} else {
+			el = document.createElement(tag);
 		}
 
-		if (typeof content === 'string') {
-			const el = document.createElement(tag);
-			el.textContent = content;
-			return this.setSlot(slot, el, {
-				replace,
-				attrs,
-				data,
-				css,
-				classList,
-				slot,
-			});
-		} else if (content instanceof HTMLElement) {
-			this.append(setAttrs(content, {attrs, data, css, classList, slot}));
-		} else if (Array.isArray(content)) {
-			return content.map(item => this.setSlot(slot, item, {
-				replace: false,
-				tag,
-				attrs,
-				classList,
-				data,
-				css,
-			}));
+		Object.entries(attrs).forEach(([k, v]) => el.setAttribute(k, v));
+		Object.entries(data).forEach(([k, v]) => el.dataset[k] = v);
+		Object.entries(css).forEach(([k, v]) => el.style.setProperty(k, v));
+
+		if (classList.length !== 0) {
+			el.classList.add(...classList);
 		}
+
+		if ('part' in el) {
+			el.part.add(...parts);
+		}
+
+		el.slot = slot;
+		el.title = 'Spotify Embedded Player';
+
+
+		if (replace) {
+			const current = await this.getSlotted(slot);
+
+			if (current.length === 0) {
+				this.append(el);
+			} else if (current.length === 1) {
+				current[0].replaceWith(el);
+			} else {
+				current.forEach(s => s.remove());
+				this.append(el);
+			}
+		} else {
+			this.append(el);
+		}
+		return el;
 	}
 
 	async getTemplate(url, {
@@ -145,14 +118,15 @@ export default class HTMLCustomElement extends HTMLElement {
 		credentials    = undefined,
 		timeout        = 5000,
 		integrity      = undefined,
+		signal         = undefined,
 	} = {}) {
-		const init = { cache, mode, headers, referrerPolicy, redirect, credentials, integrity };
 
-		if (Request.prototype.hasOwnProperty('signal')) {
+		if (Request.prototype.hasOwnProperty('signal') && typeof signal === 'undefined') {
 			const controller = new AbortController();
 			setTimeout(() => controller.abort(), timeout);
-			init.signal = controller.signal;
+			signal = controller.signal;
 		}
+		const init = { cache, mode, headers, referrerPolicy, redirect, credentials, integrity, signal };
 
 		const resp = await fetch(new URL(url, HTMLCustomElement.base), init);
 		const doc = new DOMParser().parseFromString(await resp.text(), 'text/html');
@@ -161,6 +135,7 @@ export default class HTMLCustomElement extends HTMLElement {
 		doc.querySelectorAll('link[href]').forEach(link => link.href = new URL(link.getAttribute('href'), resp.url).href);
 		doc.querySelectorAll('img[src]').forEach(img => img.src = new URL(img.getAttribute('src'), resp.url).href);
 		doc.querySelectorAll('script[src]').forEach(script => script.src = new URL(script.getAttribute('src'), resp.url).href);
+
 		frag.append(...doc.head.children, ...doc.body.children);
 		return frag;
 	}

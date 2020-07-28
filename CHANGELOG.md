@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <!-- markdownlint-disable -->
 ## [Unreleased]
 
+## [v1.0.9] - 2020-07-28
+
+### Added
+- `<audio is="audio-player">`, implementing the `navigator.mediaSession` API where supported
+
+### Changed
+- Improve `HTMLCustomElement` slot handling
+- Rewrite assigning `<iframe>` player to `<spotify-player>`
+
 ## [v1.0.8] - 2020-07-24
 
 ### Added
