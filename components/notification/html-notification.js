@@ -11,6 +11,15 @@ function getSlot(name, base) {
 		return null;
 	}
 }
+
+/**
+ * Notification API implemented as a custom element
+ * Note: Unlike most other custom elements, this exports the class
+ * for better compatibility with the Notification API.
+ *
+ * @TODO Implement queue or stacking of notifications
+ * @SEE https://developer.mozilla.org/en-US/docs/Web/API/Notification
+ */
 export default class HTMLNotificationElement extends HTMLCustomElement {
 	constructor(title, {
 		body = null,
