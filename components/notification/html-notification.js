@@ -32,6 +32,12 @@ export default class HTMLNotificationElement extends HTMLCustomElement {
 	} = {}) {
 		super();
 		this.attachShadow({mode: 'open'});
+
+		this.onshow = null;
+		this.onclose = null;
+		this.onclick = null;
+		this.onerror = null;
+
 		this.getTemplate('./components/notification/html-notification.html').then(tmp => {
 			tmp.querySelector('[part="close"]').addEventListener('click', () => this.close(), {
 				capture: true,
@@ -111,6 +117,15 @@ export default class HTMLNotificationElement extends HTMLCustomElement {
 			}
 		}, {
 			once: true,
+		});
+
+		this.addEventListener('error', evt => {
+			if (this.onerror instanceof Function) {
+				this.onerror.call(this, evt);
+			}
+		}, {
+			passive: true,
+			capture: true,
 		});
 
 		if (! (this.parentElement instanceof HTMLEmbedElement)) {
