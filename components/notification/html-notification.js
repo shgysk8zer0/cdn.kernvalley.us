@@ -80,29 +80,9 @@ export default class HTMLNotificationElement extends HTMLCustomElement {
 		this.data = data;
 		this.setAttribute('tag', tag);
 
-		this.addEventListener('click', event => {
-			if (this.onclick instanceof Function) {
-				this.onclick.call(this, event);
-			}
+		this.addEventListener('click', () => this.close(), { once: true });
 
-			this.close();
-		}, {
-			once: true,
-		});
-
-		this.addEventListener('show', event => {
-			if (this.onshow instanceof Function) {
-				this.onshow.call(this, event);
-			}
-		}, {
-			once: true,
-		});
-
-		this.addEventListener('close', event => {
-			if (this.onclose instanceof Function) {
-				this.onclose.call(this, event);
-			}
-
+		this.addEventListener('close', () => {
 			if (this.animate instanceof Function) {
 				this.animate([{
 					opacity: 1,
@@ -117,15 +97,6 @@ export default class HTMLNotificationElement extends HTMLCustomElement {
 			}
 		}, {
 			once: true,
-		});
-
-		this.addEventListener('error', evt => {
-			if (this.onerror instanceof Function) {
-				this.onerror.call(this, evt);
-			}
-		}, {
-			passive: true,
-			capture: true,
 		});
 
 		if (! (this.parentElement instanceof HTMLEmbedElement)) {
