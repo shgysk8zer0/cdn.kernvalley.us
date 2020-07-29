@@ -20,6 +20,7 @@
 	max-height: 128px;
 	box-sizing: border-box;
 	overflow-y: hidden;
+	z-index: 2147483647;
 }
 
 [part="icon"] {
