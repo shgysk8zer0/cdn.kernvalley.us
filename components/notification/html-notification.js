@@ -90,11 +90,12 @@ export default class HTMLNotificationElement extends HTMLCustomElement {
 					opacity: 1,
 					transform: 'none',
 				}, {
-					opacity: 0.1,
+					opacity: 0,
 					transform: 'translateY(64px)',
 				}], {
 					duration: 300,
 					easing: 'ease-in',
+					fill: 'forwards',
 				}).finished.then(() => this.remove());
 			} else {
 				this.remove();

@@ -57,6 +57,7 @@
 	background: transparent;
 	border: none;
 	cursor: pointer;
+	color: inherit;
 }
 
 ::slotted([slot="body"]) {
