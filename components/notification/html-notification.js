@@ -31,6 +31,8 @@ export default class HTMLNotificationElement extends HTMLCustomElement {
 		requireInteraction = false,
 	} = {}) {
 		super();
+		this.setAttribute('role', 'dialog');
+		this.setAttribute('label', 'Notification');
 		this.attachShadow({mode: 'open'});
 
 		this.onshow = null;
@@ -74,11 +76,11 @@ export default class HTMLNotificationElement extends HTMLCustomElement {
 			this.dispatchEvent(new Event('ready'));
 		});
 
-
 		this.dir = dir;
 		this.lang = lang;
 		this.data = data;
 		this.setAttribute('tag', tag);
+		this.hidden = true;
 
 		this.addEventListener('click', () => this.close(), { once: true });
 
@@ -86,8 +88,10 @@ export default class HTMLNotificationElement extends HTMLCustomElement {
 			if (this.animate instanceof Function) {
 				this.animate([{
 					opacity: 1,
+					transform: 'none',
 				}, {
-					opacity: 0.1
+					opacity: 0.1,
+					transform: 'translateY(64px)',
 				}], {
 					duration: 300,
 					easing: 'ease-in',
@@ -102,6 +106,8 @@ export default class HTMLNotificationElement extends HTMLCustomElement {
 		if (! (this.parentElement instanceof HTMLEmbedElement)) {
 			document.body.append(this);
 		}
+
+		this.stylesLoaded.then(() => this.hidden = false);
 
 		if (! requireInteraction) {
 			setTimeout(() => this.close(), 5000);

@@ -21,6 +21,15 @@
 	box-sizing: border-box;
 	overflow-y: hidden;
 	z-index: 2147483647;
+	animation: NotificationFadeIn 300ms ease-in;
+}
+
+@media (prefers-color-scheme: dark) {
+	:host {
+		background: #232323;
+		color: #dedede;
+		border-color: #6a6a6a;
+	}
 }
 
 [part="icon"] {
@@ -59,4 +68,16 @@
 ::slotted([slot="icon"]) {
 	height: 64px;
 	width: 64px;
+}
+
+@keyframes NotificationFadeIn {
+	from {
+		opacity: 0.1;
+		transform: translateY(64px);
+	}
+
+	to {
+		opacity: 1;
+		transform: none;
+	}
 }
