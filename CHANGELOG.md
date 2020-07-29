@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <!-- markdownlint-disable -->
 ## [Unreleased]
 
+### Added
+- `<html-notification>`, a custom element modelled after the `Notification` API
+
 ## [v1.0.9] - 2020-07-28
 
 ### Added
