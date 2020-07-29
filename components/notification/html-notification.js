@@ -61,7 +61,7 @@ export default class HTMLNotificationElement extends HTMLCustomElement {
 				this.append(bodyEl);
 			}
 
-			if (typeof icon === 'string') {
+			if (typeof icon === 'string' || icon instanceof URL) {
 				const iconEl = new Image(64, 64);
 				iconEl.crossOrigin = 'anonymous';
 				iconEl.loading = 'lazy';
