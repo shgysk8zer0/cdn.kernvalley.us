@@ -20,7 +20,7 @@ function getSlot(name, base) {
  * @TODO Implement queue or stacking of notifications
  * @SEE https://developer.mozilla.org/en-US/docs/Web/API/Notification
  */
-export default class HTMLNotificationElement extends HTMLCustomElement {
+export class HTMLNotificationElement extends HTMLCustomElement {
 	constructor(title, {
 		body = null,
 		icon = null,
@@ -28,6 +28,8 @@ export default class HTMLNotificationElement extends HTMLCustomElement {
 		lang = '',
 		tag = '',
 		data = null,
+		vibrate = null,
+		silent = false,
 		requireInteraction = false,
 	} = {}) {
 		super();
@@ -35,6 +37,7 @@ export default class HTMLNotificationElement extends HTMLCustomElement {
 		this.setAttribute('label', 'Notification');
 		this.attachShadow({mode: 'open'});
 
+		this.hidden = true;
 		this.onshow = null;
 		this.onclose = null;
 		this.onclick = null;
@@ -80,7 +83,20 @@ export default class HTMLNotificationElement extends HTMLCustomElement {
 		this.lang = lang;
 		this.data = data;
 		this.setAttribute('tag', tag);
-		this.hidden = true;
+
+		if (silent) {
+			this.setAttribute('silent', '');
+		}
+
+		if (requireInteraction) {
+			this.setAttribute('requireinteraction', '');
+		}
+
+		if (Array.isArray(vibrate)) {
+			this.setAttribute('vibrate', vibrate.join(' '));
+		} else if (Number.isInteger(vibrate)) {
+			this.setAttribute('vibrate', vibrate);
+		}
 
 		this.addEventListener('click', () => this.close(), { once: true });
 
@@ -104,17 +120,26 @@ export default class HTMLNotificationElement extends HTMLCustomElement {
 			once: true,
 		});
 
-		if (! (this.parentElement instanceof HTMLEmbedElement)) {
+		if (! (this.parentElement instanceof HTMLElement)) {
 			document.body.append(this);
 		}
 
-		this.stylesLoaded.then(() => this.hidden = false);
-
-		if (! requireInteraction) {
+		if (! this.requireInteraction) {
 			setTimeout(() => this.close(), 5000);
 		}
 
-		Promise.resolve(new Event('show')).then(evt => this.dispatchEvent(evt));
+		this.addEventListener('show', () => {
+			if (! this.silent && (navigator.vibrate instanceof Function)) {
+				navigator.vibrate(this.vibrate);
+			}
+		}, {
+			once: true,
+		});
+
+		this.stylesLoaded.then(() => {
+			this.hidden = false;
+			this.dispatchEvent(new Event('show'));
+		});
 	}
 
 	get title() {
@@ -125,8 +150,21 @@ export default class HTMLNotificationElement extends HTMLCustomElement {
 		return getSlot('body', this);
 	}
 
+	get requireInteraction() {
+		return this.hasAttribute('requireinteraction');
+	}
+
+	get silent() {
+		return this.hasAttribute('silent');
+	}
+
 	get tag() {
 		return this.getAttribute('tag');
+	}
+
+	get vibrate() {
+		return this.getAttribute('vibrate').split(' ')
+			.map(n => parseInt(n));
 	}
 
 	close() {
