@@ -8,7 +8,6 @@
 	grid-template-columns: auto 1fr;
 	column-gap: 8px;
 	row-gap: 6px;
-	align-content: top;
 	bottom: 1.2em;
 	right: 1.2em;
 	background: white;
