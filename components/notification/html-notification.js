@@ -17,6 +17,10 @@ function getSlot(name, base) {
  * Note: Unlike most other custom elements, this exports the class
  * for better compatibility with the Notification API.
  *
+ * Also, since `actions` are only available in service worker notifications,
+ * here they still dispatch a `notificationclick` event with `actions` & `notification`
+ * set on the event.
+ *
  * @TODO Implement queue or stacking of notifications
  * @SEE https://developer.mozilla.org/en-US/docs/Web/API/Notification
  */
@@ -24,13 +28,17 @@ export class HTMLNotificationElement extends HTMLCustomElement {
 	constructor(title, {
 		body = null,
 		icon = null,
+		badge = null,
+		image = null,
 		dir = 'auto',
 		lang = '',
 		tag = '',
 		data = null,
 		vibrate = null,
 		silent = false,
+		timestamp = Date.now(),
 		requireInteraction = false,
+		actions = [],
 	} = {}) {
 		super();
 		this.setAttribute('role', 'dialog');
@@ -59,11 +67,42 @@ export class HTMLNotificationElement extends HTMLCustomElement {
 				this.append(titleEl);
 			}
 
+			if (Array.isArray(actions) && actions.length !== 0) {
+				this.append(...actions.map(({ title = '', action = '', icon = null }) => {
+					const btn = document.createElement('button');
+					const text = document.createElement('span');
+					btn.type = 'button';
+					btn.title = title;
+					text.textContent = title;
+					btn.dataset.action = action;
+					btn.slot = 'actions';
+					btn.classList.add('no-border', 'no-background', 'background-transparent');
+
+					if (typeof icon === 'string' && icon !== '') {
+						const img = new Image(22, 22);
+						img.decoding = 'async';
+						img.referrerPolicy = 'no-referrer';
+						img.crossOrigin = 'anonymous';
+						img.src = icon;
+						btn.append(img, document.createElement('br'));
+					}
+
+					btn.append(text);
+					return btn;
+				}));
+			}
+
 			if (typeof body === 'string') {
 				const bodyEl = document.createElement('p');
 				bodyEl.textContent = body;
 				bodyEl.slot = 'body';
 				this.append(bodyEl);
+			}
+
+			if (Number.isInteger(timestamp)) {
+				this.setAttribute('timestamp', timestamp);
+			} else if (timestamp instanceof Date) {
+				this.setAttribute('timestamp', timestamp.getTime());
 			}
 
 			if (typeof icon === 'string' || icon instanceof URL) {
@@ -76,12 +115,52 @@ export class HTMLNotificationElement extends HTMLCustomElement {
 				this.append(iconEl);
 			}
 
+			if (typeof badge === 'string' || badge instanceof URL) {
+				const badgeEl = new Image(22, 22);
+				badgeEl.crossOrigin = 'anonymous';
+				badgeEl.loading = 'lazy';
+				badgeEl.decoding = 'async';
+				badgeEl.slot = 'badge';
+				badgeEl.src = badge;
+				this.append(badgeEl);
+			}
+
+			if (data) {
+				const script = document.createElement('script');
+				script.type = 'application/json';
+				script.textContent = JSON.stringify(data);
+				script.slot = 'data';
+				this.append(script);
+			}
+
+			if (typeof image === 'string' || image instanceof URL) {
+				const imageEl = new Image();
+				imageEl.height = 80;
+				imageEl.crossOrigin = 'anonymous';
+				imageEl.loading = 'lazy';
+				imageEl.decoding = 'async';
+				imageEl.slot = 'image';
+				imageEl.src = image;
+				this.append(imageEl);
+			}
+
+			this.shadowRoot.querySelector('slot[name="actions"]').assignedElements().forEach(btn => {
+				btn.addEventListener('click', event => {
+					event.preventDefault();
+					const evt = new Event('notificationclick');
+					evt.action = event.target.closest('[data-action]').dataset.action;
+					evt.notification = this;
+					this.dispatchEvent(evt);
+				}, {
+					capture: true,
+				});
+			});
+
 			this.dispatchEvent(new Event('ready'));
 		});
 
 		this.dir = dir;
 		this.lang = lang;
-		this.data = data;
 		this.setAttribute('tag', tag);
 
 		if (silent) {
@@ -97,8 +176,6 @@ export class HTMLNotificationElement extends HTMLCustomElement {
 		} else if (Number.isInteger(vibrate)) {
 			this.setAttribute('vibrate', vibrate);
 		}
-
-		this.addEventListener('click', () => this.close(), { once: true });
 
 		this.addEventListener('close', () => {
 			if (this.animate instanceof Function) {
@@ -129,7 +206,8 @@ export class HTMLNotificationElement extends HTMLCustomElement {
 		}
 
 		this.addEventListener('show', () => {
-			if (! this.silent && (navigator.vibrate instanceof Function)) {
+			const pattern = this.vibrate;
+			if (! this.silent && pattern.length !== 0 && ! pattern.every(n => n === 0)  && (navigator.vibrate instanceof Function)) {
 				navigator.vibrate(this.vibrate);
 			}
 		}, {
@@ -142,12 +220,67 @@ export class HTMLNotificationElement extends HTMLCustomElement {
 		});
 	}
 
-	get title() {
-		return getSlot('title', this);
+	get actions() {
+		return this.shadowRoot.querySelector('slot[name="actions"]').assignedElements()
+			.map(btn => {
+				const icon = btn.querySelector('img');
+				return {
+					title: btn.title,
+					action: btn.dataset.action,
+					icon: icon instanceof HTMLImageElement ? icon.src : null,
+				};
+			});
+	}
+
+	get badge() {
+		const slot = this.shadowRoot.querySelector('slot[name="badge"]');
+		const assigned = slot.assignedElements();
+
+		if (assigned.length !== 0) {
+			return assigned[0].src;
+		} else {
+			return null;
+		}
 	}
 
 	get body() {
 		return getSlot('body', this);
+	}
+
+	get data() {
+		const dataSlot = this.shadowRoot.querySelector('slot[name="data"]');
+
+		const assigned = dataSlot.assignedElements();
+
+		if (assigned.length === 0) {
+			return null;
+		} else if (assigned.length === 1) {
+			return JSON.parse(assigned[0].textContent);
+		} else {
+			return assigned.map(script => script.textContent);
+		}
+	}
+
+	get icon() {
+		const slot = this.shadowRoot.querySelector('slot[name="icon"]');
+		const assigned = slot.assignedElements();
+
+		if (assigned.length !== 0) {
+			return assigned[0].src;
+		} else {
+			return null;
+		}
+	}
+
+	get image() {
+		const slot = this.shadowRoot.querySelector('slot[name="image"]');
+		const assigned = slot.assignedElements();
+
+		if (assigned.length !== 0) {
+			return assigned[0].src;
+		} else {
+			return null;
+		}
 	}
 
 	get requireInteraction() {
@@ -162,9 +295,25 @@ export class HTMLNotificationElement extends HTMLCustomElement {
 		return this.getAttribute('tag');
 	}
 
+	get timestamp() {
+		if (this.hasAttribute('timestamp')) {
+			return parseInt(this.getAttribute('timestamp'));
+		} else {
+			return Date.now();
+		}
+	}
+
+	get title() {
+		return getSlot('title', this);
+	}
+
 	get vibrate() {
-		return this.getAttribute('vibrate').split(' ')
-			.map(n => parseInt(n));
+		if (this.hasAttribute('vibrate')) {
+			return this.getAttribute('vibrate').split(' ')
+				.map(n => parseInt(n));
+		} else {
+			return 0;
+		}
 	}
 
 	close() {
@@ -173,6 +322,10 @@ export class HTMLNotificationElement extends HTMLCustomElement {
 
 	static get permission() {
 		return 'granted';
+	}
+
+	static get maxActions() {
+		return 5;
 	}
 
 	static async requestPermission() {

@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - `<html-notification>`, a custom element modelled after the `Notification` API
+- Provide support for `badge`, `actions`, `image`, and `timestamp` in `<html-notification>`
 
 ### Changed
 - Add support for `HTMLNotificationElement.vibrate` and `HTMLNotificationElement.silent`
