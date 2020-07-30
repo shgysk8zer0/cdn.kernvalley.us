@@ -50,7 +50,6 @@ export class HTMLNotificationElement extends HTMLCustomElement {
 		this.onclose = null;
 		this.onclick = null;
 		this.onerror = null;
-		this.timestamp = timestamp;
 
 		this.getTemplate('./components/notification/html-notification.html').then(tmp => {
 			tmp.querySelector('[part="close"]').addEventListener('click', () => this.close(), {
@@ -98,6 +97,12 @@ export class HTMLNotificationElement extends HTMLCustomElement {
 				bodyEl.textContent = body;
 				bodyEl.slot = 'body';
 				this.append(bodyEl);
+			}
+
+			if (Number.isInteger(timestamp)) {
+				this.setAttribute('timestamp', timestamp);
+			} else if (timestamp instanceof Date) {
+				this.setAttribute('timestamp', timestamp.getTime());
 			}
 
 			if (typeof icon === 'string' || icon instanceof URL) {
@@ -227,8 +232,15 @@ export class HTMLNotificationElement extends HTMLCustomElement {
 			});
 	}
 
-	get title() {
-		return getSlot('title', this);
+	get badge() {
+		const slot = this.shadowRoot.querySelector('slot[name="badge"]');
+		const assigned = slot.assignedElements();
+
+		if (assigned.length !== 0) {
+			return assigned[0].src;
+		} else {
+			return null;
+		}
 	}
 
 	get body() {
@@ -249,6 +261,28 @@ export class HTMLNotificationElement extends HTMLCustomElement {
 		}
 	}
 
+	get icon() {
+		const slot = this.shadowRoot.querySelector('slot[name="icon"]');
+		const assigned = slot.assignedElements();
+
+		if (assigned.length !== 0) {
+			return assigned[0].src;
+		} else {
+			return null;
+		}
+	}
+
+	get image() {
+		const slot = this.shadowRoot.querySelector('slot[name="image"]');
+		const assigned = slot.assignedElements();
+
+		if (assigned.length !== 0) {
+			return assigned[0].src;
+		} else {
+			return null;
+		}
+	}
+
 	get requireInteraction() {
 		return this.hasAttribute('requireinteraction');
 	}
@@ -259,6 +293,18 @@ export class HTMLNotificationElement extends HTMLCustomElement {
 
 	get tag() {
 		return this.getAttribute('tag');
+	}
+
+	get timestamp() {
+		if (this.hasAttribute('timestamp')) {
+			return parseInt(this.getAttribute('timestamp'));
+		} else {
+			return Date.now();
+		}
+	}
+
+	get title() {
+		return getSlot('title', this);
 	}
 
 	get vibrate() {
