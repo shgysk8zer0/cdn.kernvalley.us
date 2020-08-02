@@ -61,10 +61,7 @@ export class HTMLNotificationElement extends HTMLCustomElement {
 			this.shadowRoot.append(tmp);
 
 			if (typeof title === 'string') {
-				const titleEl = document.createElement('span');
-				titleEl.textContent = title;
-				titleEl.slot = 'title';
-				this.append(titleEl);
+				this.setSlot('title', title);
 			}
 
 			if (Array.isArray(actions) && actions.length !== 0) {
@@ -93,10 +90,7 @@ export class HTMLNotificationElement extends HTMLCustomElement {
 			}
 
 			if (typeof body === 'string') {
-				const bodyEl = document.createElement('p');
-				bodyEl.textContent = body;
-				bodyEl.slot = 'body';
-				this.append(bodyEl);
+				this.setSlot('body', body, { tag: 'p' });
 			}
 
 			if (Number.isInteger(timestamp)) {
@@ -106,42 +100,54 @@ export class HTMLNotificationElement extends HTMLCustomElement {
 			}
 
 			if (typeof icon === 'string' || icon instanceof URL) {
-				const iconEl = new Image(64, 64);
-				iconEl.crossOrigin = 'anonymous';
-				iconEl.loading = 'lazy';
-				iconEl.decoding = 'async';
-				iconEl.slot = 'icon';
-				iconEl.src = icon;
-				this.append(iconEl);
+				this.setSlot('icon', null, {
+					tag: 'img',
+					attrs: {
+						src: icon,
+						height: 64,
+						width: 64,
+						loading: 'lazy',
+						decoding: 'async',
+						crossorigin: 'anonymous',
+						referrerpolicy: 'no-referrer',
+					}
+				});
 			}
 
 			if (typeof badge === 'string' || badge instanceof URL) {
-				const badgeEl = new Image(22, 22);
-				badgeEl.crossOrigin = 'anonymous';
-				badgeEl.loading = 'lazy';
-				badgeEl.decoding = 'async';
-				badgeEl.slot = 'badge';
-				badgeEl.src = badge;
-				this.append(badgeEl);
+				this.setSlot('badge', null, {
+					tag: 'img',
+					attrs: {
+						src: badge,
+						height: 22,
+						width: 22,
+						loading: 'lazy',
+						decoding: 'async',
+						crossorigin: 'anonymous',
+						referrerpolicy: 'no-referrer',
+					},
+				});
 			}
 
 			if (data) {
-				const script = document.createElement('script');
-				script.type = 'application/json';
-				script.textContent = JSON.stringify(data);
-				script.slot = 'data';
-				this.append(script);
+				this.setSlot('data', JSON.stringify(data), {
+					tag: 'script',
+					attrs: { type: 'application/json' },
+				});
 			}
 
 			if (typeof image === 'string' || image instanceof URL) {
-				const imageEl = new Image();
-				imageEl.height = 80;
-				imageEl.crossOrigin = 'anonymous';
-				imageEl.loading = 'lazy';
-				imageEl.decoding = 'async';
-				imageEl.slot = 'image';
-				imageEl.src = image;
-				this.append(imageEl);
+				this.setSlot('image', null, {
+					tag: 'img',
+					attrs: {
+						src: image,
+						decoding: 'async',
+						referrerpolicy: 'no-referrer',
+						crossorigin: 'anonymous',
+						loading: 'lazy',
+						height: 80,
+					}
+				});
 			}
 
 			this.shadowRoot.querySelector('slot[name="actions"]').assignedElements().forEach(btn => {

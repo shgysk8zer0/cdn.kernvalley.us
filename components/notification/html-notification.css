@@ -58,6 +58,7 @@
 	grid-area: title;
 	padding: 0;
 	margin: 0;
+	font-size: 0.9em;
 }
 
 [part="body"] {
@@ -91,6 +92,11 @@
 	padding: 0;
 	overflow: auto;
 	display: inline-block;
+	line-height: 1.2;
+}
+
+::slotted([slot="image"]) {
+	width: 100%;
 }
 
 ::slotted([slot="icon"]) {
