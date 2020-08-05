@@ -113,7 +113,7 @@ export default class HTMLCustomElement extends HTMLElement {
 		cache          = 'default',
 		mode           = undefined,
 		headers        = new Headers(),
-		referrerPolicy = undefined,
+		referrerPolicy = 'origin-when-cross-origin',
 		redirect       = undefined,
 		credentials    = undefined,
 		timeout        = 5000,
