@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- `<permissions-switch>` element for handling permission changes and requests
 - `<button is="register-protocol-handler">` component
 - `<html-notification>`, a custom element modelled after the `Notification` API
 - Provide support for `badge`, `actions`, `image`, and `timestamp` in `<html-notification>`
