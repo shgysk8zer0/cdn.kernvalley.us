@@ -1,10 +1,11 @@
 import { registerCustomElement } from '../../js/std-js/functions.js';
+import '../../js/std-js/permissions.js';
 
 async function changeHandler(event) {
 	this.dispatchEvent(new CustomEvent('permissionchange', {
 		detail: {
 			name: this.name,
-			state: event.target.state,
+			state: event.target.state || await this.state,
 		}
 	}));
 }
@@ -19,7 +20,6 @@ registerCustomElement('permissions-switch', class HTMLPermissionsSwitchButtonEle
 	} = {}) {
 		super();
 		this.attachShadow({ mode: 'open' });
-		this.addEventListener('click', () => this.request().then(console.info));
 
 		const promptSlot  = document.createElement('slot');
 		const grantedSlot = document.createElement('slot');
@@ -48,7 +48,9 @@ registerCustomElement('permissions-switch', class HTMLPermissionsSwitchButtonEle
 		}
 
 		this.addEventListener('permissionchange', ({ detail }) => {
-			this.shadowRoot.querySelectorAll('slot[name]').forEach(slot => slot.hidden = slot.name !== detail.state);
+			this.shadowRoot.querySelectorAll('slot[name]').forEach(slot => {
+				slot.hidden = slot.name !== detail.state;
+			});
 		});
 	}
 
@@ -69,9 +71,7 @@ registerCustomElement('permissions-switch', class HTMLPermissionsSwitchButtonEle
 	}
 
 	get permission() {
-		if (! HTMLPermissionsSwitchButtonElement.supported) {
-			return Promise.reject('Permissions API not supported');
-		} if (typeof this.name !== 'string') {
+		if (typeof this.name !== 'string') {
 			return Promise.reject('No permission attribute set');
 		} else {
 			return navigator.permissions.query({
@@ -80,6 +80,10 @@ registerCustomElement('permissions-switch', class HTMLPermissionsSwitchButtonEle
 				userVisibleOnly: this.userVisibleOnly,
 			});
 		}
+	}
+
+	get state() {
+		return this.permission.then(({ state }) => state);
 	}
 
 	get sysex() {
@@ -98,47 +102,20 @@ registerCustomElement('permissions-switch', class HTMLPermissionsSwitchButtonEle
 		this.toggleAttribute('uservisibleonly');
 	}
 
+	async query() {
+		return navigator.permissions.query({
+			name: this.name,
+			sysex: this.sysex,
+			userVisibleOnly: this.userVisibleOnly,
+		});
+	}
+
 	async request() {
-		if (navigator.permissions.request instanceof Function) {
-			return navigator.permissions.request({
-				name: this.name,
-				sysex: this.sysex,
-				userVisibleOnly: this.userVisibleOnly,
-			});
-		} else {
-			switch(this.name) {
-				case 'push':
-				case 'notifications':
-					if ('Notification' in window) {
-						return Notification.requestPermission().then(perm => ({ state: perm }));
-					} else {
-						return Promise.resolve({ state: 'denied'});
-					}
-
-				case 'geolocation':
-					if ('geolocation' in navigator) {
-						return new Promise((resolve, reject) => {
-							navigator.geolocation.getCurrentPosition(
-								() => resolve({ state: 'granted' }),
-								() => reject({ state: 'denied' })
-							);
-						});
-					} else {
-						return Promise.resolve({ state: 'denied' });
-					}
-
-				case 'persistent-storage':
-					if ('storage' in navigator && navigator.storage.persist instanceof Function) {
-						return navigator.storage.persist().then(resp =>
-							resp ? { state: 'granted' } : { state: 'denied' }
-						);
-					} else {
-						return Promise.resolve({ state: 'denied' });
-					}
-
-				default: throw new TypeError(`Invalid permission request: ${this.name}`);
-			}
-		}
+		return navigator.permissions.request({
+			name: this.name,
+			sysex: this.sysex,
+			userVisibleOnly: this.userVisibleOnly,
+		});
 	}
 
 	static get supported() {
