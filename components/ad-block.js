@@ -40,7 +40,7 @@ async function log(event) {
 
 const shadows = new Map();
 
-HTMLCustomElement.register('ad-block', class HTMLAddBlockElement extends HTMLElement {
+HTMLCustomElement.register('ad-block', class HTMLAdBlockElement extends HTMLCustomElement {
 	constructor() {
 		super();
 		this.whenConnected.then(() => {
