@@ -1,4 +1,5 @@
 import HTMLCustomElement from './custom-element.js';
+import { loadStylesheet } from '../js/std-js/loader.js';
 
 async function log(event) {
 	if ('target' in event) {
@@ -39,11 +40,14 @@ async function log(event) {
 
 const shadows = new Map();
 
-HTMLCustomElement.register('ad-block', class HTMLAddBlockElement extends HTMLElement {
+HTMLCustomElement.register('ad-block', class HTMLAdBlockElement extends HTMLCustomElement {
 	constructor() {
 		super();
-		this.setAttribute('itemtype', 'https://schema.org/WPAdBlock');
-		this.setAttribute('itemscope', '');
+		this.whenConnected.then(() => {
+			this.setAttribute('itemtype', 'https://schema.org/WPAdBlock');
+			this.setAttribute('itemscope', '');
+		});
+
 		const shadow = this.attachShadow({ mode: 'closed' });
 		const container = document.createElement('a');
 		const logo = document.createElement('div');
@@ -54,16 +58,15 @@ HTMLCustomElement.register('ad-block', class HTMLAddBlockElement extends HTMLEle
 		const linkSlot = document.createElement('slot');
 		const description = document.createElement('div');
 		const descriptionSlot = document.createElement('slot');
-		const style = document.createElement('link');
+		loadStylesheet(new  URL('/components/ad-block.css', HTMLCustomElement.base).href, {
+			parent: shadow,
+		});
 
 		this.addEventListener('mouseenter', log, { passive: true, once: true });
 		this.addEventListener('click', log, { passive: true, once: true });
 		this.addEventListener('contextmenu', log, { passive: true, once: true });
 		this.addEventListener('remove', log, { passive: true, once: true });
 
-		style.rel = 'stylesheet';
-		style.crossOrigin = 'anonymous';
-		style.href = new  URL('/components/ad-block.css', HTMLCustomElement.base);
 		labelSlot.name = 'label';
 		linkSlot.textContent = 'Click here to learn more';
 		label.id = 'label';
@@ -86,7 +89,7 @@ HTMLCustomElement.register('ad-block', class HTMLAddBlockElement extends HTMLEle
 		container.rel = 'noopener external nofollow';
 
 		container.append(logo, label, description, link);
-		shadow.append(style, container);
+		shadow.append(container);
 		shadows.set(this, shadow);
 		this.dispatchEvent(new Event('ready'));
 	}

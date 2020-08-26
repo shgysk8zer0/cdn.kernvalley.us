@@ -9,17 +9,19 @@ class HTMLCopyButtonElement extends HTMLButtonElement {
 		super();
 
 		if (navigator.clipboard && navigator.clipboard.writeText instanceof Function) {
-			if (typeof text === 'string') {
-				this.text = text;
-			}
+			Promise.resolve().then(() => {
+				if (typeof text === 'string') {
+					this.text = text;
+				}
 
-			if (typeof selector === 'string') {
-				this.selector = selector;
-			}
+				if (typeof selector === 'string') {
+					this.selector = selector;
+				}
 
-			if (typeof property === 'string') {
-				this.property = property;
-			}
+				if (typeof property === 'string') {
+					this.property = property;
+				}
+			});
 
 			this.addEventListener('click', async () => {
 				const { element, property, text } = this;

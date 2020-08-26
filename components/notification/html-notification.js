@@ -41,15 +41,18 @@ export class HTMLNotificationElement extends HTMLCustomElement {
 		actions = [],
 	} = {}) {
 		super();
-		this.setAttribute('role', 'dialog');
-		this.setAttribute('label', 'Notification');
 		this.attachShadow({mode: 'open'});
 
-		this.hidden = true;
-		this.onshow = null;
-		this.onclose = null;
-		this.onclick = null;
-		this.onerror = null;
+		this.whenConnected.then(() => {
+			this.setAttribute('role', 'dialog');
+			this.setAttribute('label', 'Notification');
+
+			this.hidden = true;
+			this.onshow = null;
+			this.onclose = null;
+			this.onclick = null;
+			this.onerror = null;
+		});
 
 		this.getTemplate('./components/notification/html-notification.html').then(tmp => {
 			tmp.querySelector('[part="close"]').addEventListener('click', () => this.close(), {

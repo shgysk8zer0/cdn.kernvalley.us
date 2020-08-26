@@ -15,25 +15,27 @@ registerCustomElement('audio-player', class HTMLAudioPlayerElement extends HTMLA
 	} = {}) {
 		super();
 
-		if (typeof title === 'string') {
-			this.title = title;
-		}
+		Promise.resolve().then(() => {
+			if (typeof title === 'string') {
+				this.title = title;
+			}
 
-		if (typeof artist === 'string') {
-			this.artist = artist;
-		}
+			if (typeof artist === 'string') {
+				this.artist = artist;
+			}
 
-		if (typeof album === 'string') {
-			this.album = album;
-		}
+			if (typeof album === 'string') {
+				this.album = album;
+			}
 
-		if (Array.isArray(artwork)) {
-			this.artwork = artwork;
-		}
+			if (Array.isArray(artwork)) {
+				this.artwork = artwork;
+			}
 
-		if (Number.isInteger(duration)) {
-			this.duration = duration;
-		}
+			if (Number.isInteger(duration)) {
+				this.duration = duration;
+			}
+		});
 
 		if ('mediaSession' in navigator) {
 			let playHandle = null;

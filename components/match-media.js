@@ -64,6 +64,14 @@ registerCustomElement('match-media', class HTMLMatchMediaElement extends HTMLEle
 		return new Promise(resolve => this.addEventListener('miss', () => resolve(), {once: true}));
 	}
 
+	get whenConnected() {
+		if (this.isConnected) {
+			return Promise.resolve();
+		} else {
+			return new Promise(resolve => this.addEventListener('connected', () => resolve(), { once: true }));
+		}
+	}
+
 	attributeChangedCallback(name, oldValue, newValue) {
 		switch(name) {
 			case 'media':
@@ -80,6 +88,10 @@ registerCustomElement('match-media', class HTMLMatchMediaElement extends HTMLEle
 
 			default: throw new Error(`Unhandled attribute changed: ${name}`);
 		}
+	}
+
+	connectedCallback() {
+		this.dispatchEvent(new Event('connected'));
 	}
 
 	static get observedAttributes() {

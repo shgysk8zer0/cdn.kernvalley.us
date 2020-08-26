@@ -5,11 +5,6 @@ import HTMLCustomElement from './custom-element.js';
 HTMLCustomElement.register('weather-forecast', class HTMLWeatherForecastElement extends HTMLElement {
 	constructor() {
 		super();
-		const url = new URL(location.href);
-
-		if (url.searchParams.has('postalcode')) {
-			this.postalCode = url.searchParams.get('postalcode');
-		}
 
 		Promise.resolve(this.attachShadow({mode: 'closed'})).then(async shadow => {
 			const resp = await fetch(new URL('./components/weather-forecast.html', meta.url));
@@ -24,6 +19,7 @@ HTMLCustomElement.register('weather-forecast', class HTMLWeatherForecastElement 
 	}
 
 	async connectedCallback() {
+		this.dispatchEvent(new Event('connected'));
 		await this.ready;
 		this.update();
 	}
@@ -82,6 +78,14 @@ HTMLCustomElement.register('weather-forecast', class HTMLWeatherForecastElement 
 
 			default:
 				throw new Error(`Unsupported theme: ${val}`);
+		}
+	}
+
+	get whenConnected() {
+		if (this.isConnected) {
+			return Promise.resolve();
+		} else {
+			return new Promise(resolve => this.addEventListener('connected', () => resolve(), { once: true }));
 		}
 	}
 

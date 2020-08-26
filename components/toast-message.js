@@ -3,8 +3,10 @@ import HTMLCustomElement from './custom-element.js';
 HTMLCustomElement.register('toast-message', class HTMLToastMessageElement extends HTMLCustomElement {
 	constructor(message = null) {
 		super();
-		this.hidden = ! this.open;
-		this.attachShadow({mode: 'open'});
+		this.whenConnected.then(() => {
+			this.hidden = ! this.open;
+			this.attachShadow({mode: 'open'});
+		});
 
 		this.getTemplate(('./components/toast-message.html')).then(async frag => {
 			frag.getElementById('close-toast-button').addEventListener('click', () => {

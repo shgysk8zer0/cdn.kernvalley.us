@@ -70,13 +70,15 @@ HTMLCustomElement.register('spotify-player', class HTMLSpotifyTrackElement exten
 			this.dispatchEvent(new Event('ready'));
 		});
 
-		if (typeof uri === 'string') {
-			this.uri = uri;
-		}
+		this.whenConnected.then(() => {
+			if (typeof uri === 'string') {
+				this.uri = uri;
+			}
 
-		if (typeof large === 'boolean') {
-			this.large = large;
-		}
+			if (typeof large === 'boolean') {
+				this.large = large;
+			}
+		});
 	}
 
 	get large() {

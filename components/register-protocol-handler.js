@@ -13,22 +13,25 @@ registerCustomElement('register-protocol-handler', class HTMLRegisterProtocolHan
 	} = {}) {
 		super();
 
-		if (typeof scheme === 'string') {
-			this.scheme = scheme;
-		}
+		this.whenConnected.then(() => {
+			if (typeof scheme === 'string') {
+				this.scheme = scheme;
+			}
 
-		if (typeof url === 'string') {
-			this.url = url;
-		}
+			if (typeof url === 'string') {
+				this.url = url;
+			}
 
-		if (typeof name === 'string') {
-			this.name = name;
-		}
+			if (typeof name === 'string') {
+				this.name = name;
+			}
+		});
 
 		this.addEventListener('click', register, { passive: true, capture: true });
 	}
 
 	connectedCallback() {
+		this.dispatchEvent(new Event('conencted'));
 		this.hidden = ! (navigator.registerProtocolHandler instanceof Function);
 	}
 
@@ -73,6 +76,14 @@ registerCustomElement('register-protocol-handler', class HTMLRegisterProtocolHan
 			this.setAttribute('url', val);
 		} else {
 			this.removeAttribute('url');
+		}
+	}
+
+	get whenConnected() {
+		if (this.isConnected) {
+			return Promise.resolve();
+		} else {
+			return new Promise(resolve => this.addEventListener('connected', () => resolve(), { once: true }));
 		}
 	}
 }, {
