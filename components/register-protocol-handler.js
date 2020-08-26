@@ -25,7 +25,7 @@ registerCustomElement('register-protocol-handler', class HTMLRegisterProtocolHan
 			if (typeof name === 'string') {
 				this.name = name;
 			}
-		})
+		});
 
 		this.addEventListener('click', register, { passive: true, capture: true });
 	}
