@@ -17,23 +17,27 @@ HTMLCustomElement.register('html-popup', class HTMLPopupElement extends HTMLCust
 			this.dispatchEvent(new Event('ready'));
 		});
 
-		if (typeof content === 'string') {
-			this.content = content;
-		}
+		this.whenConnected.then(() => {
+			if (typeof content === 'string') {
+				this.content = content;
+			}
 
-		if (typeof open === 'boolean') {
-			this.open = open;
-		}
+			if (typeof open === 'boolean') {
+				this.open = open;
+			}
 
-		if (typeof autoRemove === 'boolean') {
-			this.autoRemove = autoRemove;
-		}
+			if (typeof autoRemove === 'boolean') {
+				this.autoRemove = autoRemove;
+			}
 
-		this.timer = timer;
-		this.vibrate = vibrate;
+			this.timer = timer;
+			this.vibrate = vibrate;
+		});
 	}
 
 	async connectedCallback() {
+		this.dispatchEvent('connected');
+
 		if (this.open) {
 			const timer = this.timer;
 			await this.reveal({ direction: 'normal' });

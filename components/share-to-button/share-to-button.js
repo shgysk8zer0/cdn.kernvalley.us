@@ -108,9 +108,12 @@ async function share({
 HTMLCustomElement.register('share-to-button', class HTMLShareToButtonElement extends HTMLCustomElement {
 	constructor() {
 		super();
-		this.setAttribute('tabindex', '0');
-		this.setAttribute('role', 'button');
 		this.attachShadow({mode: 'open'});
+
+		this.whenConnected.then(() => {
+			this.setAttribute('tabindex', '0');
+			this.setAttribute('role', 'button');
+		});
 
 		this.getTemplate('./components/share-to-button/share-to-button.html').then(tmp => {
 			this.shadowRoot.append(tmp);

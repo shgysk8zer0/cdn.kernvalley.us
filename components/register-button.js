@@ -6,7 +6,8 @@ export default class HTMLRegisterButton extends HTMLButtonElement {
 		super();
 		document.addEventListener('login', () => this.hidden = true);
 		document.addEventListener('logout', () => this.hidden = false);
-		this.hidden = User.loggedIn;
+		this.whenConnected.then(() => this.hidden = User.loggedIn);
+
 		this.addEventListener('click', async () => {
 			await customElements.whenDefined('registration-form');
 			const form = document.querySelector('registration-form');
@@ -19,6 +20,18 @@ export default class HTMLRegisterButton extends HTMLButtonElement {
 				await form.register();
 			}
 		});
+	}
+
+	connectedCallback() {
+		this.dispatchEvent(new Event('connected'));
+	}
+
+	get whenConnected() {
+		if (this.isConnected) {
+			return Promise.resolve();
+		} else {
+			return new Promise(resolve => this.addEventListener('connected', () => resolve(), { once: true }));
+		}
 	}
 }
 

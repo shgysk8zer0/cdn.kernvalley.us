@@ -26,6 +26,8 @@ registerCustomElement('pwa-install', class HTMLPWAInstallButton extends HTMLButt
 	}
 
 	async connectedCallback() {
+		this.dispatchEvent(new Event('connected'));
+
 		if (! this.supported) {
 			this.remove();
 		} else if (typeof this.src !== 'string') {
@@ -145,6 +147,14 @@ registerCustomElement('pwa-install', class HTMLPWAInstallButton extends HTMLButt
 			this.setAttribute('updatemessage', val);
 		} else {
 			this.removeAttribute('updatemessage');
+		}
+	}
+
+	get whenConnected() {
+		if (this.isConnected) {
+			return Promise.resolve();
+		} else {
+			return new Promise(resolve => this.addEventListener('connected', () => resolve(), { once: true }));
 		}
 	}
 

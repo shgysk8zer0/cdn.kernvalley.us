@@ -4,13 +4,15 @@ registerCustomElement('date-locale', class HTMLDateLocaleElement extends HTMLTim
 	constructor(dtime = new Date()) {
 		super();
 
-		if (dtime instanceof Date) {
-			this.dateTime = dtime.toISOString();
-		} else if (typeof dtime === 'string') {
-			this.dateTime = new Date(dtime).toISOString();
-		} else {
-			this.dateTime = new Date().toISOString();
-		}
+		Promise.resolve().then(() => {
+			if (dtime instanceof Date) {
+				this.dateTime = dtime.toISOString();
+			} else if (typeof dtime === 'string') {
+				this.dateTime = new Date(dtime).toISOString();
+			} else {
+				this.dateTime = new Date().toISOString();
+			}
+		});
 	}
 
 	connectedCallback() {

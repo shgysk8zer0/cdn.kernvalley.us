@@ -70,4 +70,16 @@ registerCustomElement('theme-toggle', class HTMLThemeToggleElement extends HTMLE
 			}
 		});
 	}
+
+	get whenConnected() {
+		if (this.isConnected) {
+			return Promise.resolve();
+		} else {
+			return new Promise(resolve => this.addEventListener('connected', () => resolve(), { once: true }));
+		}
+	}
+
+	connectedCallback() {
+		this.dispatchEvent(new Event('connected'));
+	}
 });

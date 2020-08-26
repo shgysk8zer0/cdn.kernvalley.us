@@ -10,7 +10,7 @@ let map = new Map();
 /**
  * @see https://leafletjs.com/reference-1.6.0.html#map-factory
  */
-HTMLCustomElement.register('leaflet-map', class HTMLLeafletMapElement extends HTMLElement {
+HTMLCustomElement.register('leaflet-map', class HTMLLeafletMapElement extends HTMLCustomElement {
 	constructor({
 		longitude    = NaN,
 		latitude     = NaN,
@@ -21,21 +21,23 @@ HTMLCustomElement.register('leaflet-map', class HTMLLeafletMapElement extends HT
 		super();
 		this._shadow = this.attachShadow({ mode: 'closed' });
 
-		if (! Number.isNaN(latitude) && ! Number.isNaN(longitude)) {
-			this.center = { latitude, longitude };
-		}
+		this.whenConnected.then(() => {
+			if (! Number.isNaN(latitude) && ! Number.isNaN(longitude)) {
+				this.center = { latitude, longitude };
+			}
 
-		if (! Number.isNaN(zoom)) {
-			this.zoom = zoom;
-		}
+			if (! Number.isNaN(zoom)) {
+				this.zoom = zoom;
+			}
 
-		if (typeof crossOrigin === 'string') {
-			this.crossOrigin = crossOrigin;
-		}
+			if (typeof crossOrigin === 'string') {
+				this.crossOrigin = crossOrigin;
+			}
 
-		if (typeof detectRetina === 'boolean') {
-			this.detectRetina = detectRetina;
-		}
+			if (typeof detectRetina === 'boolean') {
+				this.detectRetina = detectRetina;
+			}
+		});
 
 		Promise.resolve().then(async () => {
 			const resp = await fetch(new URL('./components/leaflet/map.html', HTMLCustomElement.base));
@@ -122,7 +124,10 @@ HTMLCustomElement.register('leaflet-map', class HTMLLeafletMapElement extends HT
 	}
 
 	async connectedCallback() {
-		await this._populated;
+		const prom = this.whenConnected;
+		this.dispatchEvent(new Event('connected'));
+
+		await Promise.all([ this._populated, prom ]);
 		const m = LeafletMap(this.mapElement, {
 			zoomControl: this.zoomControl,
 			tap: false,

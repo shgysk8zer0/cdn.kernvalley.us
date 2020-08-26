@@ -35,17 +35,19 @@ registerCustomElement('permissions-switch', class HTMLPermissionsSwitchButtonEle
 
 		this.shadowRoot.append(promptSlot, grantedSlot, deniedSlot);
 
-		if (typeof name === 'string') {
-			this.name = name;
-		}
+		this.whenConnected.then(() => {
+			if (typeof name === 'string') {
+				this.name = name;
+			}
 
-		if (typeof sysex === 'boolean') {
-			this.sysex = sysex;
-		}
+			if (typeof sysex === 'boolean') {
+				this.sysex = sysex;
+			}
 
-		if (typeof userVisibleOnly === 'boolean') {
-			this.userVisibleOnly = userVisibleOnly;
-		}
+			if (typeof userVisibleOnly === 'boolean') {
+				this.userVisibleOnly = userVisibleOnly;
+			}
+		});
 
 		this.addEventListener('permissionchange', ({ detail }) => {
 			this.shadowRoot.querySelectorAll('slot[name]').forEach(slot => {
@@ -102,6 +104,14 @@ registerCustomElement('permissions-switch', class HTMLPermissionsSwitchButtonEle
 		this.toggleAttribute('uservisibleonly');
 	}
 
+	get whenConnected() {
+		if (this.isConnected) {
+			return Promise.resolve();
+		} else {
+			return new Promise(resolve => this.addEventListener('connected', () => resolve(), { once: true }));
+		}
+	}
+
 	async query() {
 		return navigator.permissions.query({
 			name: this.name,
@@ -120,6 +130,10 @@ registerCustomElement('permissions-switch', class HTMLPermissionsSwitchButtonEle
 
 	static get supported() {
 		return ('permissions' in navigator) && navigator.permissions.query instanceof Function;
+	}
+
+	connectedCallback() {
+		this.dispatchEvent(new Event('connected'));
 	}
 
 	attributeChangedCallback(name, oldVal, newVal) {

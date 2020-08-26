@@ -11,17 +11,19 @@ HTMLCustomElement.register('youtube-player', class HTMLYouTubeElement extends HT
 		this.shadowRoot.append(slot);
 		this.dispatchEvent(new Event('ready'));
 
-		if (typeof video === 'string') {
-			this.video = video;
-		}
+		this.whenConnected.then(() => {
+			if (typeof video === 'string') {
+				this.video = video;
+			}
 
-		if (Number.isInteger(width)) {
-			this.width = width;
-		}
+			if (Number.isInteger(width)) {
+				this.width = width;
+			}
 
-		if (Number.isInteger(height)) {
-			this.height = height;
-		}
+			if (Number.isInteger(height)) {
+				this.height = height;
+			}
+		});
 	}
 
 	get height() {

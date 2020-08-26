@@ -13,7 +13,9 @@ registerCustomElement('time-locale', class HTMLTimeLocaleElement extends HTMLTim
 		}
 	}
 
-	connectedCallback() {
+	async connectedCallback() {
+		this.dispatchEvent(new Event('connected'));
+		await this.whenConnected;
 		this.textContent = new Date(this.dateTime).toLocaleTimeString();
 	}
 
@@ -24,6 +26,14 @@ registerCustomElement('time-locale', class HTMLTimeLocaleElement extends HTMLTim
 				break;
 
 			default: throw new Error(`Unhandled attribute changed: ${name}`);
+		}
+	}
+
+	get whenConnected() {
+		if (this.isConnected) {
+			return Promise.resolve();
+		} else {
+			return new Promise(resolve => this.addEventListener('connected', () => resolve(), { once: true }));
 		}
 	}
 

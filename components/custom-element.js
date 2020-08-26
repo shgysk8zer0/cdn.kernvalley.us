@@ -5,6 +5,10 @@ let metaUrl = meta.url;
 let base    = null;
 
 export default class HTMLCustomElement extends HTMLElement {
+	connectedCallback() {
+		this.dispatchEvent(new Event('connected'));
+	}
+
 	get ready() {
 		return new Promise(resolve => {
 			if (this.shadowRoot !== null && this.shadowRoot.childElementCount === 0) {
@@ -34,6 +38,14 @@ export default class HTMLCustomElement extends HTMLElement {
 			}
 			return this;
 		});
+	}
+
+	get whenConnected() {
+		if (this.isConnected) {
+			return Promise.resolve();
+		} else {
+			return new Promise(resolve => this.addEventListener('connected', () => resolve(), { once: true }));
+		}
 	}
 
 	async getSlot(slot) {

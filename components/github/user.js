@@ -39,7 +39,7 @@ HTMLCustomElement.register('github-user', class HTMLGitHubUserElement extends HT
 		this.attachShadow({mode: 'open'});
 
 		if (typeof user === 'string') {
-			this.user = user;
+			this.whenConnected.then(() => this.user = user);
 		}
 
 		this.getTemplate('./components/github/user.html').then(tmp => {

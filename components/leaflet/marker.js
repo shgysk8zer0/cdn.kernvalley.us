@@ -39,7 +39,11 @@ registerCustomElement('leaflet-marker', class HTMLLeafletMarkerElement extends H
 	}
 
 	async connectedCallback() {
+		const prom = this.whenConnected;
+		this.dispatchEvent(new Event('connected'));
+		await prom;
 		const closestMap = this.closest('leaflet-map');
+
 		if (closestMap instanceof HTMLElement) {
 			await customElements.whenDefined('leaflet-map');
 			const mapEl = await closestMap.ready;
@@ -151,6 +155,14 @@ registerCustomElement('leaflet-marker', class HTMLLeafletMarkerElement extends H
 
 	set open(val) {
 		this.toggleAttribute('open', val);
+	}
+
+	get whenConnected() {
+		if (this.isConnected) {
+			return Promise.resolve();
+		} else {
+			return new Promise(resolve => this.addEventListener('connect', () => resolve(), { once: true }));
+		}
 	}
 
 	_make() {

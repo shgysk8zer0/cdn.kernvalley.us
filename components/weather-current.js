@@ -5,11 +5,6 @@ import HTMLCustomElement from './custom-element.js';
 HTMLCustomElement.register('weather-current', class HTMLWeatherForecastElement extends HTMLElement {
 	constructor() {
 		super();
-		const url = new URL(location.href);
-
-		if (url.searchParams.has('postalcode')) {
-			this.postalCode = url.searchParams.get('postalcode');
-		}
 
 		Promise.resolve(this.attachShadow({mode: 'closed'})).then(async shadow => {
 			const resp = await fetch(new URL('./components/weather-current.html', meta.url));
@@ -24,6 +19,7 @@ HTMLCustomElement.register('weather-current', class HTMLWeatherForecastElement e
 	}
 
 	async connectedCallback() {
+		this.dispatchEvent(new Event('connected'));
 		this.update(this);
 	}
 
@@ -82,6 +78,14 @@ HTMLCustomElement.register('weather-current', class HTMLWeatherForecastElement e
 		} else if (val instanceof HTMLElement) {
 			val.slot = 'updated';
 			clearSlot(this, 'updated').then(() => this.append(val));
+		}
+	}
+
+	get whenConnected() {
+		if (this.isConnected) {
+			return Promise.resolve();
+		} else {
+			return new Promise(resolve => this.addEventListener('connected', () => resolve(), { once: true }));
 		}
 	}
 
