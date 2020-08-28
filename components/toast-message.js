@@ -109,6 +109,7 @@ HTMLCustomElement.register('toast-message', class HTMLToastMessageElement extend
 	}
 
 	async show() {
+		await this.whenConnected;
 		await this.ready;
 		this.hidden = false;
 		const timer = this.timer;

@@ -37,7 +37,7 @@
 	right: 0;
 	bottom: 0;
 	left: 0;
-	transition: background 300 ease-in-out;
+	transition: background 300ms ease-in-out;
 }
 
 .backdrop[hidden] {
