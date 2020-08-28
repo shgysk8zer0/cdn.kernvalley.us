@@ -7,7 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <!-- markdownlint-disable -->
 ## [Unreleased]
 
+## [v1.0.10] - 2020-08-28
+
 ### Added
+- `<button is="print-button">` custom element
 - `<permissions-switch>` element for handling permission changes and requests
 - `<button is="register-protocol-handler">` component
 - `<html-notification>`, a custom element modelled after the `Notification` API
@@ -17,6 +20,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - Add support for `HTMLNotificationElement.vibrate` and `HTMLNotificationElement.silent`
 - Set default referrer policies on imported templates and stylesheets
+
+### Fixed
+- Fix share button show method [#239](https://github.com/shgysk8zer0/cdn.kernvalley.us/issues/239)
 
 ## [v1.0.9] - 2020-07-28
 

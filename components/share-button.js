@@ -1,5 +1,5 @@
-import webShareApi from '/js/std-js/webShareApi.js';
-import { loaded } from '/js/std-js/functions.js';
+import webShareApi from '../js/std-js/webShareApi.js';
+import { loaded } from '../js/std-js/functions.js';
 import {
 	facebook,
 	twitter,
@@ -9,7 +9,7 @@ import {
 	gmail,
 	email,
 	clipboard,
-} from '/js/std-js/share-config.js';
+} from '../js/std-js/share-config.js';
 
 import { registerCustomElement } from '../js/std-js/functions.js';
 
