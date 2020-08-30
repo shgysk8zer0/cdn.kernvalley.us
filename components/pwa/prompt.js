@@ -94,18 +94,18 @@ HTMLCustomElement.register('pwa-prompt', class HTMLPWAPromptElement extends HTML
 			tmp.querySelectorAll('[data-click]').forEach(el => {
 				switch(el.dataset.click) {
 					case 'close':
-						el.addEventListener('click', () => this.close({install: false}));
+						el.addEventListener('click', () => this.close({ install: false }));
 						break;
 
 					case 'install':
 						if (event instanceof Event && event.prompt instanceof Function) {
 							el.addEventListener('click', async () => {
 								await event.prompt();
-								this.close({install: true});
+								this.close({ install: true });
 							});
 						} else {
 							console.info({event});
-							el.addEventListener('click', () => this.close({install: false}));
+							el.addEventListener('click', () => this.close({ install: false }));
 						}
 						break;
 				}
@@ -173,7 +173,7 @@ HTMLCustomElement.register('pwa-prompt', class HTMLPWAPromptElement extends HTML
 		}
 	}
 
-	attributeChangedCallback(name, newValue) {
+	attributeChangedCallback(name, oldValue, newValue) {
 		switch(name) {
 			case 'open':
 				if (newValue !== null) {
@@ -222,7 +222,7 @@ HTMLCustomElement.register('pwa-prompt', class HTMLPWAPromptElement extends HTML
 
 	close(detail = null) {
 		this.open = false;
-		this.dispatchEvent(new CustomEvent('close', {detail}));
+		this.dispatchEvent(new CustomEvent('close', { detail }));
 	}
 
 	static get observedAttributes() {

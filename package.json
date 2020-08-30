@@ -43,7 +43,6 @@
     "lint:css": "if [ -f .stylelintrc.json ]; then stylelint ${npm_package_config_dir_css}; fi",
     "lint:js": "if [ -f .eslintrc.json ]; then eslint .; fi",
     "lint:html": "if [ -f .htmlhintrc ]; then htmlhint ${npm_package_config_dir_html} --ignore=./css/; fi",
-    "foo": "htmllint --help",
     "fix:css": "stylelint ${npm_package_config_dir_css} --fix",
     "fix:js": "eslint . --fix",
     "fix": "npm run fix:js && npm run fix:css",

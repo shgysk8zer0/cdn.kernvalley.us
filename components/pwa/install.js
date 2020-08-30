@@ -6,15 +6,18 @@ registerCustomElement('pwa-install', class HTMLPWAInstallButton extends HTMLButt
 		scope = null
 	} = {}) {
 		super();
-		this.hidden = true;
 
-		if (typeof src === 'string') {
-			this.src = src;
-		}
+		this.whenConnected.then(() => {
+			this.hidden = true;
 
-		if (typeof scope === 'string') {
-			this.scope = scope;
-		}
+			if (typeof src === 'string') {
+				this.src = src;
+			}
+
+			if (typeof scope === 'string') {
+				this.scope = scope;
+			}
+		});
 
 		this.addEventListener('updatefound', async event => {
 			await event.detail.update();
@@ -129,7 +132,7 @@ registerCustomElement('pwa-install', class HTMLPWAInstallButton extends HTMLButt
 					});
 					resolve(reg);
 				} else {
-					await this.ready;
+					await Promise.all([this.ready, this.whenConnected]);
 					const reg = await navigator.serviceWorker.register(this.src, {scope: this.scope});
 					this.dispatchEvent(new CustomEvent('serviceworkerinstall', {detail: reg}));
 					resolve(reg);
@@ -169,7 +172,7 @@ registerCustomElement('pwa-install', class HTMLPWAInstallButton extends HTMLButt
 	}
 
 	attributeChangedCallback(name, oldValue, newValue) {
-		const detail = {oldValue, newValue};
+		const detail = { oldValue, newValue };
 		switch(name) {
 			case 'scope':
 				this.dispatchEvent(new CustomEvent('scopechange', detail));
