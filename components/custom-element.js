@@ -123,11 +123,11 @@ export default class HTMLCustomElement extends HTMLElement {
 
 	async getTemplate(url, {
 		cache          = 'default',
-		mode           = undefined,
+		mode           = 'cors',
 		headers        = new Headers(),
-		referrerPolicy = 'origin-when-cross-origin',
+		referrerPolicy = 'no-referrer',
 		redirect       = undefined,
-		credentials    = undefined,
+		credentials    = 'omit',
 		timeout        = 5000,
 		integrity      = undefined,
 		signal         = undefined,

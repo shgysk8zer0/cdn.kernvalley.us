@@ -3,17 +3,18 @@
 	<head>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width" />
-		<meta name="referrer" content="origin-when-cross-origin" />
+		<meta name="referrer" content="no-referrer" />
 		<link rel="icon" href="/img/kernvalley-icons/kernvalley.svg" type="image/svg+xml" />
+		<link rel="preload" href="/components/github/user.html" as="fetch" type="text/html" crossorigin="anonymous" referrerpolicy="no-referrer" />
+		<link rel="preload" href="/components/github/user.css" as="style" type="text/css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+		<link rel="preload" href="/components/share-to-button/share-to-button.html" as="fetch" type="text/html" crossorigin="anonymous" referrerpolicy="no-referrer" />
+		<link rel="preload" href="/components/share-to-button/share-to-button.css" as="style" type="text/css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+		<link rel="preload" href="https://avatars3.githubusercontent.com/u/39509442?v=4&amp;s=64" crossorigin="anonymous" referrerpolicy="no-referrer" as="image" type="image/png" />
 		<script type="module" src="/js/std-js/deprefixer.js" async=""></script>
 		<script type="module" src="/js/std-js/shims.js" async=""></script>
 		<script type="module" src="/components/current-year.js" async=""></script>
 		<script type="module" src="/components/github/user.js" async=""></script>
 		<script type="module" src="/components/share-to-button/share-to-button.js" async=""></script>
-		<link rel="preload" href="/components/github/user.html" as="fetch" type="text/html" crossorigin="anonymous" />
-		<link rel="preload" href="/components/github/user.css" as="style" type="text/css" crossorigin="anonymous" />
-		<link rel="preload" href="/components/share-to-button/share-to-button.html" as="fetch" type="text/html" crossorigin="anonymous" />
-		<link rel="preload" href="/components/share-to-button/share-to-button.css" as="style" type="text/css" crossorigin="anonymous" />
 		<link rel="stylesheet" href="/css/core-css/theme/default/index.css" media="screen" />
 		<link rel="stylesheet" href="/css/core-css/rem.css" media="screen" />
 		<link rel="stylesheet" href="/css/core-css/viewport.css" media="screen" />
@@ -45,7 +46,7 @@
 			</blockquote>
 		</main>
 		<footer id="footer" class="contain-content">
-			<span>&copy;</span>
+			<span>©</span>
 			<time is="current-year">2020</time>
 			<a href="https://kernvalley.us" rel="noopener external">KernValley.US</a>
 		</footer>

@@ -10,13 +10,15 @@ function getBySize(opts, width) {
 }
 
 function getPicture({
-	opts          = [],
-	sizes         = '100%',
-	decoding      = 'async',
-	loading       = 'lazy',
-	alt           = 'image',
-	fallbackWidth = 192,
-	slot          = null,
+	opts           = [],
+	sizes          = '100%',
+	decoding       = 'async',
+	loading        = 'lazy',
+	crossOrigin    = 'anonymous',
+	referrerPolicy = 'no-referrer',
+	alt            = 'image',
+	fallbackWidth  = 192,
+	slot           = null,
 } = {}) {
 	const pic = document.createElement('picture');
 	const img = document.createElement('img');
@@ -25,6 +27,8 @@ function getPicture({
 	img.loading = loading;
 	img.alt = alt;
 	img.sizes = sizes;
+	img.crossOrigin = crossOrigin;
+	img.referrerPolicy = referrerPolicy;
 	img.src = getBySize(opts, fallbackWidth).src;
 
 	const srcs = opts.reduce(((srcs, {src, sizes = '', type = null} = {}) => {
