@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <!-- markdownlint-disable -->
 ## [Unreleased]
 
+### Changed
+- Make more use of `crossorigin="anonymous"` and `referrerpolicy="no-referrer"`
+
 ## [v1.0.10] - 2020-08-28
 
 ### Added
