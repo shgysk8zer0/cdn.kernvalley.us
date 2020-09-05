@@ -37,7 +37,7 @@ HTMLCustomElement.register('html-popup', class HTMLPopupElement extends HTMLCust
 	}
 
 	async connectedCallback() {
-		this.dispatchEvent('connected');
+		this.dispatchEvent(new Event('connected'));
 
 		if (this.open) {
 			const timer = this.timer;
