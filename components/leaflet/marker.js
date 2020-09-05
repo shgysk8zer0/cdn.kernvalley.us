@@ -11,31 +11,34 @@ registerCustomElement('leaflet-marker', class HTMLLeafletMarkerElement extends H
 	} = {}) {
 		super();
 		this._map = null;
-		this._shadow = this.attachShadow({mode: 'closed'});
+		this._shadow = this.attachShadow({ mode: 'closed' });
 		const popup = document.createElement('slot');
 		const iconEl = document.createElement('slot');
 
 		popup.name = 'popup';
 		iconEl.name = 'icon';
-		this.slot   = 'markers';
 
 		this._shadow.append(popup, iconEl);
 
-		if (! Number.isNaN(longitude)) {
-			this.longitude = longitude;
-		}
+		this.whenConnected.then(() => {
+			this.slot   = 'markers';
 
-		if (! Number.isNaN(latitude)) {
-			this.latitude = latitude;
-		}
+			if (! Number.isNaN(longitude)) {
+				this.longitude = longitude;
+			}
 
-		if (typeof title === 'string') {
-			this.title = title;
-		}
+			if (! Number.isNaN(latitude)) {
+				this.latitude = latitude;
+			}
 
-		if (typeof icon === 'string') {
-			this.icon = icon;
-		}
+			if (typeof title === 'string') {
+				this.title = title;
+			}
+
+			if (typeof icon === 'string') {
+				this.icon = icon;
+			}
+		});
 	}
 
 	async connectedCallback() {

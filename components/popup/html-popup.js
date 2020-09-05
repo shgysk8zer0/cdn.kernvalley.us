@@ -8,7 +8,6 @@ HTMLCustomElement.register('html-popup', class HTMLPopupElement extends HTMLCust
 		vibrate    = null,
 	} = {}) {
 		super();
-		this.hidden = true;
 		this.attachShadow({ mode: 'open' });
 		this.addEventListener('click', () => this.close(), { passive: true, capture: true });
 
@@ -18,6 +17,8 @@ HTMLCustomElement.register('html-popup', class HTMLPopupElement extends HTMLCust
 		});
 
 		this.whenConnected.then(() => {
+			this.hidden = true;
+
 			if (typeof content === 'string') {
 				this.content = content;
 			}
@@ -36,7 +37,7 @@ HTMLCustomElement.register('html-popup', class HTMLPopupElement extends HTMLCust
 	}
 
 	async connectedCallback() {
-		this.dispatchEvent('connected');
+		this.dispatchEvent(new Event('connected'));
 
 		if (this.open) {
 			const timer = this.timer;
