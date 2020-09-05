@@ -3,7 +3,7 @@ import { registerCustomElement } from '../js/std-js/functions.js';
 registerCustomElement('theme-toggle', class HTMLThemeToggleElement extends HTMLElement {
 	constructor() {
 		super();
-		this.attachShadow({mode: 'open'});
+		this.attachShadow({ mode: 'open' });
 		const light = document.createElement('button');
 		const dark = document.createElement('button');
 		const lightSlot = document.createElement('slot');
@@ -28,7 +28,7 @@ registerCustomElement('theme-toggle', class HTMLThemeToggleElement extends HTMLE
 		light.append(lightSlot);
 		dark.append(darkSlot);
 
-		if (media.matches || document.documentElement.dataset.thene === 'dark') {
+		if (media.matches || document.documentElement.dataset.theme === 'dark') {
 			dark.disabled = true;
 		} else {
 			light.disabled = true;
