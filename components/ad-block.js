@@ -112,6 +112,7 @@ HTMLCustomElement.register('ad-block', class HTMLAdBlockElement extends HTMLCust
 	}
 
 	async attributeChangedCallback(name, oldValue, newValue) {
+		await this.whenConnected;
 		await this.ready;
 		switch (name) {
 			case 'theme':
@@ -119,7 +120,7 @@ HTMLCustomElement.register('ad-block', class HTMLAdBlockElement extends HTMLCust
 				break;
 
 			case 'url':
-				shadows.get(this).childNodes.item(1).href = newValue;
+				shadows.get(this).getElementById('wrapper').href = newValue;
 				break;
 
 			default:
