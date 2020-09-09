@@ -1,40 +1,68 @@
 import HTMLCustomElement from './custom-element.js';
 import { loadStylesheet } from '../js/std-js/loader.js';
+import { whenInViewport } from '../js/std-js/viewport.js';
 
 async function log(event) {
 	if ('target' in event) {
-		const data = new FormData();
-		data.set('datetime', Date.now());
-		data.set('user[userAgent]', navigator.userAgent);
-		data.set('user[screen][width]', screen.width);
-		data.set('user[screen][height]', screen.height);
-		data.set('user[screen][colorDepth]', screen.colorDepth);
-		data.set('user[screen][pixelDepth]', screen.pixelDepth);
-		data.set('user[language]', navigator.language);
-		data.set('user[doNotTrack]', navigator.doNotTrack === '1');
-		data.set('context[page][url]', `${location.origin}${location.pathname}`);
-		data.set('context[page][title]', document.title);
-		data.set('context[page][referrer]', document.referrer);
-		data.set('context[ad][width]', event.target.scrollWidth || '');
-		data.set('context[ad][height]', event.target.scrollHeight || '');
-		data.set('context[ad][id]', event.target.id || '');
-		data.set('context[ad][url]', event.target.url || '');
+		const data = {
+			datetime: Date.now(),
+			event: event.type || 'unknown',
+			user: {
+				userAgent: navigator.userAgent,
+				language: navigator.language,
+				doNotTrack: navigator.doNotTrack,
+				screen: {
+					width: screen.width,
+					height: screen.height,
+					orientation: screen.orientation.type,
+					pixelDepth: screen.pixelDepth,
+					colorDepth: screen.colorDepth,
+				},
+				context: {
+					page: {
+						url: `${location.origin}${location.pathname}`,
+						title: document.title,
+						referrer: document.referrer,
+					},
+					ad: {
+						width: event.target.scrollWidth,
+						height: event.target.scrollHeight,
+						id: event.target.id,
+						url: event.target.url,
+					}
+				}
+			}
+		};
 
 		if ('connection' in navigator) {
-			data.set('connection[type]', navigator.connection.type || 'unknown');
-			data.set('connection[effectiveType]', navigator.connection.effectiveType);
+			data.user.connection = {
+				type: navigator.connection.type,
+				saveData: navigator.connection.saveData,
+				effectiveType: navigator.connection.effectiveType,
+				downlink: navigator.connection.downlink,
+			};
 		} else {
-			data.set('connection[type]', 'unknown');
-			data.set('connection[effectiveType]', '');
+			data.user.connection = {
+				type: 'unknown',
+				saveData: false,
+				effectiveType: '4g',
+				downlink: NaN,
+			};
 		}
 
-		if (event instanceof Event) {
-			data.set('type', event.type);
-		} else if (event instanceof IntersectionObserverEntry) {
-			data.set('type', event.isIntersecting ? 'viewed' : 'passed');
-		}
+		// fetch('https://api.kernvalley.us/test/', {
+		// 	method: 'POST',
+		// 	mode: 'cors',
+		// 	referrerPolicy: 'origin-when-cross-origin',
+		// 	credientials: 'omit',
+		// 	keepalive: true,
+		// 	headers: new Headers({ 'Content-Type': 'application/json' }),
+		// 	body: JSON.stringify(data),
+		// }).catch(console.error);
 
-		// navigator.sendBeacon('https://api.kernvalley.us/test/', data);
+		// console.info(data);
+
+		// navigator.sendBeacon('https://api.kernvalley.us/test/', JSON.stringify(data));
 	}
 }
 
@@ -58,8 +86,17 @@ HTMLCustomElement.register('ad-block', class HTMLAdBlockElement extends HTMLCust
 		const linkSlot = document.createElement('slot');
 		const description = document.createElement('div');
 		const descriptionSlot = document.createElement('slot');
+
 		loadStylesheet(new  URL('/components/ad-block.css', HTMLCustomElement.base).href, {
 			parent: shadow,
+			crossOrigin: 'anonymous',
+			referrerPolicy: 'no-referrer',
+		}).finally(() => {
+			whenInViewport(this).then(() => {
+				this.classList.add('shown');
+				this.dispatchEvent(new Event('shown'));
+				log({ target: this, type: 'visible' });
+			});
 		});
 
 		this.addEventListener('mouseenter', log, { passive: true, once: true });
@@ -80,31 +117,19 @@ HTMLCustomElement.register('ad-block', class HTMLAdBlockElement extends HTMLCust
 		logoSlot.name = 'image';
 		logo.id = 'image';
 		logoSlot.innerHTML = `<svg class="current-color" viewBox="0 0 12 16">
-			<path fill-rule="evenodd" d="M6 5h2v2H6V5zm6-.5V14c0 .55-.45 1-1 1H1c-.55 0-1-.45-1-1V2c0-.55.45-1 1-1h7.5L12 4.5zM11 5L8 2H1v11l3-5 2 4 2-2 3 3V5z"/>
+			<path fill-rule="evenodd" fill="currentColor" d="M6 5h2v2H6V5zm6-.5V14c0 .55-.45 1-1 1H1c-.55 0-1-.45-1-1V2c0-.55.45-1 1-1h7.5L12 4.5zM11 5L8 2H1v11l3-5 2 4 2-2 3 3V5z"/>
 		</svg>`;
 		logo.append(logoSlot);
 		label.append(labelSlot);
 		description.append(descriptionSlot);
 		link.append(linkSlot);
-		container.rel = 'noopener external nofollow';
+		container.relList.add('noopener', 'external', 'nofollow');
 
 		container.append(logo, label, description, link);
 		shadow.append(container);
 		shadows.set(this, shadow);
 		this.dispatchEvent(new Event('ready'));
-	}
 
-	async connectedCallback() {
-		new IntersectionObserver(async (entries, observer) => {
-			const entry = entries.find(el => el.target === this);
-			if (entry instanceof IntersectionObserverEntry && entry.isIntersecting) {
-				this.classList.add('shown');
-				this.dispatchEvent(new Event('shown'));
-				log(entry);
-				observer.unobserve(this);
-			}
-		}).observe(this);
-		this.dispatchEvent(new Event('ready'));
 	}
 
 	async disconnectedCallback() {
