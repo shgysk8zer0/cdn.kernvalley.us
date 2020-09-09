@@ -126,13 +126,12 @@ export default class HTMLCustomElement extends HTMLElement {
 		mode           = 'cors',
 		headers        = new Headers(),
 		referrerPolicy = 'no-referrer',
-		redirect       = undefined,
+		redirect       = 'error',
 		credentials    = 'omit',
 		timeout        = 5000,
 		integrity      = undefined,
 		signal         = undefined,
 	} = {}) {
-
 		if (Request.prototype.hasOwnProperty('signal') && typeof signal === 'undefined') {
 			const controller = new AbortController();
 			setTimeout(() => controller.abort(), timeout);
