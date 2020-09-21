@@ -1,6 +1,6 @@
 import { marker, icon } from 'https://unpkg.com/leaflet@1.6.0/dist/leaflet-src.esm.js';
 const map = new Map();
-import { registerCustomElement } from '../../js/std-js/functions.js';
+import { registerCustomElement, wait } from '../../js/std-js/functions.js';
 
 registerCustomElement('leaflet-marker', class HTMLLeafletMarkerElement extends HTMLElement {
 	constructor({
@@ -38,11 +38,20 @@ registerCustomElement('leaflet-marker', class HTMLLeafletMarkerElement extends H
 			if (typeof icon === 'string') {
 				this.icon = icon;
 			}
+
+			this.dispatchEvent(new Event('ready'));
 		});
 	}
 
 	async connectedCallback() {
-		const prom = this.whenConnected;
+		const prom = this.whenConnected.then(() => {
+			if (this.hasAttribute('latitude') && this.hasAttribute('longitude')) {
+				return Promise.resolve();
+			} else {
+				return wait(50);
+			}
+		});
+
 		this.dispatchEvent(new Event('connected'));
 		await prom;
 		const closestMap = this.closest('leaflet-map');
