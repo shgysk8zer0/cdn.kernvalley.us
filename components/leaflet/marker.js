@@ -3,42 +3,27 @@ const map = new Map();
 import { registerCustomElement } from '../../js/std-js/functions.js';
 
 registerCustomElement('leaflet-marker', class HTMLLeafletMarkerElement extends HTMLElement {
-	constructor({
-		latitude  = NaN,
-		longitude = NaN,
-		icon      = null,
-		title     = null,
-	} = {}) {
+	constructor({ icon = null, popup = null } = {}) {
 		super();
 		this._map = null;
 		this._shadow = this.attachShadow({ mode: 'closed' });
-		const popup = document.createElement('slot');
+		const popupEl = document.createElement('slot');
 		const iconEl = document.createElement('slot');
 
-		popup.name = 'popup';
+		popupEl.name = 'popup';
 		iconEl.name = 'icon';
 
-		this._shadow.append(popup, iconEl);
+		this._shadow.append(popupEl, iconEl);
 
-		this.whenConnected.then(() => {
-			this.slot   = 'markers';
+		if (typeof icon === 'string' || icon instanceof HTMLElement) {
+			this.iconImg = icon;
+		}
 
-			if (! Number.isNaN(longitude)) {
-				this.longitude = longitude;
-			}
+		if (popup instanceof HTMLElement) {
+			this.popup = popup;
+		}
 
-			if (! Number.isNaN(latitude)) {
-				this.latitude = latitude;
-			}
-
-			if (typeof title === 'string') {
-				this.title = title;
-			}
-
-			if (typeof icon === 'string') {
-				this.icon = icon;
-			}
-		});
+		this.whenConnected.then(() => this.slot   = 'markers');
 	}
 
 	async connectedCallback() {
@@ -114,7 +99,11 @@ registerCustomElement('leaflet-marker', class HTMLLeafletMarkerElement extends H
 		}
 
 		if (typeof val === 'string' && val !== '') {
-			const img = document.createElememnt('img');
+			const img = new Image(22, 22);
+			img.crossOrigin = 'anonymous';
+			img.referrerPolicy = 'no-referrer';
+			img.loading = 'lazy';
+			img.decoding = 'async';
 			img.src = val;
 			img.slot = 'icon';
 			this.append(img);
