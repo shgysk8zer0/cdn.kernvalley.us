@@ -405,6 +405,28 @@ HTMLCustomElement.register('leaflet-map', class HTMLLeafletMapElement extends HT
 		}
 	}
 
+	async addMarker({ latitude, longitude, icon, title, popup, center = false, open = false }) {
+		await customElements.whenDefined('leaflet-marker');
+		const Marker = customElements.get('leaflet-marker');
+		const marker = new Marker({ icon, popup });
+
+		if (typeof title === 'string') {
+			marker.title = title;
+		}
+
+		marker.latitude = latitude;
+		marker.longitude = longitude;
+
+		this.append(marker);
+
+		if (center) {
+			this.center = marker;
+		}
+
+		marker.open = open;
+		return marker;
+	}
+
 	async findMarker(callback) {
 		await this.ready;
 
