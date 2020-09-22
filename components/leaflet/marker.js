@@ -1,6 +1,6 @@
 import { marker, icon } from 'https://unpkg.com/leaflet@1.6.0/dist/leaflet-src.esm.js';
 const map = new Map();
-import { registerCustomElement } from '../../js/std-js/functions.js';
+import { registerCustomElement, parseHTML } from '../../js/std-js/functions.js';
 
 registerCustomElement('leaflet-marker', class HTMLLeafletMarkerElement extends HTMLElement {
 	constructor({ icon = null, popup = null } = {}) {
@@ -19,9 +19,7 @@ registerCustomElement('leaflet-marker', class HTMLLeafletMarkerElement extends H
 			this.iconImg = icon;
 		}
 
-		if (popup instanceof HTMLElement) {
-			this.popup = popup;
-		}
+		this.popup = popup;
 
 		this.whenConnected.then(() => this.slot   = 'markers');
 	}
@@ -129,15 +127,22 @@ registerCustomElement('leaflet-marker', class HTMLLeafletMarkerElement extends H
 		}
 	}
 
-	set popup(el) {
-		if (el instanceof HTMLElement) {
-			el.slot = 'popup';
+	set popup(val) {
+		if (val instanceof HTMLElement) {
+			val.slot = 'popup';
 			const current = this.popup;
 
 			if (current instanceof HTMLElement) {
-				current.remove();
+				current.replaceWith(val);
+			} else {
+				this.append(val);
 			}
-			this.append(el);
+		} else if (val instanceof DocumentFragment) {
+			const container = document.createElement('div');
+			container.append(val);
+			this.popup = container;
+		} else if (typeof val === 'string') {
+			this.popup = parseHTML(val);
 		}
 	}
 
