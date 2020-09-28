@@ -1,4 +1,4 @@
-import { marker, icon } from 'https://unpkg.com/leaflet@1.6.0/dist/leaflet-src.esm.js';
+import { marker, icon } from 'https://unpkg.com/leaflet@1.7.1/dist/leaflet-src.esm.js';
 const map = new Map();
 import { registerCustomElement, parseHTML } from '../../js/std-js/functions.js';
 
