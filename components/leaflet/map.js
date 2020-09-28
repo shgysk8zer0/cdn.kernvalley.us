@@ -3,7 +3,7 @@ import HTMLCustomElement from '../custom-element.js';
 import {
 	map as LeafletMap,
 	tileLayer as LeafletTileLayer
-} from 'https://unpkg.com/leaflet@1.6.0/dist/leaflet-src.esm.js';
+} from 'https://unpkg.com/leaflet@1.7.1/dist/leaflet-src.esm.js';
 
 let map = new Map();
 
@@ -130,7 +130,6 @@ HTMLCustomElement.register('leaflet-map', class HTMLLeafletMapElement extends HT
 		await Promise.all([ this._populated, prom ]);
 		const m = LeafletMap(this.mapElement, {
 			zoomControl: this.zoomControl,
-			tap: false,
 		});
 
 		const { latitude, longitude } = this.center;
