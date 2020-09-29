@@ -101,8 +101,6 @@ export default class HTMLCustomElement extends HTMLElement {
 		}
 
 		el.slot = slot;
-		el.title = 'Spotify Embedded Player';
-
 
 		if (replace) {
 			const current = await this.getSlotted(slot);

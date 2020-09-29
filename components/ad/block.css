@@ -1,0 +1,73 @@
+:host {
+	display: inline-block;
+}
+
+:host([url]) {
+	cursor: pointer;
+}
+
+:host([url]) #call-to-action {
+	color: var(--link-color, #3575ea);
+	text-decoration: underline;
+}
+
+#container {
+	box-sizing: border-box;
+	font-size: 14px;
+	display: grid;
+	grid-template-areas: "image label" "image description" "image cta" ". cta";
+	grid-template-columns: var(--ad-block-height, 140px) auto;
+	column-gap: 8px;
+	height: var(--ad-block-height, 140px);
+	width: var(--ad-block-width, 320px);
+	max-width: 100%;
+	max-height: 100%;
+	padding: 6px;
+	background-color: #fafafa;
+	color: #242424;
+	border: 1px solid #dadada;
+	border-radius: 6px;
+	contain: strict;
+	content-visibility: auto;
+}
+
+@media (prefers-color-scheme: dark) {
+	:host(:not([theme="light"])) #container {
+		background-color: #212121;
+		color: #fefefe;
+		border-color: #cacaca;
+	}
+}
+
+:host([theme="dark"]) #container {
+	background-color: #212121;
+	color: #fefefe;
+	border-color: #cacaca;
+}
+
+#label {
+	grid-area: label;
+	text-align: center;
+}
+
+#description {
+	grid-area: description;
+}
+
+#image {
+	grid-area: image;
+	overflow: hidden;
+}
+
+#call-to-action {
+	grid-area: cta;
+}
+
+::slotted([slot="image"]), slot[name="image"] > svg {
+	width: calc(var(--ad-block-height, 140px) - 4px);
+	height: auto;
+	object-fit: contain;
+	object-position: center;
+	max-width: 100%;
+	max-height: 100%;
+}
