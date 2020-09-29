@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<link rel="stylesheet" href="./block.css" crossorigin="anonymous" referrerpolicy="no-referrer" media="all" />
+	</head>
+	<body>
+		<div id="container">
+			<h3 id="label" part="label">
+				<slot name="label">No Label</slot>
+			</h3>
+			<div id="image" part="image">
+				<slot name="image">
+					<svg class="current-color" viewBox="0 0 12 16" height="80">
+						<path fill-rule="evenodd" fill="currentColor" d="M6 5h2v2H6V5zm6-.5V14c0 .55-.45 1-1 1H1c-.55 0-1-.45-1-1V2c0-.55.45-1 1-1h7.5L12 4.5zM11 5L8 2H1v11l3-5 2 4 2-2 3 3V5z"/>
+					</svg>
+				</slot>
+			</div>
+			<div id="description" part="description">
+				<slot name="description">No Description</slot>
+			</div>
+			<div id="call-to-action" part="call-to-action">
+				<slot name="calltoaction">No Call-to-Action</slot>
+			</div>
+		</div>
+	</body>
+</html>	
