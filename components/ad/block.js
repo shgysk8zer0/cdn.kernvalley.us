@@ -9,7 +9,7 @@ const observer = ('IntersectionObserver' in window) ? new IntersectionObserver((
 	entries.forEach(({ isIntersecting, target }) => {
 		if (isIntersecting) {
 			observer.unobserve(target);
-			target.dispatchEvent(new Event('seen'));
+			target.dispatchEvent(new Event('show'));
 		}
 	});
 }, {

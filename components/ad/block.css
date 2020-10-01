@@ -6,23 +6,47 @@
 	cursor: pointer;
 }
 
+:host(:not([url^="tel:"])) [part~="call-icon"] {
+	display: none;
+}
+
+:host(:not([url^="mailto:"])) [part~="email-icon"] {
+	display: none;
+}
+
+:host(:not([url^="geo:"])) [part~="geo-icon"] {
+	display: none;
+}
+
+:host(:not([url^="https://"])) [part~="link-icon"] {
+	display: none;
+}
+
 :host([url]) #call-to-action {
 	color: var(--link-color, #3575ea);
 	text-decoration: underline;
+}
+
+[part~="icon"] svg {
+	vertical-align: middle;
+	height: 1em;
+	width: auto;
 }
 
 #container {
 	box-sizing: border-box;
 	font-size: 14px;
 	display: grid;
-	grid-template-areas: "image label" "image description" "image cta" ". cta";
-	grid-template-columns: var(--ad-block-height, 140px) auto;
+	grid-template-areas: "image label" "image description" "image cta";
+	grid-template-columns: var(--ad-block-height, 180px) auto;
+	grid-template-rows: auto 1fr auto;
 	column-gap: 8px;
-	height: var(--ad-block-height, 140px);
-	width: var(--ad-block-width, 320px);
+	row-gap: 6px;
+	height: var(--ad-block-height, 180px);
+	width: var(--ad-block-width, 380px);
 	max-width: 100%;
 	max-height: 100%;
-	padding: 6px;
+	padding: 8px;
 	background-color: #fafafa;
 	color: #242424;
 	border: 1px solid #dadada;
@@ -48,10 +72,13 @@
 #label {
 	grid-area: label;
 	text-align: center;
+	margin: 4px;
+	overflow: auto;
 }
 
 #description {
 	grid-area: description;
+	overflow: auto;
 }
 
 #image {
@@ -61,13 +88,14 @@
 
 #call-to-action {
 	grid-area: cta;
+	overflow: auto;
 }
 
 ::slotted([slot="image"]), slot[name="image"] > svg {
-	width: calc(var(--ad-block-height, 140px) - 4px);
+	width: 100%;
 	height: auto;
 	object-fit: contain;
-	object-position: center;
+	object-position: left center;
 	max-width: 100%;
 	max-height: 100%;
 }
