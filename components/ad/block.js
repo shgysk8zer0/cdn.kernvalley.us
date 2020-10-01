@@ -9,7 +9,7 @@ const observer = ('IntersectionObserver' in window) ? new IntersectionObserver((
 	entries.forEach(({ isIntersecting, target }) => {
 		if (isIntersecting) {
 			observer.unobserve(target);
-			target.dispatchEvent(new Event('seen'));
+			target.dispatchEvent(new Event('show'));
 		}
 	});
 }, {
@@ -120,6 +120,30 @@ HTMLCustomElement.register('ad-block', class HTMLAdBlockElement extends HTMLCust
 				}
 				break;
 
+			case 'height':
+				this.ready.then(() => {
+					const container = this.shadowRoot.getElementById('container');
+
+					if (typeof newVal === 'string' && newVal.length !== 0) {
+						container.style.setProperty('--ad-block-height', newVal);
+					} else {
+						container.style.removeProperty('--ad-block-height');
+					}
+				});
+				break;
+
+			case 'width':
+				this.ready.then(() => {
+					const container = this.shadowRoot.getElementById('container');
+
+					if (typeof newVal === 'string' && newVal.length !== 0) {
+						container.style.setProperty('--ad-block-width', newVal);
+					} else {
+						container.style.removeProperty('--ad-block-width');
+					}
+				});
+				break;
+
 			default:
 				throw new Error(`Unhandled attribute changed: ${name}`);
 		}
@@ -151,6 +175,20 @@ HTMLCustomElement.register('ad-block', class HTMLAdBlockElement extends HTMLCust
 
 	set description(val) {
 		this.setSlot('description', val);
+	}
+
+	get height() {
+		return this.getAttribute('height');
+	}
+
+	set height(val) {
+		if (typeof val === 'string' && val.length !== 0) {
+			this.setAttribute('height', val);
+		} else if (typeof val === 'number') {
+			this.setAttribute('height', `${val}px`);
+		} else {
+			this.removeAttribute('height');
+		}
 	}
 
 	get image() {
@@ -212,9 +250,25 @@ HTMLCustomElement.register('ad-block', class HTMLAdBlockElement extends HTMLCust
 		}
 	}
 
+	get width() {
+		return this.getAttribute('width');
+	}
+
+	set width(val) {
+		if (typeof val === 'string' && val.length !== 0) {
+			this.setAttribute('width', val);
+		} else if (typeof val === 'number') {
+			this.setAttribute('width', `${val}px`);
+		}  else {
+			this.removeAttribute('width');
+		}
+	}
+
 	static get observedAttributes() {
 		return [
+			'height',
 			'url',
+			'width',
 		];
 	}
 });
