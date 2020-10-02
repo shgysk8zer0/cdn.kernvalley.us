@@ -1,5 +1,40 @@
 import HTMLCustomElement from '../custom-element.js';
 
+function getSeoUrl(ad) {
+	const { url, source, medium, term, content, campaign } = ad;
+
+	if (typeof source !== 'string') {
+		return url;
+	} else {
+		const u = new URL(url, document.baseURI);
+
+		if (! u.searchParams.has('utm_source')) {
+			u.searchParams.set('utm_source', source);
+		}
+
+		if (! u.searchParams.has('utm_medium') && typeof medium === 'string') {
+			u.searchParams.set('utm_medium', medium);
+		} else if (! u.searchParams.has('utm_medium')) {
+			u.searchParams.set('utm_medium', 'web');
+		}
+
+		if (! u.searchParams.has('utm_campaign') && typeof campaign === 'string') {
+			u.searchParams.set('utm_campaign', campaign);
+		}
+
+		if (! u.searchParams.has('utm_term') && typeof term === 'string') {
+			u.searchParams.set('utm_term', term);
+		}
+
+		if (! u.searchParams.has('utm_content') && typeof content === 'string') {
+			u.searchParams.set('utm_content', content);
+		}
+
+		return u.href;
+	}
+
+}
+
 function openLink() {
 	const url = this.url;
 
@@ -7,9 +42,9 @@ function openLink() {
 		throw new Error('No URL');
 	} else if (new URL(url, document.baseURI).origin === location.origin) {
 		this.dispatchEvent(new Event('opened'));
-		setTimeout(() => location.href = url, 20);
+		setTimeout(() => location.href = getSeoUrl(this), 20);
 	} else {
-		window.open(this.url, 'ad-window', 'noopener,noreferrer');
+		window.open(getSeoUrl(this), 'ad-window', 'noopener,noreferrer');
 		this.dispatchEvent(new Event('opened'));
 	}
 }
@@ -31,6 +66,8 @@ const observer = ('IntersectionObserver' in window) ? new IntersectionObserver((
 HTMLCustomElement.register('ad-block', class HTMLAdBlockElement extends HTMLCustomElement {
 	constructor({
 		callToAction  = null,
+		campaign      = null,
+		content       = null,
 		description   = null,
 		height        = null,
 		image         = null,
@@ -38,6 +75,9 @@ HTMLCustomElement.register('ad-block', class HTMLAdBlockElement extends HTMLCust
 		imagePosition = null,
 		label         = null,
 		layout        = null,
+		medium        = null,
+		source        = null,
+		term          = null,
 		theme         = null,
 		url           = null,
 		width         = null,
@@ -107,6 +147,26 @@ HTMLCustomElement.register('ad-block', class HTMLAdBlockElement extends HTMLCust
 
 			if (typeof imagePosition === 'string') {
 				this.imagePosition = imagePosition;
+			}
+
+			if (typeof source === 'string') {
+				this.source = source;
+			}
+
+			if (typeof medium === 'string') {
+				this.medium = medium;
+			}
+
+			if (typeof campaign === 'string') {
+				this.campaign = campaign;
+			}
+
+			if (typeof term === 'string') {
+				this.term = term;
+			}
+
+			if (typeof content === 'string') {
+				this.content = content;
 			}
 
 			if (typeof height === 'string' || (typeof height === 'number' && ! Number.isNaN(height))) {
@@ -203,6 +263,30 @@ HTMLCustomElement.register('ad-block', class HTMLAdBlockElement extends HTMLCust
 
 	set callToAction(val) {
 		this.setSlot('calltoaction', val);
+	}
+
+	get campaign() {
+		return this.getAttribute('campaign');
+	}
+
+	set campaign(val) {
+		if (typeof val === 'string' && val.length !== 0) {
+			this.setAttribute('campaign', val);
+		} else {
+			this.removeAttribute('campaign');
+		}
+	}
+
+	get content() {
+		return this.getAttribute('content');
+	}
+
+	set content(val) {
+		if (typeof val === 'string' && val.length !== 0) {
+			this.setAttribute('content', val);
+		} else {
+			this.removeAttribute('content');
+		}
 	}
 
 	get description() {
@@ -304,6 +388,30 @@ HTMLCustomElement.register('ad-block', class HTMLAdBlockElement extends HTMLCust
 		}
 	}
 
+	get medium() {
+		return this.getAttribute('medium');
+	}
+
+	set medium(val) {
+		if (typeof val === 'string' && val.length !== 0) {
+			this.setAttribute('medium', val);
+		} else {
+			this.removeAttribute('medium');
+		}
+	}
+
+	get source() {
+		return this.getAttribute('source');
+	}
+
+	set source(val) {
+		if (typeof val === 'string' && val.length !== 0) {
+			this.setAttribute('source', val);
+		} else {
+			this.removeAttribute('source');
+		}
+	}
+
 	get theme() {
 		return this.getAttribute('theme') || 'auto';
 	}
@@ -313,6 +421,18 @@ HTMLCustomElement.register('ad-block', class HTMLAdBlockElement extends HTMLCust
 			this.setAttribute('theme', val);
 		} else {
 			this.removeAttribute('theme');
+		}
+	}
+
+	get term() {
+		return this.getAttribute('term');
+	}
+
+	set term(val) {
+		if (typeof val === 'string' && val.length !== 0) {
+			this.setAttribute('term', val);
+		} else {
+			this.removeAttribute('term');
 		}
 	}
 

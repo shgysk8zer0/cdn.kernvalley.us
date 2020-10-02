@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - `<ad-block>` can now navigate to internal URLs instead of opening new tab
+- `<ad-block url="...">` now handles UTM params
 
 ## [v1.0.11] - 2020-01-02
 
