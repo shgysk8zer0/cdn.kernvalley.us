@@ -7,8 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <!-- markdownlint-disable -->
 ## [Unreleased]
 
+## [v1.0.11] - 2020-01-02
+
 ### Added
 - Postioning and fit settings for `<ad-block>` images
+- Different layouts for `<ad-block>` (card, stack, text)
 
 ### Changed
 - Update Leaflet to [v1.7.1](https://leafletjs.com/2020/09/04/leaflet-1.7.1.html)
