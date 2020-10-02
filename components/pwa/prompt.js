@@ -226,6 +226,19 @@ HTMLCustomElement.register('pwa-prompt', class HTMLPWAPromptElement extends HTML
 
 	close(detail = null) {
 		this.open = false;
+
+		if (typeof detail === 'boolean' && window.ga instanceof Function) {
+			/**
+			 * Probably safe to assume `ga` is the function for Google Analytics,
+			 * so send a pwa-install event
+			 */
+			window.ga('send', {
+				hitType: 'event',
+				eventCategory: 'pwa-install',
+				eventLabel: 'Installed PWA',
+				transport: 'beacon',
+			});
+		}
 		this.dispatchEvent(new CustomEvent('close', { detail }));
 	}
 
