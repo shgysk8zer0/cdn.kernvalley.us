@@ -1,8 +1,17 @@
 import HTMLCustomElement from '../custom-element.js';
 
 function openLink() {
-	window.open(this.url, 'ad-window', 'noopener,noreferrer');
-	this.dispatchEvent(new Event('opened'));
+	const url = this.url;
+
+	if (typeof url !== 'string') {
+		throw new Error('No URL');
+	} else if (new URL(url, document.baseURI).origin === location.origin) {
+		this.dispatchEvent(new Event('opened'));
+		setTimeout(() => location.href = url, 20);
+	} else {
+		window.open(this.url, 'ad-window', 'noopener,noreferrer');
+		this.dispatchEvent(new Event('opened'));
+	}
 }
 
 const observer = ('IntersectionObserver' in window) ? new IntersectionObserver((entries, observer) => {
