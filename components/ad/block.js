@@ -3,7 +3,7 @@ import HTMLCustomElement from '../custom-element.js';
 function getSeoUrl(ad) {
 	const { url, source, medium, term, content, campaign } = ad;
 
-	if (typeof source !== 'string') {
+	if (typeof source !== 'string' && source.length !== 0) {
 		return url;
 	} else {
 		const u = new URL(url, document.baseURI);
@@ -12,21 +12,21 @@ function getSeoUrl(ad) {
 			u.searchParams.set('utm_source', source);
 		}
 
-		if (! u.searchParams.has('utm_medium') && typeof medium === 'string') {
+		if (! u.searchParams.has('utm_medium') && typeof medium === 'string' && medium.length !== 0) {
 			u.searchParams.set('utm_medium', medium);
 		} else if (! u.searchParams.has('utm_medium')) {
 			u.searchParams.set('utm_medium', 'web');
 		}
 
-		if (! u.searchParams.has('utm_campaign') && typeof campaign === 'string') {
+		if (! u.searchParams.has('utm_campaign') && typeof campaign === 'string' && campaign.length !== 0) {
 			u.searchParams.set('utm_campaign', campaign);
 		}
 
-		if (! u.searchParams.has('utm_term') && typeof term === 'string') {
+		if (! u.searchParams.has('utm_term') && typeof term === 'string' && term.length !== 0) {
 			u.searchParams.set('utm_term', term);
 		}
 
-		if (! u.searchParams.has('utm_content') && typeof content === 'string') {
+		if (! u.searchParams.has('utm_content') && typeof content === 'string' && content.length !== 0) {
 			u.searchParams.set('utm_content', content);
 		}
 
@@ -470,5 +470,3 @@ HTMLCustomElement.register('ad-block', class HTMLAdBlockElement extends HTMLCust
 		];
 	}
 });
-
-window.HTMLAdBlockElement = customElements.get('ad-block');
