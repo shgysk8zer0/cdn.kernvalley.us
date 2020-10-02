@@ -21,12 +21,17 @@ const observer = ('IntersectionObserver' in window) ? new IntersectionObserver((
 
 HTMLCustomElement.register('ad-block', class HTMLAdBlockElement extends HTMLCustomElement {
 	constructor({
-		callToAction = null,
-		description  = null,
-		label        = null,
-		image        = null,
-		url          = null,
-		theme        = null,
+		callToAction  = null,
+		description   = null,
+		height        = null,
+		image         = null,
+		imageFit      = null,
+		imagePosition = null,
+		label         = null,
+		layout        = null,
+		theme         = null,
+		url           = null,
+		width         = null,
 	} = {}) {
 		super();
 		this.attachShadow({ mode: 'open' });
@@ -75,12 +80,32 @@ HTMLCustomElement.register('ad-block', class HTMLAdBlockElement extends HTMLCust
 		}
 
 		this.whenConnected.then(() => {
+			if (typeof layout === 'string') {
+				this.layout = layout;
+			}
+
 			if (typeof url === 'string' || url instanceof URL) {
 				this.url = url;
 			}
 
 			if (typeof theme === 'string') {
 				this.theme = theme;
+			}
+
+			if (typeof imageFit === 'string') {
+				this.imageFit = imageFit;
+			}
+
+			if (typeof imagePosition === 'string') {
+				this.imagePosition = imagePosition;
+			}
+
+			if (typeof height === 'string' || (typeof height === 'number' && ! Number.isNaN(height))) {
+				this.height = height;
+			}
+
+			if (typeof width === 'string' || (typeof width === 'number' && ! Number.isNaN(height))) {
+				this.width = width;
 			}
 		});
 	}
@@ -126,8 +151,12 @@ HTMLCustomElement.register('ad-block', class HTMLAdBlockElement extends HTMLCust
 
 					if (typeof newVal === 'string' && newVal.length !== 0) {
 						container.style.setProperty('--ad-block-height', newVal);
+						container.style.setProperty('--ad-block-stack-height', newVal);
+						container.style.setProperty('--ad-block-text-height', newVal);
 					} else {
 						container.style.removeProperty('--ad-block-height');
+						container.style.removeProperty('--ad-block-stack-height');
+						container.style.removeProperty('--ad-block-text-height');
 					}
 				});
 				break;
@@ -138,8 +167,12 @@ HTMLCustomElement.register('ad-block', class HTMLAdBlockElement extends HTMLCust
 
 					if (typeof newVal === 'string' && newVal.length !== 0) {
 						container.style.setProperty('--ad-block-width', newVal);
+						container.style.setProperty('--ad-block-stack-width', newVal);
+						container.style.setProperty('--ad-block-text-width', newVal);
 					} else {
 						container.style.removeProperty('--ad-block-width');
+						container.style.removeProperty('--ad-block-stack-width');
+						container.style.removeProperty('--ad-block-text-width');
 					}
 				});
 				break;
@@ -212,6 +245,30 @@ HTMLCustomElement.register('ad-block', class HTMLAdBlockElement extends HTMLCust
 		}
 	}
 
+	get imageFit() {
+		return this.getAttribute('imagefit');
+	}
+
+	set imageFit(val) {
+		if (typeof val === 'string' && val.length !== 0) {
+			this.setAttribute('imagefit', val);
+		} else {
+			this.removeAttribute('imagefit');
+		}
+	}
+
+	get imagePosition() {
+		return this.getAttribute('imageposition');
+	}
+
+	set imagePosition(val) {
+		if (typeof val === 'string' && val.length !== 0) {
+			this.setAttribute('imageposition', val);
+		} else {
+			this.removeAttribute('imageposition');
+		}
+	}
+
 	get label() {
 		return this.getSlot('label').then(el => {
 			if (el instanceof HTMLElement) {
@@ -224,6 +281,18 @@ HTMLCustomElement.register('ad-block', class HTMLAdBlockElement extends HTMLCust
 
 	set label(val) {
 		this.setSlot('label', val);
+	}
+
+	get layout() {
+		return this.getAttribute('layout') || 'default';
+	}
+
+	set layout(val) {
+		if (typeof val === 'string' && val.length !== 0) {
+			this.setAttribute('layout', val);
+		} else {
+			this.removeAttribute('layout');
+		}
 	}
 
 	get theme() {
@@ -272,3 +341,5 @@ HTMLCustomElement.register('ad-block', class HTMLAdBlockElement extends HTMLCust
 		];
 	}
 });
+
+window.HTMLAdBlockElement = customElements.get('ad-block');
