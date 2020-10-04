@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- Create `<table is="cache-list">` component
 - Add install event resporting to `window.ga()` if available
 - `<ad-block>` can now navigate to internal URLs instead of opening new tab
 - `<ad-block url="...">` now handles UTM params
