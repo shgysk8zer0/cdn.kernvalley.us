@@ -1,51 +1,18 @@
 import HTMLCustomElement from '../custom-element.js';
 
-function getSeoUrl(ad) {
-	const { url, source, medium, term, content, campaign } = ad;
-
-	if (typeof source !== 'string' && source.length !== 0) {
-		return url;
-	} else {
-		const u = new URL(url, document.baseURI);
-
-		if (! u.searchParams.has('utm_source')) {
-			u.searchParams.set('utm_source', source);
-		}
-
-		if (! u.searchParams.has('utm_medium') && typeof medium === 'string' && medium.length !== 0) {
-			u.searchParams.set('utm_medium', medium);
-		} else if (! u.searchParams.has('utm_medium')) {
-			u.searchParams.set('utm_medium', 'web');
-		}
-
-		if (! u.searchParams.has('utm_campaign') && typeof campaign === 'string' && campaign.length !== 0) {
-			u.searchParams.set('utm_campaign', campaign);
-		}
-
-		if (! u.searchParams.has('utm_term') && typeof term === 'string' && term.length !== 0) {
-			u.searchParams.set('utm_term', term);
-		}
-
-		if (! u.searchParams.has('utm_content') && typeof content === 'string' && content.length !== 0) {
-			u.searchParams.set('utm_content', content);
-		}
-
-		return u.href;
-	}
-
-}
-
 function openLink() {
-	const url = this.url;
+	if (! (this instanceof HTMLAnchorElement)) {
+		const url = this.url;
 
-	if (typeof url !== 'string') {
-		throw new Error('No URL');
-	} else if (new URL(url, document.baseURI).origin === location.origin) {
-		this.dispatchEvent(new Event('opened'));
-		setTimeout(() => location.href = getSeoUrl(this), 20);
-	} else {
-		window.open(getSeoUrl(this), 'ad-window', 'noopener,noreferrer');
-		this.dispatchEvent(new Event('opened'));
+		if (typeof url !== 'string') {
+			throw new Error('No URL');
+		} else if (new URL(url, document.baseURI).origin === location.origin) {
+			this.dispatchEvent(new Event('opened'));
+			setTimeout(() => location.href = this.getUrl(), 20);
+		} else {
+			window.open(this.getUrl(), 'ad-window', 'noopener,noreferrer');
+			this.dispatchEvent(new Event('opened'));
+		}
 	}
 }
 
@@ -195,7 +162,14 @@ HTMLCustomElement.register('ad-block', class HTMLAdBlockElement extends HTMLCust
 	attributeChangedCallback(name, oldVal, newVal) {
 		switch(name) {
 			case 'url':
-				if (typeof newVal === 'string') {
+				if (typeof newVal !== 'string') {
+					this.removeEventListener('click', openLink, { capture: true, passive: true });
+					this.querySelectorAll('meta[itemprop="url"].ad-url').forEach(el => el.remove());
+				} else if (newVal.length === 0) {
+					this.removeAttribute('url');
+				} else if (newVal.startsWith('/') || newVal.startsWith('./') || newVal.startsWith('#')) {
+					this.url = new URL(newVal, document.baseURI);
+				} else {
 					this.addEventListener('click', openLink, { capture: true, passive: true });
 					const meta = document.createElement('meta');
 					const current = this.querySelector('meta[itemprop="url"].ad-url');
@@ -208,9 +182,6 @@ HTMLCustomElement.register('ad-block', class HTMLAdBlockElement extends HTMLCust
 					} else {
 						this.append(meta);
 					}
-				} else {
-					this.removeEventListener('click', openLink, { capture: true, passive: true });
-					this.querySelectorAll('meta[itemprop="url"].ad-url').forEach(el => el.remove());
 				}
 				break;
 
@@ -222,10 +193,12 @@ HTMLCustomElement.register('ad-block', class HTMLAdBlockElement extends HTMLCust
 						container.style.setProperty('--ad-block-height', newVal);
 						container.style.setProperty('--ad-block-stack-height', newVal);
 						container.style.setProperty('--ad-block-text-height', newVal);
+						container.style.setProperty('--ad-block-image-height', newVal);
 					} else {
 						container.style.removeProperty('--ad-block-height');
 						container.style.removeProperty('--ad-block-stack-height');
 						container.style.removeProperty('--ad-block-text-height');
+						container.style.removeProperty('--ad-block-image-height');
 					}
 				});
 				break;
@@ -238,16 +211,52 @@ HTMLCustomElement.register('ad-block', class HTMLAdBlockElement extends HTMLCust
 						container.style.setProperty('--ad-block-width', newVal);
 						container.style.setProperty('--ad-block-stack-width', newVal);
 						container.style.setProperty('--ad-block-text-width', newVal);
+						container.style.setProperty('--ad-block-image-width', newVal);
 					} else {
 						container.style.removeProperty('--ad-block-width');
 						container.style.removeProperty('--ad-block-stack-width');
 						container.style.removeProperty('--ad-block-text-width');
+						container.style.removeProperty('--ad-block-image-width');
 					}
 				});
 				break;
 
 			default:
 				throw new Error(`Unhandled attribute changed: ${name}`);
+		}
+	}
+
+	getUrl() {
+		const { url, source, medium, term, content, campaign } = this;
+
+		if (typeof source !== 'string' && source.length !== 0) {
+			return url;
+		} else {
+			const u = new URL(url, document.baseURI);
+
+			if (! u.searchParams.has('utm_source')) {
+				u.searchParams.set('utm_source', source);
+			}
+
+			if (! u.searchParams.has('utm_medium') && typeof medium === 'string' && medium.length !== 0) {
+				u.searchParams.set('utm_medium', medium);
+			} else if (! u.searchParams.has('utm_medium')) {
+				u.searchParams.set('utm_medium', 'web');
+			}
+
+			if (! u.searchParams.has('utm_campaign') && typeof campaign === 'string' && campaign.length !== 0) {
+				u.searchParams.set('utm_campaign', campaign);
+			}
+
+			if (! u.searchParams.has('utm_term') && typeof term === 'string' && term.length !== 0) {
+				u.searchParams.set('utm_term', term);
+			}
+
+			if (! u.searchParams.has('utm_content') && typeof content === 'string' && content.length !== 0) {
+				u.searchParams.set('utm_content', content);
+			}
+
+			return u.href;
 		}
 	}
 

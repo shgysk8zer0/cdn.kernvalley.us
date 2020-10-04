@@ -9,6 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - Create `<table is="cache-list">` component
+- Add rtl support for `<ad-block>`
+- Add image only layout for `<ad-block>`
+- Add link to ads site at bottom of `<ad-block>`s
 - Add install event resporting to `window.ga()` if available
 - `<ad-block>` can now navigate to internal URLs instead of opening new tab
 - `<ad-block url="...">` now handles UTM params
