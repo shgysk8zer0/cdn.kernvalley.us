@@ -96,7 +96,7 @@ export default class HTMLCustomElement extends HTMLElement {
 			el.classList.add(...classList);
 		}
 
-		if ('part' in el) {
+		if ('part' in el && Array.isArray(parts) && parts.length !== 0) {
 			el.part.add(...parts);
 		}
 
