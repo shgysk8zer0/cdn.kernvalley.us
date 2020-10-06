@@ -63,6 +63,11 @@ export default class HTMLCustomElement extends HTMLElement {
 		}
 	}
 
+	async getSlottedItem(slot, item = 0) {
+		const slotted = await this.getSlotted(slot);
+		return slotted[item] ?? null;
+	}
+
 	async clearSlot(slot) {
 		const slotted = await this.getSlotted(slot);
 		slotted.forEach(el => el.remove());
