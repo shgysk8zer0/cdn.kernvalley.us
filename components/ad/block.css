@@ -74,7 +74,7 @@
 
 :host([layout="text"]) #container {
 	grid-template-areas: "label label label"  "description description description" ". cta cta" "branding branding .";
-	grid-template-rows: 30px auto 1fr;
+	grid-template-rows: 30px 1fr auto;
 	grid-template-columns: 10px 1fr 10px;
 	width: var(--ad-block-text-width, 280px);
 	height: var(--ad-block-text-height, 150px);
