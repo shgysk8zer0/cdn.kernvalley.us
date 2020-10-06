@@ -260,8 +260,30 @@ HTMLCustomElement.register('ad-block', class HTMLAdBlockElement extends HTMLCust
 		}
 	}
 
+	async getJSON() {
+		const { label, description, image, callToAction, id, title, url, source, medium, campaign, term, content, layout, theme, imageFit, imagePosition } = this;
+		return JSON.stringify({
+			id,
+			title,
+			label: await label,
+			description: await description,
+			image: await image,
+			callToAction: await callToAction,
+			layout,
+			theme,
+			url,
+			source,
+			medium,
+			campaign,
+			term,
+			content,
+			imageFit,
+			imagePosition,
+		});
+	}
+
 	get callToAction() {
-		return this.getSlot('calltoaction').then(el => {
+		return this.getSlottedItem('calltoaction').then(el => {
 			if (el instanceof HTMLElement) {
 				return el.textContent;
 			} else {
@@ -299,7 +321,7 @@ HTMLCustomElement.register('ad-block', class HTMLAdBlockElement extends HTMLCust
 	}
 
 	get description() {
-		return this.getSlot('description').then(el => {
+		return this.getSlottedItem('description').then(el => {
 			if (el instanceof HTMLElement) {
 				return el.textContent;
 			} else {
@@ -327,7 +349,13 @@ HTMLCustomElement.register('ad-block', class HTMLAdBlockElement extends HTMLCust
 	}
 
 	get image() {
-		return this.getSlot('image');
+		return this.getSlottedItem('image').then(img => {
+			if (img instanceof HTMLImageElement && img.hasAttribute('src')) {
+				return img.src;
+			} else {
+				return null;
+			}
+		});
 	}
 
 	set image(val) {
@@ -372,7 +400,7 @@ HTMLCustomElement.register('ad-block', class HTMLAdBlockElement extends HTMLCust
 	}
 
 	get label() {
-		return this.getSlot('label').then(el => {
+		return this.getSlottedItem('label').then(el => {
 			if (el instanceof HTMLElement) {
 				return el.textContent;
 			} else {
