@@ -353,7 +353,7 @@ HTMLCustomElement.register('ad-block', class HTMLAdBlockElement extends HTMLCust
 			if (img instanceof HTMLImageElement && img.hasAttribute('src')) {
 				return img.src;
 			} else {
-				return null
+				return null;
 			}
 		});
 	}
