@@ -54,7 +54,7 @@ export default class HTMLCustomElement extends HTMLElement {
 	}
 
 	async getSlotted(slot) {
-		const el = this.getSlot(slot);
+		const el = await this.getSlot(slot);
 
 		if (el instanceof HTMLElement) {
 			return el.assignedElements();
