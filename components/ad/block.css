@@ -105,11 +105,6 @@
 	border-color: #cacaca;
 }
 
-:host([url][theme="dark"]) #call-to-action,
-:host([theme="dark"]) #branding {
-	color: #91B4F4;
-}
-
 :host([theme="inherit"]) #container {
 	background-color: inherit;
 	color: inherit;
@@ -216,6 +211,11 @@ slot[name="image"] > svg {
 
 :host([imageposition="top-right"]) ::slotted([slot="image"]) {
 	object-position: right top;
+}
+
+:host([url][theme="dark"]) #call-to-action,
+:host([theme="dark"]) #branding {
+	color: #91B4F4;
 }
 
 @media (prefers-color-scheme: dark) {
