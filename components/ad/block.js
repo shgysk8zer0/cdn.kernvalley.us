@@ -1,5 +1,12 @@
 import HTMLCustomElement from '../custom-element.js';
 
+
+function keypress(event) {
+	if (event.keyCode === 32) {
+		openLink.apply(this);
+	}
+}
+
 function openLink() {
 	if (! (this instanceof HTMLAnchorElement)) {
 		const url = this.url;
@@ -68,6 +75,7 @@ HTMLCustomElement.register('ad-block', class HTMLAdBlockElement extends HTMLCust
 
 								case 'image':
 									el.setAttribute('itemprop', 'image');
+									el.setAttribute('role', 'image');
 									break;
 							}
 						});
@@ -96,6 +104,9 @@ HTMLCustomElement.register('ad-block', class HTMLAdBlockElement extends HTMLCust
 		}
 
 		this.whenConnected.then(() => {
+			this.tabIndex = 0;
+			this.setAttribute('role', 'document');
+
 			if (typeof layout === 'string') {
 				this.layout = layout;
 			}
@@ -164,6 +175,7 @@ HTMLCustomElement.register('ad-block', class HTMLAdBlockElement extends HTMLCust
 			case 'url':
 				if (typeof newVal !== 'string') {
 					this.removeEventListener('click', openLink, { capture: true, passive: true });
+					this.removeEventListener('keydown', keypress, { capture: true, passive: true });
 					this.querySelectorAll('meta[itemprop="url"].ad-url').forEach(el => el.remove());
 				} else if (newVal.length === 0) {
 					this.removeAttribute('url');
@@ -171,6 +183,7 @@ HTMLCustomElement.register('ad-block', class HTMLAdBlockElement extends HTMLCust
 					this.url = new URL(newVal, document.baseURI);
 				} else {
 					this.addEventListener('click', openLink, { capture: true, passive: true });
+					this.addEventListener('keydown', keypress, { capture: true, passive: true });
 					const meta = document.createElement('meta');
 					const current = this.querySelector('meta[itemprop="url"].ad-url');
 					meta.classList.add('ad-url');

@@ -24,7 +24,7 @@
 }
 
 :host([url]) #call-to-action {
-	color: var(--link-color, #3575ea);
+	color: #0F5CE8;
 	text-decoration: underline;
 }
 
@@ -110,6 +110,16 @@
 	border-color: #cacaca;
 }
 
+:host([theme="dark"]) #call-to-action, :host([theme="dark"]) #branding {
+	color: #91B4F4;
+}
+
+@media (prefers-color-scheme: dark) {
+	:host(:not([theme="light"])) #call-to-action, :host(:not([theme="light"])) #branding {
+		color: #91B4F4;
+	}
+}
+
 :host([theme="inherit"]) #container {
 	background-color: inherit;
 	color: inherit;
@@ -144,7 +154,7 @@
 
 #branding {
 	grid-area: branding;
-	color: inherit;
+	color: #0F5CE8;
 }
 
 #branding svg {
