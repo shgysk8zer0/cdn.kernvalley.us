@@ -56,7 +56,8 @@
 	text-align: right;
 }
 
-:host([layout="card"]) #container, :host(:not([layout])) #container {
+:host([layout="card"]) #container,
+:host(:not([layout])) #container {
 	grid-template-areas: "image label" "image description" "image cta" "branding branding";
 	grid-template-columns: 2fr 3fr;
 	grid-template-rows: 30px 1fr auto auto;
@@ -92,16 +93,10 @@
 	height: var(--ad-block-image-height, 210px);
 }
 
-:host([layout="image"]) #label, :host([layout="image"]) #description, :host([layout="image"]) #call-to-action {
+:host([layout="image"]) #label,
+:host([layout="image"]) #description,
+:host([layout="image"]) #call-to-action {
 	display: none;
-}
-
-@media (prefers-color-scheme: dark) {
-	:host(:not([theme="light"])) #container {
-		background-color: #212121;
-		color: #fefefe;
-		border-color: #cacaca;
-	}
 }
 
 :host([theme="dark"]) #container {
@@ -110,14 +105,9 @@
 	border-color: #cacaca;
 }
 
-:host([theme="dark"]) #call-to-action, :host([theme="dark"]) #branding {
+:host([url][theme="dark"]) #call-to-action,
+:host([theme="dark"]) #branding {
 	color: #91B4F4;
-}
-
-@media (prefers-color-scheme: dark) {
-	:host(:not([theme="light"])) #call-to-action, :host(:not([theme="light"])) #branding {
-		color: #91B4F4;
-	}
 }
 
 :host([theme="inherit"]) #container {
@@ -133,7 +123,8 @@
 	margin: 0;
 }
 
-:host([layout="card"]) #label, :host(:not([layout])) #label {
+:host([layout="card"]) #label,
+:host(:not([layout])) #label {
 	margin: 4px;
 }
 
@@ -225,4 +216,17 @@ slot[name="image"] > svg {
 
 :host([imageposition="top-right"]) ::slotted([slot="image"]) {
 	object-position: right top;
+}
+
+@media (prefers-color-scheme: dark) {
+	:host(:not([theme="light"])) #container {
+		background-color: #212121;
+		color: #fefefe;
+		border-color: #cacaca;
+	}
+
+	:host([url]:not([theme="light"])) #call-to-action,
+	:host(:not([theme="light"])) #branding {
+		color: #91B4F4;
+	}
 }
