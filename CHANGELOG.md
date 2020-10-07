@@ -17,6 +17,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `<ad-block url="...">` now handles UTM params
 - Create basic script for resetting web app data `/js/pwa-reset.js`
 
+### Fixed
+- Improve accessibility of `<ad-block>`s (contrast, keyboard navigation)
+
 ## [v1.0.11] - 2020-10-02
 
 ### Added
