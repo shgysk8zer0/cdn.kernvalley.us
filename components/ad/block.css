@@ -105,7 +105,7 @@
 	height: 220px;
 	grid-template-areas: "image label label" "image description description" "image cta branding";
 	grid-template-rows: auto 1fr auto;
-	grid-template-columns: auto 1fr auto;
+	grid-template-columns: 4fr 5fr auto;
 }
 
 :host([theme="dark"]) #container {
