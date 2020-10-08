@@ -99,13 +99,26 @@
 	display: none;
 }
 
+:host([layout="full-width"]) {
+	grid-column: 1 / -1;
+}
+
 :host([layout="full-width"]) #container {
 	width: 100vw;
 	max-width: 100%;
-	height: 220px;
+	height: 250px;
 	grid-template-areas: "image label label" "image description description" "image cta branding";
 	grid-template-rows: auto 1fr auto;
-	grid-template-columns: 4fr 5fr auto;
+	grid-template-columns: 4fr 5fr 150px;
+}
+
+@media(max-width: 650px) {
+	:host([layout="full-width"]) #container {
+		height: 300px;
+		grid-template-areas: "label label" "image description" "cta branding";
+		grid-template-rows: auto 1fr auto;
+		grid-template-columns: 1fr 1fr;
+	}
 }
 
 :host([theme="dark"]) #container {
