@@ -106,10 +106,11 @@
 :host([layout="full-width"]) #container {
 	width: 100vw;
 	max-width: 100%;
-	height: 250px;
+	height: var(--ad-block-full-width-height, 250px);
 	grid-template-areas: "image label label" "image description description" "image cta branding";
+	column-gap: 20px;
 	grid-template-rows: auto 1fr auto;
-	grid-template-columns: 4fr 5fr 150px;
+	grid-template-columns: minmax(auto, 4fr) 5fr 150px;
 }
 
 @media(max-width: 650px) {
@@ -118,6 +119,7 @@
 		grid-template-areas: "label label" "image description" "cta branding";
 		grid-template-rows: auto 1fr auto;
 		grid-template-columns: 1fr 1fr;
+		column-gap: 12px;
 	}
 }
 
