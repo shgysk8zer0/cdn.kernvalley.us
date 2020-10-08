@@ -1,6 +1,5 @@
 import HTMLCustomElement from '../custom-element.js';
 
-
 function keypress(event) {
 	if (event.keyCode === 32) {
 		openLink.apply(this);
@@ -23,10 +22,13 @@ function openLink() {
 	}
 }
 
+const queries = new WeakMap();
+
 const observer = ('IntersectionObserver' in window) ? new IntersectionObserver((entries, observer) => {
 	entries.forEach(({ isIntersecting, target }) => {
 		if (isIntersecting) {
 			observer.unobserve(target);
+			console.info(target);
 			target.dispatchEvent(new Event('show'));
 		}
 	});
@@ -49,6 +51,7 @@ HTMLCustomElement.register('ad-block', class HTMLAdBlockElement extends HTMLCust
 		imagePosition = null,
 		label         = null,
 		layout        = null,
+		media         = null,
 		medium        = null,
 		source        = null,
 		term          = null,
@@ -106,6 +109,10 @@ HTMLCustomElement.register('ad-block', class HTMLAdBlockElement extends HTMLCust
 		this.whenConnected.then(() => {
 			this.tabIndex = 0;
 			this.setAttribute('role', 'document');
+
+			if (typeof media === 'string') {
+				this.media = media;
+			}
 
 			if (typeof layout === 'string') {
 				this.layout = layout;
@@ -216,6 +223,30 @@ HTMLCustomElement.register('ad-block', class HTMLAdBlockElement extends HTMLCust
 						container.style.removeProperty('--ad-block-full-width-height', newVal);
 					}
 				});
+				break;
+
+			case 'media':
+				if (typeof newVal === 'string') {
+					const query = matchMedia(newVal);
+					this.hidden = ! query.matches;
+					const callback = ({ target }) => this.hidden = ! target.matches;
+
+					if (queries.has(this)) {
+						const { callback, query } = queries.get(this);
+						query.removeEventListener('change', callback);
+						queries.delete(this);
+					}
+
+					query.addEventListener('change', callback);
+					queries.set(this, { callback, query });
+				} else {
+					if (queries.has(this)) {
+						const { callback, query } = queries.get(this);
+						query.removeEventListener('change', callback);
+						queries.delete(this);
+					}
+					this.hidden = false;
+				}
 				break;
 
 			case 'width':
@@ -440,6 +471,18 @@ HTMLCustomElement.register('ad-block', class HTMLAdBlockElement extends HTMLCust
 		}
 	}
 
+	get media() {
+		return this.getAttribute('media');
+	}
+
+	set media(val) {
+		if (typeof val === 'string') {
+			this.setAttribute('media', val);
+		} else {
+			this.removeAttribute('media');
+		}
+	}
+
 	get medium() {
 		return this.getAttribute('medium');
 	}
@@ -517,6 +560,7 @@ HTMLCustomElement.register('ad-block', class HTMLAdBlockElement extends HTMLCust
 	static get observedAttributes() {
 		return [
 			'height',
+			'media',
 			'url',
 			'width',
 		];
