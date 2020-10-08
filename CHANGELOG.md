@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `<ad-block>` can now navigate to internal URLs instead of opening new tab
 - `<ad-block url="...">` now handles UTM params
 - Create basic script for resetting web app data `/js/pwa-reset.js`
+- Add `<ad-block media="...">` support using `matchMedia()`
 
 ### Fixed
 - Improve accessibility of `<ad-block>`s (contrast, keyboard navigation)
