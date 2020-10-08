@@ -207,11 +207,13 @@ HTMLCustomElement.register('ad-block', class HTMLAdBlockElement extends HTMLCust
 						container.style.setProperty('--ad-block-stack-height', newVal);
 						container.style.setProperty('--ad-block-text-height', newVal);
 						container.style.setProperty('--ad-block-image-height', newVal);
+						container.style.setProperty('--ad-block-full-width-height', newVal);
 					} else {
 						container.style.removeProperty('--ad-block-height');
 						container.style.removeProperty('--ad-block-stack-height');
 						container.style.removeProperty('--ad-block-text-height');
 						container.style.removeProperty('--ad-block-image-height');
+						container.style.removeProperty('--ad-block-full-width-height', newVal);
 					}
 				});
 				break;
