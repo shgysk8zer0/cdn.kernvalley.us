@@ -22,7 +22,7 @@ const observer = ('IntersectionObserver' in window)
 
 export default class HTMLCustomElement extends HTMLElement {
 	lazyLoad(lazy = true) {
-		if (lazy && ! observed.has(this)) {;
+		if (lazy && ! observed.has(this)) {
 			const opts = { resolve: null, resolved: false, promise: Promise.resolve() };
 			opts.promise = new Promise(resolve => opts.resolve = resolve);
 			observed.set(this, opts);
