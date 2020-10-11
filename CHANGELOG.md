@@ -17,6 +17,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `<ad-block url="...">` now handles UTM params
 - Create basic script for resetting web app data `/js/pwa-reset.js`
 - Add `<ad-block media="...">` support using `matchMedia()`
+- Implement lazy-loading of components
+
+### Changed
+- Support lazy loading of `<leaflet-map>`, `<ad-block>`, and `<github-user>`
 
 ### Fixed
 - Improve accessibility of `<ad-block>`s (contrast, keyboard navigation)

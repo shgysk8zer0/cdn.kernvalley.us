@@ -28,7 +28,6 @@ const observer = ('IntersectionObserver' in window) ? new IntersectionObserver((
 	entries.forEach(({ isIntersecting, target }) => {
 		if (isIntersecting) {
 			observer.unobserve(target);
-			console.info(target);
 			target.dispatchEvent(new Event('show'));
 		}
 	});
@@ -58,37 +57,11 @@ HTMLCustomElement.register('ad-block', class HTMLAdBlockElement extends HTMLCust
 		theme         = null,
 		url           = null,
 		width         = null,
+		loading       = null,
 	} = {}) {
 		super();
 		this.attachShadow({ mode: 'open' });
-
-		this.getTemplate('./components/ad/block.html').then(tmp => {
-			tmp.querySelectorAll('slot[name]').forEach(el => {
-				if (['label', 'description', 'image'].includes(el.name)) {
-					el.addEventListener('slotchange', ({ target }) => {
-						target.assignedElements().forEach(el => {
-							switch(target.name) {
-								case 'label':
-									el.setAttribute('itemprop', 'name');
-									break;
-
-								case 'description':
-									el.setAttribute('itemprop', 'description');
-									break;
-
-								case 'image':
-									el.setAttribute('itemprop', 'image');
-									el.setAttribute('role', 'image');
-									break;
-							}
-						});
-					});
-				}
-			});
-
-			this.shadowRoot.append(tmp);
-			this.dispatchEvent(new Event('ready'));
-		});
+		this.lazyLoad(true);
 
 		if (typeof callToAction === 'string' || callToAction instanceof HTMLElement) {
 			this.callToAction = callToAction;
@@ -106,9 +79,13 @@ HTMLCustomElement.register('ad-block', class HTMLAdBlockElement extends HTMLCust
 			this.image = image;
 		}
 
-		this.whenConnected.then(() => {
+		Promise.resolve().then(() => {
 			this.tabIndex = 0;
 			this.setAttribute('role', 'document');
+
+			if (typeof loading === 'string') {
+				this.loading = loading;
+			}
 
 			if (typeof media === 'string') {
 				this.media = media;
@@ -161,6 +138,39 @@ HTMLCustomElement.register('ad-block', class HTMLAdBlockElement extends HTMLCust
 			if (typeof width === 'string' || (typeof width === 'number' && ! Number.isNaN(height))) {
 				this.width = width;
 			}
+		}).then(() => {
+			Promise.allSettled([
+				this.whenConnected,
+				this.whenLoad,
+			]).then(() => {
+				this.getTemplate('./components/ad/block.html').then(tmp => {
+					tmp.querySelectorAll('slot[name]').forEach(el => {
+						if (['label', 'description', 'image'].includes(el.name)) {
+							el.addEventListener('slotchange', ({ target }) => {
+								target.assignedElements().forEach(el => {
+									switch(target.name) {
+										case 'label':
+											el.setAttribute('itemprop', 'name');
+											break;
+
+										case 'description':
+											el.setAttribute('itemprop', 'description');
+											break;
+
+										case 'image':
+											el.setAttribute('itemprop', 'image');
+											el.setAttribute('role', 'image');
+											break;
+									}
+								});
+							});
+						}
+					});
+
+					this.shadowRoot.append(tmp);
+					this.dispatchEvent(new Event('ready'));
+				});
+			});
 		});
 	}
 
@@ -223,6 +233,10 @@ HTMLCustomElement.register('ad-block', class HTMLAdBlockElement extends HTMLCust
 						container.style.removeProperty('--ad-block-full-width-height', newVal);
 					}
 				});
+				break;
+
+			case 'loading':
+				this.lazyLoad(newVal === 'lazy');
 				break;
 
 			case 'media':
@@ -560,6 +574,7 @@ HTMLCustomElement.register('ad-block', class HTMLAdBlockElement extends HTMLCust
 	static get observedAttributes() {
 		return [
 			'height',
+			'loading',
 			'media',
 			'url',
 			'width',

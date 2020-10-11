@@ -17,11 +17,12 @@ HTMLCustomElement.register('leaflet-map', class HTMLLeafletMapElement extends HT
 		zoom         = NaN,
 		crossOrigin  = null,
 		detectRetina = null,
+		loading      = null,
 	} = {}) {
 		super();
 		this._shadow = this.attachShadow({ mode: 'closed' });
 
-		this.whenConnected.then(() => {
+		Promise.resolve().then(() => {
 			if (! Number.isNaN(latitude) && ! Number.isNaN(longitude)) {
 				this.center = { latitude, longitude };
 			}
@@ -37,88 +38,95 @@ HTMLCustomElement.register('leaflet-map', class HTMLLeafletMapElement extends HT
 			if (typeof detectRetina === 'boolean') {
 				this.detectRetina = detectRetina;
 			}
-		});
 
-		Promise.resolve().then(async () => {
-			const resp = await fetch(new URL('./components/leaflet/map.html', HTMLCustomElement.base));
-			const html = await resp.text();
-			const parser = new DOMParser();
-			const doc = parser.parseFromString(html, 'text/html');
-			const stylesheets = [...doc.querySelectorAll('link[rel="stylesheet"][href]')].map(link => {
-				return new Promise((resolve, reject) => {
-					link.addEventListener('load', () => resolve(), {once: true});
-					link.addEventListener('error', (event) => reject(event), {once: true});
-					link.href = new URL(link.getAttribute('href'), resp.url);
+			if (typeof loading === 'string') {
+				this.loading = loading;
+			}
+		}).then(() => new Promise(res => setTimeout(() => res(), 500))).then(() => {
+			Promise.allSettled([
+				this.whenConnected,
+				this.whenLoad,
+			]).then(async () => {
+				const resp = await fetch(new URL('./components/leaflet/map.html', HTMLCustomElement.base));
+				const html = await resp.text();
+				const parser = new DOMParser();
+				const doc = parser.parseFromString(html, 'text/html');
+				const stylesheets = [...doc.querySelectorAll('link[rel="stylesheet"][href]')].map(link => {
+					return new Promise((resolve, reject) => {
+						link.addEventListener('load', () => resolve(), {once: true});
+						link.addEventListener('error', (event) => reject(event), {once: true});
+						link.href = new URL(link.getAttribute('href'), resp.url);
+					});
 				});
-			});
 
-			doc.querySelectorAll('slot[name]').forEach(slot => {
-				slot.addEventListener('slotchange', ({target}) => {
-					this.dispatchEvent(new CustomEvent('change', {
-						detail: {
-							slot: target.name,
-							nodes: target.assignedElements(),
-						}
-					}));
-				});
-			});
-
-			this._shadow.append(...doc.head.children, ...doc.body.children);
-			await Promise.all(stylesheets);
-			this.dispatchEvent(new Event('populated'));
-
-			new MutationObserver(async (mutations) => {
-				const changes = {
-					markers:  {added: [], removed: []},
-					overlays: {added: [], removed: []},
-					geojson:  {added: [], removed: []},
-				};
-
-				mutations.forEach(({ type, addedNodes, removedNodes }) => {
-					if (type === 'childList') {
-						[...addedNodes].forEach(el => {
-							const slot = el.slot.toLowerCase();
-							if (typeof slot === 'string' && changes.hasOwnProperty(slot)) {
-								changes[slot].added.push(el);
+				doc.querySelectorAll('slot[name]').forEach(slot => {
+					slot.addEventListener('slotchange', ({target}) => {
+						this.dispatchEvent(new CustomEvent('change', {
+							detail: {
+								slot: target.name,
+								nodes: target.assignedElements(),
 							}
-						});
-
-						[...removedNodes].forEach(el => {
-							const slot = el.slot.toLowerCase();
-							if (typeof slot === 'string' && changes.hasOwnProperty(slot)) {
-								changes[slot].removed.push(el);
-							}
-						});
-
-						const { markers, overlays, geojson } = changes;
-
-						if (markers.added.length !== 0 || markers.removed.length !== 0) {
-							this.dispatchEvent(new CustomEvent('markerchange', {detail: {
-								added: markers.added,
-								removed: markers.removed,
-							}}));
-						}
-
-						if (overlays.added.length !== 0 || overlays.removed.length !== 0) {
-							this.dispatchEvent(new CustomEvent('overlaychange', {detail: {
-								added: overlays.added,
-								removed: overlays.removed,
-							}}));
-						}
-
-						if (geojson.added.length !== 0 || geojson.removed.length !== 0) {
-							this.dispatchEvent(new CustomEvent('geojsonchange', {detail: {
-								added: geojson.added,
-								removed: geojson.removed,
-							}}));
-						}
-					}
+						}));
+					});
 				});
-			}).observe(this, {
-				childList: true,
-				subtree: true,
-				attributes: false,
-				characterData: false,
+
+				this._shadow.append(...doc.head.children, ...doc.body.children);
+				await Promise.all(stylesheets);
+				this.dispatchEvent(new Event('populated'));
+
+				new MutationObserver(async (mutations) => {
+					const changes = {
+						markers:  {added: [], removed: []},
+						overlays: {added: [], removed: []},
+						geojson:  {added: [], removed: []},
+					};
+
+					mutations.forEach(({ type, addedNodes, removedNodes }) => {
+						if (type === 'childList') {
+							[...addedNodes].forEach(el => {
+								const slot = el.slot.toLowerCase();
+								if (typeof slot === 'string' && changes.hasOwnProperty(slot)) {
+									changes[slot].added.push(el);
+								}
+							});
+
+							[...removedNodes].forEach(el => {
+								const slot = el.slot.toLowerCase();
+								if (typeof slot === 'string' && changes.hasOwnProperty(slot)) {
+									changes[slot].removed.push(el);
+								}
+							});
+
+							const { markers, overlays, geojson } = changes;
+
+							if (markers.added.length !== 0 || markers.removed.length !== 0) {
+								this.dispatchEvent(new CustomEvent('markerchange', {detail: {
+									added: markers.added,
+									removed: markers.removed,
+								}}));
+							}
+
+							if (overlays.added.length !== 0 || overlays.removed.length !== 0) {
+								this.dispatchEvent(new CustomEvent('overlaychange', {detail: {
+									added: overlays.added,
+									removed: overlays.removed,
+								}}));
+							}
+
+							if (geojson.added.length !== 0 || geojson.removed.length !== 0) {
+								this.dispatchEvent(new CustomEvent('geojsonchange', {detail: {
+									added: geojson.added,
+									removed: geojson.removed,
+								}}));
+							}
+						}
+					});
+				}).observe(this, {
+					childList: true,
+					subtree: true,
+					attributes: false,
+					characterData: false,
+				});
 			});
 		});
 	}
@@ -457,7 +465,7 @@ HTMLCustomElement.register('leaflet-map', class HTMLLeafletMapElement extends HT
 		return markers;
 	}
 
-	async attributeChangedCallback(name) {
+	async attributeChangedCallback(name, oldVal, newVal) {
 		switch (name) {
 			case 'zoom':
 				this.ready.then(() => this.map.setZoom(this.zoom));
@@ -465,6 +473,10 @@ HTMLCustomElement.register('leaflet-map', class HTMLLeafletMapElement extends HT
 
 			case 'center':
 				this.ready.then(() => this.setCenter(this.center));
+				break;
+
+			case 'loading':
+				this.lazyLoad(newVal === 'lazy');
 				break;
 
 			default:
@@ -476,6 +488,7 @@ HTMLCustomElement.register('leaflet-map', class HTMLLeafletMapElement extends HT
 		return [
 			'zoom',
 			'center',
+			'loading',
 		];
 	}
 
