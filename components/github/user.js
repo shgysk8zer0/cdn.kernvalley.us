@@ -35,16 +35,23 @@ async function getUser(user) {
 HTMLCustomElement.register('github-user', class HTMLGitHubUserElement extends HTMLCustomElement {
 	constructor(user = null) {
 		super();
-		this.hidden = true;
-		this.attachShadow({mode: 'open'});
+		this.attachShadow({ mode: 'open' });
 
-		if (typeof user === 'string') {
-			this.whenConnected.then(() => this.user = user);
-		}
+		Promise.resolve().then(() => {
+			if (typeof user === 'string') {
+				this.user = user;
+			}
 
-		this.getTemplate('./components/github/user.html').then(tmp => {
-			this.shadowRoot.append(tmp);
-			this.dispatchEvent(new Event('ready'));
+			Promise.allSettled([
+				this.whenLoad,
+				this.whenConnected,
+			]).then(() => {
+				this.getTemplate('./components/github/user.html').then(tmp => {
+					console.info(this);
+					this.shadowRoot.append(tmp);
+					this.dispatchEvent(new Event('ready'));
+				});
+			});
 		});
 	}
 
@@ -70,6 +77,10 @@ HTMLCustomElement.register('github-user', class HTMLGitHubUserElement extends HT
 
 	attributeChangedCallback(name, oldVal, newVal) {
 		switch(name) {
+			case 'loading':
+				this.lazyLoad(newVal === 'lazy');
+				break;
+
 			case 'user':
 				if (typeof newVal === 'string' && newVal.length !== 0) {
 					this.ready.then(async () => {
@@ -127,7 +138,6 @@ HTMLCustomElement.register('github-user', class HTMLGitHubUserElement extends HT
 							} else {
 								$('[part~="blog-container"]', shadow).remove();
 							}
-							this.hidden = false;
 						} catch(err) {
 							console.error(err);
 							this.hidden = true;
@@ -140,6 +150,7 @@ HTMLCustomElement.register('github-user', class HTMLGitHubUserElement extends HT
 
 	static get observedAttributes() {
 		return [
+			'loading',
 			'user',
 		];
 	}

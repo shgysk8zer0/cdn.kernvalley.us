@@ -4,9 +4,53 @@ import { registerCustomElement } from '../js/std-js/functions.js';
 let metaUrl = meta.url;
 let base    = null;
 
+const observed = new WeakMap();
+
+const observer = ('IntersectionObserver' in window)
+	? new IntersectionObserver((entries, observer) => {
+		entries.forEach(({ target, isIntersecting }) => {
+			if (isIntersecting && observed.has(target)) {
+				const opts = observed.get(target);
+				opts.resolved = true;
+				opts.resolve(target);
+				observer.unobserve(target);
+				observed.delete(target);
+			}
+		});
+	}, { rootMargin: '100px' })
+	: {observe: () => {}, has: () => false, unobserve: () => {}};
+
 export default class HTMLCustomElement extends HTMLElement {
+	lazyLoad(lazy = true) {
+		if (lazy && ! observed.has(this)) {
+			const opts = { resolve: null, resolved: false, promise: Promise.resolve() };
+			opts.promise = new Promise(resolve => opts.resolve = resolve);
+			observed.set(this, opts);
+			observer.observe(this);
+		} else if (lazy === false) {
+			if (observed.has(this)) {
+				const { resolve } = observed.get(this);
+				resolve(this);
+			}
+			observed.delete(this);
+			observer.unobserve(this);
+		}
+	}
+
 	connectedCallback() {
 		this.dispatchEvent(new Event('connected'));
+	}
+
+	get loading() {
+		return this.getAttribute('loading') || 'auto';
+	}
+
+	set loading(val) {
+		if (typeof val === 'string' && val.length !== 0) {
+			this.setAttribute('loading', val);
+		} else {
+			this.setAttribute('loading', val);
+		}
 	}
 
 	get ready() {
@@ -45,6 +89,20 @@ export default class HTMLCustomElement extends HTMLElement {
 			return Promise.resolve();
 		} else {
 			return new Promise(resolve => this.addEventListener('connected', () => resolve(), { once: true }));
+		}
+	}
+
+	get whenLoad() {
+		if (! ('IntersectionObserver' in window)) {
+			return Promise.resolve();
+		} else if (observed.has(this)) {
+			const { promise } = observed.get(this);
+			return promise;
+		} else if (this.loading === 'lazy') {
+			this.lazyLoad();
+			return this.whenLoad;
+		} else {
+			return Promise.resolve(this);
 		}
 	}
 
