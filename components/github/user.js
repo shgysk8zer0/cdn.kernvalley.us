@@ -47,7 +47,6 @@ HTMLCustomElement.register('github-user', class HTMLGitHubUserElement extends HT
 				this.whenConnected,
 			]).then(() => {
 				this.getTemplate('./components/github/user.html').then(tmp => {
-					console.info(this);
 					this.shadowRoot.append(tmp);
 					this.dispatchEvent(new Event('ready'));
 				});
