@@ -40,14 +40,19 @@ const observer = ('IntersectionObserver' in window) ? new IntersectionObserver((
 
 HTMLCustomElement.register('ad-block', class HTMLAdBlockElement extends HTMLCustomElement {
 	constructor({
+		background    = null,
+		border        = null,
+		borderWidth   = null,
 		callToAction  = null,
 		campaign      = null,
+		color         = null,
 		content       = null,
 		description   = null,
 		height        = null,
 		image         = null,
 		imageFit      = null,
 		imagePosition = null,
+		linkColor     = null,
 		label         = null,
 		layout        = null,
 		media         = null,
@@ -82,6 +87,26 @@ HTMLCustomElement.register('ad-block', class HTMLAdBlockElement extends HTMLCust
 		Promise.resolve().then(() => {
 			this.tabIndex = 0;
 			this.setAttribute('role', 'document');
+
+			if (typeof background === 'string') {
+				this.background = background;
+			}
+
+			if (typeof border === 'string') {
+				this.border = border;
+			}
+
+			if (typeof borderWidth === 'string' || typeof borderWidth === 'number') {
+				this.borderWidth = borderWidth;
+			}
+
+			if (typeof color === 'string') {
+				this.color = color;
+			}
+
+			if (typeof linkColor === 'string') {
+				this.linkColor = linkColor;
+			}
 
 			if (typeof loading === 'string') {
 				this.loading = loading;
@@ -189,6 +214,68 @@ HTMLCustomElement.register('ad-block', class HTMLAdBlockElement extends HTMLCust
 
 	attributeChangedCallback(name, oldVal, newVal) {
 		switch(name) {
+			case 'background':
+				this.ready.then(() => {
+					const container = this.shadowRoot.getElementById('container');
+
+					if (typeof newVal === 'string' && newVal.startsWith('#')) {
+						container.style.setProperty('--ad-background', newVal);
+					} else {
+						container.style.removeProperty('--ad-background');
+					}
+				});
+				break;
+
+			case 'border':
+				this.ready.then(() => {
+					const container = this.shadowRoot.getElementById('container');
+
+					if (typeof newVal === 'string' && newVal.startsWith('#')) {
+						container.style.setProperty('--ad-border', newVal);
+					} else {
+						container.style.removeProperty('--ad-border');
+					}
+				});
+				break;
+
+			case 'borderwidth':
+				this.ready.then(() => {
+					const container = this.shadowRoot.getElementById('container');
+
+					if (typeof newVal === 'string' && /\d$/.test(newVal)) {
+						container.style.setProperty('--ad-border-width', `${newVal}px`);
+					} else if (typeof newVal === 'string') {
+						container.style.setProperty('--ad-border-width', newVal);
+					} else {
+						container.style.removeProperty('--ad-border-width');
+					}
+				});
+				break;
+
+			case 'color':
+				this.ready.then(() => {
+					const container = this.shadowRoot.getElementById('container');
+
+					if (typeof newVal === 'string' && newVal.startsWith('#')) {
+						container.style.setProperty('--ad-color', newVal);
+					} else {
+						container.style.removeProperty('--ad-color');
+					}
+				});
+				break;
+
+			case 'linkcolor':
+				this.ready.then(() => {
+					const container = this.shadowRoot.getElementById('container');
+
+					if (typeof newVal === 'string' && newVal.startsWith('#')) {
+						container.style.setProperty('--ad-link-color', newVal);
+					} else {
+						container.style.removeProperty('--ad-link-color');
+					}
+				});
+				break;
+
 			case 'url':
 				if (typeof newVal !== 'string') {
 					this.removeEventListener('click', openLink, { capture: true, passive: true });
@@ -321,7 +408,7 @@ HTMLCustomElement.register('ad-block', class HTMLAdBlockElement extends HTMLCust
 	}
 
 	async getJSON() {
-		const { label, description, image, callToAction, id, title, url, source, medium, campaign, term, content, layout, theme, imageFit, imagePosition } = this;
+		const { label, description, image, callToAction, id, title, url, source, medium, campaign, term, content, layout, theme, imageFit, imagePosition, color, background, border, linkColor } = this;
 		return JSON.stringify({
 			id,
 			title,
@@ -331,6 +418,10 @@ HTMLCustomElement.register('ad-block', class HTMLAdBlockElement extends HTMLCust
 			callToAction: await callToAction,
 			layout,
 			theme,
+			background,
+			border,
+			color,
+			linkColor,
 			url,
 			source,
 			medium,
@@ -340,6 +431,42 @@ HTMLCustomElement.register('ad-block', class HTMLAdBlockElement extends HTMLCust
 			imageFit,
 			imagePosition,
 		});
+	}
+
+	get background() {
+		return this.getAttribute('background');
+	}
+
+	set background(val) {
+		if (typeof val === 'string' && val.length !== 0) {
+			this.setAttribute('background', val);
+		} else {
+			this.removeAttribute('background');
+		}
+	}
+
+	get border() {
+		return this.getAttribute('border');
+	}
+
+	set border(val) {
+		if (typeof val === 'string' && val.length !== 0) {
+			this.setAttribute('border', val);
+		} else {
+			this.removeAttribute('border');
+		}
+	}
+
+	get borderWidth() {
+		return this.getAttribute('borderwidth');
+	}
+
+	set borderWidth(val) {
+		if ((typeof val === 'string' && val.length !== 0) || Number.isInteger(val) && val > 0) {
+			this.setAttribute('borderwidth', val);
+		} else {
+			this.removeAttribute('borderwidth');
+		}
 	}
 
 	get callToAction() {
@@ -365,6 +492,18 @@ HTMLCustomElement.register('ad-block', class HTMLAdBlockElement extends HTMLCust
 			this.setAttribute('campaign', val);
 		} else {
 			this.removeAttribute('campaign');
+		}
+	}
+
+	get color() {
+		return this.getAttribute('color');
+	}
+
+	set color(val) {
+		if (typeof val === 'string' && val.length !== 0) {
+			this.setAttribute('color', val);
+		} else {
+			this.removeAttribute('color');
 		}
 	}
 
@@ -485,6 +624,18 @@ HTMLCustomElement.register('ad-block', class HTMLAdBlockElement extends HTMLCust
 		}
 	}
 
+	get linkColor() {
+		return this.getAttribute('linkcolor');
+	}
+
+	set linkColor(val) {
+		if (typeof val === 'string' && val.length !== 0) {
+			this.setAttribute('linkcolor', val);
+		} else {
+			this.removeAttribute('linkcolor');
+		}
+	}
+
 	get media() {
 		return this.getAttribute('media');
 	}
@@ -573,7 +724,12 @@ HTMLCustomElement.register('ad-block', class HTMLAdBlockElement extends HTMLCust
 
 	static get observedAttributes() {
 		return [
+			'background',
+			'border',
+			'borderwidth',
+			'color',
 			'height',
+			'linkcolor',
 			'loading',
 			'media',
 			'url',
@@ -581,3 +737,11 @@ HTMLCustomElement.register('ad-block', class HTMLAdBlockElement extends HTMLCust
 		];
 	}
 });
+
+setTimeout(() => {
+	document.querySelectorAll('#settings input').forEach(el => {
+		el.addEventListener('change', ({ target }) => {
+			document.querySelectorAll('ad-block').forEach(el => el[target.name] = target.value);
+		});
+	});
+}, 1000);
