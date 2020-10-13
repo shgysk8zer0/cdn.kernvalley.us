@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Create basic script for resetting web app data `/js/pwa-reset.js`
 - Add `<ad-block media="...">` support using `matchMedia()`
 - Implement lazy-loading of components
+- Enable setting colors, background, and border in `<ad-block>`s via attributes
 
 ### Changed
 - Support lazy loading of `<leaflet-map>`, `<ad-block>`, and `<github-user>`

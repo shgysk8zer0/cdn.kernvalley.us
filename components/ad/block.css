@@ -24,7 +24,7 @@
 }
 
 :host([url]) #call-to-action {
-	color: #0F5CE8;
+	color: var(--ad-link-color, #0F5CE8);
 	text-decoration: underline;
 }
 
@@ -44,9 +44,11 @@
 	max-width: 100%;
 	max-height: 100%;
 	padding: 8px;
-	background-color: #fafafa;
-	color: #242424;
-	border: 1px solid #dadada;
+	background-color: var(--ad-background, #fafafa);
+	color: var(--ad-color, #242424);
+	border-width: var(--ad-border-width, 1px);
+	border-style: solid;
+	border-color: var(--ad-border, #dadada);
 	border-radius: 6px;
 	contain: strict;
 	content-visibility: auto;
@@ -124,15 +126,15 @@
 }
 
 :host([theme="dark"]) #container {
-	background-color: #212121;
-	color: #fefefe;
-	border-color: #cacaca;
+	background-color: var(--ad-background, #212121);
+	color: var(--ad-color, #fefefe);
+	border-color: var(--ad-border, #cacaca);
 }
 
 :host([theme="inherit"]) #container {
-	background-color: inherit;
-	color: inherit;
-	border-color: inherit;
+	background-color: var(--ad-background, inherit);
+	color: var(--ad-color, inherit);
+	border-color: var(--ad-border, inherit);
 }
 
 #label {
@@ -164,7 +166,7 @@
 
 #branding {
 	grid-area: branding;
-	color: #0F5CE8;
+	color: var(--ad-link-color, #0F5CE8);
 }
 
 #branding svg {
@@ -244,18 +246,18 @@ slot[name="image"] > svg {
 
 :host([url][theme="dark"]) #call-to-action,
 :host([theme="dark"]) #branding {
-	color: #91B4F4;
+	color: var(--ad-link-color, #91B4F4);
 }
 
 @media (prefers-color-scheme: dark) {
 	:host(:not([theme="light"])) #container {
-		background-color: #212121;
-		color: #fefefe;
-		border-color: #cacaca;
+		background-color: var(--ad-background, #212121);
+		color: var(--ad-color, #fefefe);
+		border-color: var(--ad-border, #cacaca);
 	}
 
 	:host([url]:not([theme="light"])) #call-to-action,
 	:host(:not([theme="light"])) #branding {
-		color: #91B4F4;
+		color: var(--ad-link-color, #91B4F4);
 	}
 }
