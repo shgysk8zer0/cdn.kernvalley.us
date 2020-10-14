@@ -25,9 +25,8 @@
 	 * Necessary because Android plops the URL at the end of text
 	 * instead of setting url correctly for the share API
 	 */
-	function parseValues({title, text = null, url = null, files, params = {}} = {}) {
-		console.info({ text, url , params });
-		if (('text' in params) && ('url' in params) && typeof text === 'string' && text.length !== 0 && (typeof url !== 'string' || url.length === 0)) {
+	function parseValues({ title, text = null, url = null, files, params = {} } = {}) {
+		if (('text' in params) && typeof text === 'string' && text.length !== 0 && (typeof url !== 'string' || url.length === 0)) {
 			const words = text.trim().split(' ');
 			const end = words.splice(-1)[0];
 
@@ -38,14 +37,13 @@
 				url = end;
 				text = words.join(' ');
 			}
-		} else if (('text' in params) && typeof url === 'string' && url !== '' && ! (typeof text === 'string' && text.endsWith(url))) {
+		} else if (('text' in params) && typeof text === 'string' && typeof url == 'string' && url.length === 0 && text.endsWith(url)) {
 			/**
-			 * No URL in params, but URL has been set and text does not end with URL already
+			 * URL given alone and in text
 			 */
-			text = (typeof text === 'string' && text !== '' && ! text.endsWith(url)) ? `${text} ${url}` : url;
-			url = null;
-		} else if ((typeof url === 'string') && (typeof text === 'string') && text.endsWith(url)) {
-			text = text.substr(0, text.length - url.length).trim();
+			text = text.replace(url, '').trim();
+		} else if (typeof text === 'string' && typeof url === 'string' && text.endsWith(url)) {
+			text = text.replace(url, '').trim();
 		}
 
 		return { title, text, url, files };
@@ -57,13 +55,10 @@
 	 * as importing `ready()` here along with the entire rest of the script without
 	 * using anything else
 	 */
-	const ready = new Promise(resolve => {
-		if (document.readyState === 'loading') {
+	const ready =  document.readyState === 'loading'
+		? new Promise(resolve => {
 			document.addEventListener('DOMContentLoaded', () => resolve(), {once: true});
-		} else {
-			resolve();
-		}
-	});
+		}) : Promise.resolve();
 
 	const shareData = new Promise(async (resolve, reject) => {
 		await ready;
@@ -80,7 +75,7 @@
 					const params = manifest.share_target.params || {};
 					const method = manifest.share_target.method || 'GET';
 
-					if (method === 'GET' && location.pathname.startsWith(manifest.share_target.action)) {
+					if (method === 'GET' && location.pathname.startsWith(new URL(manifest.share_target.action, document.baseURI).pathname)) {
 						const url = new URL(location.href);
 
 						resolve(parseValues({
