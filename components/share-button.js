@@ -1,5 +1,4 @@
 import webShareApi from '../js/std-js/webShareApi.js';
-import { loaded } from '../js/std-js/functions.js';
 import {
 	facebook,
 	twitter,
@@ -16,10 +15,36 @@ import { registerCustomElement } from '../js/std-js/functions.js';
 webShareApi(facebook, twitter, googlePlus, linkedIn, reddit, gmail, email, clipboard);
 
 export default class HTMLShareButtonElement extends HTMLButtonElement {
-	constructor() {
+	constructor({ title = null, text = null, url = null, source = null, medium = null, content = null } = {}) {
 		super();
 
-		loaded().then(() => this.hidden = !(navigator.share instanceof Function));
+		Promise.resolve().then(() => {
+			this.hidden = !(navigator.share instanceof Function);
+
+			if (typeof title === 'string') {
+				this.title = title;
+			}
+
+			if (typeof text === 'string') {
+				this.text = text;
+			}
+
+			if (typeof url === 'string') {
+				this.url = url;
+			}
+
+			if (typeof source === 'string') {
+				this.source = source;
+			}
+
+			if (typeof medium === 'string') {
+				this.medium = medium;
+			}
+
+			if (typeof content === 'string') {
+				this.content = content;
+			}
+		});
 
 		this.addEventListener('click', async event => {
 			event.preventDefault();
@@ -34,6 +59,42 @@ export default class HTMLShareButtonElement extends HTMLButtonElement {
 		});
 	}
 
+	get content() {
+		return this.getAttribute('content') || 'share-button';
+	}
+
+	set content(val) {
+		if (typeof val === 'string' && val.length !== 0) {
+			this.setAttribute('content', val);
+		} else {
+			this.removeAttribute('content');
+		}
+	}
+
+	get medium() {
+		return this.getAttribute('medium') || 'share';
+	}
+
+	set medium(val) {
+		if (typeof val === 'string' && val.length !== 0) {
+			this.setAttribute('medium', val);
+		} else {
+			this.removeAttribute('medium');
+		}
+	}
+
+	get source() {
+		return this.getAttribute('source');
+	}
+
+	set source(val) {
+		if (typeof val === 'string' && val.length !== 0) {
+			this.setAttribute('source', val);
+		} else {
+			this.removeAttribute('source');
+		}
+	}
+
 	get text() {
 		return this.getAttribute('text');
 	}
@@ -43,13 +104,55 @@ export default class HTMLShareButtonElement extends HTMLButtonElement {
 	}
 
 	get url() {
-		return this.hasAttribute('url')
-			? new URL(this.getAttribute('url'), document.baseURI).href
-			: location.href;
+		if (this.hasAttribute('url')) {
+			const url = new URL(this.getAttribute('url'), location.href);
+			const { source, medium, content } = this;
+
+			if (typeof source === 'string' && typeof medium === 'string') {
+				if (! url.searchParams.has('utm_source')) {
+					url.searchParams.set('utm_souce', source);
+				}
+
+				if (! url.searchParams.has('utm_medium')) {
+					url.searchParams.set('utm_medium', medium);
+				}
+
+				if (! url.searchParams.has('utm_content')) {
+					url.searchParams.set('utm_content', content);
+				}
+			}
+
+			return url.href;
+		} else {
+			const { source, medium, content } = this;
+
+			if (typeof source === 'string' && typeof medium === 'string') {
+				const url = new URL(location.href);
+
+				if (! url.searchParams.has('utm_source')) {
+					url.searchParams.set('utm_souce', source);
+				}
+
+				if (! url.searchParams.has('utm_medium')) {
+					url.searchParams.set('utm_medium', medium);
+				}
+
+				if (! url.searchParams.has('utm_content')) {
+					url.searchParams.set('utm_content', content);
+				}
+				return url.href;
+			} else {
+				return location.href;
+			}
+		}
 	}
 
 	set url(url) {
-		this.setAttribute('url', url);
+		if (typeof url === 'string' && url.length !== 0) {
+			this.setAttribute('url', url);
+		} else {
+			this.removeAttribute('url');
+		}
 	}
 
 	get title() {
