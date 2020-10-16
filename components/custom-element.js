@@ -17,7 +17,9 @@ const observer = ('IntersectionObserver' in window)
 				observed.delete(target);
 			}
 		});
-	}, { rootMargin: '100px' })
+	}, {
+		rootMargin: `${Math.floor(0.5 * Math.max(screen.height, screen.width, 200))}px`,
+	})
 	: {observe: () => {}, has: () => false, unobserve: () => {}};
 
 export default class HTMLCustomElement extends HTMLElement {
