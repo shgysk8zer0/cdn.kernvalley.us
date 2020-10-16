@@ -106,23 +106,42 @@ async function share({
 }
 
 HTMLCustomElement.register('share-to-button', class HTMLShareToButtonElement extends HTMLCustomElement {
-	constructor() {
+	constructor({ target = null, url = null, source = null, medium = null, content = null } = {}) {
 		super();
 		this.attachShadow({mode: 'open'});
 
-		this.whenConnected.then(() => {
+		Promise.resolve().then(() => {
 			this.setAttribute('tabindex', '0');
 			this.setAttribute('role', 'button');
 		});
 
 		this.getTemplate('./components/share-to-button/share-to-button.html').then(tmp => {
+			if (typeof target === 'string') {
+				this.target = target;
+			}
+
+			if (typeof url === 'string') {
+				this.url = url;
+			}
+
+			if (typeof source === 'string') {
+				this.source = source;
+			}
+
+			if (typeof medium === 'string') {
+				this.medium = medium;
+			}
+
+			if (typeof content === 'string') {
+				this.content = content;
+			}
 			this.shadowRoot.append(tmp);
 			this.dispatchEvent(new Event('ready'));
 		});
 
 		this.addEventListener('click', () => share(this));
 
-		this.addEventListener('keypress', ({charCode}) => {
+		this.addEventListener('keypress', ({ charCode }) => {
 			if (charCode === 32) {
 				share(this);
 			}
@@ -139,12 +158,48 @@ HTMLCustomElement.register('share-to-button', class HTMLShareToButtonElement ext
 		});
 	}
 
+	get content() {
+		return this.getAttribute('content') || 'share-to-button';
+	}
+
+	set content(val) {
+		if (typeof val === 'string' && val.length !== 0) {
+			this.setAttribute('content', val);
+		} else {
+			this.removeAttribute('content');
+		}
+	}
+
 	get disabled() {
 		return this.hasAttribute('disabled');
 	}
 
 	set disabled(val) {
 		this.toggleAttribute('disabled', val);
+	}
+
+	get medium() {
+		return this.getAttribute('medium') || 'share';
+	}
+
+	set medium(val) {
+		if (typeof val === 'string' && val.length !== 0) {
+			this.setAttribute('medium', val);
+		} else {
+			this.removeAttribute('medium');
+		}
+	}
+
+	get source() {
+		return this.getAttribute('source');
+	}
+
+	set source(val) {
+		if (typeof val === 'string' && val.length !== 0) {
+			this.setAttribute('source', val);
+		} else {
+			this.removeAttribute('source');
+		}
 	}
 
 	get target() {
@@ -161,14 +216,54 @@ HTMLCustomElement.register('share-to-button', class HTMLShareToButtonElement ext
 
 	get url() {
 		if (this.hasAttribute('url')) {
-			return new URL(this.getAttribute('url'), document.baseURI).href;
+			const url = new URL(this.getAttribute('url'), location.href);
+			const { source, medium, content } = this;
+
+			if (typeof source === 'string' && typeof medium === 'string') {
+				if (! url.searchParams.has('utm_source')) {
+					url.searchParams.set('utm_souce', source);
+				}
+
+				if (! url.searchParams.has('utm_medium')) {
+					url.searchParams.set('utm_medium', medium);
+				}
+
+				if (! url.searchParams.has('utm_content')) {
+					url.searchParams.set('utm_content', content);
+				}
+			}
+
+			return url.href;
 		} else {
-			return location.href;
+			const { source, medium, content } = this;
+
+			if (typeof source === 'string' && typeof medium === 'string') {
+				const url = new URL(location.href);
+
+				if (! url.searchParams.has('utm_source')) {
+					url.searchParams.set('utm_souce', source);
+				}
+
+				if (! url.searchParams.has('utm_medium')) {
+					url.searchParams.set('utm_medium', medium);
+				}
+
+				if (! url.searchParams.has('utm_content')) {
+					url.searchParams.set('utm_content', content);
+				}
+				return url.href;
+			} else {
+				return location.href;
+			}
 		}
 	}
 
-	set url(val) {
-		this.setAttribute('url', val);
+	set url(url) {
+		if (typeof url === 'string' && url.length !== 0) {
+			this.setAttribute('url', url);
+		} else {
+			this.removeAttribute('url');
+		}
 	}
 
 	get text() {
