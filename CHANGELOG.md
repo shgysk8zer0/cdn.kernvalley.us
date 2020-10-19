@@ -26,6 +26,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - Improve accessibility of `<ad-block>`s (contrast, keyboard navigation)
 - Fix parsing of params in `<form is="share-target">`
+- Fixed typo in setting `"utm_source"` params in share buttons
 
 ## [v1.0.11] - 2020-10-02
 

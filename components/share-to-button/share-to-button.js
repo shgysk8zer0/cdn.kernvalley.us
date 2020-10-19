@@ -221,7 +221,7 @@ HTMLCustomElement.register('share-to-button', class HTMLShareToButtonElement ext
 
 			if (typeof source === 'string' && typeof medium === 'string') {
 				if (! url.searchParams.has('utm_source')) {
-					url.searchParams.set('utm_souce', source);
+					url.searchParams.set('utm_source', source);
 				}
 
 				if (! url.searchParams.has('utm_medium')) {
@@ -241,7 +241,7 @@ HTMLCustomElement.register('share-to-button', class HTMLShareToButtonElement ext
 				const url = new URL(location.href);
 
 				if (! url.searchParams.has('utm_source')) {
-					url.searchParams.set('utm_souce', source);
+					url.searchParams.set('utm_source', source);
 				}
 
 				if (! url.searchParams.has('utm_medium')) {
