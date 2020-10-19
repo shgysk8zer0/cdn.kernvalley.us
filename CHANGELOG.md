@@ -19,6 +19,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add `<ad-block media="...">` support using `matchMedia()`
 - Implement lazy-loading of components
 - Enable setting colors, background, and border in `<ad-block>`s via attributes
+- `<form is="share-target">` inputs now dispatch `"change"` and `"input"` events
+- `<form is="share-target">` has attribute `clearurlparams` to clear out GET params from URL
 
 ### Changed
 - Support lazy loading of `<leaflet-map>`, `<ad-block>`, and `<github-user>`
