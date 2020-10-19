@@ -110,7 +110,7 @@ export default class HTMLShareButtonElement extends HTMLButtonElement {
 
 			if (typeof source === 'string' && typeof medium === 'string') {
 				if (! url.searchParams.has('utm_source')) {
-					url.searchParams.set('utm_souce', source);
+					url.searchParams.set('utm_source', source);
 				}
 
 				if (! url.searchParams.has('utm_medium')) {
@@ -130,7 +130,7 @@ export default class HTMLShareButtonElement extends HTMLButtonElement {
 				const url = new URL(location.href);
 
 				if (! url.searchParams.has('utm_source')) {
-					url.searchParams.set('utm_souce', source);
+					url.searchParams.set('utm_source', source);
 				}
 
 				if (! url.searchParams.has('utm_medium')) {
