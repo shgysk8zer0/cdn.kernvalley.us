@@ -1,4 +1,3 @@
-'use strict';
 
 /**
  * NOTE: This **SHOUD** be loaded individually and without `async` in order to capture
@@ -13,6 +12,7 @@
  * @TODO Handle file uploads, since files cannot be assigned to `<input type="file">`s
  */
 ((customElements) => {
+	'use strict';
 	const postData = new Promise(async resolve => {
 		navigator.serviceWorker.addEventListener('message', event => {
 			if (event.data && event.data.type === 'share-target') {
@@ -46,7 +46,7 @@
 			text = text.replace(url, '').trim();
 		}
 
-		return { title, text, url, files };
+		return { title, text, url, files, params };
 	}
 
 	/**
@@ -57,7 +57,7 @@
 	 */
 	const ready =  document.readyState === 'loading'
 		? new Promise(resolve => {
-			document.addEventListener('DOMContentLoaded', () => resolve(), {once: true});
+			document.addEventListener('DOMContentLoaded', () => resolve(), { once: true });
 		}) : Promise.resolve();
 
 	const shareData = new Promise(async (resolve, reject) => {
@@ -89,7 +89,6 @@
 						url.searchParams.delete(params.text || 'text');
 						url.searchParams.delete(params.url || 'url');
 
-						history.replaceState(history.state, document.title, url.href);
 					} else if (method === 'POST') {
 						const post = await postData;
 
@@ -110,34 +109,52 @@
 
 	customElements.define('share-target', class HTMLShareTargetElement extends HTMLFormElement {
 		async connectedCallback() {
-			const { title, text, url, files } = await shareData;
+			const { title, text, url, files, params } = await shareData;
+			const set = (name, value) => {
+				if (typeof value === 'string' && value.length !== 0) {
+					const input = this.querySelector(`[name="${name}"]`);
+
+					if (input instanceof HTMLElement) {
+						try {
+							input.value = value;
+							input.dispatchEvent(new Event('input'));
+							input.dispatchEvent(new Event('change'));
+						} catch(err) {
+							console.error(err);
+						}
+					}
+				}
+			};
 
 			if (title || text || url || files) {
 				this.dispatchEvent(new CustomEvent('share', {
 					detail: { title, text, url, files }
 				}));
-			}
+				set(params.title || 'title', title);
+				set(params.text || 'text', text);
+				set(params.url || 'url', url);
 
-			const set = (name, value) => {
-				const input = this.querySelector(`[name="${name}"], [data-share-field="${name}"]`);
-
-				if (typeof value !== 'undefined' && (input instanceof HTMLElement)) {
-					try {
-						input.value = value;
-					} catch(err) {
-						console.error(err);
-					}
+				if (this.clearUrlParams) {
+					const u = new URL(location.href);
+					u.searchParams.delete(params.title || 'title');
+					u.searchParams.delete(params.text || 'text');
+					u.searchParams.delete(params.url || 'url');
+					history.replaceState(history.state, document.title, u.href);
 				}
-			};
-
-			set('title', title);
-			set('text', text);
-			set('url', url);
+			}
 
 			// @TODO handle files
 			// if (typeof files !== 'undefined') {
 			// 	Object.entries(files).forEach(([name, file]) => set(name, file));
 			// }
+		}
+
+		get clearUrlParams() {
+			return this.hasAttribute('clearurlparams');
+		}
+
+		set clearUrlParams(val) {
+			this.toggleAttribute('clearurlparams', val);
 		}
 	}, {
 		extends: 'form',
