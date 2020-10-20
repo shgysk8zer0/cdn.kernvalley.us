@@ -3,12 +3,16 @@ import {shadows, clearSlot, getWeatherByPostalCode, createIcon, getIcon, getSpri
 import HTMLCustomElement from './custom-element.js';
 
 HTMLCustomElement.register('weather-current', class HTMLWeatherForecastElement extends HTMLElement {
-	constructor({ appId = null } = {}) {
+	constructor({ appId = null, postalCode = null } = {}) {
 		super();
 
 		Promise.resolve(this.attachShadow({mode: 'closed'})).then(async shadow => {
 			if (typeof appId === 'string') {
 				this.appId = appId;
+			}
+
+			if (typeof postalCode === 'string' || typeof postalCode === 'number') {
+				this.postalCode = postalCode;
 			}
 
 			const resp = await fetch(new URL('./components/weather-current.html', meta.url));

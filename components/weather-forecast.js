@@ -3,13 +3,18 @@ import {shadows, clearSlot, clearSlots, getForecastByPostalCode, createIcon, get
 import HTMLCustomElement from './custom-element.js';
 
 HTMLCustomElement.register('weather-forecast', class HTMLWeatherForecastElement extends HTMLElement {
-	constructor({ appId = null } = {}) {
+	constructor({ appId = null, postalCode = null } = {}) {
 		super();
 
 		Promise.resolve(this.attachShadow({mode: 'closed'})).then(async shadow => {
 			if (typeof appId === 'string') {
 				this.appId = appId;
 			}
+
+			if (typeof postalCode === 'string' || typeof postalCode === 'number') {
+				this.postalCode = postalCode;
+			}
+
 			const resp = await fetch(new URL('./components/weather-forecast.html', meta.url));
 			const html = await resp.text();
 			const parser = new DOMParser();
