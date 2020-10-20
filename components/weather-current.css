@@ -1,8 +1,9 @@
 :host {
-	display: block;
-	padding: 1.2rem 2rem;
-	margin: 1.2em;
+	display: inline-block;
+	padding: 18px;
+	font-size: 16px;
 	overflow: hidden;
+	max-width: 380px;
 	--background: #fafafa;
 	--color: #343434;
 	background-color: var(--background);
@@ -22,6 +23,7 @@
 }
 
 #wrapper {
+	max-width: 380px;
 	grid-template-areas: "city city city"
 	"icon icon icon"
 	"conditions . ."
@@ -38,11 +40,17 @@
 	#wrapper {
 		grid-template-areas: "city city city"
 		"icon conditions temp"
-		"icon . wind"
+		"icon wind wind"
 		"credits credits updated";
 		grid-template-rows: auto minmax(4em, 1fr) minmax(2em, 1fr) auto;
-		grid-template-columns: minmax(6em, 1fr) auto auto;
+		grid-template-columns: 96px auto auto;
 	}
+}
+
+::slotted(svg[slot="icon"]) {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
 }
 
 #city {
@@ -56,7 +64,7 @@
 
 #icon {
 	grid-area: icon;
-	padding: 1.2rem;
+	padding: 10px;
 }
 
 #temp {

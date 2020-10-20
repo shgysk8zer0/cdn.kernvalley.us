@@ -1,12 +1,11 @@
-import { meta } from '../../import.meta.js';
-import {shadows, clearSlot, getWeatherByPostalCode, createIcon, getIcon, getSprite} from './weather-helper.js';
+import { shadows, clearSlot, getWeatherByPostalCode, createIcon, getIcon, getSprite } from './weather-helper.js';
 import HTMLCustomElement from './custom-element.js';
 
-HTMLCustomElement.register('weather-current', class HTMLWeatherForecastElement extends HTMLElement {
-	constructor({ appId = null, postalCode = null } = {}) {
+HTMLCustomElement.register('weather-current', class HTMLWeatherForecastElement extends HTMLCustomElement {
+	constructor({ appId = null, postalCode = null, loading = null } = {}) {
 		super();
 
-		Promise.resolve(this.attachShadow({mode: 'closed'})).then(async shadow => {
+		Promise.resolve(this.attachShadow({ mode: 'closed' })).then(async shadow => {
 			if (typeof appId === 'string') {
 				this.appId = appId;
 			}
@@ -15,12 +14,14 @@ HTMLCustomElement.register('weather-current', class HTMLWeatherForecastElement e
 				this.postalCode = postalCode;
 			}
 
-			const resp = await fetch(new URL('./components/weather-current.html', meta.url));
-			const html = await resp.text();
-			const parser = new DOMParser();
-			const doc = parser.parseFromString(html, 'text/html');
-			doc.querySelectorAll('link[href]').forEach(link => link.href = new URL(link.getAttribute('href'), resp.url));
-			shadow.append(...doc.head.children, ...doc.body.children);
+			if (typeof loading === 'string') {
+				this.loading = loading;
+			}
+
+			await Promise.all([this.whenConnected, this.whenLoad]);
+
+			const tmp = await this.getTemplate('./components/weather-current.html');
+			shadow.append(tmp);
 			shadows.set(this, shadow);
 			this.dispatchEvent(new Event('ready'));
 		});
@@ -90,6 +91,18 @@ HTMLCustomElement.register('weather-current', class HTMLWeatherForecastElement e
 		} else if (val instanceof HTMLElement) {
 			val.slot = 'updated';
 			clearSlot(this, 'updated').then(() => this.append(val));
+		}
+	}
+
+	get loading() {
+		return this.getAttribute('loading') || 'auto';
+	}
+
+	set loading(val) {
+		if (typeof val === 'string' && val.length !== 0) {
+			this.setAttribute('loading', val);
+		} else {
+			this.removeAttribute('loading');
 		}
 	}
 
@@ -178,6 +191,10 @@ HTMLCustomElement.register('weather-current', class HTMLWeatherForecastElement e
 				this.dispatchEvent(new CustomEvent('unitschange', {detail: {oldValue, newValue}}));
 				break;
 
+			case 'loading':
+				this.lazyLoad(newValue === 'lazy');
+				break;
+
 			default: throw new Error(`Unhandled attribute changed: ${name}`);
 		}
 	}
@@ -185,6 +202,7 @@ HTMLCustomElement.register('weather-current', class HTMLWeatherForecastElement e
 	static get observedAttributes() {
 		return [
 			'appid',
+			'loading',
 			'postalcode',
 			'units',
 			'theme',
