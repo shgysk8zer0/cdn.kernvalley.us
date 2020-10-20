@@ -18,7 +18,7 @@ const observer = ('IntersectionObserver' in window)
 			}
 		});
 	}, {
-		rootMargin: `${Math.floor(0.5 * Math.max(screen.height, screen.width, 200))}px`,
+		rootMargin: `${Math.floor(0.5 * Math.max(screen.height, 200))}px`,
 	})
 	: {observe: () => {}, has: () => false, unobserve: () => {}};
 
