@@ -13,13 +13,17 @@ registerCustomElement('register-protocol-handler', class HTMLRegisterProtocolHan
 	} = {}) {
 		super();
 
-		this.whenConnected.then(() => {
+		Promise.resolve().then(() => {
+			this.hidden = ! (navigator.registerProtocolHandler instanceof Function);
+
 			if (typeof scheme === 'string') {
 				this.scheme = scheme;
 			}
 
 			if (typeof url === 'string') {
 				this.url = url;
+			} else if (url instanceof URL) {
+				this.url = url.href;
 			}
 
 			if (typeof name === 'string') {
@@ -28,11 +32,6 @@ registerCustomElement('register-protocol-handler', class HTMLRegisterProtocolHan
 		});
 
 		this.addEventListener('click', register, { passive: true, capture: true });
-	}
-
-	connectedCallback() {
-		this.dispatchEvent(new Event('conencted'));
-		this.hidden = ! (navigator.registerProtocolHandler instanceof Function);
 	}
 
 	get name() {
@@ -65,7 +64,7 @@ registerCustomElement('register-protocol-handler', class HTMLRegisterProtocolHan
 
 	get url() {
 		if (this.hasAttribute('url')) {
-			return new URL(this.getAttribute('url'), location.origin).href;
+			return new URL(this.getAttribute('url'), document.baseURI).href;
 		} else {
 			return location.origin;
 		}
@@ -74,16 +73,10 @@ registerCustomElement('register-protocol-handler', class HTMLRegisterProtocolHan
 	set url(val) {
 		if (typeof val === 'string') {
 			this.setAttribute('url', val);
+		} else if (val instanceof URL) {
+			this.setAttribute('url', val.href);
 		} else {
 			this.removeAttribute('url');
-		}
-	}
-
-	get whenConnected() {
-		if (this.isConnected) {
-			return Promise.resolve();
-		} else {
-			return new Promise(resolve => this.addEventListener('connected', () => resolve(), { once: true }));
 		}
 	}
 }, {
