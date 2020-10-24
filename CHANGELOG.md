@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <!-- markdownlint-disable -->
 ## [Unreleased]
 
+## [v1.0.12] - 2020-10-24
+
 ### Added
 - Create `<table is="cache-list">` component
 - Add rtl support for `<ad-block>`
@@ -21,6 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Enable setting colors, background, and border in `<ad-block>`s via attributes
 - `<form is="share-target">` inputs now dispatch `"change"` and `"input"` events
 - `<form is="share-target">` has attribute `clearurlparams` to clear out GET params from URL
+- `<ad-block>` file methods
 
 ### Changed
 - Support lazy loading of `<leaflet-map>`, `<ad-block>`, and `<github-user>`
