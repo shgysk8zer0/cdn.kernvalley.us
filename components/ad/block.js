@@ -49,6 +49,7 @@ HTMLCustomElement.register('ad-block', class HTMLAdBlockElement extends HTMLCust
 		content       = null,
 		description   = null,
 		height        = null,
+		identifier    = null,
 		image         = null,
 		imageFit      = null,
 		imagePosition = null,
@@ -66,7 +67,6 @@ HTMLCustomElement.register('ad-block', class HTMLAdBlockElement extends HTMLCust
 	} = {}) {
 		super();
 		this.attachShadow({ mode: 'open' });
-		this.lazyLoad(true);
 
 		if (typeof callToAction === 'string' || callToAction instanceof HTMLElement) {
 			this.callToAction = callToAction;
@@ -88,6 +88,14 @@ HTMLCustomElement.register('ad-block', class HTMLAdBlockElement extends HTMLCust
 			this.tabIndex = 0;
 			this.setAttribute('role', 'document');
 
+			if (typeof loading === 'string') {
+				this.loading = loading;
+			}
+
+			if (typeof identifier === 'string') {
+				this.id = identifier;
+			}
+
 			if (typeof background === 'string') {
 				this.background = background;
 			}
@@ -106,10 +114,6 @@ HTMLCustomElement.register('ad-block', class HTMLAdBlockElement extends HTMLCust
 
 			if (typeof linkColor === 'string') {
 				this.linkColor = linkColor;
-			}
-
-			if (typeof loading === 'string') {
-				this.loading = loading;
 			}
 
 			if (typeof media === 'string') {
@@ -410,7 +414,10 @@ HTMLCustomElement.register('ad-block', class HTMLAdBlockElement extends HTMLCust
 	async getJSON() {
 		const { label, description, image, callToAction, id, title, url, source, medium, campaign, term, content, layout, theme, imageFit, imagePosition, color, background, border, linkColor } = this;
 		return JSON.stringify({
-			id,
+			'@context': 'https://schema.org',
+			'@type': 'WPAdBlock',
+			version: HTMLAdBlockElement.VERSION,
+			identifier: id,
 			title,
 			label: await label,
 			description: await description,
@@ -722,6 +729,43 @@ HTMLCustomElement.register('ad-block', class HTMLAdBlockElement extends HTMLCust
 		}
 	}
 
+	async toFile({ fname = 'ad.krvad' } = {}) {
+		const json = await this.getJSON();
+		return new File([json], fname, { type: HTMLAdBlockElement.CONTENT_TYPE });
+	}
+
+	async getDownloadURL({ fname = 'ad.krvad' } = {}) {
+		const file = await this.toFile({ fname });
+		return URL.createObjectURL(file);
+	}
+
+	async getDownloadLink({ fname = 'ad.krvad', text = null } = {}) {
+		const href = await this.getDownloadURL({ fname });
+		const a = document.createElement('a');
+
+		a.href = href;
+		a.download = fname;
+
+		if (typeof text === 'string') {
+			a.textContent = text;
+		} else {
+			a.textContent = `Download ${fname}`;
+		}
+		return a;
+	}
+
+	static get CONTENT_TYPE() {
+		return 'application/krv-ad+json';
+	}
+
+	static get FILE_EXTENSION() {
+		return '.krvad';
+	}
+
+	static get VERSION() {
+		return '1.0.0';
+	}
+
 	static get observedAttributes() {
 		return [
 			'background',
@@ -735,6 +779,27 @@ HTMLCustomElement.register('ad-block', class HTMLAdBlockElement extends HTMLCust
 			'url',
 			'width',
 		];
+	}
+
+	static async fromFile(file) {
+		if (! (file instanceof File)) {
+			throw new Error('Expected instance of `File`');
+		} else if (! file.name.endsWith('.krvad')) {
+			throw new Error(`${file.name} is not a KRV Ad file`);
+		} else {
+			const data = JSON.parse(await file.text());
+			return HTMLAdBlockElement.fromJSONObject(data);
+		}
+	}
+
+	static fromJSONObject(data) {
+		const ad = new HTMLAdBlockElement(data);
+
+		if ('identifier' in data) {
+			ad.id = data.identifier;
+		}
+
+		return ad;
 	}
 });
 
