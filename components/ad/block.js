@@ -1,5 +1,17 @@
 import HTMLCustomElement from '../custom-element.js';
 
+function log(type, ad) {
+	if (window.ga instanceof Function) {
+		ad.label.then(label => {
+			window.ga('send', {
+				hitType: 'event',
+				eventCategory: type,
+				eventLabel: `${label} ${ad.id || 'no id'}`,
+			});
+		});
+	}
+}
+
 function keypress(event) {
 	if (event.keyCode === 32) {
 		openLink.apply(this);
@@ -13,9 +25,11 @@ function openLink() {
 		if (typeof url !== 'string') {
 			throw new Error('No URL');
 		} else if (new URL(url, document.baseURI).origin === location.origin) {
+			log('ad-click', this);
 			this.dispatchEvent(new Event('opened'));
 			setTimeout(() => location.href = this.getUrl(), 20);
 		} else {
+			log('ad-click', this);
 			window.open(this.getUrl(), 'ad-window', 'noopener,noreferrer');
 			this.dispatchEvent(new Event('opened'));
 		}
@@ -27,6 +41,7 @@ const queries = new WeakMap();
 const observer = ('IntersectionObserver' in window) ? new IntersectionObserver((entries, observer) => {
 	entries.forEach(({ isIntersecting, target }) => {
 		if (isIntersecting) {
+			log('ad-view', target);
 			observer.unobserve(target);
 			target.dispatchEvent(new Event('show'));
 		}
@@ -491,7 +506,7 @@ HTMLCustomElement.register('ad-block', class HTMLAdBlockElement extends HTMLCust
 	}
 
 	get campaign() {
-		return this.getAttribute('campaign');
+		return this.getAttribute('campaign') || 'krv-ads';
 	}
 
 	set campaign(val) {
