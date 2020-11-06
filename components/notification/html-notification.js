@@ -41,9 +41,9 @@ export class HTMLNotificationElement extends HTMLCustomElement {
 		actions = [],
 	} = {}) {
 		super();
-		this.attachShadow({mode: 'open'});
+		this.attachShadow({ mode: 'open' });
 
-		this.whenConnected.then(() => {
+		Promise.resolve().then(() => {
 			this.setAttribute('role', 'dialog');
 			this.setAttribute('label', 'Notification');
 
@@ -180,10 +180,8 @@ export class HTMLNotificationElement extends HTMLCustomElement {
 			this.setAttribute('requireinteraction', '');
 		}
 
-		if (Array.isArray(vibrate)) {
-			this.setAttribute('vibrate', vibrate.join(' '));
-		} else if (Number.isInteger(vibrate)) {
-			this.setAttribute('vibrate', vibrate);
+		if (Array.isArray(vibrate) || Number.isInteger(vibrate)) {
+			this.vibrate = vibrate;
 		}
 
 		this.addEventListener('close', () => {
@@ -296,12 +294,28 @@ export class HTMLNotificationElement extends HTMLCustomElement {
 		return this.hasAttribute('requireinteraction');
 	}
 
+	set requireInteraction(value) {
+		this.toggleAttribute('requireinteraction', value);
+	}
+
 	get silent() {
 		return this.hasAttribute('silent');
 	}
 
+	set silent(value) {
+		this.toggleAttribute('silent', value);
+	}
+
 	get tag() {
 		return this.getAttribute('tag');
+	}
+
+	set tag(value) {
+		if (typeof value === 'string') {
+			this.setAttribute('tag', value);
+		} else {
+			this.removeAttribute('tag');
+		}
 	}
 
 	get timestamp() {
@@ -309,6 +323,18 @@ export class HTMLNotificationElement extends HTMLCustomElement {
 			return parseInt(this.getAttribute('timestamp'));
 		} else {
 			return Date.now();
+		}
+	}
+
+	set timestamp(value) {
+		if (Number.isInteger(value)) {
+			this.setAttribute('timestamp', value);
+		} else if (value instanceof Date) {
+			this.timestamp = value.getTime();
+		} else if (typeof value === 'string' && value.length !== 0) {
+			this.timestamp = Date.parse(value);
+		} else {
+			this.removeAttribute('timestamp');
 		}
 	}
 
@@ -321,7 +347,15 @@ export class HTMLNotificationElement extends HTMLCustomElement {
 			return this.getAttribute('vibrate').split(' ')
 				.map(n => parseInt(n));
 		} else {
-			return 0;
+			return [0];
+		}
+	}
+
+	set vibrate(value) {
+		if (Array.isArray(value)) {
+			this.setAttribute('vibrate', value.join(' '));
+		} else if (Number.isInteger(value) || typeof value === 'string') {
+			this.setAttribute('vibrate', value);
 		}
 	}
 
