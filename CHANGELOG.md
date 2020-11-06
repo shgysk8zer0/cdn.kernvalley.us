@@ -10,6 +10,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 `ga('send', ...)` on ad view or click
 
+### Changed
+- Google Analytics `importGa()` now returns `{ ga, gtag }`
+
+### Fixed
+- Fix handling of `vibrate` in `HTMLNotificationElement`
+
 ## [v1.0.12] - 2020-10-24
 
 ### Added

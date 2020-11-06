@@ -1,12 +1,14 @@
 import HTMLCustomElement from '../custom-element.js';
 
-function log(type, ad) {
+function log(eventAction, ad, transport = 'beacon') {
 	if (window.ga instanceof Function) {
 		ad.label.then(label => {
 			window.ga('send', {
 				hitType: 'event',
-				eventCategory: type,
+				eventCategory: 'ad-block',
 				eventLabel: `${label} ${ad.id || 'no id'}`,
+				eventAction,
+				transport,
 			});
 		});
 	}
@@ -14,7 +16,7 @@ function log(type, ad) {
 
 function keypress(event) {
 	if (event.keyCode === 32) {
-		openLink.apply(this);
+		return openLink.apply(this);
 	}
 }
 
