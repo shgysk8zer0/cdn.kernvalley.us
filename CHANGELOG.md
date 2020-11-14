@@ -8,10 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-`ga('send', ...)` on ad view or click
+- `ga('send', ...)` on ad view or click
 
 ### Changed
 - Google Analytics `importGa()` now returns `{ ga, gtag }`
+- Copy `<weather-*>` components to `/components/weather/`
+- Update lazy loading of `<spotify-player>` and `<youtube-player>`
 
 ### Fixed
 - Fix handling of `vibrate` in `HTMLNotificationElement`
