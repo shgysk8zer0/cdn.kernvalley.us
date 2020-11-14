@@ -56,7 +56,7 @@ HTMLCustomElement.register('youtube-player', class HTMLYouTubeElement extends HT
 	}
 
 	get loading() {
-		return this.getAttribute('loading') || 'auto';
+		return this.getAttribute('loading') || 'eager';
 	}
 
 	set loading(val) {

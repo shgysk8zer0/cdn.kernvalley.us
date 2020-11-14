@@ -113,7 +113,7 @@ HTMLCustomElement.register('spotify-player', class HTMLSpotifyTrackElement exten
 	}
 
 	get loading() {
-		return this.getAttribute('loading') || 'auto'
+		return this.getAttribute('loading') || 'eager';
 	}
 
 	set loading(val) {
