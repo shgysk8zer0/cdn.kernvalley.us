@@ -143,7 +143,11 @@ HTMLCustomElement.register('youtube-player', class HTMLYouTubeElement extends HT
 						this.shadowRoot.querySelector('slot[name="player"]')
 							.assignedNodes().forEach(el => el.remove());
 
-						if (loading === 'lazy' && ! ('loading' in iframe) && ('IntersectionObserver' in window)) {
+						if ('loading' in iframe) {
+							iframe.loading = loading;
+							iframe.src = url;
+							this.append(iframe);
+						} else  if (loading === 'lazy' && ('IntersectionObserver' in window)) {
 							iframe.setAttribute('loading', 'lazy');
 							new IntersectionObserver(([{ target, isIntersecting }], observer) => {
 								if (isIntersecting) {
@@ -156,7 +160,6 @@ HTMLCustomElement.register('youtube-player', class HTMLYouTubeElement extends HT
 								rootMargin: `${Math.floor(0.2 * Math.max(screen.height, screen.width, 400))}px`,
 							}).observe(this);
 						} else {
-							iframe.loading = loading;
 							iframe.src = url;
 							this.append(iframe);
 						}

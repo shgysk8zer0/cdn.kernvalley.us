@@ -181,7 +181,11 @@ HTMLCustomElement.register('spotify-player', class HTMLSpotifyTrackElement exten
 							iframe.sandbox.add('allow-scripts', 'allow-popups', 'allow-same-origin');
 						}
 
-						if (loading === 'lazy' && ! ('loading' in iframe) && ('IntersectionObserver' in window)) {
+						if ('loading' in iframe) {
+							iframe.loading = loading;
+							iframe.src = new URL(`${type}/${id}`, SPOTIFY).href;
+							this.append(iframe);
+						} else if (loading === 'lazy' && ('IntersectionObserver' in window)) {
 							iframe.setAttribute('loading', 'lazy');
 							new IntersectionObserver(([{ target, isIntersecting }], observer) => {
 								if (isIntersecting) {
@@ -194,7 +198,6 @@ HTMLCustomElement.register('spotify-player', class HTMLSpotifyTrackElement exten
 								rootMargin: `${Math.floor(0.2 * Math.max(screen.height, screen.width, 400))}px`,
 							}).observe(this);
 						} else {
-							iframe.loading = loading;
 							iframe.src = new URL(`${type}/${id}`, SPOTIFY).href;
 							this.append(iframe);
 						}
