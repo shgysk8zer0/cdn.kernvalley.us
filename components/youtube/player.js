@@ -1,6 +1,8 @@
 import HTMLCustomElement from '../custom-element.js';
 const YOUTUBE  = 'https://www.youtube.com/embed/';
 const NOCOOKIE = 'https://www.youtube-nocookie.com/embed/';
+const SANDBOX = ['allow-scripts', 'allow-popups', 'allow-same-origin', 'allow-presentation'];
+const ALLOW = ['accelerometer', 'encrypted-media', 'gyroscope', 'picture-in-picture'];
 
 HTMLCustomElement.register('youtube-player', class HTMLYouTubeElement extends HTMLCustomElement {
 	constructor(video = null, { height = null, width = null, loading = null } = {}) {
@@ -126,14 +128,14 @@ HTMLCustomElement.register('youtube-player', class HTMLYouTubeElement extends HT
 						iframe.slot = 'player';
 						iframe.height = this.height;
 						iframe.width = this.width;
-						iframe.allow = 'accelerometer; encrypted-media; gyroscope; picture-in-picture';
+						iframe.allow = ALLOW.join(';');
 						iframe.allowFullscreen = true;
 						iframe.referrerPolicy = 'origin';
 
 						iframe.style.setProperty('border', 'none');
 
 						if ('sandbox' in iframe) {
-							iframe.sandbox.add('allow-scripts', 'allow-popups', 'allow-same-origin');
+							iframe.sandbox.add(...SANDBOX);
 						}
 
 						iframe.addEventListener('load', () => {

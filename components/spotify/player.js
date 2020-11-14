@@ -9,6 +9,9 @@ const TYPES = [
 	'track',
 ];
 
+const SANDBOX = ['allow-scripts', 'allow-popups', 'allow-same-origin'];
+const ALLOW = ['encrypted-media'];
+
 function linkToUri(link) {
 	if (typeof link === 'string' && link.startsWith('https:')) {
 		const url = new URL(link);
@@ -173,12 +176,12 @@ HTMLCustomElement.register('spotify-player', class HTMLSpotifyTrackElement exten
 						iframe.width = 300;
 						iframe.height = large ? 380 : 80;
 						iframe.allowTransparency = true;
-						iframe.allow = 'encrypted-media';
+						iframe.allow = ALLOW.join(';');
 						iframe.referrerPolicy = 'origin';
 						iframe.slot = 'player';
 
 						if ('sandbox' in iframe) {
-							iframe.sandbox.add('allow-scripts', 'allow-popups', 'allow-same-origin');
+							iframe.sandbox.add(...SANDBOX);
 						}
 
 						if ('loading' in iframe) {
