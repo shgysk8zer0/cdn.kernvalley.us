@@ -2,40 +2,124 @@
 <html lang="en" dir="ltr">
 	<head>
 		<meta charset="utf-8" />
-		<link rel="stylesheet" href="./weather-current.css" media="all" crossorigin="anonymous" referrerpolicy="no-referrer" />
+		<link rel="stylesheet" href="./forecast.css" media="all" crossorigin="anonymous" referrerpolicy="no-referrer" />
 	</head>
 	<body>
-		<div id="wrapper" class="grid">
-			<h3 class="center" part="city" id="city">
-				<span>Weather in</span>
-				<slot name="city">Unknown</slot>
-			</h3>
-			<div id="icon" class="center no-overflow">
-				<slot name="icon">
-					<svg class="current-color" viewBox="0 0 16 16">
-						<use xlink:href="#sunny"></use>
-					</svg>
-				</slot>
-			</div>
-			<div part="temp" id="temp">
-				<slot name="temp">No data</slot>&deg;<slot name="tempUnits">F</slot>
-			</div>
-			<b class="capitalize" id="conditions"><slot name="conditions">Unknown</slot></b>
-			<div part="wind" id="wind">
-				<div>
-					<span>Wind:</span>
-					<slot name="windSpeed">?</slot>
-					<slot name="speedUnits"><abbr title="Miles Per Hour">mph</abbr></slot>
-				</div>
-			</div>
-			<div part="updated" id="updated">
-				<b>Updated:</b>
-				<slot name="updated"></slot>
-			</div>
-			<div part="credits" id="credits">
-				<span>Weather data provided by</span>
-				<a href="https://openweathermap.org" rel="noopener extnernal" class="color-inherit">OpenWeatherMap</a>
-			</div>
+		<div id="wrapper" class="forecast inline-block overflow-x-auto">
+			<table class="overflow-x-auto">
+				<caption><h3 class="center">Forecast for <slot name="city">Unknown</slot></h3><hr /></caption>
+				<thead>
+					<tr>
+						<th class="cell dow"><slot name="dow1">Sunday</slot></th>
+						<th class="cell dow"><slot name="dow2">Monday</slot></th>
+						<th class="cell dow"><slot name="dow3">Tuesday</slot></th>
+						<th class="cell dow"><slot name="dow4">Wednesday</slot></th>
+						<th class="cell dow"><slot name="dow5">Thursday</slot></th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td class="cell day">
+							<div class="date center">
+								<slot name="date1"></slot>
+							</div>
+							<div class="forecast-icon center">
+								<slot name="icon1">
+									<svg class="current-color" viewbox="0 0 16 16">
+										<use xlink:href="#weather-clear" />
+									</svg>
+								</slot>
+							</div>
+							<div class="summary center capitalize">
+								<slot name="summary1">Unknown</slot>
+							</div>
+							<hr />
+							<span class="high-low high" title="Forecasted High"><slot name="high1">?</slot>&deg;</span>
+							<span class="high-low low" title="Forecasted Low"><slot name="low1">?</slot>&deg;</span>
+						</td>
+						<td class="cell day">
+							<div class="date center">
+								<slot name="date2"></slot>
+							</div>
+							<div class="forecast-icon center">
+								<slot name="icon2">
+									<svg class="current-color" viewbox="0 0 16 16">
+										<use xlink:href="#weather-clear" />
+									</svg>
+								</slot>
+							</div>
+							<div class="summary center capitalize">
+								<slot name="summary2">Unknown</slot>
+							</div>
+							<hr />
+							<span class="high-low high" title="Forecasted High"><slot name="high2">?</slot>&deg;</span>
+							<span class="high-low low" title="Forecasted Low"><slot name="low2">?</slot>&deg;</span>
+						</td>
+						<td class="cell day">
+							<div class="date center">
+								<slot name="date3"></slot>
+							</div>
+							<div class="forecast-icon center">
+								<slot name="icon3">
+									<svg class="current-color" viewbox="0 0 16 16">
+										<use xlink:href="#weather-clear" />
+									</svg>
+								</slot>
+							</div>
+							<div class="summary center capitalize">
+								<slot name="summary3">Unknown</slot>
+							</div>
+							<hr />
+							<span class="high-low high" title="Forecasted High"><slot name="high3">?</slot></span>
+							<span class="high-low low" title="Forecasted Low"><slot name="low3">?</slot>&deg;</span>
+						</td>
+						<td class="cell day">
+							<div class="date center">
+								<slot name="date4"></slot>
+							</div>
+							<div class="forecast-icon center">
+								<slot name="icon4">
+									<svg class="current-color" viewbox="0 0 16 16">
+										<use xlink:href="#weather-clear" />
+									</svg>
+								</slot>
+							</div>
+							<div class="summary center capitalize">
+								<slot name="summary4">Unknown</slot>
+							</div>
+							<hr />
+							<span class="high-low high" title="Forecasted High"><slot name="high4">?</slot>&deg;</span>
+							<span class="high-low low" title="Forecasted Low"><slot name="low4">?</slot>&deg;</span>
+						</td>
+						<td class="cell day">
+							<div class="date center">
+								<slot name="date5"></slot>
+							</div>
+							<div class="forecast-icon center">
+								<slot name="icon5">
+									<svg class="current-color" viewbox="0 0 16 16">
+										<use xlink:href="#weather-clear" />
+									</svg>
+								</slot>
+							</div>
+							<div class="summary center capitalize">
+								<slot name="summary5">Unknown</slot>
+							</div>
+							<hr />
+							<span class="high-low high" title="Forecasted High"><slot name="high5">?</slot>&deg;</span>
+							<span class="high-low low" title="Forecasted Low"><slot name="low5">?</slot>&deg;</span>
+						</td>
+					</tr>
+				</tbody>
+				<tfoot>
+					<tr>
+						<th colspan="5">
+							<span>Weather data provided by</span>
+							<a href="https://openweathermap.org" rel="noopener external" class="color-inherit">OpenWeatherMap</a>
+						</th>
+					</tr>
+				</tfoot>
+			</table>
 		</div>
 		<svg xmlns="http://www.w3.org/2000/svg" hidden="">
 <symbol id="weather-clear" viewBox="0 0 16 16">
