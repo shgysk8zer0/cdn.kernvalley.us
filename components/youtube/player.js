@@ -3,15 +3,14 @@ const YOUTUBE  = 'https://www.youtube.com/embed/';
 const NOCOOKIE = 'https://www.youtube-nocookie.com/embed/';
 
 HTMLCustomElement.register('youtube-player', class HTMLYouTubeElement extends HTMLCustomElement {
-	constructor(video = null, {height = null, width = null} = {}) {
+	constructor(video = null, { height = null, width = null, loading = null } = {}) {
 		super();
-		this.attachShadow({mode: 'open'});
+		this.attachShadow({ mode: 'open' });
 		const slot = document.createElement('slot');
 		slot.name = 'player';
 		this.shadowRoot.append(slot);
-		this.dispatchEvent(new Event('ready'));
 
-		this.whenConnected.then(() => {
+		Promise.resolve().then(() => {
 			if (typeof video === 'string') {
 				this.video = video;
 			}
@@ -23,6 +22,12 @@ HTMLCustomElement.register('youtube-player', class HTMLYouTubeElement extends HT
 			if (Number.isInteger(height)) {
 				this.height = height;
 			}
+
+			if (typeof loading === 'string') {
+				this.loading = loading;
+			}
+
+			this.dispatchEvent(new Event('ready'));
 		});
 	}
 
@@ -50,6 +55,18 @@ HTMLCustomElement.register('youtube-player', class HTMLYouTubeElement extends HT
 		}
 	}
 
+	get loading() {
+		return this.getAttribute('loading') || 'auto';
+	}
+
+	set loading(val) {
+		if (typeof val === 'string' && val.length !== 0) {
+			this.setAttribute('loading', val);
+		} else {
+			this.removeAttribute('loading');
+		}
+	}
+
 	get cookies() {
 		return this.hasAttribute('cookies');
 	}
@@ -60,13 +77,15 @@ HTMLCustomElement.register('youtube-player', class HTMLYouTubeElement extends HT
 
 	get video() {
 		const video = this.getAttribute('video');
+
 		if (typeof video !== 'string') {
 			return null;
 		} else if (video.startsWith('https:')) {
 			const url = new URL(video);
+
 			if (url.host === 'youtu.be') {
 				return url.pathname.substr(1);
-			} else if (!url.host.endsWith('youtube.com')) {
+			} else if (! url.host.endsWith('youtube.com')) {
 				throw new Error('Invalid URL for YouTube');
 			} else if (url.searchParams.has('v')) {
 				return url.searchParams.get('v');
@@ -101,7 +120,8 @@ HTMLCustomElement.register('youtube-player', class HTMLYouTubeElement extends HT
 			case 'video':
 				if (newValue !== null && newValue.length !== 0) {
 					this.ready.then(async () => {
-						const url = new URL(`./${this.video}`, this.cookies ? YOUTUBE : NOCOOKIE);
+						const { video, cookies, loading } = this;
+						const url = new URL(`./${video}`, cookies ? YOUTUBE : NOCOOKIE);
 						const iframe = document.createElement('iframe');
 						iframe.slot = 'player';
 						iframe.height = this.height;
@@ -109,7 +129,7 @@ HTMLCustomElement.register('youtube-player', class HTMLYouTubeElement extends HT
 						iframe.allow = 'accelerometer; encrypted-media; gyroscope; picture-in-picture';
 						iframe.allowFullscreen = true;
 						iframe.referrerPolicy = 'origin';
-						iframe.loading = 'lazy';
+
 						iframe.style.setProperty('border', 'none');
 
 						if ('sandbox' in iframe) {
@@ -120,12 +140,26 @@ HTMLCustomElement.register('youtube-player', class HTMLYouTubeElement extends HT
 							this.dispatchEvent(new Event('load'));
 						}, {once: true});
 
-						iframe.src = url;
-
 						this.shadowRoot.querySelector('slot[name="player"]')
 							.assignedNodes().forEach(el => el.remove());
 
-						this.append(iframe);
+						if (loading === 'lazy' && ! ('loading' in iframe) && ('IntersectionObserver' in window)) {
+							iframe.setAttribute('loading', 'lazy');
+							new IntersectionObserver(([{ target, isIntersecting }], observer) => {
+								if (isIntersecting) {
+									iframe.src = url;
+									this.append(iframe);
+									observer.unobserve(target);
+									observer.disconnect();
+								}
+							}, {
+								rootMargin: `${Math.floor(0.2 * Math.max(screen.height, screen.width, 400))}px`,
+							}).observe(this);
+						} else {
+							iframe.loading = loading;
+							iframe.src = url;
+							this.append(iframe);
+						}
 					});
 				}
 				break;
