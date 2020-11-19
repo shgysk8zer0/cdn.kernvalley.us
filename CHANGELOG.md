@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - `ga('send', ...)` on ad view or click
+- Create `<svg-box>` element for using SVGBox icons
 
 ### Changed
 - Google Analytics `importGa()` now returns `{ ga, gtag }`
