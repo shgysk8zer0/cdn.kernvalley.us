@@ -183,6 +183,7 @@
 ::slotted([slot="description"]) {
 	overflow-wrap: break-word;
 	white-space: break-spaces;
+	display: block;
 }
 
 slot[name="image"] > svg {

@@ -143,8 +143,12 @@ export default class HTMLCustomElement extends HTMLElement {
 		parts     = [],
 	} = {}) {
 		let el = null;
+		const current = await this.getSlotted(slot);
 
-		if (content instanceof HTMLElement) {
+		if (replace && current.length === 1 && typeof content === 'string' && current[0].tagName === tag.toUpperCase()) {
+			el = current[0];
+			el.textContent = content;
+		} else if (content instanceof HTMLElement) {
 			el = content;
 		} else if (typeof content === 'string') {
 			el = document.createElement(tag);
@@ -168,15 +172,13 @@ export default class HTMLCustomElement extends HTMLElement {
 		el.slot = slot;
 
 		if (replace) {
-			const current = await this.getSlotted(slot);
-
 			if (current.length === 0) {
 				this.append(el);
-			} else if (current.length === 1) {
-				current[0].replaceWith(el);
-			} else {
+			} else if (current.length !== 1) {
 				current.forEach(s => s.remove());
 				this.append(el);
+			} else if (! current[0].isSameNode(el)) {
+				current[0].replaceWith(el);
 			}
 		} else {
 			this.append(el);
