@@ -1,3 +1,5 @@
+'use strict';
+
 if (confirm('Delete all Web App data?')) {
 	Promise.all([
 		Promise.resolve().then(function() {
