@@ -165,17 +165,23 @@
 button:not([hidden]) {
 	display: inline-block;
 	cursor: pointer;
-	background: var(--button-background, initial);
-	color: var(--button-color, initial);
-	border: var(--button-border, 1px solid #aaa);
+	background-color: var(--button-primary-background);
+	color: var(--button-primary-color);
+	border: var(--button-primary-border, 1px solid #aaa);
 	border-radius: var(--button-border-radius, initial);
 	box-sizing: border-box;
 }
 
+button:hover {
+	background-color: var(--button-primary-hover-background, var(--button-primary-background));
+	color: var(--button-primary-hover-color, var(--button-primary-color));
+	border: var(--button-primary-hover-border, var(--button-primary-border, 0.2rem inset black));
+}
+
 button:active {
-	background: var(--button-active-background, var(--button-background, initial));
-	color: var(--button-active-color, var(--button-color, inherit));
-	border: var(--button-active-border, var(--button-border, 0.2rem inset black));
+	background-color: var(--button-primary-active-background, var(--button-primary-background));
+	color: var(--button-primary-active-color, var(--button-primary-color));
+	border: var(--button-primary-active-border, var(--button-primary-border, 0.2rem inset black));
 }
 
 button:focus {
