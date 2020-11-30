@@ -15,9 +15,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Google Analytics `importGa()` now returns `{ ga, gtag }`
 - Copy `<weather-*>` components to `/components/weather/`
 - Update lazy loading of `<spotify-player>` and `<youtube-player>`
+- Use Adwaita theme
 
 ### Fixed
 - Fix handling of `vibrate` in `HTMLNotificationElement`
+- Correct custom property usage in `<pwa-prompt>` button styles
 
 ## [v1.0.12] - 2020-10-24
 

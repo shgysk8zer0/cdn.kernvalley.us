@@ -16,7 +16,8 @@
 		<script type="module" src="/components/github/user.js" async=""></script>
 		<script type="module" src="/components/share-to-button/share-to-button.js" async=""></script>
 		<link rel="stylesheet" href="/css/core-css/theme/properties.css" media="screen" />
-		<link rel="stylesheet" href="/css/core-css/theme/default/index.css" media="screen" />
+		<link rel="stylesheet" title="Adwaita Theme" href="/css/core-css/theme/adwaita/index.css" media="screen" />
+		<link rel="alternate stylesheet" title="Default Theme" href="/css/core-css/theme/default/index.css" media="screen" />
 		<link rel="stylesheet" href="/css/core-css/rem.css" media="screen" />
 		<link rel="stylesheet" href="/css/core-css/viewport.css" media="screen" />
 		<link rel="stylesheet" href="/css/core-css/element.css" media="screen" />
@@ -32,12 +33,12 @@
 			<h1 class="center">This is the <abbr title="Content Delivery Network">CDN</abbr> for <a class="underline" href="https://kernvalley.us">KernValley.us</a></h1>
 			<github-user user="kernvalley"></github-user>
 		</header>
-		<nav id="nav" class="contain-content">
-			<share-to-button target="facebook"></share-to-button>
-			<share-to-button target="twitter"></share-to-button>
-			<share-to-button target="gmail"></share-to-button>
-			<share-to-button target="linkedin"></share-to-button>
-			<share-to-button target="reddit"></share-to-button>
+		<nav id="nav" class="contain-content background-primary adwaita-toolbar sticky top shadow z-4 flex row no-wrap">
+			<share-to-button class="grow-1" target="facebook"></share-to-button>
+			<share-to-button class="grow-1" target="twitter"></share-to-button>
+			<share-to-button class="grow-1" target="gmail"></share-to-button>
+			<share-to-button class="grow-1" target="linkedin"></share-to-button>
+			<share-to-button class="grow-1" target="reddit"></share-to-button>
 		</nav>
 		<main id="main" class="contain-content card shadow">
 			<blockquote>
