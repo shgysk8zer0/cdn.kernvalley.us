@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Copy `<weather-*>` components to `/components/weather/`
 - Update lazy loading of `<spotify-player>` and `<youtube-player>`
 - Use Adwaita theme
+- Update `<leaflet-*>` constructors for easier JS creation
 
 ### Fixed
 - Fix handling of `vibrate` in `HTMLNotificationElement`

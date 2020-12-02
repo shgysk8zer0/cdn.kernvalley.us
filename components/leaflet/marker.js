@@ -3,7 +3,7 @@ const map = new Map();
 import { registerCustomElement, parseHTML } from '../../js/std-js/functions.js';
 
 registerCustomElement('leaflet-marker', class HTMLLeafletMarkerElement extends HTMLElement {
-	constructor({ icon = null, popup = null } = {}) {
+	constructor({ icon = null, popup = null, latitude = null, longitude = null, open = null } = {}) {
 		super();
 		this._map = null;
 		this._shadow = this.attachShadow({ mode: 'closed' });
@@ -19,9 +19,25 @@ registerCustomElement('leaflet-marker', class HTMLLeafletMarkerElement extends H
 			this.iconImg = icon;
 		}
 
-		this.popup = popup;
+		if (popup) {
+			this.popup = popup;
+		}
 
-		this.whenConnected.then(() => this.slot   = 'markers');
+		Promise.resolve().then(() => {
+			this.slot   = 'markers';
+
+			if (typeof latitude === 'number' || typeof latitude === 'string') {
+				this.latitude = latitude;
+			}
+
+			if (typeof longitude === 'number' || typeof longitude === 'string') {
+				this.longitude = longitude;
+			}
+
+			if (typeof open === 'boolean') {
+				this.open = open;
+			}
+		});
 	}
 
 	async connectedCallback() {

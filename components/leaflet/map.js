@@ -18,9 +18,27 @@ HTMLCustomElement.register('leaflet-map', class HTMLLeafletMapElement extends HT
 		crossOrigin  = null,
 		detectRetina = null,
 		loading      = null,
+		zoomControl  = null,
+		markers      = null,
 	} = {}) {
 		super();
 		this._shadow = this.attachShadow({ mode: 'closed' });
+
+		if (Array.isArray(markers)) {
+			customElements.whenDefined('leaflet-marker').then(() => {
+				const Marker = customElements.get('leaflet-marker');
+				markers.forEach(marker => {
+					if (marker instanceof Marker) {
+						marker.slot = 'markers';
+						this.append(marker);
+					} else if ('longitude' in marker && 'latitude' in marker) {
+						const el = new Marker(marker);
+						el.slot = 'markers';
+						this.append(el);
+					}
+				});
+			});
+		}
 
 		Promise.resolve().then(() => {
 			if (! Number.isNaN(latitude) && ! Number.isNaN(longitude)) {
@@ -29,6 +47,10 @@ HTMLCustomElement.register('leaflet-map', class HTMLLeafletMapElement extends HT
 
 			if (! Number.isNaN(zoom)) {
 				this.zoom = zoom;
+			}
+
+			if (typeof zoomControl === 'boolean') {
+				this.zoomControl = zoomControl;
 			}
 
 			if (typeof crossOrigin === 'string') {
