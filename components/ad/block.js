@@ -21,7 +21,9 @@ function keypress(event) {
 }
 
 function openLink() {
-	if (! (this instanceof HTMLAnchorElement)) {
+	const ad = this.closest('ad-block');
+
+	if (! ad.preview && ! (this instanceof HTMLAnchorElement)) {
 		const url = this.url;
 
 		if (typeof url !== 'string') {
@@ -684,6 +686,14 @@ HTMLCustomElement.register('ad-block', class HTMLAdBlockElement extends HTMLCust
 		}
 	}
 
+	get preview() {
+		return this.hasAttribute('preview');
+	}
+
+	set preview(val) {
+		this.toggleAttribute('preview', val);
+	}
+
 	get source() {
 		return this.getAttribute('source');
 	}
@@ -819,11 +829,3 @@ HTMLCustomElement.register('ad-block', class HTMLAdBlockElement extends HTMLCust
 		return ad;
 	}
 });
-
-setTimeout(() => {
-	document.querySelectorAll('#settings input').forEach(el => {
-		el.addEventListener('change', ({ target }) => {
-			document.querySelectorAll('ad-block').forEach(el => el[target.name] = target.value);
-		});
-	});
-}, 1000);

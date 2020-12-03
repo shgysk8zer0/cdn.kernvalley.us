@@ -1,12 +1,15 @@
 <!DOCTYPE html>
-<html lang="en" dir="ltr" data-layout="wide" data-theme="auto">
+<html lang="en" dir="ltr" data-layout="right-sidebar" data-theme="auto">
 	<head>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width" />
 		<meta name="referrer" content="no-referrer" />
 		<link rel="icon" href="/img/kernvalley-icons/kernvalley.svg" type="image/svg+xml" />
 		<link rel="preload" href="/components/github/user.html" as="fetch" type="text/html" referrerpolicy="no-referrer" />
+		<link rel="preload" href="/components/leaflet/map.css" as="style" type="text/css" referrerpolicy="no-referrer" crossorigin="anonymous" />
+		<link rel="preload" href="/components/weather/current.css" as="style" type="text/css" referrerpolicy="no-referrer" crossorigin="anonymous" />
 		<link rel="preload" href="/components/github/user.css" as="style" type="text/css" referrerpolicy="no-referrer" />
+		<link rel="preload" href="/components/ad/block.css" as="style" type="text/css" referrerpolicy="no-referrer" />
 		<link rel="preload" href="/components/share-to-button/share-to-button.html" as="fetch" type="text/html" referrerpolicy="no-referrer" />
 		<link rel="preload" href="/components/share-to-button/share-to-button.css" as="style" type="text/css" referrerpolicy="no-referrer" />
 		<link rel="preconnect" href="https://api.github.com" crossorigin="anonymous" referrerpolicy="no-referrer" />
@@ -14,7 +17,11 @@
 		<script type="module" src="/js/std-js/shims.js" async=""></script>
 		<script type="module" src="/components/current-year.js" async=""></script>
 		<script type="module" src="/components/github/user.js" async=""></script>
+		<script type="module" src="/components/ad/block.js" async=""></script>
 		<script type="module" src="/components/share-to-button/share-to-button.js" async=""></script>
+		<script type="module" src="/components/weather/current.js" async=""></script>
+		<script type="module" src="/components/leaflet/map.js" async=""></script>
+		<script type="module" src="/components/leaflet/marker.js" async=""></script>
 		<link rel="stylesheet" href="/css/core-css/theme/properties.css" media="screen" />
 		<link rel="stylesheet" title="Adwaita Theme" href="/css/core-css/theme/adwaita/index.css" media="screen" />
 		<link rel="alternate stylesheet" title="Default Theme" href="/css/core-css/theme/default/index.css" media="screen" />
@@ -25,7 +32,7 @@
 		<link rel="stylesheet" href="/css/core-css/fonts.css" media="screen" />
 		<link rel="stylesheet" href="/css/core-css/scrollbar.css" media="screen" />
 		<link rel="stylesheet" href="/css/accessibility.css" media="screen" />
-		<link rel="stylesheet" href="/css/core-css/layout/wide/index.css" media="screen" />
+		<link rel="stylesheet" href="/css/core-css/layout/right-sidebar/index.css" media="screen" />
 		<title>KernValley.us | CDN</title>
 	</head>
 	<body class="grid border-box background-primary color-default font-main">
@@ -46,7 +53,21 @@
 				<i>(JavaScript, Stylesheets, Images, &amp; Fonts)</i> are shared and accessible
 				on a number of different sites.
 			</blockquote>
+			<leaflet-map center="35.753003,-118.424572" zoom="13" crossorigin="anonymous" detectretina="" loading="lazy">
+				<leaflet-marker slot="markers" latitude="35.753332" longitude="-118.42499">
+					<img crossorigin="anonymous" referrerpolicy="no-referrer" loading="lazy" decoding="async" src="https://cdn.kernvalley.us/img/adwaita-icons/actions/mark-location.svg" slot="icon" width="22" height="22" />
+				</leaflet-marker>
+			</leaflet-map>
 		</main>
+		<aside id="sidebar">
+			<weather-current postalcode="93240" appid="6be145cbc5791c9f80471ff39d8523ed" theme="auto"></weather-current>
+			<ad-block url="https://ads.kernvalley.us" layout="card" theme="auto" loading="lazy" source="krv-cdn" medium="web" campaign="krv-ads" content="sidebar" preview="">
+				<span slot="label">Kern Valley Ads</span>
+				<span slot="description">Advertise on local websites throughout the Kern River Valley</span>
+				<span slot="calltoaction">Click here to get started!</span>
+				<img src="https://cdn.kernvalley.us/img/branding/ads.kernvalley.us.svg" slot="image" loading="lazy" decoding="async" width="64" height="64" alt="KRV Ads" crossorigin="anonymous" referrerpolicy="no-referrer" />
+			</ad-block>
+		</aside>
 		<footer id="footer" class="contain-content">
 			<span>©</span>
 			<time is="current-year">2020</time>
