@@ -1,4 +1,5 @@
 import './prompt.js';
+import { confirm } from '../../js/std-js/asyncDialog.js';
 import { registerCustomElement } from '../../js/std-js/functions.js';
 
 registerCustomElement('pwa-install', class HTMLPWAInstallButton extends HTMLButtonElement {
@@ -22,7 +23,7 @@ registerCustomElement('pwa-install', class HTMLPWAInstallButton extends HTMLButt
 		this.addEventListener('updatefound', async event => {
 			await event.detail.update();
 
-			if (this.reloadOnUpdate && confirm(this.updateMessage)) {
+			if (this.reloadOnUpdate && await confirm(this.updateMessage)) {
 				location.reload();
 			}
 		}, {once: true});
