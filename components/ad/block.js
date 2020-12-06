@@ -1,7 +1,9 @@
 import HTMLCustomElement from '../custom-element.js';
+import { save, open } from '../../js/std-js/filesystem.js';
+import { css, attr, on, off, loaded } from '../../js/std-js/functions.js';
 
 function log(eventAction, ad, transport = 'beacon') {
-	if (window.ga instanceof Function) {
+	if (window.ga instanceof Function && ! ad.preview) {
 		ad.label.then(label => {
 			window.ga('send', {
 				hitType: 'event',
@@ -40,14 +42,22 @@ function openLink() {
 	}
 }
 
+const timers = new WeakMap();
+
 const queries = new WeakMap();
 
 const observer = ('IntersectionObserver' in window) ? new IntersectionObserver((entries, observer) => {
-	entries.forEach(({ isIntersecting, target }) => {
+	entries.forEach(async ({ isIntersecting, target }) => {
 		if (isIntersecting) {
-			log('ad-view', target);
-			observer.unobserve(target);
-			target.dispatchEvent(new Event('show'));
+			timers.set(target, setTimeout(() => {
+				log('ad-view', target);
+				observer.unobserve(target);
+				timers.delete(target);
+				target.dispatchEvent(new Event('show'));
+			}, 500));
+		} else if (timers.has(target)) {
+			clearInterval(timers.get(target));
+			timers.delete(target);
 		}
 	});
 }, {
@@ -186,6 +196,24 @@ HTMLCustomElement.register('ad-block', class HTMLAdBlockElement extends HTMLCust
 			if (typeof width === 'string' || (typeof width === 'number' && ! Number.isNaN(height))) {
 				this.width = width;
 			}
+
+			const container = document.createElement('div');
+			const nameEl = document.createElement('meta');
+			const urlEl = document.createElement('meta');
+			const logoEl = document.createElement('meta');
+
+			attr(container, {
+				itemprop: 'publisher',
+				itemtype: 'https://schema.org/Organization',
+				itemscope: true,
+				hidden: true,
+			});
+
+			attr(nameEl, { itemprop: 'name', content: 'Kern Valley Ads' });
+			attr(urlEl, { itemprop: 'url', content: 'https://ads.kernvalley.us' });
+			attr(logoEl, { itemprop: 'logo', content: 'https://cdn.kernvalley.us/img/branding/ads.kernvalley.us.svg' });
+			container.append(nameEl, urlEl, logoEl);
+			this.append(container);
 		}).then(() => {
 			Promise.allSettled([
 				this.whenConnected,
@@ -198,16 +226,15 @@ HTMLCustomElement.register('ad-block', class HTMLAdBlockElement extends HTMLCust
 								target.assignedElements().forEach(el => {
 									switch(target.name) {
 										case 'label':
-											el.setAttribute('itemprop', 'name');
+											attr(el, { itemprop: 'name' });
 											break;
 
 										case 'description':
-											el.setAttribute('itemprop', 'description');
+											attr(el, { itemprop: 'description' });
 											break;
 
 										case 'image':
-											el.setAttribute('itemprop', 'image');
-											el.setAttribute('role', 'image');
+											attr(el, { itemprop: 'image', role: 'image' });
 											break;
 									}
 								});
@@ -224,11 +251,8 @@ HTMLCustomElement.register('ad-block', class HTMLAdBlockElement extends HTMLCust
 
 	connectedCallback() {
 		this.dispatchEvent(new Event('connected'));
-		this.ready.then(() => {
-			observer.observe(this);
-		});
-		this.setAttribute('itemtype', 'https://schema.org/WPAdBlock');
-		this.setAttribute('itemscope', '');
+		Promise.all([this.ready, loaded()]).then(() => observer.observe(this));
+		attr(this, { itemtype: 'https://schema.org/WPAdBlock', itemscope: true });
 	}
 
 	disconnectedCallback() {
@@ -242,9 +266,9 @@ HTMLCustomElement.register('ad-block', class HTMLAdBlockElement extends HTMLCust
 					const container = this.shadowRoot.getElementById('container');
 
 					if (typeof newVal === 'string' && newVal.startsWith('#')) {
-						container.style.setProperty('--ad-background', newVal);
+						css(container, { '--ad-background': newVal });
 					} else {
-						container.style.removeProperty('--ad-background');
+						css(container, { '-ad-background': null });
 					}
 				});
 				break;
@@ -254,9 +278,9 @@ HTMLCustomElement.register('ad-block', class HTMLAdBlockElement extends HTMLCust
 					const container = this.shadowRoot.getElementById('container');
 
 					if (typeof newVal === 'string' && newVal.startsWith('#')) {
-						container.style.setProperty('--ad-border', newVal);
+						css(container, { '--ad-border': newVal });
 					} else {
-						container.style.removeProperty('--ad-border');
+						css(container, { '--ad-border': null });
 					}
 				});
 				break;
@@ -266,11 +290,11 @@ HTMLCustomElement.register('ad-block', class HTMLAdBlockElement extends HTMLCust
 					const container = this.shadowRoot.getElementById('container');
 
 					if (typeof newVal === 'string' && /\d$/.test(newVal)) {
-						container.style.setProperty('--ad-border-width', `${newVal}px`);
+						css(container, { '--ad-border-width': `${newVal}px` });
 					} else if (typeof newVal === 'string') {
-						container.style.setProperty('--ad-border-width', newVal);
+						css(container, { '--ad-border-width': newVal });
 					} else {
-						container.style.removeProperty('--ad-border-width');
+						css(container, { '--ad-border-width': null });
 					}
 				});
 				break;
@@ -280,9 +304,9 @@ HTMLCustomElement.register('ad-block', class HTMLAdBlockElement extends HTMLCust
 					const container = this.shadowRoot.getElementById('container');
 
 					if (typeof newVal === 'string' && newVal.startsWith('#')) {
-						container.style.setProperty('--ad-color', newVal);
+						css(container, { '--ad-color': newVal });
 					} else {
-						container.style.removeProperty('--ad-color');
+						css(container, { '--ad-color': null });
 					}
 				});
 				break;
@@ -292,25 +316,30 @@ HTMLCustomElement.register('ad-block', class HTMLAdBlockElement extends HTMLCust
 					const container = this.shadowRoot.getElementById('container');
 
 					if (typeof newVal === 'string' && newVal.startsWith('#')) {
-						container.style.setProperty('--ad-link-color', newVal);
+						css(container, { '--ad-link-color': newVal });
 					} else {
-						container.style.removeProperty('--ad-link-color');
+						css(container, { '--ad-link-color': null });
 					}
 				});
 				break;
 
 			case 'url':
 				if (typeof newVal !== 'string') {
-					this.removeEventListener('click', openLink, { capture: true, passive: true });
-					this.removeEventListener('keydown', keypress, { capture: true, passive: true });
+					off(this, {
+						click: openLink,
+						keydown: keypress,
+					}, { capture: true, passive: true });
+
 					this.querySelectorAll('meta[itemprop="url"].ad-url').forEach(el => el.remove());
 				} else if (newVal.length === 0) {
 					this.removeAttribute('url');
 				} else if (newVal.startsWith('/') || newVal.startsWith('./') || newVal.startsWith('#')) {
 					this.url = new URL(newVal, document.baseURI);
 				} else {
-					this.addEventListener('click', openLink, { capture: true, passive: true });
-					this.addEventListener('keydown', keypress, { capture: true, passive: true });
+					on(this, {
+						click: openLink,
+						keydown: keypress,
+					}, { capture: true, passive: true });
 					const meta = document.createElement('meta');
 					const current = this.querySelector('meta[itemprop="url"].ad-url');
 					meta.classList.add('ad-url');
@@ -330,17 +359,21 @@ HTMLCustomElement.register('ad-block', class HTMLAdBlockElement extends HTMLCust
 					const container = this.shadowRoot.getElementById('container');
 
 					if (typeof newVal === 'string' && newVal.length !== 0) {
-						container.style.setProperty('--ad-block-height', newVal);
-						container.style.setProperty('--ad-block-stack-height', newVal);
-						container.style.setProperty('--ad-block-text-height', newVal);
-						container.style.setProperty('--ad-block-image-height', newVal);
-						container.style.setProperty('--ad-block-full-width-height', newVal);
+						css(container, {
+							'--ad-block-height': newVal,
+							'--ad-block-stack-height': newVal,
+							'--ad-block-text-height': newVal,
+							'--ad-block-image-height': newVal,
+							'--ad-block-full-width-height': newVal,
+						});
 					} else {
-						container.style.removeProperty('--ad-block-height');
-						container.style.removeProperty('--ad-block-stack-height');
-						container.style.removeProperty('--ad-block-text-height');
-						container.style.removeProperty('--ad-block-image-height');
-						container.style.removeProperty('--ad-block-full-width-height', newVal);
+						css(container, {
+							'--ad-block-height': null,
+							'--ad-block-stack-height': null,
+							'--ad-block-text-height': null,
+							'--ad-block-image-height': null,
+							'--ad-block-full-width-height': null,
+						});
 					}
 				});
 				break;
@@ -378,15 +411,19 @@ HTMLCustomElement.register('ad-block', class HTMLAdBlockElement extends HTMLCust
 					const container = this.shadowRoot.getElementById('container');
 
 					if (typeof newVal === 'string' && newVal.length !== 0) {
-						container.style.setProperty('--ad-block-width', newVal);
-						container.style.setProperty('--ad-block-stack-width', newVal);
-						container.style.setProperty('--ad-block-text-width', newVal);
-						container.style.setProperty('--ad-block-image-width', newVal);
+						css(container, {
+							'--ad-block-width': newVal,
+							'--ad-block-stack-width': newVal,
+							'--ad-block-text-width': newVal,
+							'--ad-block-image-width': newVal,
+						});
 					} else {
-						container.style.removeProperty('--ad-block-width');
-						container.style.removeProperty('--ad-block-stack-width');
-						container.style.removeProperty('--ad-block-text-width');
-						container.style.removeProperty('--ad-block-image-width');
+						css(container, {
+							'--ad-block-width': null,
+							'--ad-block-stack-width': null,
+							'--ad-block-text-width': null,
+							'--ad-block-image-width': null,
+						});
 					}
 				});
 				break;
@@ -589,7 +626,6 @@ HTMLCustomElement.register('ad-block', class HTMLAdBlockElement extends HTMLCust
 			img.crossOrigin = 'anonymous';
 			img.referrerPolicy = 'no-referrer';
 			img.decoding = 'async';
-			img.referrerPolicy = 'no-referrer';
 			img.src = val;
 			img.alt = '';
 			this.image = img;
@@ -781,6 +817,40 @@ HTMLCustomElement.register('ad-block', class HTMLAdBlockElement extends HTMLCust
 		return a;
 	}
 
+	async copyJSON() {
+		const json = await this.getJSON();
+		return navigator.clipboard.writeText(json);
+	}
+
+	async copyHTML() {
+		return navigator.clipboard.writeText(this.outerHTML);
+	}
+
+	async downloadFile({ fname = 'ad.krvad' } = {}) {
+		const file = await this.toFile({ fname });
+		await save(file);
+	}
+
+	async saveHTML({ fname = 'ad.html', type = 'text/html' } = {}) {
+		const file = new File([this.outerHTML], fname, { type });
+		await save(file);
+	}
+
+	static async fromClipboard() {
+		if (navigator.clipboard && navigator.clipboard.readText instanceof Function) {
+			const text = await navigator.clipboard.readText();
+
+			if (text.startsWith('{') && text.endsWith('}')) {
+				const data = await JSON.parse(text);
+				return await HTMLAdBlockElement.fromJSONObject(data);
+			} else {
+				throw new Error('Cliboard did not contain valid data');
+			}
+		} else {
+			throw new Error('Clipboard not supported');
+		}
+	}
+
 	static get CONTENT_TYPE() {
 		return 'application/krv-ad+json';
 	}
@@ -806,6 +876,29 @@ HTMLCustomElement.register('ad-block', class HTMLAdBlockElement extends HTMLCust
 			'url',
 			'width',
 		];
+	}
+
+	static async fromURL(url, {
+		mode = 'cors',
+		credentials = 'omit',
+		redirect = 'follow',
+		cache = 'default',
+		referrerPolicy = 'no-referrer',
+		headers = new Headers({ Accept: 'application/krvad+json' }),
+	} = {}) {
+		const resp = await fetch(url, { headers, referrerPolicy, mode, credentials, redirect, cache });
+
+		if (resp.ok) {
+			const json = await resp.json();
+			return await HTMLAdBlockElement.fromJSONObject(json);
+		} else {
+			throw new Error(`${resp.url} [${resp.status} ${resp.statusText}]`);
+		}
+	}
+
+	static async openFile() {
+		const [file] = await open({ accept: ['.krvad', 'application/krvad+json'] });
+		return await HTMLAdBlockElement.fromFile(file);
 	}
 
 	static async fromFile(file) {

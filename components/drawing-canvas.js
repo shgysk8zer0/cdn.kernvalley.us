@@ -1,4 +1,6 @@
-import { registerCustomElement } from '../js/std-js/functions.js';
+import { registerCustomElement, on } from '../js/std-js/functions.js';
+import { save } from '../js/std-js/filesystem.js';
+import { loadImage } from '../js/std-js/loader.js';
 
 export default class HTMLDrawingCanvasElement extends HTMLCanvasElement {
 	connectedCallback() {
@@ -53,10 +55,12 @@ export default class HTMLDrawingCanvasElement extends HTMLCanvasElement {
 			}
 		};
 
-		this.addEventListener('touchstart', begin, config);
-		this.addEventListener('touchend', end, config);
-		this.addEventListener('mousedown', begin, config);
-		this.addEventListener('mouseup', end, config);
+		on(this, {
+			touchstart: begin,
+			mousedown: begin,
+			touchend: end,
+			mouseup: end,
+		}, config);
 	}
 
 	get coords() {
@@ -88,7 +92,7 @@ export default class HTMLDrawingCanvasElement extends HTMLCanvasElement {
 	}
 
 	get exportQuality() {
-		return parseInt(this.getAttribute('export-quality')) || 1;
+		return parseFloat(this.getAttribute('export-quality')) || 1;
 	}
 
 	set exportQuality(quality) {
@@ -143,6 +147,18 @@ export default class HTMLDrawingCanvasElement extends HTMLCanvasElement {
 
 	get imageData() {
 		return this.getImageData();
+	}
+
+	async saveAs({ filename = 'canvas.png', type = 'image/png', quality = 0.8}) {
+		const blob = await this.toBlob(type, quality);
+		const file = new File([blob], filename, { type });
+		await save(file);
+	}
+
+	async import(src, { x = 0, y = 0 } = {}) {
+		const img = await loadImage(src);
+		await img.decode();
+		return this.ctx.drawImage(img, x, y);
 	}
 
 	async ready() {
