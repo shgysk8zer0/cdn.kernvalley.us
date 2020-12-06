@@ -885,7 +885,7 @@ HTMLCustomElement.register('ad-block', class HTMLAdBlockElement extends HTMLCust
 		cache = 'default',
 		referrerPolicy = 'no-referrer',
 		headers = new Headers({ Accept: 'application/krvad+json' }),
-	}) {
+	} = {}) {
 		const resp = await fetch(url, { headers, referrerPolicy, mode, credentials, redirect, cache });
 
 		if (resp.ok) {
