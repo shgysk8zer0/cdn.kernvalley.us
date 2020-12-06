@@ -193,7 +193,7 @@ export default class HTMLCustomElement extends HTMLElement {
 		referrerPolicy = 'no-referrer',
 		redirect       = 'error',
 		credentials    = 'omit',
-		timeout        = 5000,
+		timeout        = 25000,
 		integrity      = undefined,
 		signal         = undefined,
 	} = {}) {
@@ -217,7 +217,13 @@ export default class HTMLCustomElement extends HTMLElement {
 	}
 
 	static get base() {
-		return base || metaUrl;
+		if (typeof base === 'string') {
+			return base;
+		} else if (document.documentElement.dataset.hasOwnProperty('componentBase')) {
+			return new URL(document.documentElement.dataset.componentBase, document.baseURI).href;
+		} else {
+			return metaUrl;
+		}
 	}
 
 	static set base(val) {
@@ -227,8 +233,4 @@ export default class HTMLCustomElement extends HTMLElement {
 	static register(tag, cls, ...rest) {
 		return registerCustomElement(tag, cls, ...rest);
 	}
-}
-
-if (document.documentElement.dataset.hasOwnProperty('componentBase')) {
-	HTMLCustomElement.base = new URL(document.documentElement.dataset.componentBase, document.baseURI).href;
 }
