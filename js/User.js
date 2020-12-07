@@ -9,7 +9,7 @@ const KEYS = [
 ];
 
 import HTMLGravatarImageElement from '/components/gravatar-img.js';
-import {notify} from '/js/std-js/functions.js';
+import { notify } from '/js/std-js/deprecatedFunctions.js';
 
 const ENDPOINT = document.documentElement.dataset.apiEndpoint || 'https://api.kernvalley.us';
 
@@ -21,7 +21,7 @@ async function saveCredentials({username, password, image}) {
 			password: password,
 			iconURL: (typeof image === 'string')
 				? image
-				: HTMLGravatarImageElement.url({email: username, size: 64}),
+				: HTMLGravatarImageElement.url({ email: username, size: 64 }),
 		});
 		return await navigator.credentials.store(creds);
 	}

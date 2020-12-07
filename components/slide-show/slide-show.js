@@ -1,9 +1,5 @@
 import HTMLCustomElement from '../custom-element.js';
-// import { meta } from '../../import.meta.js';
-
-async function sleep(ms = 1000) {
-	await new Promise(resolve => setTimeout(() => resolve(), ms));
-}
+import { sleep } from '../../js/std-js/functions.js';
 
 async function visible() {
 	if (document.visibilityState === 'hidden') {
