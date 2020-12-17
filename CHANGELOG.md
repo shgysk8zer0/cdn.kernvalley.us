@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <!-- markdownlint-disable -->
 ## [Unreleased]
 
+## [v1.0.13] - 2020-12-17
+
 ### Added
 - `ga('send', ...)` on ad view or click
 - Create `<svg-box>` element for using SVGBox icons
@@ -18,6 +20,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Update lazy loading of `<spotify-player>` and `<youtube-player>`
 - Use Adwaita theme
 - Update `<leaflet-*>` constructors for easier JS creation
+- Update `navigator.share()` based on [Share Target API](https://web.dev/web-share-target/)
+- `<button is="share-button">` changes to work with new `navigator.share()`
 
 ### Fixed
 - Fix handling of `vibrate` in `HTMLNotificationElement`
