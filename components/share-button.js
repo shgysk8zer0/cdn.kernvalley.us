@@ -1,18 +1,10 @@
-import webShareApi from '../js/std-js/webShareApi.js';
-import {
-	facebook,
-	twitter,
-	googlePlus,
-	linkedIn,
-	reddit,
-	gmail,
-	email,
-	clipboard,
-} from '../js/std-js/share-config.js';
-
+import './toast-message.js';
 import { registerCustomElement } from '../js/std-js/functions.js';
+import { shim } from '../js/std-js/share.js';
+import { Facebook, Twitter, LinkedIn, Reddit, Gmail, Pinterest, Telegram, Tumblr,
+	Email } from '../js/std-js/share-targets.js';
 
-webShareApi(facebook, twitter, googlePlus, linkedIn, reddit, gmail, email, clipboard);
+shim([Facebook, Twitter, LinkedIn, Reddit, Tumblr, Pinterest, Telegram, Gmail, Email]);
 
 export default class HTMLShareButtonElement extends HTMLButtonElement {
 	constructor({ title = null, text = null, url = null, source = null, medium = null, content = null } = {}) {
