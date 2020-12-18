@@ -1,3 +1,4 @@
+import { getJSON } from '../../js/std-js/http.js';
 export const ENDPOINT = 'https://api.openweathermap.org';
 export const ICON_SRC = 'https://openweathermap.org/img/wn/';
 export const VERSION = 2.5;
@@ -120,24 +121,14 @@ export async function getForecastByPostalCode(appId, postalCode, {units = 'imper
 	}
 }
 
-export async function getWeatherByPostalCode(appId, postalCode, {units = 'imperial', country = 'us', lang = 'en'} = {}) {
-	const url = new URL(`/data/${VERSION}/weather`, ENDPOINT);
-	url.searchParams.set('appid', appId);
-	url.searchParams.set('zip', `${postalCode},${country}`);
-	url.searchParams.set('units', units);
-	url.searchParams.set('lang', lang);
-
-	const resp = await fetch(url, {
-		headers: new Headers({Accept: 'application/json'}),
-		mode: 'cors',
-		credentials: 'omit',
+export async function getWeatherByPostalCode(appid, postalCode, {
+	units = 'imperial',
+	country = 'us',
+	lang = 'en',
+} = {}) {
+	return await getJSON(new URL(`/data/${VERSION}/weather`, ENDPOINT), {
+		body: {  appid, zip: `${postalCode},${country}`, units, lang }
 	});
-
-	if (resp.ok) {
-		return await resp.json();
-	} else {
-		throw new Error(`${resp.url} [${resp.status} ${resp.statusText}]`);
-	}
 }
 
 export async function getSlot(el, name) {

@@ -1,5 +1,6 @@
 import { registerCustomElement, css, attr } from '../../js/std-js/functions.js';
 import { loadImage } from '../../js/std-js/loader.js';
+import { getJSON } from '../../js/std-js/http.js';
 
 function log() {
 	if (window.ga instanceof Function) {
@@ -190,32 +191,25 @@ registerCustomElement('app-list', class HTMLKernValleyAppListButtonlement extend
 	}
 
 	static async getAppList({ source = null, medium = null, content = null } = {}) {
-		const resp = await fetch('https://apps.kernvalley.us/apps.json', {
-			mode: 'cors',
-			credentials: 'omit',
-			headers: new Headers({ Accept: 'application/json' }),
-		});
+		const list = await getJSON('https://apps.kernvalley.us/apps.json');
 
-		if (resp.ok) {
-			const list = await resp.json();
+		if (Array.isArray(list) && typeof source === 'string') {
+			return list.map(app => {
+				if (typeof app.url === 'string') {
+					const url = new URL(app.url, document.baseURI);
 
-			if (Array.isArray(list) && typeof source === 'string') {
-				return list.map(app => {
-					if (typeof app.url === 'string') {
-						const url = new URL(app.url, document.baseURI);
+					if (! url.searchParams.has('utm_source')) {
 						url.searchParams.set('utm_source', source);
 						url.searchParams.set('utm_medium', medium || 'web');
 						url.searchParams.set('utm_content', content || 'krv-app-list');
 						app.url = url.href;
 					}
+				}
 
-					return app;
-				});
-			} else {
-				return list;
-			}
+				return app;
+			});
 		} else {
-			throw new Error(`${resp.url} [${resp.status} ${resp.statusText}]`);
+			throw new Error('Failed fetching app list');
 		}
 	}
 }, {
