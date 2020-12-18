@@ -193,7 +193,7 @@ registerCustomElement('app-list', class HTMLKernValleyAppListButtonlement extend
 	static async getAppList({ source = null, medium = null, content = null } = {}) {
 		const list = await getJSON('https://apps.kernvalley.us/apps.json');
 
-		if (Array.isArray(list) && typeof source === 'string') {
+		if (Array.isArray(list)) {
 			return list.map(app => {
 				if (typeof app.url === 'string') {
 					const url = new URL(app.url, document.baseURI);
