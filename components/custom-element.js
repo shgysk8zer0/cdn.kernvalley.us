@@ -1,5 +1,6 @@
 import { meta } from '../import.meta.js';
-import { registerCustomElement } from '../js/std-js/functions.js';
+import { registerCustomElement, when } from '../js/std-js/functions.js';
+import { getHTML } from '../js/std-js/http.js';
 
 let metaUrl = meta.url;
 let base    = null;
@@ -66,15 +67,15 @@ export default class HTMLCustomElement extends HTMLElement {
 	}
 
 	get stylesLoaded() {
-		return this.ready.then(async () => {
+		return this.ready.then(() => {
 			if (this.shadowRoot !== null) {
-				const stylesheets = this.shadowRoot.querySelectorAll('link[rel="stylesheet"][href]');
-				await Promise.all([...stylesheets].map(async link => {
-					if (! link.disabled && link.sheet === null) {
-						await new Promise((res, rej) => {
-							link.addEventListener('load', () => res(), {once: true});
-							link.addEventListener('error', () => rej(`Error loading ${link.href}`), {once: true});
-						});
+				const stylesheets = this.shadowRoot.querySelectorAll('link[rel="stylesheet"][href]:not(:disabled)');
+				return Promise.allSettled([...stylesheets].map(async link => {
+					if (link.sheet === null) {
+						return Promise.race([
+							when(link, 'load'),
+							when(link, 'error'),
+						]);
 					} else {
 						return Promise.resolve();
 					}
@@ -186,33 +187,13 @@ export default class HTMLCustomElement extends HTMLElement {
 		return el;
 	}
 
-	async getTemplate(url, {
-		cache          = 'default',
-		mode           = 'cors',
-		headers        = new Headers(),
-		referrerPolicy = 'no-referrer',
-		redirect       = 'error',
-		credentials    = 'omit',
-		timeout        = 25000,
-		integrity      = undefined,
-		signal         = undefined,
-	} = {}) {
-		if (Request.prototype.hasOwnProperty('signal') && typeof signal === 'undefined') {
-			const controller = new AbortController();
-			setTimeout(() => controller.abort(), timeout);
-			signal = controller.signal;
-		}
-		const init = { cache, mode, headers, referrerPolicy, redirect, credentials, integrity, signal };
+	async getTemplate(url, init = {}) {
+		url = new URL(url, HTMLCustomElement.base);
+		const frag = await getHTML(url, init);
 
-		const resp = await fetch(new URL(url, HTMLCustomElement.base), init);
-		const doc = new DOMParser().parseFromString(await resp.text(), 'text/html');
-		const frag = document.createDocumentFragment();
-
-		doc.querySelectorAll('link[href]').forEach(link => link.href = new URL(link.getAttribute('href'), resp.url).href);
-		doc.querySelectorAll('img[src]').forEach(img => img.src = new URL(img.getAttribute('src'), resp.url).href);
-		doc.querySelectorAll('script[src]').forEach(script => script.src = new URL(script.getAttribute('src'), resp.url).href);
-
-		frag.append(...doc.head.children, ...doc.body.children);
+		frag.querySelectorAll('link[href]').forEach(link => link.href = new URL(link.getAttribute('href'), url).href);
+		frag.querySelectorAll('img[src]').forEach(img => img.src = new URL(img.getAttribute('src'), url).href);
+		frag.querySelectorAll('script[src]').forEach(script => script.src = new URL(script.getAttribute('src'), url).href);
 		return frag;
 	}
 

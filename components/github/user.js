@@ -1,4 +1,5 @@
 import { $ } from '../../js/std-js/functions.js';
+import { getJSON } from '../../js/std-js/http.js';
 const ENDPOINT = 'https://api.github.com';
 import HTMLCustomElement from '../custom-element.js';
 
@@ -8,26 +9,9 @@ async function getUser(user) {
 	if (sessionStorage.hasOwnProperty(key)) {
 		return JSON.parse(sessionStorage.getItem(key));
 	} else {
-		const url = new URL(`/users/${user}`, ENDPOINT);
-		const resp = await fetch(url, {
-			mode: 'cors',
-			referrerPolicy: 'no-referrer',
-			crossorigin: 'anonymous',
-			cache: 'default',
-			headers: new Headers({
-				Accept: 'application/json',
-			})
-		});
-
-		if (resp.ok) {
-			sessionStorage.setItem(key, await resp.clone().text());
-			return await resp.json();
-		} else {
-			/**
-			 * @TODO Handle API errors (service down, rate limit, etc.
-			 */
-			throw new Error(`${resp.url} [${resp.status} ${resp.statusText}]`);
-		}
+		const data = await getJSON(new URL(`/users/${user}`, ENDPOINT));
+		sessionStorage.setItem(key, JSON.stringify(data));
+		return data;
 	}
 
 }

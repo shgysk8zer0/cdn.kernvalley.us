@@ -75,6 +75,18 @@ select:focus, textarea:focus, .input:focus, [tabindex]:focus, a:focus, [tabindex
 	background-color: #1d87bd;
 }
 
+:host([target="pinterest"]) [part="container"] {
+	background-color: #CB1F27;
+}
+
+:host([target="tumblr"]) [part="container"] {
+	background-color: #39475d;
+}
+
+:host([target="telegram"]) [part="container"] {
+	background-color: #37aee2;
+}
+
 :host([target="email"]) [part="container"] {
 	background-color: #343434;
 }
@@ -111,10 +123,32 @@ select:focus, textarea:focus, .input:focus, [tabindex]:focus, a:focus, [tabindex
 	display: none;
 }
 
+:host(:not([target="pinterest"])) [part~="pinterest-icon"] {
+	display: none;
+}
+
+:host(:not([target="tumblr"])) [part~="tumblr-icon"] {
+	display: none;
+}
+
+:host(:not([target="telegram"])) [part~="telegram-icon"] {
+	display: none;
+}
+
 .inline-block {
 	display: inline-block;
 }
 
 .current-color {
 	fill: currentColor;
+}
+
+@media(max-width: 800px) {
+	.mobile-hidden {
+		display: none;
+	}
+}
+
+#network {
+	text-transform: capitalize;
 }

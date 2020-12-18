@@ -1,12 +1,6 @@
 import HTMLCustomElement from '../custom-element.js';
-
-const urls = {
-	facebook: 'https://www.facebook.com/sharer/sharer.php?u&t',
-	twitter: 'https://twitter.com/intent/tweet/?text&url',
-	reddit: 'https://www.reddit.com/submit/?url&title',
-	linkedIn: 'https://www.linkedin.com/shareArticle/?title&summary&url',
-	gmail: 'https://mail.google.com/mail/u/0/?view=cm&fs=1&tf=1&su=&body=',
-};
+import { Facebook, Twitter, Reddit, LinkedIn, Gmail, Pinterest, Email, Tumblr, Telegram, getShareURL }
+	from '../../js/std-js/share-targets.js';
 
 async function openPopup(url, {
 	title = 'SharePopup',
@@ -18,67 +12,51 @@ async function openPopup(url, {
 
 async function share({
 	target,
-	shareTitle = document.title,
+	title = document.title,
 	text = '',
 	url = location.href,
 }) {
 	switch(target.toLowerCase()) {
 		case 'facebook':
-			(() => {
-				const link = new URL(urls.facebook);
-				link.searchParams.set('u', url);
-				link.searchParams.set('t', shareTitle);
-				openPopup(link);
-			})();
+			openPopup(getShareURL(Facebook, { title, text, url }));
 			break;
 
 		case 'twitter':
-			(() => {
-				const link = new URL(urls.twitter);
-				link.searchParams.set('text', shareTitle);
-				link.searchParams.set('url', url);
-				openPopup(link);
-			})();
+			openPopup(getShareURL(Twitter, { title, text, url }));
 			break;
 
 		case 'reddit':
-			(() => {
-				const link = new URL(urls.reddit);
-				link.searchParams.set('url', url);
-				link.searchParams.set('title', shareTitle);
-				openPopup(link);
-			})();
+			openPopup(getShareURL(Reddit, { title, text, url }));
 			break;
 
 		case 'linkedin':
 			(() => {
-				const link = new URL(urls.linkedIn);
-				link.searchParams.set('title', shareTitle);
-				link.searchParams.set('summary', text);
-				link.searchParams.set('url', url);
-				openPopup(link);
+				openPopup(getShareURL(LinkedIn, { title, text, url }));
 			})();
 			break;
 
 		case 'gmail':
-			(() => {
-				const link = new URL(urls.gmail);
-				link.searchParams.set('su', shareTitle);
-				if (typeof text === 'string' && text !== '') {
-					link.searchParams.set('body', `${shareTitle} <${url}>\n${text}`);
-				} else {
-					link.searchParams.set('body', `${shareTitle} <${url}>`);
-				}
-				openPopup(link);
-			})();
+			openPopup(getShareURL(Gmail, { title, text, url }));
+			break;
+
+		case 'pinterest':
+			openPopup(getShareURL(Pinterest, { title, text, url }));
+			break;
+
+		case 'tumblr':
+			openPopup(getShareURL(Tumblr, { title, text, url }));
+			break;
+
+		case 'telegram':
+			openPopup(getShareURL(Telegram, { title, text, url }));
 			break;
 
 		case 'clipboard':
 			if (typeof text === 'string' && text.length !== 0) {
-				navigator.clipboard.writeText(`${shareTitle} <${url}>\n${text}`)
+				navigator.clipboard.writeText(`${title} <${url}>\n${text}`)
 					.then(() => alert('Copied to clipboard'));
 			} else {
-				navigator.clipboard.writeText(`${shareTitle} <${url}>`)
+				navigator.clipboard.writeText(`${title} <${url}>`)
 					.then(() => alert('Copied to clipboard'));
 			}
 			break;
@@ -88,16 +66,7 @@ async function share({
 			break;
 
 		case 'email':
-			(() => {
-				const link = new URL('mailto:');
-				link.searchParams.set('subject', shareTitle);
-				if (typeof text === 'string' && text.length > 0) {
-					link.searchParams.set('body', `${shareTitle} <${url}>\n${text}`);
-				} else {
-					link.searchParams.set('body', `${shareTitle} <${url}>`);
-				}
-				location.href = link;
-			})();
+			openPopup(getShareURL(Email, { title, text, url }));
 			break;
 
 		default:
@@ -116,6 +85,8 @@ HTMLCustomElement.register('share-to-button', class HTMLShareToButtonElement ext
 		});
 
 		this.getTemplate('./components/share-to-button/share-to-button.html').then(tmp => {
+			const wasHidden = this.hidden;
+			this.hidden = true;
 			if (typeof target === 'string') {
 				this.target = target;
 			}
@@ -136,7 +107,10 @@ HTMLCustomElement.register('share-to-button', class HTMLShareToButtonElement ext
 				this.content = content;
 			}
 			this.shadowRoot.append(tmp);
-			this.dispatchEvent(new Event('ready'));
+			this.stylesLoaded.then(() => {
+				this.dispatchEvent(new Event('ready'));
+				this.hidden = wasHidden;
+			});
 		});
 
 		this.addEventListener('click', () => share(this));
@@ -300,6 +274,9 @@ HTMLCustomElement.register('share-to-button', class HTMLShareToButtonElement ext
 				} else if (newValue.toLowerCase() === 'clipboard') {
 					this.hidden = ! (('clipboard' in navigator) && navigator.clipboard.writeText instanceof Function);
 				} else {
+					this.ready.then(() => {
+						this.shadowRoot.getElementById('network').textContent = newValue;
+					});
 					this.hidden = false;
 				}
 				break;
