@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <!-- markdownlint-disable -->
 ## [Unreleased]
 
+### Added
+- `<share-button>` now supports an optional `file`
+
 ## [v1.0.13] - 2020-12-17
 
 ### Added
