@@ -1,13 +1,36 @@
 import './toast-message.js';
 import { registerCustomElement } from '../js/std-js/functions.js';
 import { shim } from '../js/std-js/share.js';
+import { GET } from '../js/std-js/http.js';
 import { Facebook, Twitter, LinkedIn, Reddit, Gmail, Pinterest, Telegram, Tumblr,
 	Email } from '../js/std-js/share-targets.js';
 
 shim([Facebook, Twitter, LinkedIn, Reddit, Tumblr, Pinterest, Telegram, Gmail, Email]);
 
+const supportsFiles = navigator.canShare instanceof Function && navigator.canShare({ text: 'hi', files: [new File([''], 'text.txt', { type: 'text/plain' })]});
+
+async function getFiles(file) {
+	if (supportsFiles && typeof file === 'string') {
+		const resp = await GET(file);
+
+		if (! resp.ok) {
+			throw new Error(`Failed fetching ${file} [${resp.status} ${resp.statusText}]`);
+		} else if (! resp.headers.has('Content-Type')) {
+			throw new Error(`Unknown Content-Type for ${file}`);
+		} else {
+			const path = file.split('/');
+			const name = path[path.length - 1];
+			const type = resp.headers.get('Content-Type').split(';')[0];
+			const files = [new File([await resp.blob()], name, { type })];
+			return files;
+		}
+	} else {
+		return [];
+	}
+}
+
 export default class HTMLShareButtonElement extends HTMLButtonElement {
-	constructor({ title = null, text = null, url = null, source = null, medium = null, content = null } = {}) {
+	constructor({ title = null, text = null, url = null, file = null, source = null, medium = null, content = null } = {}) {
 		super();
 
 		Promise.resolve().then(() => {
@@ -36,17 +59,30 @@ export default class HTMLShareButtonElement extends HTMLButtonElement {
 			if (typeof content === 'string') {
 				this.content = content;
 			}
+
+			if (typeof file === 'string') {
+				this.file = file;
+			}
 		});
 
 		this.addEventListener('click', async event => {
 			event.preventDefault();
 			event.stopPropagation();
+			this.disabled = true;
 
 			try {
-				const { title, text, url } = this;
-				await navigator.share({ title, text, url });
+				const { title, text, url, file } = this;
+
+				if (supportsFiles && typeof file === 'string') {
+					const files = await getFiles(file);
+					await navigator.share({ title, text, url, files });
+				} else {
+					await navigator.share({ title, text, url });
+				}
 			} catch (err) {
 				console.error(err);
+			} finally {
+				this.disabled = false;
 			}
 		});
 	}
@@ -60,6 +96,22 @@ export default class HTMLShareButtonElement extends HTMLButtonElement {
 			this.setAttribute('content', val);
 		} else {
 			this.removeAttribute('content');
+		}
+	}
+
+	get file() {
+		if (this.hasAttribute('file')) {
+			return new URL(this.getAttribute('file'), document.baseURI).href;
+		} else {
+			return null;
+		}
+	}
+
+	set file(val) {
+		if (typeof val === 'string' && val.length !== 0) {
+			this.setAttribute('file', new URL(val, document.baseURI));
+		} else {
+			this.removeAttribute('file');
 		}
 	}
 
