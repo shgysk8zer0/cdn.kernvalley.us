@@ -2,6 +2,8 @@ import { registerCustomElement, css, attr } from '../../js/std-js/functions.js';
 import { loadImage } from '../../js/std-js/loader.js';
 import { getJSON } from '../../js/std-js/http.js';
 
+const X = '<svg width="12" height="16" fill="currentColor" viewBox="0 0 12 16"><path fill-rule="evenodd" d="M7.48 8l3.75 3.75-1.48 1.48L6 9.48l-3.75 3.75-1.48-1.48L4.52 8 .77 4.25l1.48-1.48L6 6.52l3.75-3.75 1.48 1.48L7.48 8z"/></svg>';
+
 function log() {
 	if (window.ga instanceof Function) {
 		window.ga('send', {
@@ -142,19 +144,30 @@ registerCustomElement('app-list', class HTMLKernValleyAppListButtonlement extend
 			'flex-basis': '100%',
 		});
 
-		close.textContent ='X';
+		close.innerHTML = X;
+		css('svg', {
+			'color': 'inherit',
+			'max-width': '100%',
+			'max-height': '100%',
+			'width': 'var(--icon-size, 1em)',
+			'height': 'var(--icon-size, 1em)',
+			'vertical-align': 'middle',
+		}, { base: close });
+
 		close.addEventListener('click', ({ target }) => {
 			target.closest('dialog').close();
 			this.disabled = false;
 		});
 		css(close, {
+			'display': 'inline-block',
 			'background-color': '#dc3545',
 			'color': '#fefefe',
 			'border': 'none',
 			'cursor': 'pointer',
-			'font-size': '2em',
+			'font-size': '20px',
 			'margin-left': 'auto',
 			'border-radius': '4px',
+			'padding': '0.3em',
 		});
 		close.title = 'Close Dialog';
 		header.append(close);
@@ -198,7 +211,7 @@ registerCustomElement('app-list', class HTMLKernValleyAppListButtonlement extend
 				if (typeof app.url === 'string') {
 					const url = new URL(app.url, document.baseURI);
 
-					if (! url.searchParams.has('utm_source')) {
+					if (typeof source === 'string' && ! url.searchParams.has('utm_source')) {
 						url.searchParams.set('utm_source', source);
 						url.searchParams.set('utm_medium', medium || 'web');
 						url.searchParams.set('utm_content', content || 'krv-app-list');
