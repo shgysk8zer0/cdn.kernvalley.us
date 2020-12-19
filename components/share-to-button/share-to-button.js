@@ -3,11 +3,9 @@ import { openWindow } from '../../js/std-js/functions.js';
 import { Facebook, Twitter, Reddit, LinkedIn, Gmail, Pinterest, Email, Tumblr, Telegram, getShareURL }
 	from '../../js/std-js/share-targets.js';
 
-const windowParams = {
-	title: 'SharePopup',
-	height: 360,
-	width: 720,
-};
+function openShare(target, { title, text, url, height = 360, width = 720, name = 'SharePopup' } = {}) {
+	openWindow(getShareURL(target, { title, text, url }), { height, width, name });
+}
 
 async function share({
 	target,
@@ -17,37 +15,35 @@ async function share({
 }) {
 	switch(target.toLowerCase()) {
 		case 'facebook':
-			openWindow(getShareURL(Facebook, { title, text, url }), windowParams);
+			openShare(Facebook, { title, text, url });
 			break;
 
 		case 'twitter':
-			openWindow(getShareURL(Twitter, { title, text, url }), windowParams);
+			openShare(Twitter, { title, text, url });
 			break;
 
 		case 'reddit':
-			openWindow(getShareURL(Reddit, { title, text, url }), windowParams);
+			openShare(Reddit, { title, text, url });
 			break;
 
 		case 'linkedin':
-			(() => {
-				openWindow(getShareURL(LinkedIn, { title, text, url }), windowParams);
-			})();
+			openShare(LinkedIn, { title, text, url });
 			break;
 
 		case 'gmail':
-			openWindow(getShareURL(Gmail, { title, text, url }), windowParams);
+			openShare(Gmail, { title, text, url });
 			break;
 
 		case 'pinterest':
-			openWindow(getShareURL(Pinterest, { title, text, url }), windowParams);
+			openShare(Pinterest, { title, text, url });
 			break;
 
 		case 'tumblr':
-			openWindow(getShareURL(Tumblr, { title, text, url }), windowParams);
+			openShare(Tumblr, { title, text, url });
 			break;
 
 		case 'telegram':
-			openWindow(getShareURL(Telegram, { title, text, url }), windowParams);
+			openShare(Telegram, { title, text, url });
 			break;
 
 		case 'clipboard':
@@ -65,7 +61,7 @@ async function share({
 			break;
 
 		case 'email':
-			openWindow(getShareURL(Email, { title, text, url }), windowParams);
+			openShare(Email, { title, text, url });
 			break;
 
 		default:
@@ -112,7 +108,10 @@ HTMLCustomElement.register('share-to-button', class HTMLShareToButtonElement ext
 			});
 		});
 
-		this.addEventListener('click', () => share(this));
+		this.addEventListener('click', () => {
+			const { shareTitle, target, url, text } = this;
+			share({ target, title: shareTitle, url, text });
+		});
 
 		this.addEventListener('keypress', ({ charCode }) => {
 			if (charCode === 32) {
