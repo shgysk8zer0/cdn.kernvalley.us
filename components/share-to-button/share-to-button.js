@@ -3,6 +3,18 @@ import { openWindow } from '../../js/std-js/functions.js';
 import { Facebook, Twitter, Reddit, LinkedIn, Gmail, Pinterest, Email, Tumblr, Telegram, getShareURL }
 	from '../../js/std-js/share-targets.js';
 
+function log(btn) {
+	if (window.ga instanceof Function) {
+		window.ga('send', {
+			hitType: 'event',
+			eventCategory: `${btn.tagName.toLowerCase()} | ${btn.target}`,
+			eventAction: btn.url,
+			eventLabel: btn.title || document.title,
+			transport: 'beacon',
+		});
+	}
+}
+
 function openShare(target, { title, text, url, height = 360, width = 720, name = 'SharePopup' } = {}) {
 	openWindow(getShareURL(target, { title, text, url }), { height, width, name });
 }
@@ -108,9 +120,10 @@ HTMLCustomElement.register('share-to-button', class HTMLShareToButtonElement ext
 			});
 		});
 
-		this.addEventListener('click', () => {
+		this.addEventListener('click', async () => {
 			const { shareTitle, target, url, text } = this;
-			share({ target, title: shareTitle, url, text });
+			await share({ target, title: shareTitle, url, text });
+			log(this);
 		});
 
 		this.addEventListener('keypress', ({ charCode }) => {

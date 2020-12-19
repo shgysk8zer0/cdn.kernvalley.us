@@ -7,6 +7,18 @@ import { Facebook, Twitter, LinkedIn, Reddit, Gmail, Pinterest, Telegram, Tumblr
 
 shim([Facebook, Twitter, LinkedIn, Reddit, Tumblr, Pinterest, Telegram, Gmail, Email]);
 
+function log(btn) {
+	if (window.ga instanceof Function) {
+		window.ga('send', {
+			hitType: 'event',
+			eventCategory: 'share-button',
+			eventAction: btn.url,
+			eventLabel: btn.title || document.title,
+			transport: 'beacon',
+		});
+	}
+}
+
 const supportsFiles = navigator.canShare instanceof Function && navigator.canShare({ text: 'hi', files: [new File([''], 'text.txt', { type: 'text/plain' })]});
 
 async function getFiles(file) {
@@ -76,8 +88,10 @@ export default class HTMLShareButtonElement extends HTMLButtonElement {
 				if (supportsFiles && typeof file === 'string') {
 					const files = await getFiles(file);
 					await navigator.share({ title, text, url, files });
+					log(this);
 				} else {
 					await navigator.share({ title, text, url });
+					log(this);
 				}
 			} catch (err) {
 				console.error(err);
