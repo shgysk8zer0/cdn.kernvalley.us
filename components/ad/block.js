@@ -1,6 +1,6 @@
 import HTMLCustomElement from '../custom-element.js';
 import { save, open } from '../../js/std-js/filesystem.js';
-import { css, attr, on, off, loaded } from '../../js/std-js/functions.js';
+import { css, attr, on, off, loaded, openWindow } from '../../js/std-js/functions.js';
 
 function log(eventAction, ad, transport = 'beacon') {
 	if (window.ga instanceof Function && ! ad.preview) {
@@ -36,7 +36,7 @@ function openLink() {
 			setTimeout(() => location.href = this.getUrl(), 20);
 		} else {
 			log('ad-click', this);
-			window.open(this.getUrl(), 'ad-window', 'noopener,noreferrer');
+			openWindow(this.getUrl());
 			this.dispatchEvent(new Event('opened'));
 		}
 	}

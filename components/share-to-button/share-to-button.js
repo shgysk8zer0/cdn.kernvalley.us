@@ -1,14 +1,13 @@
 import HTMLCustomElement from '../custom-element.js';
+import { openWindow } from '../../js/std-js/functions.js';
 import { Facebook, Twitter, Reddit, LinkedIn, Gmail, Pinterest, Email, Tumblr, Telegram, getShareURL }
 	from '../../js/std-js/share-targets.js';
 
-async function openPopup(url, {
-	title = 'SharePopup',
-	height = 360,
-	width = 720,
-} = {}) {
-	window.open(url, title, `width=${width},height=${height},resizable,scrollbars,noopener,noreferrer,toolbar=no,menubar=no,location=no,status=no`);
-}
+const windowParams = {
+	title: 'SharePopup',
+	height: 360,
+	width: 720,
+};
 
 async function share({
 	target,
@@ -18,37 +17,37 @@ async function share({
 }) {
 	switch(target.toLowerCase()) {
 		case 'facebook':
-			openPopup(getShareURL(Facebook, { title, text, url }));
+			openWindow(getShareURL(Facebook, { title, text, url }), windowParams);
 			break;
 
 		case 'twitter':
-			openPopup(getShareURL(Twitter, { title, text, url }));
+			openWindow(getShareURL(Twitter, { title, text, url }), windowParams);
 			break;
 
 		case 'reddit':
-			openPopup(getShareURL(Reddit, { title, text, url }));
+			openWindow(getShareURL(Reddit, { title, text, url }), windowParams);
 			break;
 
 		case 'linkedin':
 			(() => {
-				openPopup(getShareURL(LinkedIn, { title, text, url }));
+				openWindow(getShareURL(LinkedIn, { title, text, url }), windowParams);
 			})();
 			break;
 
 		case 'gmail':
-			openPopup(getShareURL(Gmail, { title, text, url }));
+			openWindow(getShareURL(Gmail, { title, text, url }), windowParams);
 			break;
 
 		case 'pinterest':
-			openPopup(getShareURL(Pinterest, { title, text, url }));
+			openWindow(getShareURL(Pinterest, { title, text, url }), windowParams);
 			break;
 
 		case 'tumblr':
-			openPopup(getShareURL(Tumblr, { title, text, url }));
+			openWindow(getShareURL(Tumblr, { title, text, url }), windowParams);
 			break;
 
 		case 'telegram':
-			openPopup(getShareURL(Telegram, { title, text, url }));
+			openWindow(getShareURL(Telegram, { title, text, url }), windowParams);
 			break;
 
 		case 'clipboard':
@@ -66,7 +65,7 @@ async function share({
 			break;
 
 		case 'email':
-			openPopup(getShareURL(Email, { title, text, url }));
+			openWindow(getShareURL(Email, { title, text, url }), windowParams);
 			break;
 
 		default:
