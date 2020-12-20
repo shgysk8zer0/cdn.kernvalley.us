@@ -1,7 +1,7 @@
 import './prompt.js';
 import { confirm } from '../../js/std-js/asyncDialog.js';
 import { registerCustomElement } from '../../js/std-js/functions.js';
-import { getJSON } from '../../js/std-js/http.js';
+import { getManifest } from '../../js/std-js/http.js';
 
 registerCustomElement('pwa-install', class HTMLPWAInstallButton extends HTMLButtonElement {
 	constructor(src = null, {
@@ -74,13 +74,7 @@ registerCustomElement('pwa-install', class HTMLPWAInstallButton extends HTMLButt
 	}
 
 	get manifest() {
-		const link = document.querySelector('link[rel="manifest"][href]');
-
-		if (link instanceof HTMLLinkElement) {
-			return getJSON(link.href);
-		} else {
-			return Promise.reject(new Error('No webapp manifest found'));
-		}
+		return getManifest();
 	}
 
 	get reloadOnUpdate() {
