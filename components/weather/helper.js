@@ -48,7 +48,7 @@ export function getIconSrc(icon) {
 export function createIcon(symbol, owner = document) {
 	const sprite = owner.getElementById(symbol);
 	const svg = document.createElementNS(SVGNS, 'svg');
-	svg.classList.add('current-color');
+	svg.setAttribute('fill', 'currentColor');
 	svg.setAttributeNS(null, 'viewBox', sprite.getAttribute('viewBox'));
 	for (const child of sprite.children) {
 		svg.appendChild(child.cloneNode(true));
@@ -78,7 +78,7 @@ export async function getForecastByPostalCode(appId, postalCode, {units = 'imper
 	});
 
 	if (resp.ok) {
-		const {city, list} = await resp.json();
+		const { city, list } = await resp.json();
 
 		const forecast = list.reduce((forecast, entry) => {
 			const date = new Date(entry.dt_txt.replace(' ', 'T') + TZ);
