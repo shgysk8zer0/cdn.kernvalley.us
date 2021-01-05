@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <!-- markdownlint-disable -->
 ## [Unreleased]
 
+### Fixed
+- Do not hide open markers on zoom change
+- Check zoom level on append for `<leaflet-marker>`
+- Remove debugging code
+
 ## [v1.0.14] - 2021-01-05
 
 ### Added
