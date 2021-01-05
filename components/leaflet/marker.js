@@ -290,6 +290,8 @@ registerCustomElement('leaflet-marker', class HTMLLeafletMarkerElement extends H
 					this.whenConnected.then(() => {
 						const { minZoom, maxZoom } = this;
 						const map = this.closest('leaflet-map');
+						const zoom = map.map.getZoom();
+						this.hidden = ! this.open && (zoom > maxZoom || zoom < minZoom);
 
 						if (zoomHandlers.has(this)) {
 							map.removeEventListener('zoom', zoomHandlers.get(this));
@@ -298,11 +300,10 @@ registerCustomElement('leaflet-marker', class HTMLLeafletMarkerElement extends H
 
 						if (! Number.isNaN(minZoom) || ! Number.isNaN(maxZoom)) {
 							const handler = ({ detail: { zoom }}) => {
-								console.info({ map, zoom, minZoom, maxZoom });
 								if (! Number.isNaN(minZoom) && zoom < minZoom) {
-									this.hidden = true;
+									this.hidden = ! this.open;
 								} else if (! Number.isNaN(maxZoom) && zoom > maxZoom) {
-									this.hidden = true;
+									this.hidden = ! this.open;
 								} else {
 									this.hidden = false;
 								}
