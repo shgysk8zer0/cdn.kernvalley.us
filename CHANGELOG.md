@@ -10,6 +10,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - `<share-button>` now supports an optional `file`
 - Provide minified (Rollup) version of certain custom elements
+- `<leaflet-map>` now dispatches `"zoom"` and `"pan"` events
+- New `WeakMap` for storing zoom handlers
+- Add `minZoom` & `maxZoom` to marker comstructor
+- On `minzoom` or `maxzoom` change, toggle map zoom listener
+
+### Changed
+- Use `WeakMap` for storing maps from elements to markers
 
 ## [v1.0.13] - 2020-12-17
 
