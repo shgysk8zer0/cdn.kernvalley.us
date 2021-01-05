@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <!-- markdownlint-disable -->
 ## [Unreleased]
 
+## [v1.0.14] - 2021-01-05
+
 ### Added
 - `<share-button>` now supports an optional `file`
 - Provide minified (Rollup) version of certain custom elements
