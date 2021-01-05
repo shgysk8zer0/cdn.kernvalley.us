@@ -290,7 +290,7 @@ registerCustomElement('leaflet-marker', class HTMLLeafletMarkerElement extends H
 					this.whenConnected.then(() => {
 						const { minZoom, maxZoom } = this;
 						const map = this.closest('leaflet-map');
-						const zoom = map.map.getZoom()
+						const zoom = map.map.getZoom();
 						this.hidden = ! this.open && (zoom > maxZoom || zoom < minZoom);
 
 						if (zoomHandlers.has(this)) {
