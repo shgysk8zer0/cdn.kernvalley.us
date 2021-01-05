@@ -8,7 +8,7 @@ import {
 let map = new Map();
 
 /**
- * @see https://leafletjs.com/reference-1.6.0.html#map-factory
+ * @see https://leafletjs.com/reference-1.7.1.html#map-factory
  */
 HTMLCustomElement.register('leaflet-map', class HTMLLeafletMapElement extends HTMLCustomElement {
 	constructor({
@@ -160,6 +160,24 @@ HTMLCustomElement.register('leaflet-map', class HTMLLeafletMapElement extends HT
 		await Promise.all([ this._populated, prom ]);
 		const m = LeafletMap(this.mapElement, {
 			zoomControl: this.zoomControl,
+		});
+
+		const handler = ({ type, target }) => {
+			const event = type === 'move' ? 'pan': 'zoom';
+			const { lat: latitude, lng: longitude } = target.getCenter();
+			const { _northEast: ne, _southWest: sw } = target.getBounds();
+			const bounds = [
+				{ latitude: ne.lat, longitude: ne.lng },
+				{ latitude: sw.lat, longitude: sw.lng },
+			];
+			const zoom = target.getZoom();
+			const detail = { center: { latitude, longitude }, zoom, bounds };
+			this.dispatchEvent(new CustomEvent(event, { detail }));
+		};
+
+		m.on({
+			move: handler,
+			zoom: handler,
 		});
 
 		const { latitude, longitude } = this.center;
