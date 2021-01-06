@@ -1,0 +1,5 @@
+<svg version="1.1" viewBox="0 0 640 480" xmlns="http://www.w3.org/2000/svg">
+	<rect width="640" height="480" fill="#1a1a1a" rx="12" ry="12"/>
+	<path d="m320 129.03h42.162v42.162h-42.162zm126.49-10.54v200.27c0 11.595-9.4864 21.081-21.081 21.081h-210.81c-11.595 0-21.081-9.4865-21.081-21.081v-252.97c0-11.595 9.4864-21.081 21.081-21.081h158.11zm-21.081 10.54-63.243-63.243h-147.57v231.89l63.243-105.41 42.162 84.324 42.162-42.162 63.243 63.243z" fill="#e6e6e6" fill-rule="evenodd"/>
+	<text x="318.61456" y="425.08475" fill="#f2f2f2" font-family="'Roboto Condensed'" font-size="74.667px" text-align="center" text-anchor="middle">Missing Image</text>
+</svg>
