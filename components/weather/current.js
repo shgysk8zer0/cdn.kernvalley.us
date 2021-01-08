@@ -5,7 +5,8 @@ HTMLCustomElement.register('weather-current', class HTMLWeatherForecastElement e
 	constructor({ appId = null, postalCode = null, loading = null } = {}) {
 		super();
 
-		Promise.resolve(this.attachShadow({ mode: 'closed' })).then(async shadow => {
+		this.addEventListener('connected', async () => {
+			const shadow = this.attachShadow({ mode: 'closed' });
 			if (typeof appId === 'string') {
 				this.appId = appId;
 			}
@@ -24,7 +25,7 @@ HTMLCustomElement.register('weather-current', class HTMLWeatherForecastElement e
 			shadow.append(tmp);
 			shadows.set(this, shadow);
 			this.dispatchEvent(new Event('ready'));
-		});
+		}, { once: true });
 	}
 
 	async connectedCallback() {

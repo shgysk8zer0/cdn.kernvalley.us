@@ -25,7 +25,7 @@ registerCustomElement('leaflet-marker', class HTMLLeafletMarkerElement extends H
 			this.popup = popup;
 		}
 
-		Promise.resolve().then(() => {
+		this.addEventListener('connected', () => {
 			this.slot   = 'markers';
 
 			if (typeof latitude === 'number' || typeof latitude === 'string') {
@@ -47,7 +47,7 @@ registerCustomElement('leaflet-marker', class HTMLLeafletMarkerElement extends H
 			if (Number.isInteger(maxZoom)) {
 				this.maxZoom = maxZoom;
 			}
-		});
+		}, { once: true });
 	}
 
 	async connectedCallback() {

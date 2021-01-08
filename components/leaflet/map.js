@@ -1,4 +1,4 @@
-import { getLocation } from '../../js/std-js/functions.js';
+import { getLocation, sleep } from '../../js/std-js/functions.js';
 import HTMLCustomElement from '../custom-element.js';
 import {
 	map as LeafletMap,
@@ -40,7 +40,7 @@ HTMLCustomElement.register('leaflet-map', class HTMLLeafletMapElement extends HT
 			});
 		}
 
-		Promise.resolve().then(() => {
+		this.addEventListener('connected', () => {
 			if (! Number.isNaN(latitude) && ! Number.isNaN(longitude)) {
 				this.center = { latitude, longitude };
 			}
@@ -64,7 +64,9 @@ HTMLCustomElement.register('leaflet-map', class HTMLLeafletMapElement extends HT
 			if (typeof loading === 'string') {
 				this.loading = loading;
 			}
-		}).then(() => new Promise(res => setTimeout(() => res(), 500))).then(() => {
+		}, { once: true });
+
+		sleep(500).then(() => {
 			Promise.allSettled([
 				this.whenConnected,
 				this.whenLoad,

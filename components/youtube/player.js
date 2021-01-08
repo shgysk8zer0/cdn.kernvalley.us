@@ -12,7 +12,7 @@ HTMLCustomElement.register('youtube-player', class HTMLYouTubeElement extends HT
 		slot.name = 'player';
 		this.shadowRoot.append(slot);
 
-		Promise.resolve().then(() => {
+		this.addEventListener('connected', () => {
 			if (typeof video === 'string') {
 				this.video = video;
 			}
@@ -30,7 +30,7 @@ HTMLCustomElement.register('youtube-player', class HTMLYouTubeElement extends HT
 			}
 
 			this.dispatchEvent(new Event('ready'));
-		});
+		}, { once: true });
 	}
 
 	get height() {
