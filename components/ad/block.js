@@ -113,7 +113,7 @@ HTMLCustomElement.register('ad-block', class HTMLAdBlockElement extends HTMLCust
 			this.image = image;
 		}
 
-		Promise.resolve().then(() => {
+		this.addEventListener('connected', () => {
 			this.tabIndex = 0;
 			this.setAttribute('role', 'document');
 
@@ -214,37 +214,37 @@ HTMLCustomElement.register('ad-block', class HTMLAdBlockElement extends HTMLCust
 			attr(logoEl, { itemprop: 'logo', content: 'https://cdn.kernvalley.us/img/branding/ads.kernvalley.us.svg' });
 			container.append(nameEl, urlEl, logoEl);
 			this.append(container);
-		}).then(() => {
-			Promise.allSettled([
-				this.whenConnected,
-				this.whenLoad,
-			]).then(() => {
-				this.getTemplate('./components/ad/block.html').then(tmp => {
-					tmp.querySelectorAll('slot[name]').forEach(el => {
-						if (['label', 'description', 'image'].includes(el.name)) {
-							el.addEventListener('slotchange', ({ target }) => {
-								target.assignedElements().forEach(el => {
-									switch(target.name) {
-										case 'label':
-											attr(el, { itemprop: 'name' });
-											break;
+		}, { once: true });
 
-										case 'description':
-											attr(el, { itemprop: 'description' });
-											break;
+		Promise.allSettled([
+			this.whenConnected,
+			this.whenLoad,
+		]).then(() => {
+			this.getTemplate('./components/ad/block.html').then(tmp => {
+				tmp.querySelectorAll('slot[name]').forEach(el => {
+					if (['label', 'description', 'image'].includes(el.name)) {
+						el.addEventListener('slotchange', ({ target }) => {
+							target.assignedElements().forEach(el => {
+								switch(target.name) {
+									case 'label':
+										attr(el, { itemprop: 'name' });
+										break;
 
-										case 'image':
-											attr(el, { itemprop: 'image', role: 'image' });
-											break;
-									}
-								});
+									case 'description':
+										attr(el, { itemprop: 'description' });
+										break;
+
+									case 'image':
+										attr(el, { itemprop: 'image', role: 'image' });
+										break;
+								}
 							});
-						}
-					});
-
-					this.shadowRoot.append(tmp);
-					this.dispatchEvent(new Event('ready'));
+						});
+					}
 				});
+
+				this.shadowRoot.append(tmp);
+				this.dispatchEvent(new Event('ready'));
 			});
 		});
 	}

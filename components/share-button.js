@@ -45,7 +45,7 @@ export default class HTMLShareButtonElement extends HTMLButtonElement {
 	constructor({ title = null, text = null, url = null, file = null, source = null, medium = null, content = null } = {}) {
 		super();
 
-		Promise.resolve().then(() => {
+		this.addEventListener('connected', () => {
 			this.hidden = !(navigator.share instanceof Function);
 
 			if (typeof title === 'string') {
@@ -75,7 +75,7 @@ export default class HTMLShareButtonElement extends HTMLButtonElement {
 			if (typeof file === 'string') {
 				this.file = file;
 			}
-		});
+		}, { once: true });
 
 		this.addEventListener('click', async event => {
 			event.preventDefault();
@@ -99,6 +99,10 @@ export default class HTMLShareButtonElement extends HTMLButtonElement {
 				this.disabled = false;
 			}
 		});
+	}
+
+	connectedCallback() {
+		this.dispatchEvent(new Event('connected'));
 	}
 
 	get content() {

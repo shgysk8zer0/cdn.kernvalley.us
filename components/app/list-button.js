@@ -72,7 +72,7 @@ registerCustomElement('app-list', class HTMLKernValleyAppListButtonlement extend
 	} = {}) {
 		super();
 		this.addEventListener('click', this.show, { passive: true, capture: true });
-		Promise.resolve().then(() => {
+		this.addEventListener('connected', () => {
 			this.hidden = false;
 
 			if (typeof source === 'string') {
@@ -86,7 +86,11 @@ registerCustomElement('app-list', class HTMLKernValleyAppListButtonlement extend
 			if (typeof content === 'string') {
 				this.content = content;
 			}
-		});
+		}, { once: true });
+	}
+
+	connectedCallback() {
+		this.dispatchEvent(new Event('connected'));
 	}
 
 	get content() {

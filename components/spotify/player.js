@@ -73,7 +73,7 @@ HTMLCustomElement.register('spotify-player', class HTMLSpotifyTrackElement exten
 			this.dispatchEvent(new Event('ready'));
 		});
 
-		Promise.resolve().then(() => {
+		this.addEventListener('connected', () => {
 			if (typeof uri === 'string') {
 				this.uri = uri;
 			}
@@ -85,7 +85,7 @@ HTMLCustomElement.register('spotify-player', class HTMLSpotifyTrackElement exten
 			if (typeof loading === 'string') {
 				this.loading = loading;
 			}
-		});
+		}, { once: true });
 	}
 
 	get large() {
