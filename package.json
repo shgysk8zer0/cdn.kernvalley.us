@@ -38,7 +38,7 @@
     "preinstall": "git submodule update --init --recursive",
     "postinstall": "npm run build",
     "start": "npm run netlify:live",
-    "build": "npm run build:js && npm run build:icons",
+    "build": "npm run build:js && npm run build:icons && npm run build:sprites",
     "build:js": "npm run build:js:maps && npm run build:js:ads && npm run build:js:weather && npm run build:js:share",
     "build:js:maps": "if [ -f 'rollup.map.config.js' ]; then rollup -c rollup.map.config.js; fi",
     "build:js:ads": "if [ -f 'rollup.ads.config.js' ]; then rollup -c rollup.ads.config.js; fi",
