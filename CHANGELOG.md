@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <!-- markdownlint-disable -->
 ## [Unreleased]
 
+### Added
+- Add school marker/icon
+- Use [`svg-sprite-standardized`](https://www.npmjs.com/package/svg-sprite-standardized) to generate SVG sprites
+
 ### Fixed
 - Do not hide open markers on zoom change
 - Check zoom level on append for `<leaflet-marker>`
