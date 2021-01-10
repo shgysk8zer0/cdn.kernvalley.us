@@ -45,6 +45,7 @@
     "build:js:share": "if [ -f 'rollup.share.config.js' ]; then rollup -c rollup.share.config.js; fi",
     "build:js:weather": "if [ -f 'rollup.weather.config.js' ]; then rollup -c rollup.weather.config.js; fi",
     "build:icons": "if [ -f 'icons.csv' ]; then svg-sprite-generate -c icons.csv -o img/icons.svg; fi",
+    "build:sprites": "if [ -d 'img/markers/' ]; then node sprites.js img/markers/ img/sprites.svg; fi",
     "test": "npm run lint:js && npm run lint:css && npm run lint:html",
     "lint:css": "if [ -f .stylelintrc.json ]; then stylelint ${npm_package_config_dir_css}; fi",
     "lint:js": "if [ -f .eslintrc.json ]; then eslint .; fi",
@@ -68,6 +69,7 @@
     "stylelint": "^13.8.0",
     "stylelint-config-recommended": "^3.0.0",
     "stylelint-config-standard": "^20.0.0",
+    "svg-sprite-standardized": "^1.1.0",
     "svgo": "^1.3.2"
   }
 }
