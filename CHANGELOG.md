@@ -10,6 +10,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Add school marker/icon
 - Use [`svg-sprite-standardized`](https://www.npmjs.com/package/svg-sprite-standardized) to generate SVG sprites
+- New `<app-stores>` component to list app store badges/links from app manifest `related_applications`
+
+### Changed
+- `<pwa-prompt>` now uses images from CDN instead of inline SVG, greatly reducing size
 
 ### Fixed
 - Do not hide open markers on zoom change
