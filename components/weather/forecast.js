@@ -1,5 +1,5 @@
 import { meta } from '../../../import.meta.js';
-import {shadows, clearSlot, clearSlots, getForecastByPostalCode, createIcon, getSprite} from './weather-helper.js';
+import {shadows, clearSlot, clearSlots, getForecastByPostalCode, createIcon, getSprite} from './helper.js';
 import HTMLCustomElement from '../custom-element.js';
 
 HTMLCustomElement.register('weather-forecast', class HTMLWeatherForecastElement extends HTMLElement {
