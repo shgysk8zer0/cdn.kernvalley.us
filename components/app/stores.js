@@ -8,15 +8,15 @@ import { loadImage } from '../../js/std-js/loader.js';
 const loading = 'lazy';
 const height = 53;
 
-if (! (navigator.getInstalledRelatedApplications instanceof Function)) {
-	navigator.getInstalledRelatedApplications = async () => [];
+if (! (navigator.getInstalledRelatedApps instanceof Function)) {
+	navigator.getInstalledRelatedApps = async () => [];
 }
 
 registerCustomElement('app-stores', class HTMLAppStoresElement extends HTMLElement {
 	async connectedCallback() {
 		const [{ related_applications }, apps = []] = await Promise.all([
 			getManifest(),
-			navigator.getInstalledRelatedApplications(),
+			navigator.getInstalledRelatedApps(),
 		]).catch(console.error);
 
 		const platforms = apps.map(({ platform }) => platform);
@@ -100,10 +100,14 @@ registerCustomElement('app-stores', class HTMLAppStoresElement extends HTMLEleme
 				}
 			}));
 
-			this.append(...stores.filter(({ status }) => status === 'fulfilled')
-				.map(({ value }) => value));
+			if (stores.length === 0) {
+				this.hidden = true;
+			} else {
+				this.append(...stores.filter(({ status }) => status === 'fulfilled')
+					.map(({ value }) => value));
+			}
 		} else {
-			this.remove();
+			this.hidden = true;
 		}
 	}
 });
