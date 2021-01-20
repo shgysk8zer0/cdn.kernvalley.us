@@ -1,4 +1,4 @@
-import { getLocation, sleep } from '../../js/std-js/functions.js';
+import { getLocation, sleep, getCustomElement } from '../../js/std-js/functions.js';
 import HTMLCustomElement from '../custom-element.js';
 import {
 	map as LeafletMap,
@@ -388,6 +388,57 @@ HTMLCustomElement.register('leaflet-map', class HTMLLeafletMapElement extends HT
 		return state === 'granted';
 	}
 
+	async markUserLocation({
+		icon = 'https://cdn.kernvalley.us/img/adwaita-icons/actions/mark-location.svg',
+		body = 'This site would like permission to use your location to mark where you are on the map',
+		popup = '<h3>Current Location</h3>',
+	} = {}) {
+		const Marker = await getCustomElement('leaflet-marker');
+
+		if (await this.hasGeoPermission()) {
+			const { latitude, longitude } = await this.coords;
+			const marker = new Marker({ latitude, longitude, icon, popup });
+			marker.addEventListener('close', ({ target }) => setTimeout(() => target.remove(), 400));
+			this.append(marker);
+			marker.open = true;
+		} else {
+			const Notification = await getCustomElement('html-notification');
+			const notification = new Notification('Allow location access?', {
+				body,
+				icon: 'https://cdn.kernvalley.us/img/adwaita-icons/actions/find-location.svg',
+				pattern: [300, 0, 300],
+				requireInteraction: true,
+				actions: [{
+					title: 'Grant',
+					action: 'grant',
+					icon: 'https://cdn.kernvalley.us/img/octicons/check.svg',
+				}, {
+					title: 'Deny',
+					action: 'deny',
+					icon: 'https://cdn.kernvalley.us/img/octicons/x.svg',
+				}]
+			});
+
+			notification.addEventListener('notificationclick', ({ target, action }) => {
+				switch(action) {
+					case 'grant':
+						this.coords.then(({ latitude, longitude }) => {
+							const marker = new Marker({ latitude, longitude, icon, popup });
+							marker.addEventListener('close', ({ target }) => setTimeout(() => target.remove(), 400));
+							this.append(marker);
+							marker.open = true;
+						});
+						target.close();
+						break;
+
+					case 'deny':
+						target.close();
+						break;
+				}
+			});
+		}
+	}
+
 	get map() {
 		return map.get(this);
 	}
@@ -455,8 +506,7 @@ HTMLCustomElement.register('leaflet-map', class HTMLLeafletMapElement extends HT
 	}
 
 	async addMarker({ latitude, longitude, icon, title, popup, center = false, open = false }) {
-		await customElements.whenDefined('leaflet-marker');
-		const Marker = customElements.get('leaflet-marker');
+		const Marker = getCustomElement('leaflet-marker');
 		const marker = new Marker({ icon, popup });
 
 		if (typeof title === 'string') {
