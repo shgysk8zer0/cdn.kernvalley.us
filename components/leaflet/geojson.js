@@ -29,7 +29,9 @@ registerCustomElement('leaflet-geojson', class HTMLLeafletGeoJSONElement extends
 				map.set(this, path);
 
 				if (parent.tagName === 'LEAFLET-MAP' && this.hidden === false) {
-					parent.ready.then(() => path.addTo(parent.map));
+					customElements.whenDefined('leaflet-map').then(() => {
+						parent.ready.then(() => path.addTo(parent.map));
+					});
 				}
 
 				this.dispatchEvent(new Event('ready'));
