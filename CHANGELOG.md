@@ -12,6 +12,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Use [`svg-sprite-standardized`](https://www.npmjs.com/package/svg-sprite-standardized) to generate SVG sprites
 - New `<app-stores>` component to list app store badges/links from app manifest `related_applications`
 - CDN copy of `service-worker.js`, contiaining all service worker handling
+- `HTMLLeafletMarkerElement.getSchemaIcon()` sets icon by schema `@type` using `/img/markers.svg`
+- `HTMLLeafletMarkerElement.getMarkers()` fetches data from `maps.kernvalley.us` and creates markers
 
 ### Changed
 - `<pwa-prompt>` now uses images from CDN instead of inline SVG, greatly reducing size

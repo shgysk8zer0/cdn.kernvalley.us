@@ -1,5 +1,8 @@
 import { marker, icon } from 'https://unpkg.com/leaflet@1.7.1/dist/leaflet-src.esm.js';
-import { registerCustomElement, parseHTML } from '../../js/std-js/functions.js';
+import { registerCustomElement, parseHTML } from 'https://cdn.kernvalley.us/js/std-js/functions.js';
+import { getJSON } from 'https://cdn.kernvalley.us/js/std-js/http.js';
+import { getSchemaIcon } from './schema-icon.js';
+
 const map = new WeakMap();
 const zoomHandlers = new WeakMap();
 
@@ -343,6 +346,29 @@ registerCustomElement('leaflet-marker', class HTMLLeafletMarkerElement extends H
 					throw new Error(`Unhandled attribute changed: ${name}`);
 			}
 		}
+	}
+
+	static async getSchemaIcon(...args) {
+		return await getSchemaIcon(...args);
+	}
+
+	static async getMarkers(...types) {
+		async function callback(markers) {
+			return await markers.map(async marker => {
+				return new HTMLLeafletMarkerElement({
+					latitude: marker.geo.latitude,
+					longitude: marker.geo.longitude,
+					popup: `<h3>${marker.name}</h3>`,
+					icon: await HTMLLeafletMarkerElement.getSchemaIcon(marker),
+				});
+			});
+		}
+
+		return await Promise.all(types.map(type => {
+			return getJSON(`https://maps.kernvalley.us/places/${type}.json`)
+				.then(markers => callback(markers));
+		})).then(markers => Promise.all(markers.flat()));
+
 	}
 
 	static get observedAttributes() {
