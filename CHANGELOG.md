@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - CDN copy of `service-worker.js`, contiaining all service worker handling
 - `HTMLLeafletMarkerElement.getSchemaIcon()` sets icon by schema `@type` using `/img/markers.svg`
 - `HTMLLeafletMarkerElement.getMarkers()` fetches data from `maps.kernvalley.us` and creates markers
+- `HTMLLeafletMapElement.loadMarkers()` appending markers from `HTMLLeafletMarkerElement.getMarkers()`
 
 ### Changed
 - `<pwa-prompt>` now uses images from CDN instead of inline SVG, greatly reducing size

@@ -557,6 +557,13 @@ HTMLCustomElement.register('leaflet-map', class HTMLLeafletMapElement extends HT
 		return markers;
 	}
 
+	async loadMarkers(...types) {
+		await customElements.whenDefined('leaflet-marker');
+		const Marker = customElements.get('leaflet-marker');
+		const markers = await Marker.getMarkers(...types);
+		this.append(...markers);
+	}
+
 	async attributeChangedCallback(name, oldVal, newVal) {
 		switch (name) {
 			case 'zoom':
