@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <!-- markdownlint-disable -->
 ## [Unreleased]
 
+## [v1.1.0] - 2021-02-22
+
 ### Added
 - Add school marker/icon
 - Use [`svg-sprite-standardized`](https://www.npmjs.com/package/svg-sprite-standardized) to generate SVG sprites
@@ -15,6 +17,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `HTMLLeafletMarkerElement.getSchemaIcon()` sets icon by schema `@type` using `/img/markers.svg`
 - `HTMLLeafletMarkerElement.getMarkers()` fetches data from `maps.kernvalley.us` and creates markers
 - `HTMLLeafletMapElement.loadMarkers()` appending markers from `HTMLLeafletMarkerElement.getMarkers()`
+- `<leaflet-map>` now updates `center` and `zoom` on interaction
+- `<leaflet-map>` now supports automatic router (URL <-> marker mapping)
+- `*change` handler for `<leaflet-map>` via native event (`slotchange`)
+- `<leaflet-map>` title source changing support
+- Support for `<leaflet-map watch=":int">` (`watch` set to `maxZoom`)
+- Constants for `<leaflet-marker>` supported types (for loading markers)
+- `HTMLLeafletMapElement.locate()` calling `this.map.locate()`, passing all arguments
 
 ### Changed
 - `<pwa-prompt>` now uses images from CDN instead of inline SVG, greatly reducing size
@@ -23,6 +32,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Do not hide open markers on zoom change
 - Check zoom level on append for `<leaflet-marker>`
 - Remove debugging code
+
+### Removed
+- Slot change handler for `<leaflet-map>` via `MutationObserver`
 
 ## [v1.0.14] - 2021-01-05
 
