@@ -186,7 +186,9 @@ HTMLCustomElement.register('leaflet-map', class HTMLLeafletMapElement extends HT
 				if (this.router && ! (this.openMarker instanceof HTMLElement)) {
 					this.center = center;
 					this.zoom = zoom;
-					location.hash = `#${center.latitude},${center.longitude},${zoom}`;
+					const url = new URL(location.href);
+					url.hash = `#${center.latitude},${center.longitude},${zoom}`;
+					history.replaceState(history.state, document.title, url.href);
 				}
 			}, 150), { passive: true });
 		}, { once: true });
