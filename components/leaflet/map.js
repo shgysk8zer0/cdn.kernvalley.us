@@ -864,7 +864,7 @@ HTMLCustomElement.register('leaflet-map', class HTMLLeafletMapElement extends HT
 	}
 
 	static get osm() {
-		return 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}{r}.png';
+		return 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
 	}
 
 	static get natGeo() {
