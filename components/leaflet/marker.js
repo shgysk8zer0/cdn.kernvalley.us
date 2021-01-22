@@ -2,9 +2,22 @@ import { marker, icon } from 'https://unpkg.com/leaflet@1.7.1/dist/leaflet-src.e
 import { registerCustomElement, parseHTML } from 'https://cdn.kernvalley.us/js/std-js/functions.js';
 import { getJSON } from 'https://cdn.kernvalley.us/js/std-js/http.js';
 import { getSchemaIcon } from './schema-icon.js';
+import { MARKER_TYPES } from './marker-types.js';
 
 const map = new WeakMap();
 const zoomHandlers = new WeakMap();
+
+function filterTypes(types) {
+	if (Array.isArray(types)) {
+		return [...new Set(types)].filter(type => MARKER_TYPES.includes(type));
+	} else if (types instanceof Set) {
+		return filterTypes([...types]);
+	} else if (typeof types === 'string') {
+		return filterTypes(types.split(' '));
+	} else {
+		return [];
+	}
+}
 
 registerCustomElement('leaflet-marker', class HTMLLeafletMarkerElement extends HTMLElement {
 	constructor({ icon = null, popup = null, latitude = null, longitude = null,
@@ -355,16 +368,23 @@ registerCustomElement('leaflet-marker', class HTMLLeafletMarkerElement extends H
 	static async getMarkers(...types) {
 		async function callback(markers) {
 			return await markers.map(async marker => {
-				return new HTMLLeafletMarkerElement({
+				const markerEl = new HTMLLeafletMarkerElement({
 					latitude: marker.geo.latitude,
 					longitude: marker.geo.longitude,
 					popup: `<h3>${marker.name}</h3>`,
 					icon: await HTMLLeafletMarkerElement.getSchemaIcon(marker),
 				});
+
+				if (typeof marker.identifier === 'string') {
+					markerEl.id = marker.identifier;
+					markerEl.title = marker.name;
+				}
+
+				return markerEl;
 			});
 		}
 
-		return await Promise.all(types.map(type => {
+		return await Promise.all(filterTypes(types).map(type => {
 			return getJSON(`https://maps.kernvalley.us/places/${type}.json`)
 				.then(markers => callback(markers));
 		})).then(markers => Promise.all(markers.flat()));
