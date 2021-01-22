@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <!-- markdownlint-disable -->
 ## [Unreleased]
 
+### Changed
+- `HTMLLeafletMapElement.locate()` now has default arguments
+
+### Fixed
+- Do not update URL for `<leaflet-map>` on pan if marker is open
+
 ## [v1.1.0] - 2021-02-22
 
 ### Added
