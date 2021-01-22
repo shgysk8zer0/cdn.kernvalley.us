@@ -182,14 +182,13 @@ HTMLCustomElement.register('leaflet-map', class HTMLLeafletMapElement extends HT
 				this.watch = watch;
 			}
 
-			this.addEventListener('pan', debounce(({ detail: { center, zoom }}) => {
-				this.center = center;
-				this.zoom = zoom;
-
-				if (this.router) {
+			this.addEventListener('pan', debounce(async ({ detail: { center, zoom }}) => {
+				if (this.router && ! (this.openMarker instanceof HTMLElement)) {
+					this.center = center;
+					this.zoom = zoom;
 					location.hash = `#${center.latitude},${center.longitude},${zoom}`;
 				}
-			}, 50), { passive: true });
+			}, 150), { passive: true });
 		}, { once: true });
 
 		sleep(500).then(() => {
@@ -477,6 +476,10 @@ HTMLCustomElement.register('leaflet-map', class HTMLLeafletMapElement extends HT
 		this.append(el);
 	}
 
+	get openMarker() {
+		return this.querySelector('leaflet-marker[open]');
+	}
+
 	async zoomIn() {
 		this.map.zoomIn();
 	}
@@ -571,9 +574,10 @@ HTMLCustomElement.register('leaflet-map', class HTMLLeafletMapElement extends HT
 		}
 	}
 
-	async locate(...args) {
+	async locate({ enableHighAccuracy= true, setView = true, watch = false,
+		maxZoom = Infinity, timeout = 10000, maximumAge = 0 } = {}) {
 		await this.ready;
-		this.map.locate(...args);
+		this.map.locate({ enableHighAccuracy, setView, watch, maxZoom, timeout, maximumAge });
 	}
 
 	async stopLocate() {
