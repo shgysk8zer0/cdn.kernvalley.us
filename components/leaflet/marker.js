@@ -1,11 +1,10 @@
-import { marker, icon } from 'https://unpkg.com/leaflet@1.7.1/dist/leaflet-src.esm.js';
+import { marker, icon, latLng } from 'https://unpkg.com/leaflet@1.7.1/dist/leaflet-src.esm.js';
 import { registerCustomElement, parseHTML } from 'https://cdn.kernvalley.us/js/std-js/functions.js';
 import { getJSON } from 'https://cdn.kernvalley.us/js/std-js/http.js';
 import { getSchemaIcon } from './schema-icon.js';
 import { MARKER_TYPES } from './marker-types.js';
 
-const map = new WeakMap();
-const zoomHandlers = new WeakMap();
+const data = new WeakMap();
 
 function filterTypes(types) {
 	if (Array.isArray(types)) {
@@ -77,13 +76,13 @@ registerCustomElement('leaflet-marker', class HTMLLeafletMarkerElement extends H
 			const mapEl = await closestMap.ready;
 			this._map = closestMap;
 
-			if (! map.has(this)) {
-				map.set(this, await this._make());
+			if (! data.has(this)) {
+				data.set(this, await this._make());
 				this.dispatchEvent(new Event('ready'));
 			}
 
 			if (! this.hidden) {
-				const marker = map.get(this);
+				const marker = data.get(this);
 				marker.addTo(mapEl.map);
 
 				if (this.open) {
@@ -96,9 +95,9 @@ registerCustomElement('leaflet-marker', class HTMLLeafletMarkerElement extends H
 	async disconnectedCallback() {
 		if (this._map instanceof HTMLElement) {
 			await this._map.ready;
-			const marker = map.get(this);
+			const marker = data.get(this);
 			marker.remove();
-			map.delete(this);
+			data.delete(this);
 			this._map = null;
 		}
 	}
@@ -109,11 +108,30 @@ registerCustomElement('leaflet-marker', class HTMLLeafletMarkerElement extends H
 	}
 
 	get ready() {
-		if (map.has(this)) {
+		if (data.has(this)) {
 			return Promise.resolve();
 		} else {
 			return new Promise(resolve => this.addEventListener('ready', () => resolve(), { once: true }));
 		}
+	}
+
+	get geo() {
+		const { latitude, longitude } = this;
+		return { latitude, longitude };
+	}
+
+	set geo({ latitude, longitude }) {
+		if (typeof latitude === 'number' && typeof longitude === 'number') {
+			this.latitude = latitude;
+			this.longitude = longitude;
+		} else {
+			throw new TypeError('latitude and longitude must be numbers');
+		}
+	}
+
+	get latLng() {
+		const { latitude, longitude } = this;
+		return new latLng({ lat: latitude, lng: longitude });
 	}
 
 	get latitude() {
@@ -242,6 +260,11 @@ registerCustomElement('leaflet-marker', class HTMLLeafletMarkerElement extends H
 		this.toggleAttribute('open', val);
 	}
 
+	get visible() {
+		const map = this.closest('leaflet-map');
+		return map instanceof HTMLElement && map.containsMarker(this);
+	}
+
 	get whenConnected() {
 		if (this.isConnected) {
 			return Promise.resolve();
@@ -297,38 +320,10 @@ registerCustomElement('leaflet-marker', class HTMLLeafletMarkerElement extends H
 
 	async attributeChangedCallback(name/*, oldVal, newVal*/) {
 		await this.ready;
-		const marker = map.get(this);
+		const marker = data.get(this);
 
 		if (marker) {
 			switch(name) {
-				case 'minzoom':
-				case 'maxzoom':
-					this.whenConnected.then(() => {
-						const { minZoom, maxZoom } = this;
-						const map = this.closest('leaflet-map');
-						const zoom = map.map.getZoom();
-						this.hidden = ! this.open && (zoom > maxZoom || zoom < minZoom);
-
-						if (zoomHandlers.has(this)) {
-							map.removeEventListener('zoom', zoomHandlers.get(this));
-							zoomHandlers.delete(this);
-						}
-
-						if (! Number.isNaN(minZoom) || ! Number.isNaN(maxZoom)) {
-							const handler = ({ detail: { zoom }}) => {
-								if (! Number.isNaN(minZoom) && zoom < minZoom) {
-									this.hidden = ! this.open;
-								} else if (! Number.isNaN(maxZoom) && zoom > maxZoom) {
-									this.hidden = ! this.open;
-								} else {
-									this.hidden = false;
-								}
-							};
-							map.addEventListener('zoom', handler);
-							zoomHandlers.set(this, handler);
-						}
-					});
-					break;
 				case 'hidden':
 					if (this.hidden) {
 						marker.remove();
@@ -340,7 +335,7 @@ registerCustomElement('leaflet-marker', class HTMLLeafletMarkerElement extends H
 				case 'open':
 					if (this._map instanceof HTMLElement) {
 						this._map.ready.then(() => {
-							const marker = map.get(this);
+							const marker = data.get(this);
 							const open = this.open;
 							const isOpen = marker.isPopupOpen();
 
@@ -359,6 +354,15 @@ registerCustomElement('leaflet-marker', class HTMLLeafletMarkerElement extends H
 					throw new Error(`Unhandled attribute changed: ${name}`);
 			}
 		}
+	}
+
+	distanceTo({ latitude, longitude, altitude }) {
+		const pt = new latLng({ lat: latitude, lng: longitude, alt: altitude });
+		return this.latLng.distanceTo(pt);
+	}
+
+	distanceToMarker(marker) {
+		return this.latLng.distanceTo(marker.latLng);
 	}
 
 	static async getSchemaIcon(...args) {
@@ -395,8 +399,6 @@ registerCustomElement('leaflet-marker', class HTMLLeafletMarkerElement extends H
 		return [
 			'open',
 			'hidden',
-			'minzoom',
-			'maxzoom',
 		];
 	}
 });

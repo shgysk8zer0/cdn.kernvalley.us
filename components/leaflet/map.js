@@ -4,15 +4,44 @@ import { MARKER_TYPES } from './marker-types.js';
 import { TILES } from './tiles.js';
 import {
 	map as LeafletMap,
-	tileLayer as LeafletTileLayer
+	tileLayer as LeafletTileLayer,
+	point as Point,
+	latLng as LatLng,
 } from 'https://unpkg.com/leaflet@1.7.1/dist/leaflet-src.esm.js';
 
-
+function $$(selector, base) {
+	return Array.from(base.querySelectorAll(selector));
+}
 
 const initialTitle = document.title;
 const GEO_EXP = /#-?\d{1,3}\.\d+,-?\d{1,3}\.\d+(,\d{1,2})?/;
 
-let map = new Map();
+let data = new WeakMap();
+
+async function locate(map, { enableHighAccuracy = true, setView = true,
+	watch = false, maxZoom = Infinity, timeout = 10000, maximumAge = 0 } = {}) {
+	return await new Promise((resolve, reject) => {
+		function success(event) {
+			map.off('locationfound', success);
+			map.off('locationerror', error);
+			const { latitude, longitude, accuracy, timestamp, target } = event;
+			const zoom = target.getZoom();
+			resolve({ coords: { latitude, longitude, accuracy }, zoom, timestamp });
+		}
+
+		function error(event) {
+			map.off('locationfound', success);
+			map.off('locationerror', error);
+			reject(event.message);
+		}
+
+
+		map.on('locationfound', success);
+		map.on('locationerror', error);
+
+		map.locate({ enableHighAccuracy, setView, watch, maxZoom, timeout, maximumAge });
+	});
+}
 
 function parseURL(url = location.href) {
 	const hash = url.substr(url.indexOf('#') + 1);
@@ -118,6 +147,7 @@ HTMLCustomElement.register('leaflet-map', class HTMLLeafletMapElement extends HT
 		centerOnUser = null,
 		tileSrc      = null,
 		watch        = NaN,
+		find         = NaN,
 	} = {}) {
 		super();
 		this._shadow = this.attachShadow({ mode: 'closed' });
@@ -181,8 +211,10 @@ HTMLCustomElement.register('leaflet-map', class HTMLLeafletMapElement extends HT
 				this.router = router;
 			}
 
-			if (! Number.isNaN(watch)) {
+			if (Number.isSafeInteger(watch)) {
 				this.watch = watch;
+			} else if (Number.isSafeInteger(find)) {
+				this.find = find;
 			}
 
 			this.addEventListener('pan', debounce(async ({ detail: { center, zoom }}) => {
@@ -194,6 +226,18 @@ HTMLCustomElement.register('leaflet-map', class HTMLLeafletMapElement extends HT
 					history.replaceState(history.state, document.title, url.href);
 				}
 			}, 150), { passive: true });
+
+			this.addEventListener('zoom', ({ detail: { zoom }}) => {
+				const markers = $$('[slot="markers"][minzoom],[slot="markers"][maxzoom]', this);
+				markers.forEach(marker => {
+					const { minZoom, maxZoom, open } = marker;
+
+					if (! open) {
+						marker.hidden = (! Number.isNaN(minZoom) && zoom < minZoom)
+							|| (! Number.isNaN(maxZoom) && zoom > maxZoom);
+					}
+				});
+			}, { passive: true });
 		}, { once: true });
 
 		sleep(500).then(() => {
@@ -289,19 +333,19 @@ HTMLCustomElement.register('leaflet-map', class HTMLLeafletMapElement extends HT
 			label: 'OpenStreetMap',
 		}).addTo(m);
 
-		map.set(this, { map: m, tiles });
+		data.set(this, { map: m, tiles });
 
 		this.dispatchEvent(new Event('ready'));
 	}
 
 	disconnectedCallback() {
-		map.delete(this);
+		data.delete(this);
 	}
 
 	get ready() {
 		return new Promise(async resolve => {
 			await this._populated;
-			if (! map.has(this)) {
+			if (! data.has(this)) {
 				this.addEventListener('ready', () => {
 					this.map.whenReady(() => resolve(this));
 				}, {
@@ -378,6 +422,14 @@ HTMLCustomElement.register('leaflet-map', class HTMLLeafletMapElement extends HT
 		}
 	}
 
+	get bounds() {
+		if (data.has(this)) {
+			return data.get(this).map.getBounds();
+		} else {
+			return null;
+		}
+	}
+
 	get center() {
 		if (this.hasAttribute('center')) {
 			const [latitude = NaN, longitude = NaN] = this.getAttribute('center').split(',', 2).map(parseFloat);
@@ -396,6 +448,10 @@ HTMLCustomElement.register('leaflet-map', class HTMLLeafletMapElement extends HT
 		} else {
 			throw new Error('{latitude, longitude} must be numbers');
 		}
+	}
+
+	get centerLatLng() {
+		return HTMLLeafletMapElement.latLng(this.center);
 	}
 
 	get zoomControl() {
@@ -580,7 +636,7 @@ HTMLCustomElement.register('leaflet-map', class HTMLLeafletMapElement extends HT
 	async locate({ enableHighAccuracy= true, setView = true, watch = false,
 		maxZoom = Infinity, timeout = 10000, maximumAge = 0 } = {}) {
 		await this.ready;
-		this.map.locate({ enableHighAccuracy, setView, watch, maxZoom, timeout, maximumAge });
+		return await locate(this.map, { enableHighAccuracy, setView, watch, maxZoom, timeout, maximumAge });
 	}
 
 	async stopLocate() {
@@ -592,11 +648,46 @@ HTMLCustomElement.register('leaflet-map', class HTMLLeafletMapElement extends HT
 		this.flyTo(await this.coords, zoom);
 	}
 
+	containsLatLng(latLng) {
+		const bounds = this.bounds;
+		return typeof bounds === 'object' ? bounds.contains(latLng) : false;
+	}
+
+	contains({ latitude, longitude, altitude }) {
+		return this.containsLatLng(HTMLLeafletMapElement.latLng({ latitude, longitude, altitude }));
+	}
+
+	containsMarker(marker) {
+		return marker instanceof HTMLElement && this.containsLatLng(marker.latLng);
+	}
+
+	containsMarkers(...markers) {
+		if (data.has(this)) {
+			const bounds = this.bounds;
+			return markers.filter(({ latLng }) => bounds.contains(latLng));
+		}
+	}
+
 	get map() {
-		if (map.has(this)) {
-			return map.get(this).map;
+		if (data.has(this)) {
+			return data.get(this).map;
 		} else {
 			return null;
+		}
+	}
+
+	get find() {
+		return parseInt(this.hasAttribute('find')) || this.maxZoom;
+	}
+
+	/**
+	 * Value will be `maxZoom` on call to `locate()`
+	 */
+	set find(val) {
+		if (Number.isSafeInteger(val)) {
+			this.setAttribute('find', val);
+		} else {
+			this.removeAttribute('find');
 		}
 	}
 
@@ -616,6 +707,10 @@ HTMLCustomElement.register('leaflet-map', class HTMLLeafletMapElement extends HT
 			const slot = this._shadow.querySelector('slot[name="markers"]');
 			return slot.assignedNodes();
 		}
+	}
+
+	get visibleMarkers() {
+		return this.containsMarkers(...this.markers);
 	}
 
 	get geoJson() {
@@ -653,6 +748,8 @@ HTMLCustomElement.register('leaflet-map', class HTMLLeafletMapElement extends HT
 	set watch(val) {
 		if (Number.isSafeInteger(val)) {
 			this.setAttribute('watch', val);
+		} else {
+			this.removeAttribute('watch');
 		}
 	}
 
@@ -745,7 +842,7 @@ HTMLCustomElement.register('leaflet-map', class HTMLLeafletMapElement extends HT
 	async setTileServer({ tileSrc, minZoom, maxZoom, attribution, detectRetina, crossOrigin, label }) {
 		await this.ready;
 
-		const { tiles } = map.get(this);
+		const { tiles } = data.get(this);
 
 		if (tiles) {
 			tiles.remove();
@@ -754,7 +851,7 @@ HTMLCustomElement.register('leaflet-map', class HTMLLeafletMapElement extends HT
 		const newTiles = LeafletTileLayer(tileSrc, { minZoom, maxZoom, attribution,
 			detectRetina, crossOrigin, label }).addTo(this.map);
 
-		map.set(this, { map: this.map, tiles: newTiles });
+		data.set(this, { map: this.map, tiles: newTiles });
 	}
 
 	async attributeChangedCallback(name, oldVal, newVal) {
@@ -780,13 +877,13 @@ HTMLCustomElement.register('leaflet-map', class HTMLLeafletMapElement extends HT
 
 			case 'minzoom':
 				if (typeof newVal === 'string') {
-					this.ready.then(() => map.get(this).map.setMinZoom(parseInt(newVal)));
+					this.ready.then(() => data.get(this).data.setMinZoom(parseInt(newVal)));
 				}
 				break;
 
 			case 'maxzoom':
 				if (typeof newVal === 'string') {
-					this.ready.then(() => map.get(this).map.setMaxZoom(parseInt(newVal)));
+					this.ready.then(() => data.get(this).data.setMaxZoom(parseInt(newVal)));
 				}
 				break;
 
@@ -828,7 +925,7 @@ HTMLCustomElement.register('leaflet-map', class HTMLLeafletMapElement extends HT
 			case 'tilesrc':
 				this.ready.then(async () => {
 					if (typeof newVal === 'string') {
-						const { tiles } = map.get(this);
+						const { tiles } = data.get(this);
 						tiles.setUrl(newVal);
 					}
 				});
@@ -844,9 +941,33 @@ HTMLCustomElement.register('leaflet-map', class HTMLLeafletMapElement extends HT
 							enableHighAccuracy: true,
 							maxZoom,
 						});
+					} else {
+						this.watch = null;
 					}
 				} else {
 					this.stopLocate();
+				}
+				break;
+
+			case 'find':
+				if (typeof newVal === 'string') {
+					if (await this.hasGeoPermission(['granted', 'prompt'])) {
+						const maxZoom = Math.min(parseInt(newVal) || 20, this.maxZoom);
+
+						try {
+							await this.locate({
+								setView: true,
+								enableHighAccuracy: true,
+								maxZoom,
+							});
+						} catch(err) {
+							console.error(err);
+						} finally {
+							this.find = null;
+						}
+					} else {
+						this.find = null;
+					}
 				}
 				break;
 
@@ -866,6 +987,7 @@ HTMLCustomElement.register('leaflet-map', class HTMLLeafletMapElement extends HT
 			'center',
 			'tilesrc',
 			'watch',
+			'find',
 		];
 	}
 
@@ -897,5 +1019,13 @@ HTMLCustomElement.register('leaflet-map', class HTMLLeafletMapElement extends HT
 
 	static urlHasGeo(url = location.href) {
 		return url.includes('#') && GEO_EXP.test(url);
+	}
+
+	static point({ latitude, longitude }) {
+		return new Point({ x: latitude, y: longitude });
+	}
+
+	static latLng({ latitude, longitude, altitude }) {
+		return new LatLng({ lat: latitude, lng: longitude, alt: altitude });
 	}
 });
