@@ -1,10 +1,13 @@
 import { getLocation, sleep, getCustomElement, on, off, debounce } from '../../js/std-js/functions.js';
 import HTMLCustomElement from '../custom-element.js';
 import { MARKER_TYPES } from './marker-types.js';
+import { TILES } from './tiles.js';
 import {
 	map as LeafletMap,
 	tileLayer as LeafletTileLayer
 } from 'https://unpkg.com/leaflet@1.7.1/dist/leaflet-src.esm.js';
+
+
 
 const initialTitle = document.title;
 const GEO_EXP = /#-?\d{1,3}\.\d+,-?\d{1,3}\.\d+(,\d{1,2})?/;
@@ -404,9 +407,7 @@ HTMLCustomElement.register('leaflet-map', class HTMLLeafletMapElement extends HT
 	}
 
 	get tileSrc() {
-		/* https://{s}.tile.openstreetmap.org/{z}/{x}/{y}{r}.png */
-		/* https://maps.wikimedia.org/osm-intl/{z}/{x}/{y}{r}.png */
-		return this.getAttribute('tilesrc') || HTMLLeafletMapElement.wikimedia;
+		return this.getAttribute('tilesrc') || TILES.wikimedia.tileSrc;
 	}
 
 	set tileSrc(val) {
@@ -741,6 +742,21 @@ HTMLCustomElement.register('leaflet-map', class HTMLLeafletMapElement extends HT
 		this.append(...markers);
 	}
 
+	async setTileServer({ tileSrc, minZoom, maxZoom, attribution, detectRetina, crossOrigin, label }) {
+		await this.ready;
+
+		const { tiles } = map.get(this);
+
+		if (tiles) {
+			tiles.remove();
+		}
+
+		const newTiles = LeafletTileLayer(tileSrc, { minZoom, maxZoom, attribution,
+			detectRetina, crossOrigin, label }).addTo(this.map);
+
+		map.set(this, { map: this.map, tiles: newTiles });
+	}
+
 	async attributeChangedCallback(name, oldVal, newVal) {
 		switch (name) {
 			case 'zoom':
@@ -860,19 +876,23 @@ HTMLCustomElement.register('leaflet-map', class HTMLLeafletMapElement extends HT
 	}
 
 	static get wikimedia() {
-		return 'https://maps.wikimedia.org/osm-intl/{z}/{x}/{y}{r}.png';
+		return TILES.wikimedia.tileSrc;
 	}
 
 	static get osm() {
-		return 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+		return TILES.osm.tileSrc;
 	}
 
 	static get natGeo() {
-		return 'https://server.arcgisonline.com/ArcGIS/rest/services/NatGeo_World_Map/MapServer/tile/{z}/{y}/{x}';
+		return TILES.natGeo.tileSrc;
 	}
 
 	static get allMarkerTypes() {
 		return MARKER_TYPES;
+	}
+
+	static get tileServers() {
+		return TILES;
 	}
 
 	static urlHasGeo(url = location.href) {
