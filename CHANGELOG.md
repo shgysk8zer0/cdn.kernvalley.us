@@ -7,8 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <!-- markdownlint-disable -->
 ## [Unreleased]
 
+### Added
+- `HTMLLeafletMapElement.locate` now returns data when location is discovered
+- Several new `<leaflet-map>` and `<leaflet-marker>` methods for working with `bounds` & `latLng`
+- New `<leaflet-map find="15">` attribute, indicating intent to find user with `maxZoom` of (e.g.) 15
+- Methods to calculate distance between two `<leaflet-marker>`s or other coordinates
+- Methods for checking if `<leaflet-marker>` is visible on `<leaflet-map>`
+
 ### Changed
 - `HTMLLeafletMapElement.locate()` now has default arguments
+- `<leaflet-map>` now handles `<leaflet-marker minzoom maxzoom>` visibility toggling
+- Rename some map component `WeakMap`s from `map` to `data`
 
 ### Fixed
 - Do not update URL for `<leaflet-map>` on pan if marker is open
