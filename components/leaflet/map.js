@@ -877,13 +877,13 @@ HTMLCustomElement.register('leaflet-map', class HTMLLeafletMapElement extends HT
 
 			case 'minzoom':
 				if (typeof newVal === 'string') {
-					this.ready.then(() => data.get(this).data.setMinZoom(parseInt(newVal)));
+					this.ready.then(() => data.get(this).map.setMinZoom(parseInt(newVal)));
 				}
 				break;
 
 			case 'maxzoom':
 				if (typeof newVal === 'string') {
-					this.ready.then(() => data.get(this).data.setMaxZoom(parseInt(newVal)));
+					this.ready.then(() => data.get(this).map.setMaxZoom(parseInt(newVal)));
 				}
 				break;
 
