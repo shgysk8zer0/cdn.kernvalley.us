@@ -30,7 +30,7 @@ function init(worker, config) {
 						return cached;
 					} else {
 						const [resp, cache] = await Promise.all([
-							fetch(event.request),
+							fetch(event.request).catch(console.error),
 							caches.open(config.version),
 						]);
 
@@ -43,14 +43,36 @@ function init(worker, config) {
 				} else if (Array.isArray(config.fresh) && config.fresh.includes(event.request.url)) {
 					if (navigator.onLine) {
 						const [resp, cache] = await Promise.all([
-							fetch(event.request),
+							fetch(event.request).catch(console.error),
 							caches.open(config.version),
 						]);
 
 						if (resp.ok) {
-							cache.put(event.request, resp.clone());
+							cache.put(event.request, resp.clone()).catch(console.error);
 						}
 						return resp;
+					} else {
+						return caches.match(event.request);
+					}
+				} else if (Array.isArray(config.staleFirst) && config.staleFirst.includes(event.request.url)) {
+					if (navigator.onLine) {
+						const cached = await caches.match(event.request);
+
+						const promise = Promise.all([
+							fetch(event.request).catch(console.error),
+							caches.open(config.version),
+						]).then(([resp, cache]) => {
+							if (resp.ok) {
+								cache.put(event.request, resp.clone()).catch(console.error);
+							}
+							return resp;
+						});
+
+						if (cached instanceof Response) {
+							return cached;
+						} else {
+							return await promise;
+						}
 					} else {
 						return caches.match(event.request);
 					}
@@ -74,6 +96,24 @@ function init(worker, config) {
 							console.error(`Failed in request for ${event.request.url}`);
 						}
 					}
+				} else if (Array.isArray(config.allowedFresh) && config.allowedFresh.some(entry => (
+					entry instanceof RegExp
+						? entry.test(event.request.url)
+						: event.request.url.startsWith(entry)
+				))) {
+					if (navigator.onLine) {
+						const [resp, cache] = await Promise.all([
+							fetch(event.request),
+							caches.open(config.version),
+						]);
+
+						if (resp.ok) {
+							cache.put(event.request, resp.clone());
+						}
+						return resp;
+					} else {
+						return caches.match(event.request);
+					}
 				} else {
 					return fetch(event.request);
 				}
@@ -83,7 +123,8 @@ function init(worker, config) {
 
 	worker.addEventListener('push', async event => {
 		const data = event.data.json();
-		if (('notification' in data) && Array.isArray(data.notification) && Notification.permission === 'granted') {
+		if (('notification' in data) && Array.isArray(data.notification)
+			&& Notification.permission === 'granted') {
 
 			this.registration.showNotification(...data.notification);
 		}
