@@ -59,7 +59,7 @@
   },
   "dependencies": {
     "svg-sprite-generator": "0.0.7",
-    "rollup": "^2.38.0",
+    "rollup": "^2.38.3",
     "rollup-plugin-terser": "^7.0.2",
     "rollup-plugin-url-resolve": "^0.1.1"
   },
