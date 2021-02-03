@@ -2,18 +2,19 @@ import './toast-message.js';
 import { registerCustomElement } from '../js/std-js/functions.js';
 import { shim } from '../js/std-js/share.js';
 import { GET } from '../js/std-js/http.js';
+import { hasGa, send } from '../js/std-js/google-analytics.js';
 import { Facebook, Twitter, LinkedIn, Reddit, Gmail, Pinterest, Telegram, Tumblr,
 	Email } from '../js/std-js/share-targets.js';
 
 shim([Facebook, Twitter, LinkedIn, Reddit, Tumblr, Pinterest, Telegram, Gmail, Email]);
 
 function log(btn) {
-	if (window.ga instanceof Function) {
-		window.ga('send', {
+	if (hasGa()) {
+		send({
 			hitType: 'event',
 			eventCategory: 'share-button',
 			eventAction: btn.url,
-			eventLabel: btn.title || document.title,
+			eventLabel: btn.shareTitle,
 			transport: 'beacon',
 		});
 	}
@@ -83,7 +84,7 @@ export default class HTMLShareButtonElement extends HTMLButtonElement {
 			this.disabled = true;
 
 			try {
-				const { title, text, url, file } = this;
+				const { shareTitle: title, text, url, file } = this;
 
 				if (supportsFiles && typeof file === 'string') {
 					const files = await getFiles(file);
@@ -142,6 +143,18 @@ export default class HTMLShareButtonElement extends HTMLButtonElement {
 			this.setAttribute('medium', val);
 		} else {
 			this.removeAttribute('medium');
+		}
+	}
+
+	get shareTitle() {
+		return this.getAttribute('sharetitle') || this.title || document.title;
+	}
+
+	set shareTitle(val) {
+		if (typeof val === 'string' && val.length !== 0) {
+			this.setAttribute('sharetitle', val);
+		} else {
+			this.removeAttribute('sharetitle');
 		}
 	}
 
