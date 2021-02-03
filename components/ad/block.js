@@ -1,11 +1,12 @@
 import HTMLCustomElement from '../custom-element.js';
 import { save, open } from '../../js/std-js/filesystem.js';
 import { css, attr, on, off, loaded, openWindow } from '../../js/std-js/functions.js';
+import { hasGa, send } from '../../js/std-js/google-analytics.js';
 
 function log(eventAction, ad, transport = 'beacon') {
-	if (window.ga instanceof Function && ! ad.preview) {
+	if (hasGa() && ! ad.preview) {
 		ad.label.then(label => {
-			window.ga('send', {
+			send({
 				hitType: 'event',
 				eventCategory: 'ad-block',
 				eventLabel: `${label} ${ad.id || 'no id'}`,

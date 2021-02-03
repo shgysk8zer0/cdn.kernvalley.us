@@ -1,12 +1,13 @@
 import { registerCustomElement, css, attr } from '../../js/std-js/functions.js';
 import { loadImage } from '../../js/std-js/loader.js';
 import { getJSON } from '../../js/std-js/http.js';
+import { hasGa, send } from '../../js/std-js/google-analytics.js';
 
 const X = '<svg width="12" height="16" fill="currentColor" viewBox="0 0 12 16"><path fill-rule="evenodd" d="M7.48 8l3.75 3.75-1.48 1.48L6 9.48l-3.75 3.75-1.48-1.48L4.52 8 .77 4.25l1.48-1.48L6 6.52l3.75-3.75 1.48 1.48L7.48 8z"/></svg>';
 
 function log() {
-	if (window.ga instanceof Function) {
-		window.ga('send', {
+	if (hasGa()) {
+		send({
 			hitType: 'event',
 			eventCategory: 'outbound',
 			eventAction: 'click',

@@ -2,6 +2,7 @@ import './prompt.js';
 import { confirm } from '../../js/std-js/asyncDialog.js';
 import { registerCustomElement } from '../../js/std-js/functions.js';
 import { getManifest } from '../../js/std-js/http.js';
+import { hasGa, send } from '../../js/std-js/google-analytics.js';
 
 registerCustomElement('pwa-install', class HTMLPWAInstallButton extends HTMLButtonElement {
 	constructor(src = null, {
@@ -59,8 +60,16 @@ registerCustomElement('pwa-install', class HTMLPWAInstallButton extends HTMLButt
 
 					el.remove();
 					if (install === true) {
-						const detail = {install, playforms: event.platforms};
+						const detail = { install, playforms: event.platforms };
 						this.dispatchEvent(new CustomEvent('install', {detail}));
+						if (hasGa) {
+							send({
+								hitType: 'event',
+								eventCategory: 'pwa',
+								eventAction: 'install',
+								transport: 'beacon',
+							});
+						}
 						this.hidden = true;
 						setTimeout(() => this.remove(), 500);
 					} else {
