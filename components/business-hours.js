@@ -12,8 +12,6 @@ registerCustomElement('business-hours', class HTMLBusinessHoursElement extends H
 	constructor() {
 		super();
 		this.attachShadow({ mode: 'open' });
-		this.setAttribute('itemtype', 'https://schema.org/OpeningHoursSpecification');
-		this.setAttribute('itemscope', '');
 		const data = document.createElement('slot');
 		data.name = 'data';
 		on(data, 'slotchange', ({ target }) => {
@@ -21,6 +19,7 @@ registerCustomElement('business-hours', class HTMLBusinessHoursElement extends H
 				this.setOpeningHoursSpecification(target.assignedElements()[0]);
 			}
 		});
+
 		this.shadowRoot.append(data, ...days.map(({ name, short }) => {
 			const container = document.createElement('div');
 			const opens = document.createElement('slot');
@@ -59,6 +58,9 @@ registerCustomElement('business-hours', class HTMLBusinessHoursElement extends H
 	}
 
 	connectedCallback() {
+		this.setAttribute('itemtype', 'https://schema.org/OpeningHoursSpecification');
+		this.setAttribute('itemscope', '');
+
 		if (this.todayOnly) {
 			this.day = days[new Date().getDay()].name.toLowerCase();
 		}
