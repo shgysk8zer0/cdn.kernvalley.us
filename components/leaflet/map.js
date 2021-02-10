@@ -100,12 +100,15 @@ function hashchange({ oldURL, newURL }) {
 		const marker = document.getElementById(hash);
 
 		if (marker instanceof HTMLElement && marker.tagName === 'LEAFLET-MARKER' && ! marker.open) {
-			marker.closest('leaflet-map').flyTo(marker, 16);
-			marker.open = true;
+			marker.ready.then(() => {
+				marker.closest('leaflet-map').flyTo(marker, 16);
+				marker.hidden = false;
+				marker.open = true;
 
-			if (typeof marker.title === 'string') {
-				document.title = marker.title;
-			}
+				if (typeof marker.title === 'string') {
+					document.title = marker.title;
+				}
+			});
 		}
 	}
 }
@@ -709,6 +712,10 @@ HTMLCustomElement.register('leaflet-map', class HTMLLeafletMapElement extends HT
 		}
 	}
 
+	get markersReady() {
+		return Promise.allSettled(this.markers.map(marker => marker.ready));
+	}
+
 	get visibleMarkers() {
 		return this.containsMarkers(...this.markers);
 	}
@@ -903,6 +910,8 @@ HTMLCustomElement.register('leaflet-map', class HTMLLeafletMapElement extends HT
 
 						if (target instanceof HTMLElement && target.tagName === 'LEAFLET-MARKER') {
 							await customElements.whenDefined('leaflet-marker');
+							await target.ready;
+							target.hidden = false;
 							this.flyTo(target, 16);
 							target.open = true;
 
