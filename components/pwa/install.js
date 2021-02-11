@@ -61,8 +61,8 @@ registerCustomElement('pwa-install', class HTMLPWAInstallButton extends HTMLButt
 					el.remove();
 					if (install === true) {
 						const detail = { install, playforms: event.platforms };
-						this.dispatchEvent(new CustomEvent('install', {detail}));
-						if (hasGa) {
+						this.dispatchEvent(new CustomEvent('install', { detail }));
+						if (hasGa()) {
 							send({
 								hitType: 'event',
 								eventCategory: 'pwa',
