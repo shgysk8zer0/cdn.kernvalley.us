@@ -120,7 +120,7 @@ function buildForm() {
 	});
 
 	css(submit, {
-		'background-color':'#28a745',
+		'background-color': '#28a745',
 		'color': '#fefefe',
 		'border': 'none',
 		'border-radius': '6px',
