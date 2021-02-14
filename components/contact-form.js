@@ -80,7 +80,7 @@ function makeSection({
 	return div;
 }
 
-function buildForm() {
+function buildForm({ phone = false, url = false } = {}) {
 	const form = document.createElement('form');
 	const submit = document.createElement('button');
 	const reset = document.createElement('button');
@@ -99,17 +99,17 @@ function buildForm() {
 	fieldset.append(
 		legend,
 		makeSection({ name: 'name', id: 'name', required: true, autocomplete: 'name',
-			label: 'Name *' }),
+			label: 'Full Name *', placeholder: 'First & Last name' }),
 		makeSection({ name: 'email', id: 'email', type: 'email', required: true,
-			autocomplete: 'email', label: 'Email *' }),
-		makeSection({ name: 'phone', id: 'phone', type: 'tel', autocomplete: 'tel',
-			label: 'Phone' }),
-		makeSection({ name: 'url', id: 'url', type: 'url', autocomplete: 'off',
-			label: 'Page URL', placeholder: 'https://example.com/page' }),
+			autocomplete: 'email', label: 'Email Address *', placeholder: 'user@example.com' }),
+		phone ? makeSection({ name: 'phone', id: 'phone', type: 'tel', autocomplete: 'tel',
+			label: 'Phone', placeholder: '+1-555-555-5555' }) : '',
+		url ? makeSection({ name: 'url', id: 'url', type: 'url', autocomplete: 'off',
+			label: 'Page URL', placeholder: 'https://example.com/page' }) : '',
 		makeSection({ name: 'subject', id: 'subject', required: true,
-			label: 'Subject *', autocomplete: 'off' }),
+			label: 'Subject *', autocomplete: 'off', placeholder: 'Message Subject' }),
 		makeSection({ name: 'body', id: 'body', tag: 'textarea', required: true,
-			label: 'Message *', autocomplete: 'off' }),
+			label: 'Message *', autocomplete: 'off', placeholder: 'Your Message here' }),
 	);
 
 	css(form, {
@@ -166,42 +166,67 @@ function buildForm() {
 }
 
 registerCustomElement('contact-form', class HTMLContactFormElement extends HTMLElement {
-	constructor() {
+	constructor({ phone, url } = {}) {
 		super();
 		const shadow = this.attachShadow({ mode: 'closed' });
-		const form = buildForm();
 
-		form.addEventListener('reset', () => this.dispatchEvent(new Event('reset')));
+		this.whenConnected.then(() => {
+			if (typeof phone === 'boolean') {
+				this.phone = phone;
+			}
 
-		form.addEventListener('submit', async event => {
-			event.preventDefault();
-			const form = event.target;
-			const data = new FormData(form);
-			const { success = false, body = {}} = await send(this.action, {
-				name: data.get('name'),
-				email: data.get('email'),
-				phone: data.get('phone'),
-				subject: data.get('subject'),
-				body: data.get('body'),
+			if (typeof url === 'boolean') {
+				this.url = url;
+			}
+
+			const form = buildForm({ phone: this.phone, url: this.url });
+
+			form.addEventListener('reset', () => this.dispatchEvent(new Event('reset')));
+
+			form.addEventListener('submit', async event => {
+				event.preventDefault();
+				const form = event.target;
+				const data = new FormData(form);
+				const { success = false, body = {}} = await send(this.action, {
+					name: data.get('name'),
+					email: data.get('email'),
+					phone: data.get('phone'),
+					subject: data.get('subject'),
+					body: data.get('body'),
+				});
+
+				if (success === true) {
+					this.dispatchEvent(new Event('sent'));
+					form.reset();
+				} else if ('error' in body && typeof body.error.message === 'string') {
+					this.dispatchEvent(new ErrorEvent('error', {
+						error: new Error(body.error.message),
+						message: body.error.message,
+					}));
+				} else {
+					this.dispatchEvent(new ErrorEvent('error', {
+						error: new Error('Error submitting form'),
+						message: 'Error submitting form',
+					}));
+				}
 			});
 
-			if (success === true) {
-				this.dispatchEvent(new Event('sent'));
-				form.reset();
-			} else if ('error' in body && typeof body.error.message === 'string') {
-				this.dispatchEvent(new ErrorEvent('error', {
-					error: new Error(body.error.message),
-					message: body.error.message,
-				}));
-			} else {
-				this.dispatchEvent(new ErrorEvent('error', {
-					error: new Error('Error submitting form'),
-					message: 'Error submitting form',
-				}));
-			}
+			shadow.append(form);
 		});
+	}
 
-		shadow.append(form);
+	get whenConnected() {
+		if (this.isConnected) {
+			return Promise.resolve();
+		} else {
+			return new Promise(resolve => {
+				this.addEventListener('connected', () => resolve(), { once: true });
+			});
+		}
+	}
+
+	connectedCallback() {
+		this.dispatchEvent(new Event('connected'));
 	}
 
 	get action() {
@@ -218,5 +243,21 @@ registerCustomElement('contact-form', class HTMLContactFormElement extends HTMLE
 		} else {
 			this.removeAttribute('action');
 		}
+	}
+
+	get phone() {
+		return this.hasAttribute('phone');
+	}
+
+	set phone(val) {
+		this.toggleAttribute('phone', val);
+	}
+
+	get url() {
+		return this.hasAttribute('url');
+	}
+
+	set url(val) {
+		this.toggleAttribute('url', val);
 	}
 });
