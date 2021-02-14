@@ -26,7 +26,7 @@ function makeSection({
 	const labelEl = document.createElement('label');
 
 	labelEl.for = id;
-	labelEl.append(makeSlot(`${name}-label`, label));
+	labelEl.append(makeSlot(`${name}-label`, label), ' ', makeSlot(`${name}-icon`));
 	const input = document.createElement(tag);
 
 	if ('type' in input) {
@@ -65,7 +65,7 @@ function makeSection({
 		'border-bottom-color': 'currentColor',
 		'color': 'inherit',
 		'background-color': 'transparent',
-		'width': '99%',
+		'width': 'calc(100% - 16px)',
 		'box-sizing': 'border-box',
 		'padding': '16px',
 		'margin': '7px',
@@ -80,7 +80,7 @@ function makeSection({
 	return div;
 }
 
-function buildForm() {
+function buildForm({ phone = false, url = false } = {}) {
 	const form = document.createElement('form');
 	const submit = document.createElement('button');
 	const reset = document.createElement('button');
@@ -91,32 +91,37 @@ function buildForm() {
 	legend.append(makeSlot('legend', 'Send Message to KernValley.US'));
 
 	submit.type = 'submit';
-	submit.append(makeSlot('submit-icon'), makeSlot('submit-text', 'Send'));
+	submit.append(makeSlot('submit-text', 'Send'), ' ', makeSlot('submit-icon'));
 
 	reset.type = 'reset';
-	reset.append(makeSlot('reset-icon'), makeSlot('reset-text', 'Cancel'));
+	reset.append(makeSlot('reset-text', 'Cancel'), ' ', makeSlot('reset-icon'));
 
 	fieldset.append(
 		legend,
 		makeSection({ name: 'name', id: 'name', required: true, autocomplete: 'name',
-			label: 'Name' }),
+			label: 'Full Name *', placeholder: 'First & Last name' }),
 		makeSection({ name: 'email', id: 'email', type: 'email', required: true,
-			autocomplete: 'email', label: 'Email' }),
-		makeSection({ name: 'phone', id: 'phone', type: 'tel', autocomplete: 'tel',
-			label: 'Phone' }),
-		makeSection({ name: 'subject', id: 'subject', required: true, label: 'Subject' }),
+			autocomplete: 'email', label: 'Email Address *', placeholder: 'user@example.com' }),
+		phone ? makeSection({ name: 'phone', id: 'phone', type: 'tel', autocomplete: 'tel',
+			label: 'Phone', placeholder: '+1-555-555-5555' }) : '',
+		url ? makeSection({ name: 'url', id: 'url', type: 'url', autocomplete: 'off',
+			label: 'Page URL', placeholder: 'https://example.com/page' }) : '',
+		makeSection({ name: 'subject', id: 'subject', required: true,
+			label: 'Subject *', autocomplete: 'off', placeholder: 'Message Subject' }),
 		makeSection({ name: 'body', id: 'body', tag: 'textarea', required: true,
-			label: 'Message' }),
+			label: 'Message *', autocomplete: 'off', placeholder: 'Your Message here' }),
 	);
 
 	css(form, {
 		'max-width': '100%',
+		'box-sizing': 'border-box',
 	});
 
 	css(fieldset, {
 		'border': 'none',
 		'line-height': '1.7',
 		'max-width': '100%',
+		'box-sizing': 'border-box',
 	});
 
 	css(submit, {
@@ -144,6 +149,8 @@ function buildForm() {
 	css(btnContainer, {
 		'display': 'flex',
 		'justify-content': 'space-evenly',
+		'gap': '12px',
+		'padding': '2px',
 	});
 
 	btnContainer.append(submit, reset);
@@ -159,42 +166,67 @@ function buildForm() {
 }
 
 registerCustomElement('contact-form', class HTMLContactFormElement extends HTMLElement {
-	constructor() {
+	constructor({ phone, url } = {}) {
 		super();
 		const shadow = this.attachShadow({ mode: 'closed' });
-		const form = buildForm();
 
-		form.addEventListener('reset', () => this.dispatchEvent(new Event('reset')));
+		this.whenConnected.then(() => {
+			if (typeof phone === 'boolean') {
+				this.phone = phone;
+			}
 
-		form.addEventListener('submit', async event => {
-			event.preventDefault();
-			const form = event.target;
-			const data = new FormData(form);
-			const { success = false, body = {}} = await send(this.action, {
-				name: data.get('name'),
-				email: data.get('email'),
-				phone: data.get('phone'),
-				subject: data.get('subject'),
-				body: data.get('body'),
+			if (typeof url === 'boolean') {
+				this.url = url;
+			}
+
+			const form = buildForm({ phone: this.phone, url: this.url });
+
+			form.addEventListener('reset', () => this.dispatchEvent(new Event('reset')));
+
+			form.addEventListener('submit', async event => {
+				event.preventDefault();
+				const form = event.target;
+				const data = new FormData(form);
+				const { success = false, body = {}} = await send(this.action, {
+					name: data.get('name'),
+					email: data.get('email'),
+					phone: data.get('phone'),
+					subject: data.get('subject'),
+					body: data.get('body'),
+				});
+
+				if (success === true) {
+					this.dispatchEvent(new Event('sent'));
+					form.reset();
+				} else if ('error' in body && typeof body.error.message === 'string') {
+					this.dispatchEvent(new ErrorEvent('error', {
+						error: new Error(body.error.message),
+						message: body.error.message,
+					}));
+				} else {
+					this.dispatchEvent(new ErrorEvent('error', {
+						error: new Error('Error submitting form'),
+						message: 'Error submitting form',
+					}));
+				}
 			});
 
-			if (success === true) {
-				this.dispatchEvent(new Event('sent'));
-				form.reset();
-			} else if ('error' in body && typeof body.error.message === 'string') {
-				this.dispatchEvent(new ErrorEvent('error', {
-					error: new Error(body.error.message),
-					message: body.error.message,
-				}));
-			} else {
-				this.dispatchEvent(new ErrorEvent('error', {
-					error: new Error('Error submitting form'),
-					message: 'Error submitting form',
-				}));
-			}
+			shadow.append(form);
 		});
+	}
 
-		shadow.append(form);
+	get whenConnected() {
+		if (this.isConnected) {
+			return Promise.resolve();
+		} else {
+			return new Promise(resolve => {
+				this.addEventListener('connected', () => resolve(), { once: true });
+			});
+		}
+	}
+
+	connectedCallback() {
+		this.dispatchEvent(new Event('connected'));
 	}
 
 	get action() {
@@ -211,5 +243,21 @@ registerCustomElement('contact-form', class HTMLContactFormElement extends HTMLE
 		} else {
 			this.removeAttribute('action');
 		}
+	}
+
+	get phone() {
+		return this.hasAttribute('phone');
+	}
+
+	set phone(val) {
+		this.toggleAttribute('phone', val);
+	}
+
+	get url() {
+		return this.hasAttribute('url');
+	}
+
+	set url(val) {
+		this.toggleAttribute('url', val);
 	}
 });
