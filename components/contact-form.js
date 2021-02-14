@@ -26,7 +26,7 @@ function makeSection({
 	const labelEl = document.createElement('label');
 
 	labelEl.for = id;
-	labelEl.append(makeSlot(`${name}-label`, label));
+	labelEl.append(makeSlot(`${name}-label`, label), ' ', makeSlot(`${name}-icon`));
 	const input = document.createElement(tag);
 
 	if ('type' in input) {
@@ -65,7 +65,7 @@ function makeSection({
 		'border-bottom-color': 'currentColor',
 		'color': 'inherit',
 		'background-color': 'transparent',
-		'width': '99%',
+		'width': 'calc(100% - 16px)',
 		'box-sizing': 'border-box',
 		'padding': '16px',
 		'margin': '7px',
@@ -91,32 +91,37 @@ function buildForm() {
 	legend.append(makeSlot('legend', 'Send Message to KernValley.US'));
 
 	submit.type = 'submit';
-	submit.append(makeSlot('submit-icon'), makeSlot('submit-text', 'Send'));
+	submit.append(makeSlot('submit-text', 'Send'), ' ', makeSlot('submit-icon'));
 
 	reset.type = 'reset';
-	reset.append(makeSlot('reset-icon'), makeSlot('reset-text', 'Cancel'));
+	reset.append(makeSlot('reset-text', 'Cancel'), ' ', makeSlot('reset-icon'));
 
 	fieldset.append(
 		legend,
 		makeSection({ name: 'name', id: 'name', required: true, autocomplete: 'name',
-			label: 'Name' }),
+			label: 'Name *' }),
 		makeSection({ name: 'email', id: 'email', type: 'email', required: true,
-			autocomplete: 'email', label: 'Email' }),
+			autocomplete: 'email', label: 'Email *' }),
 		makeSection({ name: 'phone', id: 'phone', type: 'tel', autocomplete: 'tel',
 			label: 'Phone' }),
-		makeSection({ name: 'subject', id: 'subject', required: true, label: 'Subject' }),
+		makeSection({ name: 'url', id: 'url', type: 'url', autocomplete: 'off',
+			label: 'Page URL', placeholder: 'https://example.com/page' }),
+		makeSection({ name: 'subject', id: 'subject', required: true,
+			label: 'Subject *', autocomplete: 'off' }),
 		makeSection({ name: 'body', id: 'body', tag: 'textarea', required: true,
-			label: 'Message' }),
+			label: 'Message *', autocomplete: 'off' }),
 	);
 
 	css(form, {
 		'max-width': '100%',
+		'box-sizing': 'border-box',
 	});
 
 	css(fieldset, {
 		'border': 'none',
 		'line-height': '1.7',
 		'max-width': '100%',
+		'box-sizing': 'border-box',
 	});
 
 	css(submit, {
@@ -144,6 +149,8 @@ function buildForm() {
 	css(btnContainer, {
 		'display': 'flex',
 		'justify-content': 'space-evenly',
+		'gap': '12px',
+		'padding': '2px',
 	});
 
 	btnContainer.append(submit, reset);
