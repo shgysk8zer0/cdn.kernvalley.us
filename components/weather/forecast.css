@@ -3,6 +3,9 @@
 	overflow: auto;
 	--background-color: #fafafa;
 	--color: #343434;
+	border: 1px solid #dadada;
+	border-radius: 6px;
+	max-width: 100%;
 }
 
 :host([theme="dark"]) {

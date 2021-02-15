@@ -1,6 +1,6 @@
 import { registerCustomElement } from '../../js/std-js/functions.js';
 
-function getIframe({uri, details, theme, followers}) {
+function getIframe({ uri, details, theme, followers }) {
 	const iframe = document.createElement('iframe');
 	const url = new URL('https://open.spotify.com/follow/1/');
 	url.searchParams.set('uri', uri);
