@@ -1,7 +1,7 @@
 import HTMLCustomElement from '../custom-element.js';
 import { save, open } from '../../js/std-js/filesystem.js';
 import { openWindow } from '../../js/std-js/functions.js';
-import { css, attr, on, off, loaded } from '../../js/std-js/custom-elements.js';
+import { css, attr, on, off, loaded } from '../../js/std-js/dom.js';
 import { hasGa, send } from '../../js/std-js/google-analytics.js';
 
 function log(eventAction, ad, transport = 'beacon') {
