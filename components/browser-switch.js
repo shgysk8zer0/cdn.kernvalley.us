@@ -1,4 +1,4 @@
-import { registerCustomElement } from '../js/std-js/functions.js';
+import { registerCustomElement } from '../js/std-js/custom-elements.js';
 
 registerCustomElement('browser-switch', class HTMLBrowserSwitchElement extends HTMLElement {
 	constructor() {

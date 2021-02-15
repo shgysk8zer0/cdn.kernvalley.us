@@ -1,5 +1,6 @@
 import { meta } from '../import.meta.js';
-import { registerCustomElement, when } from '../js/std-js/functions.js';
+import { registerCustomElement } from '../js/std-js/custom-elements.js';
+import { when } from '../js/std-js/dom.js';
 import { getHTML } from '../js/std-js/http.js';
 
 let metaUrl = meta.url;

@@ -1,4 +1,4 @@
-import { registerCustomElement } from '../../js/std-js/functions.js';
+import { registerCustomElement } from '../../js/std-js/custom-elements.js';
 import '../../js/std-js/permissions.js';
 
 async function changeHandler(event) {

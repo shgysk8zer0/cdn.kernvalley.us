@@ -1,4 +1,4 @@
-import { registerCustomElement } from '../js/std-js/functions.js';
+import { registerCustomElement } from '../js/std-js/custom-elements.js';
 /**
  * Imports SVG sprites from a remote src and allows getting of full `<svg>`s
  */

@@ -1,5 +1,5 @@
 import { meta } from '../../import.meta.js';
-import { registerCustomElement } from '../../js/std-js/functions.js';
+import { registerCustomElement } from '../../js/std-js/custom-elements.js';
 import User from '/js/User.js';
 import '../toast-message.js';
 import '../register-button.js';

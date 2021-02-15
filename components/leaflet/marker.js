@@ -1,5 +1,6 @@
 import { marker, icon, latLng } from 'https://unpkg.com/leaflet@1.7.1/dist/leaflet-src.esm.js';
-import { registerCustomElement, parseHTML } from 'https://cdn.kernvalley.us/js/std-js/functions.js';
+import { registerCustomElement } from 'https://cdn.kernvalley.us/js/std-js/dom.js';
+import { parseHTML } from 'https://cdn.kernvalley.us/js/std-js/custom-elements.js';
 import { getJSON } from 'https://cdn.kernvalley.us/js/std-js/http.js';
 import { getSchemaIcon } from './schema-icon.js';
 import { MARKER_TYPES } from './marker-types.js';

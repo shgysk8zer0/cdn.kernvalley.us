@@ -1,4 +1,5 @@
-import { registerCustomElement, css, attr } from '../../js/std-js/functions.js';
+import { css, attr } from '../../js/std-js/dom.js';
+import { registerCustomElement } from '../../js/std-js/custom-elements.js';
 import { loadImage } from '../../js/std-js/loader.js';
 import { getJSON } from '../../js/std-js/http.js';
 import { hasGa, send } from '../../js/std-js/google-analytics.js';

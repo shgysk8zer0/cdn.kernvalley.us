@@ -1,4 +1,4 @@
-import { registerCustomElement } from '../js/std-js/functions.js';
+import { registerCustomElement } from '../js/std-js/custom-elements.js';
 const ENDPOINT = 'https://i.imgur.com';
 
 export default class HTMLImgurImgElement extends HTMLPictureElement {

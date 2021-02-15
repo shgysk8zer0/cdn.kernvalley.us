@@ -1,4 +1,4 @@
-import { $ } from '../../js/std-js/functions.js';
+import { $ } from '../../js/std-js/esQuery.js';
 import { getJSON } from '../../js/std-js/http.js';
 const ENDPOINT = 'https://api.github.com';
 import HTMLCustomElement from '../custom-element.js';

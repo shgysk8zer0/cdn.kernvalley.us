@@ -1,4 +1,6 @@
-import { getLocation, sleep, getCustomElement, on, off, debounce } from '../../js/std-js/functions.js';
+import { getLocation, sleep, debounce } from '../../js/std-js/functions.js';
+import { on, off } from '../../js/std-js/dom.js';
+import { getCustomElement } from '../../js/std-js/custom-elements.js';
 import HTMLCustomElement from '../custom-element.js';
 import { MARKER_TYPES } from './marker-types.js';
 import { TILES } from './tiles.js';

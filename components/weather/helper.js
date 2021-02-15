@@ -4,7 +4,7 @@ export const ICON_SRC = 'https://openweathermap.org/img/wn/';
 export const VERSION = 2.5;
 const TZ = '.' + new Date().toISOString().split('.').pop();
 const dateString = date => `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`;
-const SVGNS = 'http://www.w3.org/2000/svg';
+import { SVG as SVGNS } from '../../js/std-js/namespaces.js';
 const DAYS = [
 	'Sunday',
 	'Monday',

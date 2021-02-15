@@ -1,5 +1,5 @@
 const ENDPOINT = 'https://baconipsum.com/api/';
-import { registerCustomElement } from '../js/std-js/functions.js';
+import { registerCustomElement } from '../js/std-js/custom-elements.js';
 
 export default class HTMLBaconIpsumElement extends HTMLElement {
 	constructor() {

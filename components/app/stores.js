@@ -1,7 +1,7 @@
 /* @SEE https://github.com/w3c/manifest/wiki/Platforms */
 /* @TODO Handle `"webapp"` platform */
 
-import { registerCustomElement } from '../../js/std-js/functions.js';
+import { registerCustomElement } from '../../js/std-js/custom-elements.js';
 import { getManifest } from '../../js/std-js/http.js';
 import { loadImage } from '../../js/std-js/loader.js';
 
