@@ -64,7 +64,7 @@
     "rollup-plugin-url-resolve": "^0.1.1"
   },
   "devDependencies": {
-    "eslint": "^7.19.0",
+    "eslint": "^7.20.0",
     "htmlhint": "^0.14.2",
     "stylelint": "^13.9.0",
     "stylelint-config-recommended": "^3.0.0",
