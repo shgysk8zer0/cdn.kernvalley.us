@@ -1,4 +1,4 @@
-import { registerCustomElement } from '../js/std-js/functions.js';
+import { registerCustomElement } from '../js/std-js/custom-elements.js';
 
 registerCustomElement('match-media', class HTMLMatchMediaElement extends HTMLElement {
 	constructor(media = null) {

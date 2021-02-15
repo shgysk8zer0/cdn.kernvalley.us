@@ -1,5 +1,5 @@
 import md5 from '/js/std-js/md5.js';
-import { registerCustomElement } from '../js/std-js/functions.js';
+import { registerCustomElement } from '../js/std-js/custom-elements.js';
 
 const GRAVATAR = 'https://secure.gravatar.com/avatar/';
 const SIZES = [

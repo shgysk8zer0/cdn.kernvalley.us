@@ -1,7 +1,9 @@
 import '../file-input.js';
 import '../drawing-canvas.js';
 import '../../js/std-js/shims.js';
-import { $, importLink, registerCustomElement } from '../../js/std-js/functions.js';
+import { importLink } from '../../js/std-js/functions.js';
+import { registerCustomElement } from '../../js/std-js/custom-elements.js';
+import { $ } from '../../js/std-js/esQuery.js';
 import { confirm } from '../../js/std-js/asyncDialog.js';
 
 export default class HTMLPaintAppElement extends HTMLElement {

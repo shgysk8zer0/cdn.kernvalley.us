@@ -1,4 +1,4 @@
-import { registerCustomElement } from '../js/std-js/functions.js';
+import { registerCustomElement } from '../js/std-js/custom-elements.js';
 
 const COLS = ['name', 'value', 'expires', 'domain', 'path', 'sameSite', 'secure', 'actions'];
 

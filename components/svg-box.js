@@ -1,5 +1,5 @@
 import { loadImage, preload } from '../js/std-js/loader.js';
-import { registerCustomElement } from '../js/std-js/functions.js';
+import { registerCustomElement } from '../js/std-js/custom-elements.js';
 
 const SVGBOX = 'https://s.svgbox.net';
 const timers = new WeakMap();

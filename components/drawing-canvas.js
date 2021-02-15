@@ -1,4 +1,4 @@
-import { registerCustomElement, on } from '../js/std-js/functions.js';
+import { registerCustomElement, on } from '../js/std-js/custom-elements.js';
 import { save } from '../js/std-js/filesystem.js';
 import { loadImage } from '../js/std-js/loader.js';
 
