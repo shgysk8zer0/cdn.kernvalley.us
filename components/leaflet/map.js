@@ -1,5 +1,6 @@
 import { getLocation, sleep, debounce } from '../../js/std-js/functions.js';
-import { on, off } from '../../js/std-js/dom.js';
+import { on, off, create } from '../../js/std-js/dom.js';
+import { loadStylesheet } from '../../js/std-js/loader.js';
 import { getCustomElement } from '../../js/std-js/custom-elements.js';
 import HTMLCustomElement from '../custom-element.js';
 import { MARKER_TYPES } from './marker-types.js';
@@ -245,32 +246,63 @@ HTMLCustomElement.register('leaflet-map', class HTMLLeafletMapElement extends HT
 			}, { passive: true });
 		}, { once: true });
 
-		sleep(500).then(() => {
+		sleep(500).then(async () => {
 			Promise.allSettled([
 				this.whenConnected,
 				this.whenLoad,
 			]).then(async () => {
-				const resp = await fetch(new URL('./components/leaflet/map.html', HTMLCustomElement.base));
-				const html = await resp.text();
-				const parser = new DOMParser();
-				const doc = parser.parseFromString(html, 'text/html');
-				const stylesheets = [...doc.querySelectorAll('link[rel="stylesheet"][href]')].map(link => {
-					return new Promise((resolve, reject) => {
-						link.addEventListener('load', () => resolve(), {once: true});
-						link.addEventListener('error', (event) => reject(event), {once: true});
-						link.href = new URL(link.getAttribute('href'), resp.url);
-					});
-				});
-
-				doc.querySelectorAll('slot[name]').forEach(slot => {
-					slot.addEventListener('slotchange', ({ target }) => {
+				const events = {
+					slotchange: ({ target }) => {
 						const detail = target.assignedElements();
 						this.dispatchEvent(new CustomEvent(`${target.name}change`, { detail }));
-					});
+					}
+				};
+
+				const doc = create('div', {
+					part: ['container'],
+					children: [
+						create('slot', { events, attrs: { name: 'toolbar' }}),
+						create('slot', {
+							events,
+							attrs: {
+								name: 'map',
+							},
+							children: [
+								create('div', { id: 'map-fallback', part: ['map'] }),
+							],
+						}),
+						create('slot', {
+							events,
+							attrs: {
+								text: 'Wikimedia',
+								name: 'attribution',
+							},
+							children: [
+								create('a', {
+									part: ['attribution'],
+									attrs: {
+										href: 'https://wikimediafoundation.org/wiki/Maps_Terms_of_Use',
+									}
+								})
+							]
+						}),
+						create('slot', { events, attrs: { name: 'markers' }}),
+						create('slot', { events, attrs: { name: 'overlays' }}),
+						create('slot', { events, attrs: { name: 'geojson' }}),
+					]
 				});
 
-				this._shadow.append(...doc.head.children, ...doc.body.children);
-				await Promise.all(stylesheets);
+				await Promise.allSettled([
+					loadStylesheet('https://unpkg.com/leaflet@1.7.1/dist/leaflet.css', {
+						integrity: 'sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A==',
+						parent: this._shadow,
+					}),
+					loadStylesheet(new URL('/components/leaflet/map.css', HTMLCustomElement.base), {
+						parent: this._shadow,
+					}),
+				]);
+
+				this._shadow.append(doc);
 
 				if ('markers' in this.dataset) {
 					await this.loadMarkers(...this.dataset.markers.split(' ')).catch(console.error);
