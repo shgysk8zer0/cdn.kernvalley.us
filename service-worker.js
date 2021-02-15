@@ -21,6 +21,12 @@ function init(worker, config) {
 
 	worker.addEventListener('activate', event => event.waitUntil(clients.claim()));
 
+	worker.addEventListener('periodicsync', event => {
+		if (config[event.tag] instanceof Function) {
+			event.waitUntil(config[event.tag]([worker, { event, config }]));
+		}
+	});
+
 	worker.addEventListener('fetch', event => {
 		if (event.request.method === 'GET') {
 			event.respondWith((async () => {
