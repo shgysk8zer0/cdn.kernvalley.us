@@ -1,4 +1,5 @@
-import { registerCustomElement, on } from 'https://cdn.kernvalley.us/js/std-js/custom-elements.js';
+import { registerCustomElement } from 'https://cdn.kernvalley.us/js/std-js/custom-elements.js';
+import { on } from 'https://cdn.kernvalley.us/js/std-js/dom.js';
 import { days } from 'https://cdn.kernvalley.us/js/std-js/date-consts.js';
 
 const dayNames = days.map(({ name }) => name.toLowerCase());
