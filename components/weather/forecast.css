@@ -1,18 +1,18 @@
 :host {
 	display: block;
 	overflow: auto;
-	--background: #fafafa;
+	--background-color: #fafafa;
 	--color: #343434;
 }
 
 :host([theme="dark"]) {
-	--background: #212121;
+	--background-color: #212121;
 	--color: #fefefe;
 }
 
 @media (prefers-color-scheme: dark) {
 	:host(:not([theme="light"])) {
-		--background: #212121;
+		--background-color: #212121;
 		--color: #fefefe;
 	}
 }
