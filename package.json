@@ -35,9 +35,18 @@
     }
   },
   "scripts": {
-    "preinstall": "git submodule update --init --recursive",
+    "test": "npm run lint:js && npm run lint:css && npm run lint:html",
+    "start": "npm run netlify",
+    "preinstall": "npm run git:submodules",
     "postinstall": "npm run build",
-    "start": "npm run netlify:live",
+    "preversion": "npm test",
+    "git:fetch": "git fetch --prune --tags",
+    "git:submodules": "if [ -f '.gitmodules' ]; then git submodule update --init --recursive; fi",
+    "lint:css": "if [ -f '.stylelintrc.json' ]; then stylelint ${npm_package_config_dir_css}; fi",
+    "lint:html": "if [ -f '.htmlhintrc' ]; then htmlhint ${npm_package_config_dir_html}; fi",
+    "lint:js": "if [ -f '.eslintrc.json' ]; then eslint .; fi",
+    "fix:css": "if [ -f './stylelintrc.json' ]; then stylelint ${npm_package_config_dir_css} --fix; fi",
+    "fix:js": "if [ -f '.eslintrc.json' ]; then eslint. --fix; fi",
     "build": "npm run build:js && npm run build:icons && npm run build:markers",
     "build:js": "npm run build:js:maps && npm run build:js:ads && npm run build:js:weather && npm run build:js:share",
     "build:js:maps": "if [ -f 'rollup.map.config.js' ]; then rollup -c rollup.map.config.js; fi",
@@ -46,30 +55,18 @@
     "build:js:weather": "if [ -f 'rollup.weather.config.js' ]; then rollup -c rollup.weather.config.js; fi",
     "build:icons": "if [ -f 'icons.csv' ]; then svg-sprite-generate -c icons.csv -o img/icons.svg; fi",
     "build:markers": "if [ -d 'img/markers/' ]; then node markers.js img/markers/ img/markers.svg; fi",
-    "test": "npm run lint:js && npm run lint:css && npm run lint:html",
-    "lint:css": "if [ -f .stylelintrc.json ]; then stylelint ${npm_package_config_dir_css}; fi",
-    "lint:js": "if [ -f .eslintrc.json ]; then eslint .; fi",
-    "lint:html": "if [ -f .htmlhintrc ]; then htmlhint ${npm_package_config_dir_html} --ignore=./css/; fi",
-    "fix:css": "stylelint ${npm_package_config_dir_css} --fix",
-    "fix:js": "eslint . --fix",
-    "fix": "npm run fix:js && npm run fix:css",
+    "netlify": "if [ -f '.netlify/state.json' ]; then npm run netlify:live; else npm run netlify:serve; fi",
     "netlify:deploy": "netlify deploy",
     "netlify:serve": "netlify dev",
-    "netlify:live": "netlify dev --live"
+    "netlify:live": "netlify dev --live",
+    "netlify:link": "netlify link",
+    "version:bump": "npm run version:bump:patch",
+    "version:bump:patch": "npm version --no-git-tag-version patch",
+    "version:bump:minor": "npm version --no-git-tag-version minor",
+    "version:bump:major": "npm version --no-git-tag-version patch"
   },
   "dependencies": {
-    "svg-sprite-generator": "0.0.7",
-    "rollup": "^2.39.0",
-    "rollup-plugin-terser": "^7.0.2",
-    "rollup-plugin-url-resolve": "^0.1.1"
-  },
-  "devDependencies": {
-    "eslint": "^7.20.0",
-    "htmlhint": "^0.14.2",
-    "stylelint": "^13.10.0",
-    "stylelint-config-recommended": "^3.0.0",
-    "stylelint-config-standard": "^20.0.0",
-    "svg-sprite-standardized": "^1.1.0",
-    "svgo": "^1.3.2"
+    "netlify-js-app": "^1.0.12",
+    "svg-sprite-standardized": "^1.1.0"
   }
 }
