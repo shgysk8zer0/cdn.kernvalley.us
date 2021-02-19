@@ -47,7 +47,7 @@ async function makeAppItem({ name, url, description, image }) {
 		'grid-template-columns': 'auto 150px auto',
 		'grid-template-rows': '150px auto auto',
 		'gap': '8px',
-		'border': '1px solid currentColor',
+		'border': '1px solid #dedede',
 		'border-radius': '12px',
 	});
 
@@ -107,6 +107,14 @@ registerCustomElement('app-list', class HTMLKernValleyAppListButtonlement extend
 		}
 	}
 
+	get dev() {
+		return this.hasAttribute('dev');
+	}
+
+	set dev(val) {
+		this.toggleAttribute('dev', val);
+	}
+
 	get medium() {
 		return this.getAttribute('medium') || 'web';
 	}
@@ -117,6 +125,14 @@ registerCustomElement('app-list', class HTMLKernValleyAppListButtonlement extend
 		} else {
 			this.removeAttribute('medium');
 		}
+	}
+
+	get host() {
+		return this.hasAttribute('host');
+	}
+
+	set host(val) {
+		this.toggleAttribute('host', val);
 	}
 
 	get source() {
@@ -133,9 +149,11 @@ registerCustomElement('app-list', class HTMLKernValleyAppListButtonlement extend
 
 	async show() {
 		this.disabled = true;
-		const { source, medium, content } = this;
+		const { source, medium, content, dev, host } = this;
 		const dialog = document.createElement('dialog');
-		const list = await HTMLKernValleyAppListButtonlement.getAppList({ source, medium, content });
+		const list = await HTMLKernValleyAppListButtonlement.getAppList({
+			source, medium, content, dev, host,
+		});
 		const apps = await Promise.all(list.map(makeAppItem));
 		const header = document.createElement('header');
 		const close = document.createElement('button');
@@ -209,11 +227,13 @@ registerCustomElement('app-list', class HTMLKernValleyAppListButtonlement extend
 		dialog.showModal();
 	}
 
-	static async getAppList({ source = null, medium = null, content = null } = {}) {
+	static async getAppList({ source = null, medium = null, content = null,
+		dev = false, host = false,
+	} = {}) {
 		const list = await getJSON('https://apps.kernvalley.us/apps.json');
 
 		if (Array.isArray(list)) {
-			return list.map(app => {
+			const apps = list.map(app => {
 				if (typeof app.url === 'string') {
 					const url = new URL(app.url, document.baseURI);
 
@@ -227,6 +247,18 @@ registerCustomElement('app-list', class HTMLKernValleyAppListButtonlement extend
 
 				return app;
 			});
+
+			if (dev && host) {
+				return apps;
+			} else if (host) {
+				return apps.filter(({ dev }) => ! dev);
+			} else if (dev) {
+				return apps.filter(({ url }) => new URL(url).hostname !== location.hostname);
+			} else {
+				return apps.filter(({ dev, url }) =>
+					! dev && new URL(url).hostname !== location.hostname
+				);
+			}
 		} else {
 			throw new Error('Failed fetching app list');
 		}
