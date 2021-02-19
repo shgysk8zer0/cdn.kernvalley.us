@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - New `<leaflet-map find="15">` attribute, indicating intent to find user with `maxZoom` of (e.g.) 15
 - Methods to calculate distance between two `<leaflet-marker>`s or other coordinates
 - Methods for checking if `<leaflet-marker>` is visible on `<leaflet-map>`
+- Filtering of `<button is="app-list">` using `dev` and `host` attributes
 
 ### Changed
 - `HTMLLeafletMapElement.locate()` now has default arguments
