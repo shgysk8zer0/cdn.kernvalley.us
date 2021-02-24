@@ -1,4 +1,5 @@
-import { registerCustomElement, css, attr } from '../js/std-js/custom-elements.js';
+import { registerCustomElement } from '../js/std-js/custom-elements.js';
+import { css, attr } from '../js/std-js/dom.js';
 import { send } from '../js/std-js/slack.js';
 
 function makeSlot(name, text) {
