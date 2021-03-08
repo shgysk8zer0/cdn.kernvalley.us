@@ -390,15 +390,11 @@ HTMLCustomElement.register('leaflet-map', class HTMLLeafletMapElement extends HT
 	}
 
 	get _populated() {
-		return new Promise(async resolve => {
-			if (this._shadow.childElementCount === 0) {
-				this.addEventListener('populated', () => resolve(this), {
-					once: true
-				});
-			} else {
-				resolve(this);
-			}
-		});
+		if (this._shadow.childElementCount === 0) {
+			return new Promise(r =>on(this, 'populated', () => r(this), { once: true }));
+		} else {
+			return Promise.resolve(this);
+		}
 	}
 
 	get crossOrigin() {
