@@ -2,10 +2,145 @@
 <html lang="en" dir="ltr">
 	<head>
 		<meta charset="UTF-8" />
+		<link rel="stylesheet" href="https://cdn.kernvalley.us/css/core-css/element.css" />
+		<link rel="stylesheet" href="https://cdn.kernvalley.us/css/core-css/class-rules.css" />
+		<link rel="stylesheet" href="https://cdn.kernvalley.us/css/core-css/forms.css" />
+		<link rel="stylesheet" href="/components/payment/request.css" />
 	</head>
 	<body>
-		<form name="PaymentRequest">
-			<button type="submit">Submit</button>
-		</form>
+		<div id="payment-request-dialog" part="dialog" hidden="">
+			<form id="payment-request-form" name="PaymentRequest">
+				<input type="hidden" name="id" id="payment-id" />
+				<section id="order-summary">
+					<h4 class="payment-heading" part="heading">Order Summary</h4>
+					<slot name="display-items"></slot>
+				</section>
+				<fieldset id="payment-contact-section" class="no-border" part="section contact-info">
+					<legend class="payment-heading" part="heading">
+						<slot name="contact-legend">Basic Contact Info</slot>
+					</legend>
+					<div class="form-group">
+						<label for="payment-name" class="input-label required" part="label">
+							<span>Name</span>
+						</label>
+						<input type="text" name="name" id="payment-name" class="input" placeholder="First Last" autocomplete="name" part="input" required="" />
+					</div>
+					<div class="form-group">
+						<label for="payment-email" class="input-label required" part="label">
+							<span>Email</span>
+						</label>
+						<input type="email" name="email" id="payment-email" class="input" placeholder="user@example.com" autocomplete="email" part="input" required="" />
+					</div>
+					<div class="form-group">
+						<label for="payment-phone" class="input-label required" part="label">
+							<span>Phone</span>
+						</label>
+						<input type="tel" name="telephone" id="payment-phone" class="input" placeholder="+1-555-555-5555" autocomplete="tel" part="input" required="" />
+					</div>
+					<div class="btns nav-btns">
+						<button type="button" class="btn btn-primary" data-dir="next">Next</button>
+					</div>
+				</fieldset>
+				<fieldset id="payment-shipping-address" class="no-border" part="section shipping-address">
+					<legend class="payment-heading" part="heading">
+						<slot name="shipping-address-legend">Shipping address</slot>
+					</legend>
+					<div class="form-group">
+						<label for="payment-shipping-street-address" class="input-label required" part="label">
+							<span>Shipping Address</span>
+						</label>
+						<input type="text" name="shipping-street-address" id="payment-shipping-street-address" class="input" placeholder="123 Easy St." part="input" autocomplete="shipping street-address" required="" />
+					</div>
+					<div class="form-group">
+						<label for="payment-shipping-city" class="input-label required" part="label">
+							<span>State</span>
+						</label>
+						<input type="text" name="shipping-city" id="payment-shipping-city" class="input" placeholder="Pleasant Town" part="input" autocomplete="shipping address-level2" required="" />
+					</div>
+					<div class="form-group">
+						<label for="payment-shipping-state" class="input-label required" part="label">
+							<span>State</span>
+						</label>
+						<input type="text" name="shipping-state" id="payment-shipping-state" class="input" placeholder="CA" part="input" autocomplete="shipping address-level1" required="" />
+					</div>
+					<div class="form-group">
+						<label for="payment-shipping-postal-code" class="input-label required" part="label">
+							<span>Postal Code</span>
+						</label>
+						<input type="text" name="shipping-postal-code" id="payment-shipping-postal-code" class="input" placeholder="12345" part="input" autocomplete="shipping postal-code" required="" />
+					</div>
+				</fieldset>
+				<fieldset id="payment-shipping-method" class="no-border" part="section shipping-method" disabled="" hidden="">
+					<legend class="payment-heading" part="heading">
+						<slot name="shipping-method-legend">Shipping Method</slot>
+					</legend>
+				</fieldset>
+				<fieldset id="payment-address" class="no-border" part="section payment-method">
+					<legend class="payment-heading" part="heading">
+						<slot name="payment-method-legend">Payment method</slot>
+					</legend>
+					<div class="form-group">
+						<label for="payment-billing-cc-name" class="input-label required" part="label">
+							<span>Name on Card</span>
+						</label>
+						<input type="text" name="cc-name" id="payment-billing-cc-name" class="input" placeholder="First Last" autocomplete="cc-name" part="input" required="" />
+					</div>
+					<div class="form-group">
+						<label for="payment-billing-cc-number" class="input-label required" part="label">
+							<span>Card number</span>
+						</label>
+						<input type="text" name="cc-num" id="payment-billing-cc-number" class="input" placeholder="****-****-****-****" pattern="(\d{4}[ \-]?){3}\d{4,5}" autocomplete="cc-number" part="input" required="" />
+					</div>
+					<div class="form-group">
+						<label for="payment-billing-cc-expiry" class="input-label required" part="label">
+							<span>Expiration Date</span>
+						</label>
+						<input type="month" name="cc-expiry" id="payment-billing-cc-expiry" class="input" placeholder="YYYY-MM" autocomplete="cc-exp" part="input" pattern="\d{4}-\d{2}" required="" />
+					</div>
+					<div class="form-group">
+						<label for="payment-billing-cc-cvc" class="input-label required" part="label">
+							<abbr title="Card Verification Code">CVC</abbr>
+						</label>
+						<input type="number" name="cc-cvc" id="payment-billing-cc-cvc" class="input" part="input" placeholder="###" min="1" max="999" autocomplete="cc-csc" required="" />
+					</div>
+					<div class="form-group">
+						<label for="payment-billing-street-address" class="input-label required" part="label">
+							<span>Billing Address</span>
+						</label>
+						<input type="text" name="billing-street-address" id="payment-billing-street-address" class="input" placeholder="123 Easy St." part="input" autocomplete="billing street-address" required="" />
+					</div>
+					<div class="form-group">
+						<label for="payment-billing-city" class="input-label required" part="label">
+							<span>State</span>
+						</label>
+						<input type="text" name="billing-city" id="payment-billing-city" class="input" placeholder="Pleasant Town" part="input" autocomplete="billing address-level2" required="" />
+					</div>
+					<div class="form-group">
+						<label for="payment-billing-state" class="input-label required" part="label">
+							<span>State</span>
+						</label>
+						<input type="text" name="billing-region" id="payment-billing-state" class="input" placeholder="CA" part="input" autocomplete="billing address-level1" required="" />
+					</div>
+					<div class="form-group">
+						<label for="payment-billing-postal-code" class="input-label required" part="label">
+							<span>Postal Code</span>
+						</label>
+						<input type="text" name="billing-postal-code" id="payment-billing-postal-code" class="input" placeholder="12345" part="input" autocomplete="billing postal-code" required="" />
+					</div>
+				</fieldset>
+				<br />
+				<div class="btns">
+					<button type="reset" class="btn btn-reject grow-1" title="Cancel" part="button cancel-button">
+						<slot name="cancel-icon"></slot>
+						<slot name="cancel-text">Cancel</slot>
+					</button>
+					<button type="submit" class="btn btn-accept grow-1" title="Pay" part="button pay-button">
+						<slot name="pay-icon"></slot>
+						<slot name="pay-text">Pay</slot>
+					</button>
+				</div>
+			</form>
+		</div>
+		<div id="payment-request-backdrop" part="backdrop" hidden=""></div>
 	</body>
 </html>
