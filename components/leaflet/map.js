@@ -295,16 +295,19 @@ HTMLCustomElement.register('leaflet-map', class HTMLLeafletMapElement extends HT
 				}),
 			]);
 
-			this._shadow.append(doc);
+			requestAnimationFrame(async () => {
+				this._shadow.append(doc);
+				this.dispatchEvent(new Event('populated'));
 
-			if ('markers' in this.dataset) {
-				await this.loadMarkers(...this.dataset.markers.split(' ')).catch(console.error);
-			}
+				if ('markers' in this.dataset) {
+					await this.loadMarkers(...this.dataset.markers.split(' ')).catch(console.error);
+				}
 
-			await styles;
-			doc.hidden = false;
+				await styles;
+				doc.hidden = false;
+			});
 
-			this.dispatchEvent(new Event('populated'));
+
 		});
 	}
 
