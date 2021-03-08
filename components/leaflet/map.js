@@ -1,5 +1,5 @@
-import { getLocation, sleep, debounce } from '../../js/std-js/functions.js';
-import { on, off, create } from '../../js/std-js/dom.js';
+import { getLocation, debounce } from '../../js/std-js/functions.js';
+import { on, off, create, query } from '../../js/std-js/dom.js';
 import { loadStylesheet } from '../../js/std-js/loader.js';
 import { getCustomElement } from '../../js/std-js/custom-elements.js';
 import HTMLCustomElement from '../custom-element.js';
@@ -11,10 +11,6 @@ import {
 	point as Point,
 	latLng as LatLng,
 } from 'https://unpkg.com/leaflet@1.7.1/dist/leaflet-src.esm.js';
-
-function $$(selector, base) {
-	return Array.from(base.querySelectorAll(selector));
-}
 
 const initialTitle = document.title;
 const GEO_EXP = /#-?\d{1,3}\.\d+,-?\d{1,3}\.\d+(,\d{1,2})?/;
@@ -234,7 +230,7 @@ HTMLCustomElement.register('leaflet-map', class HTMLLeafletMapElement extends HT
 			}, 150), { passive: true });
 
 			this.addEventListener('zoom', ({ detail: { zoom }}) => {
-				const markers = $$('[slot="markers"][minzoom],[slot="markers"][maxzoom]', this);
+				const markers = query('[slot="markers"][minzoom],[slot="markers"][maxzoom]', this);
 				markers.forEach(marker => {
 					const { minZoom, maxZoom, open } = marker;
 
@@ -246,70 +242,72 @@ HTMLCustomElement.register('leaflet-map', class HTMLLeafletMapElement extends HT
 			}, { passive: true });
 		}, { once: true });
 
-		sleep(500).then(async () => {
-			Promise.allSettled([
-				this.whenConnected,
-				this.whenLoad,
-			]).then(async () => {
-				const events = {
-					slotchange: ({ target }) => {
-						const detail = target.assignedElements();
-						this.dispatchEvent(new CustomEvent(`${target.name}change`, { detail }));
-					}
-				};
+		Promise.allSettled([
+			this.whenConnected,
+			this.whenLoad,
+		]).then(async () => {
+			const events = {
+				slotchange: ({ target }) => {
+					const detail = target.assignedElements();
+					this.dispatchEvent(new CustomEvent(`${target.name}change`, { detail }));
+				}
+			};
 
-				const doc = create('div', {
-					part: ['container'],
-					children: [
-						create('slot', { events, attrs: { name: 'toolbar' }}),
-						create('slot', {
-							events,
-							attrs: {
-								name: 'map',
-							},
-							children: [
-								create('div', { id: 'map-fallback', part: ['map'] }),
-							],
-						}),
-						create('slot', {
-							events,
-							attrs: {
+			const doc = create('div', {
+				part: ['container'],
+				hidden: true,
+				children: [
+					create('slot', { events, attrs: { name: 'toolbar' }}),
+					create('slot', {
+						events,
+						attrs: { name: 'map' },
+						children: [
+							create('div', { id: 'map-fallback', part: ['map'] }),
+						],
+					}),
+					create('slot', {
+						events,
+						attrs: { name: 'attribution' },
+						children: [
+							create('a', {
 								text: 'Wikimedia',
-								name: 'attribution',
-							},
-							children: [
-								create('a', {
-									part: ['attribution'],
-									attrs: {
-										href: 'https://wikimediafoundation.org/wiki/Maps_Terms_of_Use',
-									}
-								})
-							]
-						}),
-						create('slot', { events, attrs: { name: 'markers' }}),
-						create('slot', { events, attrs: { name: 'overlays' }}),
-						create('slot', { events, attrs: { name: 'geojson' }}),
-					]
-				});
-
-				await Promise.allSettled([
-					loadStylesheet('https://unpkg.com/leaflet@1.7.1/dist/leaflet.css', {
-						integrity: 'sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A==',
-						parent: this._shadow,
+								part: ['attribution'],
+								attrs: {
+									href: 'https://wikimediafoundation.org/wiki/Maps_Terms_of_Use',
+									rel: 'noopener noreferrer external',
+								}
+							})
+						]
 					}),
-					loadStylesheet(new URL('/components/leaflet/map.css', HTMLCustomElement.base), {
-						parent: this._shadow,
-					}),
-				]);
+					create('slot', { events, attrs: { name: 'markers' }}),
+					create('slot', { events, attrs: { name: 'overlays' }}),
+					create('slot', { events, attrs: { name: 'geojson' }}),
+				]
+			});
 
+			const styles = Promise.allSettled([
+				loadStylesheet('https://unpkg.com/leaflet@1.7.1/dist/leaflet.css', {
+					integrity: 'sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A==',
+					parent: this._shadow,
+				}),
+				loadStylesheet(new URL('/components/leaflet/map.css', HTMLCustomElement.base), {
+					parent: this._shadow,
+				}),
+			]);
+
+			requestAnimationFrame(async () => {
 				this._shadow.append(doc);
+				this.dispatchEvent(new Event('populated'));
 
 				if ('markers' in this.dataset) {
 					await this.loadMarkers(...this.dataset.markers.split(' ')).catch(console.error);
 				}
 
-				this.dispatchEvent(new Event('populated'));
+				await styles;
+				doc.hidden = false;
 			});
+
+
 		});
 	}
 
@@ -395,15 +393,11 @@ HTMLCustomElement.register('leaflet-map', class HTMLLeafletMapElement extends HT
 	}
 
 	get _populated() {
-		return new Promise(async resolve => {
-			if (this._shadow.childElementCount === 0) {
-				this.addEventListener('populated', () => resolve(this), {
-					once: true
-				});
-			} else {
-				resolve(this);
-			}
-		});
+		if (this._shadow.childElementCount === 0) {
+			return new Promise(r =>on(this, 'populated', () => r(this), { once: true }));
+		} else {
+			return Promise.resolve(this);
+		}
 	}
 
 	get crossOrigin() {
