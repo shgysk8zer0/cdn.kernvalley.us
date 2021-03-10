@@ -256,7 +256,6 @@ export class HTMLPaymentRequestElement extends HTMLElement {
 			throw new TypeError('<payment-request> currently only suports BasiCardRequest');
 		}
 
-		const itemTemplate = frag.getElementById('display-item-template').content;
 		const statesList = frag.getElementById('states-options').content;
 		frag.getElementById('payment-shipping-state').append(statesList.cloneNode(true));
 		frag.getElementById('payment-billing-state').append(statesList.cloneNode(true));
