@@ -50,6 +50,8 @@ class BasicCardResponse {
 // @SEE https://developer.mozilla.org/en-US/docs/Web/API/PaymentResponse
 class PaymentResponse extends EventTarget {
 	constructor(request) {
+		super();
+
 		if (request instanceof HTMLElement && protectedData.has(request)) {
 			const { shadow, args } = getData(request);
 			const data = new FormData(shadow.getElementById('payment-request-form'));
@@ -83,7 +85,7 @@ class PaymentResponse extends EventTarget {
 
 function getPaymentResonse(request) {
 	if (request instanceof HTMLElement) {
-		return new PaymentResponse(request)
+		return new PaymentResponse(request);
 	} else {
 		throw new TypeError('data must be an instance of FormData');
 	}
