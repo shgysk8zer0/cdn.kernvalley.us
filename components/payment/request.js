@@ -24,28 +24,28 @@ function getData(obj, key, defaultValue) {
 }
 
 // @SEE https://developer.mozilla.org/en-US/docs/Web/API/PaymentAddress
-class BasicCardResponse {
-	constructor(response) {
-		if (protectedData.has(response)) {
-			const data = getData(response, 'data');
-			const [year, month] = data.get('cc-expiry').split('-', 2).map(parseInt);
-			setData(this, {
-				cardNumber: data.get('cc-num'),
-				cardholderName: data.get('cc-name'),
-				expiryMonth: month,
-				expiryYear: year,
-				billingAddress: {
-					addressLine: [data.get('billing-street-address')],
-					city: data.get('billing-city'),
-					region: data.get('billing-region'),
-					dependentLocality: '',
-					postalCode: data.get('billing-postal-code'),
-					country: data.get('billing-country') || 'US',
-				}
-			});
-		}
-	}
-}
+// class BasicCardResponse {
+// 	constructor(response) {
+// 		if (protectedData.has(response)) {
+// 			const data = getData(response, 'data');
+// 			const [year, month] = data.get('cc-expiry').split('-', 2).map(parseInt);
+// 			setData(this, {
+// 				cardNumber: data.get('cc-num'),
+// 				cardholderName: data.get('cc-name'),
+// 				expiryMonth: month,
+// 				expiryYear: year,
+// 				billingAddress: {
+// 					addressLine: [data.get('billing-street-address')],
+// 					city: data.get('billing-city'),
+// 					region: data.get('billing-region'),
+// 					dependentLocality: '',
+// 					postalCode: data.get('billing-postal-code'),
+// 					country: data.get('billing-country') || 'US',
+// 				}
+// 			});
+// 		}
+// 	}
+// }
 
 // @SEE https://developer.mozilla.org/en-US/docs/Web/API/PaymentResponse
 class PaymentResponse extends EventTarget {
@@ -57,7 +57,7 @@ class PaymentResponse extends EventTarget {
 			const data = new FormData(shadow.getElementById('payment-request-form'));
 			setData(this, { request, args, data });
 		} else {
-			throw new TypeError('Cannot construct a response without a PaymentRequest')
+			throw new TypeError('Cannot construct a response without a PaymentRequest');
 		}
 	}
 
@@ -65,7 +65,7 @@ class PaymentResponse extends EventTarget {
 		return getData(this, 'data').id;
 	}
 
-	async complete(reason) {
+	async complete(/*reason*/) {
 		const request = getData(this, 'request');
 		const shadow = getData(request, 'shadow');
 		const backdrop = shadow.getElementById('payment-request-backdrop');
@@ -202,7 +202,7 @@ registerCustomElement('payment-request', class HTMLPaymentRequestElement extends
 		await this.ready;
 		const { shadow, promise } = protectedData.get(this);
 		const dialog = shadow.getElementById('payment-request-dialog');
-		const form = shadow.getElementById('payment-request-form');
+		// const form = shadow.getElementById('payment-request-form');
 		const backdrop = shadow.getElementById('payment-request-backdrop');
 
 		requestAnimationFrame(() => {
@@ -254,6 +254,8 @@ registerCustomElement('payment-request', class HTMLPaymentRequestElement extends
 				duration: 400,
 			})
 		]);
+
+		reject('Aborted');
 
 		getData(this).reject(new DOMException('PaymentRequest aborted'));
 		this.remove();
