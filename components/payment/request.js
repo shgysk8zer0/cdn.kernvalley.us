@@ -257,6 +257,7 @@ export class HTMLPaymentRequestElement extends HTMLElement {
 		}
 
 		const statesList = frag.getElementById('states-options').content;
+		const itemTemplate = frag.getElementById('display-item-template').content;
 		frag.getElementById('payment-shipping-state').append(statesList.cloneNode(true));
 		frag.getElementById('payment-billing-state').append(statesList.cloneNode(true));
 
