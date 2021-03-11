@@ -2,6 +2,7 @@ import { registerCustomElement } from '../../js/std-js/custom-elements.js';
 import { getHTML } from '../../js/std-js/http.js';
 import { uuidv6 } from '../../js/std-js/uuid.js';
 import { on, create, attr, text, query, animate } from '../../js/std-js/dom.js';
+import { meta } from '../../import.meta.js';
 
 const protectedData = new WeakMap();
 
@@ -244,7 +245,7 @@ export class HTMLPaymentRequestElement extends HTMLElement {
 	}
 
 	async connectedCallback() {
-		const frag = await getHTML('/components/payment/request.html');
+		const frag = await getHTML(new URL('./components/payment/request.html', meta.url));
 		const { methodData, shadow,
 			details: { id, total, displayItems, shippingOptions },
 			options: { requestPayerName, requestPayerEmail, requestPayerPhone, requestShipping/*, shippingType*/ },
