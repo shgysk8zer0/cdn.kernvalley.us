@@ -2,10 +2,9 @@
 <html lang="en" dir="ltr">
 	<head>
 		<meta charset="UTF-8" />
-		<link rel="stylesheet" href="https://cdn.kernvalley.us/css/core-css/element.css" />
-		<link rel="stylesheet" href="https://cdn.kernvalley.us/css/core-css/class-rules.css" />
-		<link rel="stylesheet" href="https://cdn.kernvalley.us/css/core-css/forms.css" />
-		<link rel="stylesheet" href="/components/payment/request.css" />
+		<link rel="stylesheet" href="https://cdn.kernvalley.us/css/core-css/element.css" crossorigin="anonymous" referrerpolicy="no-referrer" media="all" />
+		<link rel="stylesheet" href="https://cdn.kernvalley.us/css/core-css/class-rules.css" crossorigin="anonymous" referrerpolicy="no-referrer" media="all" />
+		<link rel="stylesheet" href="https://cdn.kernvalley.us/css/core-css/forms.css" crossorigin="anonymous" referrerpolicy="no-referrer" media="all" />
 	</head>
 	<body>
 		<div id="payment-request-dialog" part="dialog" hidden="">
@@ -143,13 +142,13 @@
 					</div>
 					<div class="form-group">
 						<label for="payment-billing-city" class="input-label required" part="label">
-							<span>State</span>
+							<span>City</span>
 						</label>
 						<input type="text" name="billing-city" id="payment-billing-city" class="input" placeholder="Pleasant Town" part="input" autocomplete="billing address-level2" required="" />
 					</div>
 					<div class="form-group">
 						<label for="payment-billing-state" class="input-label required" part="label">
-							<span>City</span>
+							<span>State</span>
 						</label>
 						<!-- <input type="text" name="billing-region" id="payment-billing-state" class="input" placeholder="CA" part="input" autocomplete="billing address-level1" required="" /> -->
 						<select name="billing-region" id="payment-billing-state" class="input" part="input" autocomplete="billing address-level1" required=""></select>
