@@ -1,7 +1,7 @@
 import { registerCustomElement } from '../../js/std-js/custom-elements.js';
 import { getHTML } from '../../js/std-js/http.js';
 import { uuidv6 } from '../../js/std-js/uuid.js';
-import { on, create, attr, text, query, animate } from '../../js/std-js/dom.js';
+import { on, when, create, attr, text, query, animate } from '../../js/std-js/dom.js';
 import { loadStylesheet } from '../../js/std-js/loader.js';
 import { meta } from '../../import.meta.js';
 
@@ -363,8 +363,10 @@ export class HTMLPaymentRequestElement extends HTMLElement {
 		});
 
 		requestAnimationFrame(async () => {
-			await loadStylesheet(new URL('./components/payment/request.css', meta.url), { parent: shadow });
+			const style = await loadStylesheet(new URL('./components/payment/request.css', meta.url), { parent: shadow });
 			shadow.append(frag);
+			const styles = query('link[rel="stylesheet"]', shadow).filter(link => !link.isSameNode(style));
+			await Promise.all(styles.map(link => when(link, 'load')));
 			this.dispatchEvent(new Event('ready'));
 		});
 	}
