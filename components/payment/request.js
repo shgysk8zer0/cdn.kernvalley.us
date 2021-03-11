@@ -1,7 +1,7 @@
 import { registerCustomElement } from '../../js/std-js/custom-elements.js';
 import { getHTML } from '../../js/std-js/http.js';
 import { uuidv6 } from '../../js/std-js/uuid.js';
-import { on, attr, query, animate } from '../../js/std-js/dom.js';
+import { on, create, attr, text, query, animate } from '../../js/std-js/dom.js';
 
 const protectedData = new WeakMap();
 
@@ -24,28 +24,56 @@ function getData(obj, key, defaultValue) {
 }
 
 // @SEE https://developer.mozilla.org/en-US/docs/Web/API/PaymentAddress
-// class BasicCardResponse {
-// 	constructor(response) {
-// 		if (protectedData.has(response)) {
-// 			const data = getData(response, 'data');
-// 			const [year, month] = data.get('cc-expiry').split('-', 2).map(parseInt);
-// 			setData(this, {
-// 				cardNumber: data.get('cc-num'),
-// 				cardholderName: data.get('cc-name'),
-// 				expiryMonth: month,
-// 				expiryYear: year,
-// 				billingAddress: {
-// 					addressLine: [data.get('billing-street-address')],
-// 					city: data.get('billing-city'),
-// 					region: data.get('billing-region'),
-// 					dependentLocality: '',
-// 					postalCode: data.get('billing-postal-code'),
-// 					country: data.get('billing-country') || 'US',
-// 				}
-// 			});
-// 		}
-// 	}
-// }
+class BasicCardResponse {
+	constructor(form) {
+		if (form instanceof FormData) {
+			const [year, month] = form.get('cc-expiry').split('-', 2).map(n => parseInt(n));
+			setData(this, {
+				cardNumber: form.get('cc-num'),
+				cardholderName: form.get('cc-name'),
+				cardSecurityCode: form.get('cc-cvc'),
+				expiryMonth: month,
+				expiryYear: year,
+				billingAddress: {
+					addressLine: [form.get('billing-street-address')],
+					city: form.get('billing-city'),
+					region: form.get('billing-region'),
+					dependentLocality: '',
+					postalCode: form.get('billing-postal-code'),
+					country: form.get('billing-country') || 'US',
+				}
+			});
+		}
+	}
+
+	get cardNumber() {
+		return getData(this, 'cardNumber');
+	}
+
+	get cardholderName() {
+		return getData(this, 'cardholderName');
+	}
+
+	get cardSecurityCode() {
+		return getData(this, 'cardSecurityCode');
+	}
+
+	get expiryMonth() {
+		return getData(this, 'expiryMonth');
+	}
+
+	get expiryYear() {
+		return getData(this, 'expiryYear');
+	}
+
+	get billingAddress() {
+		return getData(this, 'billingAddress');
+	}
+
+	toJSON() {
+		return getData(this);
+	}
+}
 
 // @SEE https://developer.mozilla.org/en-US/docs/Web/API/PaymentResponse
 class PaymentResponse extends EventTarget {
@@ -53,16 +81,80 @@ class PaymentResponse extends EventTarget {
 		super();
 
 		if (request instanceof HTMLElement && protectedData.has(request)) {
-			const { shadow, args } = getData(request);
-			const data = new FormData(shadow.getElementById('payment-request-form'));
-			setData(this, { request, args, data });
+			const { shadow, options: { requestPayerName, requestPayerEmail, requestPayerPhone, requestShipping }} = getData(request);
+			const form = new FormData(shadow.getElementById('payment-request-form'));
+
+			const data = {
+				details: new BasicCardResponse(form),
+				methodName: form.get('cc-type'),
+				requestId: form.get('id'),
+			};
+
+			if (requestPayerName) {
+				data.payerName = form.get('name');
+			}
+
+			if (requestPayerEmail) {
+				data.payerEmail = form.get('email');
+			}
+
+			if (requestPayerPhone) {
+				data.payerPhone = form.get('telephone');
+			}
+
+			if (requestShipping) {
+				data.shippingOption = form.get('shippingOption');
+				data.shippingAddress = {
+					// @TODO handle PO Boxes, etc.
+					addressLine: [form.get('shipping-street-address')],
+					city: form.get('shipping-city'),
+					region: form.get('shipping-region'),
+					dependentLocality: '',
+					postalCode: form.get('shipping-postal-code'),
+					country: form.get('shipping-country') || 'US',
+				};
+			}
+
+			setData(this, { request, data });
 		} else {
 			throw new TypeError('Cannot construct a response without a PaymentRequest');
 		}
 	}
 
+	toJSON() {
+		return getData(this, 'data');
+	}
+
 	get requestId() {
 		return getData(this, 'data').id;
+	}
+
+	get details() {
+		return getData(this, 'data').details;
+	}
+
+	get methodName() {
+		return getData(this, 'data').methodName;
+	}
+
+	get payerName() {
+		return getData(this, 'data').payerName;
+	}
+
+	get payerEmail() {
+		return getData(this, 'data').payerEmail;
+	}
+
+	get payerPhone() {
+		return getData(this, 'data').payerPhone;
+	}
+
+	get shippingOption() {
+		return getData(this, 'data').shippingOption;
+	}
+
+	get shippingAddress() {
+		return getData(this, 'data').shippingAddress;
 	}
 
 	async complete(/*reason*/) {
@@ -75,6 +167,10 @@ class PaymentResponse extends EventTarget {
 		request.remove();
 	}
 
+	/**
+	 * @TODO Dispatch `payerdetailchange` event when retry completes.
+	 * This should also update this response instead of returning another
+	 */
 	async retry() {
 		const request = getData(this, 'request');
 		const shadow = getData(request, 'shadow');
@@ -102,17 +198,151 @@ function getPromise() {
 	return obj;
 }
 
-registerCustomElement('payment-request', class HTMLPaymentRequestElement extends HTMLElement {
-	constructor(...args) {
+/**
+ * @TODO Dispatch various change events
+ * @SEE https://developer.mozilla.org/en-US/docs/Web/API/PaymentRequest#events
+ */
+export class HTMLPaymentRequestElement extends HTMLElement {
+	constructor(methodData, {
+		total,
+		id = uuidv6(),
+		displayItems = [],
+		shippingOptions = [],
+		modifiers,
+	}, {
+		requestPayerName = false,
+		requestPayerEmail = false,
+		requestPayerPhone = false,
+		requestShipping = false,
+		shippingType = 'shipping',
+	} = {}) {
 		super();
 		const shadow = this.attachShadow({ mode: 'closed' });
 		const { promise, resolve, reject } = getPromise();
-		setData(this, { shadow, args, promise, resolve, reject });
+
+		const cardRequest = methodData.find(({ supportedMethods }) => supportedMethods === 'basic-card');
+		if (typeof cardRequest === 'undefined') {
+			throw new TypeError('Currently only supports BasicCardRequest types');
+		}
+		if (! ('data' in cardRequest)) {
+			cardRequest.data = {
+				supportedNetworks: Object.keys(HTMLPaymentRequestElement.supportedCardNetworks),
+			};
+		}
+		if (! Array.isArray(cardRequest.data.supportedNetworks)
+			||cardRequest.data.supportedNetworks.length === 0
+		) {
+			cardRequest.data.supportedNetworks = Object.keys(HTMLPaymentRequestElement.supportedCardNetworks);
+		}
+
+		setData(this, { shadow, methodData, promise, resolve, reject,
+			details: { total, id, displayItems, shippingOptions, modifiers },
+			options: { requestPayerName, requestPayerEmail, requestPayerPhone,
+				requestShipping, shippingType }});
+
+		queueMicrotask(() => this.id = id);
 	}
 
 	async connectedCallback() {
 		const frag = await getHTML('/components/payment/request.html');
-		frag.getElementById('payment-id').value = uuidv6();
+		const { methodData, shadow,
+			details: { id, total, displayItems, shippingOptions },
+			options: { requestPayerName, requestPayerEmail, requestPayerPhone, requestShipping/*, shippingType*/ },
+		} = getData(this);
+
+		const requestPayerInfo = requestPayerName || requestPayerEmail || requestPayerPhone;
+
+		if (! methodData.some(({ supportedMethods }) => supportedMethods === 'basic-card')) {
+			throw new TypeError('<payment-request> currently only suports BasiCardRequest');
+		}
+
+		const statesList = frag.getElementById('states-options').content;
+		const itemTemplate = frag.getElementById('display-item-template').content;
+		frag.getElementById('payment-shipping-state').append(statesList.cloneNode(true));
+		frag.getElementById('payment-billing-state').append(statesList.cloneNode(true));
+
+		const items = await Promise.all(displayItems.map(async ({ label,  amount: { value }}) => {
+			const base = itemTemplate.cloneNode(true);
+			await Promise.allSettled([
+				text('.item-label', label, { base }),
+				text('.item-amount-value', value, { base }),
+			]);
+			return base;
+		}));
+
+		await Promise.all([
+			text('.site-name', document.title, { base: frag }),
+			text('.site-hostname', location.hostname, { base: frag }),
+		]);
+
+		this.append(
+			create('b', {
+				slot: 'total-label',
+				text: total.label,
+			}),
+			create('b', {
+				slot: 'total-amount-value',
+				text: total.amount.value,
+			}),
+			...items,
+		);
+		const networks = HTMLPaymentRequestElement.supportedCardNetworks;
+		const types = methodData.find(({ supportedMethods }) => supportedMethods === 'basic-card')
+			.data.supportedNetworks.map(type => {
+				const opt = document.createElement('option');
+				opt.value = type;
+				opt.textContent = networks[type] || 'Unknown Card Type';
+				return opt;
+			});
+
+		await frag.getElementById('payment-billing-cc-type').append(...types);
+
+		if (requestPayerInfo === false) {
+			await attr('#payment-contact-section', {
+				hidden: true,
+				disabled: true,
+			}, { base: frag });
+		} else {
+			if (requestPayerName === false) {
+				frag.getElementById('payer-name-field').remove();
+			}
+
+			if (requestPayerEmail === false) {
+				frag.getElementById('payer-phone-field').remove();
+			}
+
+			if (requestPayerPhone === false) {
+				frag.getElementById('payer-phone-field').remove();
+			}
+		}
+
+		frag.getElementById('payment-id').value = id;
+
+		if (requestShipping) {
+			if (Array.isArray(shippingOptions)) {
+				const shippingOptTemplate = frag.getElementById('shipping-option-template').content;
+				await Promise.all(shippingOptions.map(async ({ label, id, selected, amount: { value }}) => {
+					const base = shippingOptTemplate.cloneNode(true);
+					await Promise.allSettled([
+						text('.shipping-option-label', label, { base }),
+						text('.shipping-option-amount-value', value, { base }),
+						attr('.shipping-option-checkbox', { id, checked: selected, value: id }, { base }),
+					]);
+					return base;
+				})).then(opts => frag.getElementById('payment-shipping-method').append(...opts));
+			} else {
+				await attr('#payment-shipping-method', {
+					hidden: true,
+					disabled: true,
+				}, { base: frag });
+			}
+		} else {
+			await attr('#payment-shipping-address, #payment-shipping-method', {
+				hidden: true,
+				disabled: true,
+			}, { base: frag});
+		}
+
 
 		on(query('form', frag), {
 			submit: async event => {
@@ -130,8 +360,10 @@ registerCustomElement('payment-request', class HTMLPaymentRequestElement extends
 			},
 		});
 
-		getData(this, 'shadow').append(frag);
-		this.dispatchEvent(new Event('ready'));
+		requestAnimationFrame(() => {
+			shadow.append(frag);
+			this.dispatchEvent(new Event('ready'));
+		});
 	}
 
 	disconnectedCallback() {
@@ -140,67 +372,42 @@ registerCustomElement('payment-request', class HTMLPaymentRequestElement extends
 		}
 	}
 
-	get supportedMethods() {
-		return this.getAttribute('supportedmethods') || 'basic-card';
-	}
-
-	set supportedMethods(methods) {
-		this.setAttribute('supportedmethods', methods);
-	}
-
-	get supportedTypes() {
-		return this.hasAttribute('supportedtypes')
-			? this.getAttribute('supportedtypes').split(',').map(type => type.trim())
-			: [
-				'credit',
-				'debit',
-			];
-	}
-
-	set supportedTypes(types) {
-		if (Array.isArray(types)) {
-			this.setAttribute ('supportedtypes', types.join(', '));
+	get ready() {
+		if (getData(this, 'shadow').childElementCount === 0) {
+			return new Promise(r => this.addEventListener('ready', () => r(), { once: true }));
 		} else {
-			throw new TypeError('Supported types must be an array of types');
-		}
-	}
-
-	get supportedNetworks() {
-		return this.hasAttribute('supportednetworks')
-			? this.getAttribute('supportednetworks').split(',').map(net => net.trim())
-			: [
-				'visa',
-				'mastercard',
-				'discover',
-			];
-	}
-
-	set supportedNetworks(networks) {
-		if (Array.isArray(networks)) {
-			this.setAttribute ('supportednetworks', networks.join(', '));
-		} else {
-			throw new TypeError('Supported networks must be an array of networks');
-		}
-	}
-
-	async ready() {
-		if (this.shadowRoot.childElementCount === 0) {
-			return await new Promise(r => this.addEventListener('ready', () => r(), { once: true }));
-		} else {
-			return await Promise.resolve();
+			return Promise.resolve();
 		}
 	}
 
 	async canMakePayment() {
-		const types = this.supportedTypes;
-		return this.supportedNetworks.length !== 0
-			&& (types.includes('credit') || types.includes('debit'));
+		const methodData = getData(this, 'methodData');
+
+		if (! Array.isArray(methodData)) {
+			return false;
+		} else {
+			const card = methodData.find(({ supportedMethods }) => supportedMethods === 'basic-card');
+			const networks = Object.keys(HTMLPaymentRequestElement.supportedCardNetworks);
+
+			if (typeof card === 'undefined') {
+				return false;
+			} else if (! ('data' in card)) {
+				return false;
+			} else if (! ('supportedNetworks' in card.data)) {
+				return true;
+			} else {
+				return card.data.supportedNetworks.every(type => networks.includes(type));
+			}
+		}
 	}
 
 	// @SEE https://developer.mozilla.org/en-US/docs/Web/API/PaymentRequest/show
 	async show() {
+		if (! (this.parentElement instanceof Element)) {
+			document.body.append(this);
+		}
+		const { promise, shadow } = protectedData.get(this);
 		await this.ready;
-		const { shadow, promise } = protectedData.get(this);
 		const dialog = shadow.getElementById('payment-request-dialog');
 		// const form = shadow.getElementById('payment-request-form');
 		const backdrop = shadow.getElementById('payment-request-backdrop');
@@ -213,7 +420,7 @@ registerCustomElement('payment-request', class HTMLPaymentRequestElement extends
 				opacity: 1,
 				transform: 'none',
 			}], {
-				duration: 6000,
+				duration: 600,
 			});
 
 			animate(backdrop, [{
@@ -221,7 +428,7 @@ registerCustomElement('payment-request', class HTMLPaymentRequestElement extends
 			}, {
 				opacity: 1
 			}], {
-				duration: 6000,
+				duration: 600,
 			});
 
 			dialog.hidden = false;
@@ -260,4 +467,25 @@ registerCustomElement('payment-request', class HTMLPaymentRequestElement extends
 		getData(this).reject(new DOMException('PaymentRequest aborted'));
 		this.remove();
 	}
-});
+
+	/**
+	 * @SEE https://www.w3.org/Payments/card-network-ids
+	 */
+	static get supportedCardNetworks() {
+		return {
+			'amex': 'American Express',
+			'cartebancaire': 'Cartes Bancaires',
+			'diners': 'Diners Club International',
+			'discover': 'Discover',
+			'jcb': 'Japan Credit Bureau',
+			'mastercard': 'Mastercard',
+			'mir': 'Mir',
+			'paypak': 'PayPak',
+			'troy': 'Troy',
+			'unionpay': 'UnionPay',
+			'visa': 'Visa',
+		};
+	}
+}
+
+registerCustomElement('payment-request', HTMLPaymentRequestElement);
