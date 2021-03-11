@@ -2,6 +2,7 @@ import { registerCustomElement } from '../../js/std-js/custom-elements.js';
 import { getHTML } from '../../js/std-js/http.js';
 import { uuidv6 } from '../../js/std-js/uuid.js';
 import { on, create, attr, text, query, animate } from '../../js/std-js/dom.js';
+import { loadStylesheet } from '../../js/std-js/loader.js';
 import { meta } from '../../import.meta.js';
 
 const protectedData = new WeakMap();
@@ -361,7 +362,8 @@ export class HTMLPaymentRequestElement extends HTMLElement {
 			},
 		});
 
-		requestAnimationFrame(() => {
+		requestAnimationFrame(async () => {
+			await loadStylesheet(new URL('./components/payment/request.css', meta.url), { parent: shadow });
 			shadow.append(frag);
 			this.dispatchEvent(new Event('ready'));
 		});
