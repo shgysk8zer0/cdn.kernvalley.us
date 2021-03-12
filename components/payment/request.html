@@ -9,7 +9,7 @@
 	<body>
 		<div id="payment-request-dialog" part="dialog" hidden="">
 			<form id="payment-request-form" name="PaymentRequest">
-				<header part="header">
+				<header part="header" class="clearfix">
 					<button type="reset" id="rest-button" class="border-none background-none color-inherit float-right">X</button>
 					<div class="float-left inline-block">
 						<h2 class="site-name"></h2>
@@ -83,7 +83,7 @@
 							<span>State</span>
 						</label>
 						<!-- <input type="text" name="shipping-state" id="payment-shipping-state" class="input" placeholder="CA" part="input" autocomplete="shipping address-level1" required="" /> -->
-						<select name="shipping-state" id="payment-shipping-state" class="input states" part="input" autocomplete="shipping address-level1" required=""></select>
+						<select name="shipping-region" id="payment-shipping-state" class="input states" part="input" autocomplete="shipping address-level1" required=""></select>
 					</div>
 					<div class="form-group">
 						<label for="payment-shipping-postal-code" class="input-label required" part="label">

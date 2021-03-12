@@ -7,6 +7,14 @@ import { meta } from '../../import.meta.js';
 
 const protectedData = new WeakMap();
 
+function toAmount(val) {
+	if (typeof val === 'number') {
+		return val.toFixed(2);
+	} else {
+		return toAmount(parseFloat(val));
+	}
+}
+
 function setData(obj, data) {
 	if (protectedData.has(obj)) {
 		protectedData.set(obj, { ...protectedData.get(obj), ...data });
@@ -267,7 +275,7 @@ export class HTMLPaymentRequestElement extends HTMLElement {
 			const base = itemTemplate.cloneNode(true);
 			await Promise.allSettled([
 				text('.item-label', label, { base }),
-				text('.item-amount-value', value, { base }),
+				text('.item-amount-value', toAmount(value), { base }),
 			]);
 			return base;
 		}));
@@ -284,7 +292,7 @@ export class HTMLPaymentRequestElement extends HTMLElement {
 			}),
 			create('b', {
 				slot: 'total-amount-value',
-				text: total.amount.value,
+				text: toAmount(total.amount.value),
 			}),
 			...items,
 		);
