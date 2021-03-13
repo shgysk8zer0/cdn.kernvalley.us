@@ -14,6 +14,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Methods to calculate distance between two `<leaflet-marker>`s or other coordinates
 - Methods for checking if `<leaflet-marker>` is visible on `<leaflet-map>`
 - Filtering of `<button is="app-list">` using `dev` and `host` attributes
+- `<payment-requet>` component
+- Basic validation of Card numbers and expiration dates in `<payment-request>`
+- Full `<shopping-cart>` and `<button is="checkout-button">` experience, using `PaymentRequest` API
 
 ### Changed
 - `HTMLLeafletMapElement.locate()` now has default arguments
@@ -22,6 +25,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - Do not update URL for `<leaflet-map>` on pan if marker is open
+- `<payment-request>` response now (*mostly*) consistent with `PaymentRequest` API
 
 ## [v1.1.0] - 2021-02-22
 

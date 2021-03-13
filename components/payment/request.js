@@ -7,6 +7,49 @@ import { meta } from '../../import.meta.js';
 
 const protectedData = new WeakMap();
 
+function validateCardNumber({ cardNumber, cardSecurityCode, network }) {
+	return typeof cardNumber === 'string'
+		&& cardNumber.length > 10
+		&& parseInt(cardSecurityCode) > 100
+		&& Object.keys(HTMLPaymentRequestElement.supportedCardNetworks).includes(network);
+}
+
+function isExpired(expiryYear, expiryMonth) {
+	const expiresDate = new Date(parseInt(expiryYear), parseInt(expiryMonth) - 1);
+	const nowDate = new Date();
+
+	const { expires, now } = {
+		expires: {
+			month: expiresDate.getMonth(),
+			year: expiresDate.getFullYear(),
+		},
+		now: {
+			month: nowDate.getMonth(),
+			year: nowDate.getFullYear(),
+		}
+	};
+
+	return expires.year === now.year
+		? expires.month < now.month
+		: expires.year < now.year;
+}
+
+function validateCC(card, network) {
+	if (! (card instanceof BasicCardResponse)) {
+		return false;
+	} else {
+		const { expiryYear, expiryMonth, cardNumber, cardSecurityCode } = card;
+
+		if (isExpired(expiryYear, expiryMonth)) {
+			return false;
+		} else if (! validateCardNumber({ cardNumber, cardSecurityCode, network })) {
+			return false;
+		} else {
+			return true;
+		}
+	}
+}
+
 function toAmount(val) {
 	if (typeof val === 'number') {
 		return val.toFixed(2);
@@ -33,8 +76,82 @@ function getData(obj, key, defaultValue) {
 	}
 }
 
-// @SEE https://developer.mozilla.org/en-US/docs/Web/API/PaymentAddress
-class BasicCardResponse {
+/**
+ * @see https://developer.mozilla.org/en-US/docs/Web/API/PaymentAddress
+ */
+export class PaymentAddress {
+	constructor(form, type) {
+		if (! (form instanceof FormData)) {
+			throw new TypeError('Address requires `FormData`');
+		} else if (type === 'billing') {
+			protectedData.set(this, {
+				recipient: form.get('billing-recipient') || form.get('cc-name'),
+				organization: form.get('billing-organization'),
+				phone: form.get('billing-phone') || form.get('telephone'),
+				addressLine: [
+					form.get('billing-street-address'),
+					form.get('billing-street-address2'),
+					form.get('billing-street-address3'),
+				].filter(l => typeof l === 'string' && l.trim().length !== 0),
+				city: form.get('billing-city'),
+				region: form.get('billing-region'),
+				dependentLocality: '',
+				postalCode: form.get('billing-postal-code'),
+				country: form.get('billing-country') || 'US',
+				sortingCode: '',
+				languageCode: navigator.language,
+			});
+		} else if (type === 'shipping') {
+			protectedData.set(this, {
+				recipient: form.get('shipping-recipient'),
+				organization: form.get('shipping-organization'),
+				phone: form.get('shipping-phone') || form.get('telephone'),
+				addressLine: [
+					form.get('shipping-street-address'),
+					form.get('shipping-street-address2'),
+					form.get('shipping-street-address3'),
+				].filter(l => typeof l === 'string' && l.trim().length !== 0),
+				city: form.get('shipping-city'),
+				region: form.get('shipping-region'),
+				dependentLocality: '',
+				postalCode: form.get('shipping-postal-code'),
+				country: form.get('shipping-country') || 'US',
+				sortingCode: '',
+			});
+		}
+	}
+
+	toJSON() {
+		return protectedData.get(this);
+	}
+
+	get addressLine() {
+		return getData(this, 'addressLine');
+	}
+
+	get city() {
+		return getData(this, 'city');
+	}
+
+	get region() {
+		return getData(this, 'region');
+	}
+
+	get dependentLocality() {
+		return getData(this, 'dependentLocality');
+	}
+
+	get postalCode() {
+		return getData(this, 'postalCode');
+	}
+
+	get country() {
+		return getData(this, 'country');
+	}
+}
+
+// @SEE https://developer.mozilla.org/en-US/docs/Web/API/BasicCardResponse
+export class BasicCardResponse {
 	constructor(form) {
 		if (form instanceof FormData) {
 			const [year, month] = form.get('cc-expiry').split('-', 2).map(n => parseInt(n));
@@ -42,16 +159,9 @@ class BasicCardResponse {
 				cardNumber: form.get('cc-num'),
 				cardholderName: form.get('cc-name'),
 				cardSecurityCode: form.get('cc-cvc'),
-				expiryMonth: month,
-				expiryYear: year,
-				billingAddress: {
-					addressLine: [form.get('billing-street-address')],
-					city: form.get('billing-city'),
-					region: form.get('billing-region'),
-					dependentLocality: '',
-					postalCode: form.get('billing-postal-code'),
-					country: form.get('billing-country') || 'US',
-				}
+				expiryMonth: month.toString().padStart(2, '0'),
+				expiryYear: year.toString(),
+				billingAddress: new PaymentAddress(form, 'billing'),
 			});
 		}
 	}
@@ -86,19 +196,29 @@ class BasicCardResponse {
 }
 
 // @SEE https://developer.mozilla.org/en-US/docs/Web/API/PaymentResponse
-class PaymentResponse extends EventTarget {
+export class PaymentResponse extends EventTarget {
 	constructor(request) {
 		super();
 
 		if (request instanceof HTMLElement && protectedData.has(request)) {
 			const { shadow, options: { requestPayerName, requestPayerEmail, requestPayerPhone, requestShipping }} = getData(request);
 			const form = new FormData(shadow.getElementById('payment-request-form'));
+			const card = new BasicCardResponse(form);
+
+			if (! validateCC(card, form.get('cc-type'))) {
+				throw new DOMException('Invalid card info');
+			}
 
 			const data = {
-				details: new BasicCardResponse(form),
-				methodName: form.get('cc-type'),
 				requestId: form.get('id'),
+				methodName: 'basic-card',
+				details: card,
 			};
+
+			if (requestShipping) {
+				data.shippingOption = form.get('shippingOption');
+				data.shippingAddress = new PaymentAddress(form, 'shipping');
+			}
 
 			if (requestPayerName) {
 				data.payerName = form.get('name');
@@ -112,18 +232,6 @@ class PaymentResponse extends EventTarget {
 				data.payerPhone = form.get('telephone');
 			}
 
-			if (requestShipping) {
-				data.shippingOption = form.get('shippingOption');
-				data.shippingAddress = {
-					// @TODO handle PO Boxes, etc.
-					addressLine: [form.get('shipping-street-address')],
-					city: form.get('shipping-city'),
-					region: form.get('shipping-region'),
-					dependentLocality: '',
-					postalCode: form.get('shipping-postal-code'),
-					country: form.get('shipping-country') || 'US',
-				};
-			}
 
 			setData(this, { request, data });
 		} else {
@@ -400,15 +508,20 @@ export class HTMLPaymentRequestElement extends HTMLElement {
 			return false;
 		} else {
 			const card = methodData.find(({ supportedMethods }) => supportedMethods === 'basic-card');
-			const networks = Object.keys(HTMLPaymentRequestElement.supportedCardNetworks);
 
 			if (typeof card === 'undefined') {
 				return false;
 			} else if (! ('data' in card)) {
 				return false;
 			} else if (! ('supportedNetworks' in card.data)) {
-				return true;
+				return false;
+			} else if (
+				! Array.isArray(card.data.supportedNetworks) ||
+				card.data.supportedNetworks.length === 0
+			) {
+				return false;
 			} else {
+				const networks = Object.keys(HTMLPaymentRequestElement.supportedCardNetworks);
 				return card.data.supportedNetworks.every(type => networks.includes(type));
 			}
 		}
@@ -419,10 +532,10 @@ export class HTMLPaymentRequestElement extends HTMLElement {
 		if (! (this.parentElement instanceof Element)) {
 			document.body.append(this);
 		}
+
 		const { promise, shadow } = protectedData.get(this);
 		await this.ready;
 		const dialog = shadow.getElementById('payment-request-dialog');
-		// const form = shadow.getElementById('payment-request-form');
 		const backdrop = shadow.getElementById('payment-request-backdrop');
 
 		requestAnimationFrame(() => {
@@ -433,7 +546,7 @@ export class HTMLPaymentRequestElement extends HTMLElement {
 				opacity: 1,
 				transform: 'none',
 			}], {
-				duration: 600,
+				duration: 400,
 			});
 
 			animate(backdrop, [{
@@ -441,7 +554,7 @@ export class HTMLPaymentRequestElement extends HTMLElement {
 			}, {
 				opacity: 1
 			}], {
-				duration: 600,
+				duration: 400,
 			});
 
 			dialog.hidden = false;

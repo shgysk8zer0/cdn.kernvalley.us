@@ -1,35 +1,87 @@
-import { registerCustomElement } from '../js/std-js/custom-elements.js';
+import { registerCustomElement, getCustomElement } from '../js/std-js/custom-elements.js';
+import { loadScript, preload } from '../js/std-js/loader.js';
 import { ShoppingCart } from '../js/std-js/ShoppingCart.js';
+import { meta } from '../import.meta.js';
+
+async function getRequest(btn, fallback = false) {
+	const { requestPayerName, requestPayerEmail, requestPayerPhone,
+		requestShipping, shippingOptions, supportedMethods,
+		supportedNetworks, shippingType } = btn;
+
+	if ('PaymentRequest' in window && ! fallback) {
+		const cart = new ShoppingCart();
+		const { total, displayItems } = await cart.paymentRequestDetails;
+
+		const req = new PaymentRequest(
+			[{ supportedMethods, data: { supportedNetworks }}],
+			{ total, displayItems, shippingOptions },
+			{ requestPayerName, requestPayerEmail, requestPayerPhone, requestShipping, shippingType }
+		);
+
+		if (await req.canMakePayment()) {
+			return req;
+		} else {
+			return await getRequest(btn, true);
+		}
+	} else {
+		let prom = Promise.resolve();
+		const cart = new ShoppingCart();
+
+		if (typeof customElements.get('payment-request') === 'undefined') {
+			prom = Promise.allSettled([
+				loadScript(new URL('./components/payment/request.js', meta.url), { type: 'module' }),
+				preload(new URL('./components/payment/request.html', meta.url), { as: 'fetch' }),
+				preload(new URL('./components/payment/request.css', meta.url), { as: 'style' }),
+			]);
+		}
+
+		const [HTMLPaymentRequestElement, { total, displayItems }] = await Promise.all([
+			getCustomElement('payment-request'),
+			cart.paymentRequestDetails,
+			prom,
+		]);
+
+		const req = new HTMLPaymentRequestElement(
+			[{ supportedMethods, data: { supportedNetworks }}],
+			{ total, displayItems, shippingOptions },
+			{ requestPayerName, requestPayerEmail, requestPayerPhone, requestShipping, shippingType }
+		);
+
+		if (await req.canMakePayment()) {
+			return req;
+		} else {
+			return {
+				canMakePayment: async () => false,
+			};
+		}
+	}
+}
+
 
 registerCustomElement('checkout-button', class HTMLCheckoutButtonElement extends HTMLButtonElement {
 	constructor() {
 		super();
+		this.hidden = false;
 
-		if ('PaymentRequest' in window) {
-			this.hidden = false;
+		this.addEventListener('click', async () => {
+			try {
+				this.disabled = true;
 
-			this.addEventListener('click', async () => {
-				try {
-					const cart = new ShoppingCart();
-					const { total, displayItems } = await cart.paymentRequestDetails;
-					const { requestPayerName, requestPayerEmail, requestPayerPhone,
-						requestShipping, shippingOptions, supportedMethods,
-						supportedNetworks, shippingType } = this;
+				const req = await getRequest(this);
 
-					const req = new PaymentRequest(
-						[{ supportedMethods, data: { supportedNetworks }}],
-						{ total, displayItems, shippingOptions },
-						{ requestPayerName, requestPayerEmail, requestPayerPhone, requestShipping, shippingType }
-					);
-
+				if (await req.canMakePayment()) {
 					this.dispatchEvent(new CustomEvent('pay', { detail: req }));
-				} catch(err) {
-					alert(err);
+					this.disabled = false;
+				} else {
+					throw new Error('Payment options not supported');
 				}
-			});
-		} else {
-			this.remove();
-		}
+			} catch(err) {
+				alert(err);
+			}
+		}, {
+			capture: true,
+			passive: true,
+		});
 	}
 
 	get shippingOptions() {
@@ -75,7 +127,7 @@ registerCustomElement('checkout-button', class HTMLCheckoutButtonElement extends
 		if (this.hasAttribute('supportednetworks')) {
 			return this.getAttribute('supportednetworks').split(' ');
 		} else {
-			return ['visa', 'mastercard', 'discovery'];
+			return ['visa', 'mastercard', 'discover', 'amex'];
 		}
 	}
 
