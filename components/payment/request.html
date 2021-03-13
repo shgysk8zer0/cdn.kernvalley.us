@@ -67,10 +67,23 @@
 						<slot name="shipping-address-legend">Shipping address</slot>
 					</legend>
 					<div class="form-group">
+						<label for="payment-shipping-recipient" class="input-label required">
+							<span>Recipient</span>
+						</label>
+						<input type="text" name="shipping-recipient" id="payment-shipping-recipient" class="input" placeholder="First Last" part="input" autocomplete="shipping name" required="" />
+					</div>
+					<div class="form-group">
+						<label for="payment-shipping-organization" class="input-label">
+							<span>Organization</span>
+						</label>
+						<input type="text" name="shipping-organization" id="payment-shipping-organization" class="input" placeholder="Acme Inc" part="input" autocomplete="shipping organization" />
+					</div>
+					<div class="form-group">
 						<label for="payment-shipping-street-address" class="input-label required" part="label">
 							<span>Street Address</span>
 						</label>
-						<input type="text" name="shipping-street-address" id="payment-shipping-street-address" class="input" placeholder="123 Easy St." part="input" autocomplete="shipping street-address" required="" />
+						<input type="text" name="shipping-street-address" id="payment-shipping-street-address" class="input" placeholder="123 Easy St." part="input" autocomplete="shipping address-line1" required="" />
+						<input type="text" name="shipping-street-address2" id="payment-shipping-street-address2" class="input" placeholder="PO Box 123" part="input" autocomplete="shipping address-line2" />
 					</div>
 					<div class="form-group">
 						<label for="payment-shipping-city" class="input-label required" part="label">
@@ -82,7 +95,6 @@
 						<label for="payment-shipping-state" class="input-label required" part="label">
 							<span>State</span>
 						</label>
-						<!-- <input type="text" name="shipping-state" id="payment-shipping-state" class="input" placeholder="CA" part="input" autocomplete="shipping address-level1" required="" /> -->
 						<select name="shipping-region" id="payment-shipping-state" class="input states" part="input" autocomplete="shipping address-level1" required=""></select>
 					</div>
 					<div class="form-group">
@@ -135,10 +147,17 @@
 						<input type="number" name="cc-cvc" id="payment-billing-cc-cvc" class="input" part="input" placeholder="###" min="1" max="999" autocomplete="cc-csc" required="" />
 					</div>
 					<div class="form-group">
+						<label for="payment-billing-organization" class="input-label">
+							<span>Organization</span>
+						</label>
+						<input type="text" name="billing-organization" id="payment-billing-organization" class="input" placeholder="Acme Inc" part="input" autocomplete="billing organization" />
+					</div>
+					<div class="form-group">
 						<label for="payment-billing-street-address" class="input-label required" part="label">
 							<span>Billing Address</span>
 						</label>
-						<input type="text" name="billing-street-address" id="payment-billing-street-address" class="input" placeholder="123 Easy St." part="input" autocomplete="billing street-address" required="" />
+						<input type="text" name="billing-street-address" id="payment-billing-street-address" class="input" placeholder="123 Easy St." part="input" autocomplete="billing address-line1" required="" />
+						<input type="text" name="billing-street-address2" id="payment-billing-street-address2" class="input" placeholder="PO Box 123" part="input" autocomplete="billing address-line2" />
 					</div>
 					<div class="form-group">
 						<label for="payment-billing-city" class="input-label required" part="label">
