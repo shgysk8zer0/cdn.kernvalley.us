@@ -19,27 +19,29 @@ function log(eventAction, ad, transport = 'beacon') {
 }
 
 function keypress(event) {
-	if (event.keyCode === 32) {
+	if (event.keyCode === 32 && event.isTrusted !== false) {
 		return openLink.apply(this);
 	}
 }
 
-function openLink() {
-	const ad = this.closest('ad-block');
+function openLink(event) {
+	if (event.isTrusted !== false) {
+		const ad = this.closest('ad-block');
 
-	if (! ad.preview && ! (this instanceof HTMLAnchorElement)) {
-		const url = this.url;
+		if (! ad.preview && ! (this instanceof HTMLAnchorElement)) {
+			const url = this.url;
 
-		if (typeof url !== 'string') {
-			throw new Error('No URL');
-		} else if (new URL(url, document.baseURI).origin === location.origin) {
-			log('ad-click', this);
-			this.dispatchEvent(new Event('opened'));
-			setTimeout(() => location.href = this.getUrl(), 20);
-		} else {
-			log('ad-click', this);
-			openWindow(this.getUrl());
-			this.dispatchEvent(new Event('opened'));
+			if (typeof url !== 'string') {
+				throw new Error('No URL');
+			} else if (new URL(url, document.baseURI).origin === location.origin) {
+				log('ad-click', this);
+				this.dispatchEvent(new Event('opened'));
+				setTimeout(() => location.href = this.getUrl(), 20);
+			} else {
+				log('ad-click', this);
+				openWindow(this.getUrl());
+				this.dispatchEvent(new Event('opened'));
+			}
 		}
 	}
 }
@@ -215,7 +217,7 @@ HTMLCustomElement.register('ad-block', class HTMLAdBlockElement extends HTMLCust
 			attr(urlEl, { itemprop: 'url', content: 'https://ads.kernvalley.us' });
 			attr(logoEl, { itemprop: 'logo', content: 'https://cdn.kernvalley.us/img/branding/ads.kernvalley.us.svg' });
 			container.append(nameEl, urlEl, logoEl);
-			this.append(container);
+			requestAnimationFrame(() => this.append(container));
 		}, { once: true });
 
 		Promise.allSettled([
