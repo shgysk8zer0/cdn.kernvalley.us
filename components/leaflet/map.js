@@ -255,7 +255,6 @@ HTMLCustomElement.register('leaflet-map', class HTMLLeafletMapElement extends HT
 
 			const doc = create('div', {
 				part: ['container'],
-				hidden: true,
 				children: [
 					create('slot', { events, attrs: { name: 'toolbar' }}),
 					create('slot', {
@@ -285,12 +284,12 @@ HTMLCustomElement.register('leaflet-map', class HTMLLeafletMapElement extends HT
 				]
 			});
 
-			const styles = Promise.allSettled([
+			await Promise.allSettled([
 				loadStylesheet('https://unpkg.com/leaflet@1.7.1/dist/leaflet.css', {
 					integrity: 'sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A==',
 					parent: this._shadow,
 				}),
-				loadStylesheet(new URL('/components/leaflet/map.css', HTMLCustomElement.base), {
+				loadStylesheet(new URL('./components/leaflet/map.css', HTMLCustomElement.base), {
 					parent: this._shadow,
 				}),
 			]);
@@ -302,9 +301,6 @@ HTMLCustomElement.register('leaflet-map', class HTMLLeafletMapElement extends HT
 				if ('markers' in this.dataset) {
 					await this.loadMarkers(...this.dataset.markers.split(' ')).catch(console.error);
 				}
-
-				await styles;
-				doc.hidden = false;
 			});
 
 
