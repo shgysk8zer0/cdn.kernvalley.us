@@ -2,6 +2,7 @@ import { meta } from '../import.meta.js';
 import { registerCustomElement } from '../js/std-js/custom-elements.js';
 import { when } from '../js/std-js/dom.js';
 import { getHTML } from '../js/std-js/http.js';
+import { getDeferred } from '../js/std-js/promises.js';
 
 let metaUrl = meta.url;
 let base    = null;
@@ -58,13 +59,15 @@ export default class HTMLCustomElement extends HTMLElement {
 	}
 
 	get ready() {
-		return new Promise(resolve => {
-			if (this.shadowRoot !== null && this.shadowRoot.childElementCount === 0) {
-				this.addEventListener('ready', () => resolve(this), {once: true});
-			} else {
-				resolve(this);
-			}
-		}).then(() => this);
+		const { promise, resolve } = getDeferred();
+
+		if (this.shadowRoot !== null && this.shadowRoot.childElementCount === 0) {
+			resolve(this);
+		} else {
+			when(this, 'ready').then(() => resolve(this));
+		}
+
+		return promise;
 	}
 
 	get stylesLoaded() {
@@ -89,11 +92,15 @@ export default class HTMLCustomElement extends HTMLElement {
 	}
 
 	get whenConnected() {
+		const { resolve, promise } = getDeferred();
+
 		if (this.isConnected) {
-			return Promise.resolve();
+			resolve();
 		} else {
-			return new Promise(resolve => this.addEventListener('connected', () => resolve(), { once: true }));
+			when(this, 'connected').then(() => resolve());
 		}
+
+		return promise;
 	}
 
 	get whenLoad() {
