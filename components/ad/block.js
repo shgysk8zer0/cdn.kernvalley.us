@@ -472,7 +472,10 @@ HTMLCustomElement.register('ad-block', class HTMLAdBlockElement extends HTMLCust
 	}
 
 	async getJSON() {
-		const { label, description, image, callToAction, id, title, url, source, medium, campaign, term, content, layout, theme, imageFit, imagePosition, color, background, border, linkColor } = this;
+		const { label, description, image, callToAction, id, title, url, source,
+			medium, campaign, term, content, layout, theme, imageFit, imagePosition,
+			color, background, border, linkColor } = this;
+
 		return JSON.stringify({
 			'@context': 'https://schema.org',
 			'@type': 'WPAdBlock',
