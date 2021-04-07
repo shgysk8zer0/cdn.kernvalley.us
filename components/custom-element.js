@@ -62,9 +62,9 @@ export default class HTMLCustomElement extends HTMLElement {
 		const { promise, resolve } = getDeferred();
 
 		if (this.shadowRoot !== null && this.shadowRoot.childElementCount === 0) {
-			resolve(this);
-		} else {
 			when(this, 'ready').then(() => resolve(this));
+		} else {
+			resolve(this);
 		}
 
 		return promise;
