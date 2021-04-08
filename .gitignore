@@ -1,5 +1,7 @@
 img/icons.svg
 /img/markers.svg
+/local/*
+!/local/.gitkeep
 data/github.json
 node_modules/
 *.min.*
