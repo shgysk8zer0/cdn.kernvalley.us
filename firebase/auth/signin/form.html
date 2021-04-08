@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+	<head>
+		<meta charset="utf-8" />
+	</head>
+	<body>
+		<form>
+			<fieldset>
+				<legend>
+					<slot name="legend">Sign In</slot>
+				</legend>
+				<div class="form-group">
+					<label for="email" class="input-label required">Email</label>
+					<input type="email" id="email" name="email" class="input" placeholder="user@example.com" autocomplete="email" required="" />
+				</div>
+				<div class="form-group">
+					<label for="password" class="input-label required">Password</label>
+					<input type="password" id="password" name="password" class="input" placeholder="********" minlength="8" autocomplete="current-password" required="" />
+				</div>
+			</fieldset>
+			<div class="btns">
+				<button type="submit" title="Sign In" part="btn sign-in-btn">
+					<slot name="sign-in-icon"></slot>
+					<slot name="sign-in-label">
+						<span>Sign In</span>
+					</slot>
+				</button>
+				<button type="reset" title="Cancel" part="btn cancel-btn">
+					<slot name="cancel-icon"></slot>
+					<slot name="cancel-label">
+						<span>Cancel</span>
+					</slot>
+				</button>
+			</div>
+		</form>
+	</body>
+</html>
