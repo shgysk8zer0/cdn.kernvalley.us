@@ -1,3 +1,15 @@
 :host {
 	display: block;
 }
+
+fieldset {
+	border: none;
+}
+
+::slotted([slot="gravatar"]) {
+	border-radius: 50%;
+}
+
+::slotted(svg) {
+	vertical-align: middle;
+}

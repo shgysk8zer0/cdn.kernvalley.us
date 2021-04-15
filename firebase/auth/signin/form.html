@@ -9,6 +9,15 @@
 				<legend>
 					<slot name="legend">Sign In</slot>
 				</legend>
+				<div class="center">
+					<slot name="gravatar">
+						<svg class="round" width="192" height="192" fill="currentColor" viewBox="0 0 16 16">
+							<path d="M10.555 8.094C9.849 8.717 9.015 9 8 9c-1.016 0-1.853-.29-2.559-.914-1.109.363-2.436 1.288-2.437 2.902L3 14c0 .554.446 1 1 1h8c.554 0 1-.446 1-1v-3c0-1.387-1.102-2.556-2.445-2.906z"/>
+							<path d="M11 5a3 3 0 1 1-6 0 3 3 0 1 1 6 0z" overflow="visible"/>
+						</svg>
+					</slot>
+				</div>
+				<br />
 				<div class="form-group">
 					<label for="email" class="input-label required">Email</label>
 					<input type="email" id="email" name="email" class="input" placeholder="user@example.com" autocomplete="email" required="" />
@@ -18,14 +27,14 @@
 					<input type="password" id="password" name="password" class="input" placeholder="********" minlength="8" autocomplete="current-password" required="" />
 				</div>
 			</fieldset>
-			<div class="btns">
-				<button type="submit" title="Sign In" part="btn sign-in-btn">
+			<div class="btns flex row">
+				<button type="submit" title="Sign In" class="btn btn-accept grow-1" part="btn sign-in-btn">
 					<slot name="sign-in-icon"></slot>
 					<slot name="sign-in-label">
 						<span>Sign In</span>
 					</slot>
 				</button>
-				<button type="reset" title="Cancel" part="btn cancel-btn">
+				<button type="reset" title="Cancel" class="btn btn-reject grow-1" part="btn cancel-btn">
 					<slot name="cancel-icon"></slot>
 					<slot name="cancel-label">
 						<span>Cancel</span>

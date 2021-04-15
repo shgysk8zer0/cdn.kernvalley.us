@@ -38,6 +38,30 @@
 		<link rel="stylesheet" href="/css/core-css/forms.css" />
 		<link rel="stylesheet" href="/css/core-css/layout/right-sidebar/index.css" media="screen" />
 		<title>KernValley.us | CDN</title>
+		<script type="module">
+			Promise.all([
+				import('/firebase/base.js'),
+				import('/local/credentials.js'),
+				import('/firebase/auth/signin/button.js'),
+				import('/firebase/auth/signin/form.js'),
+				import('/firebase/auth/signout/button.js'),
+			]).then(async ([{ init, getCustomElement, loadPlugin }, { firebase: credentials }]) => {
+				document.documentElement.classList.toggle('no-dialog', document.createElement('dialog') instanceof HTMLUnknownElement);
+
+				await loadPlugin('app');
+				await loadPlugin('auth');
+				await init(credentials);
+				// const [FirebaseSignInButton, FirebaseSignOutButton] = await Promise.all([
+				// 	getCustomElement('firebase-auth-signin-button'),
+				// 	getCustomElement('firebase-auth-signout-button'),
+				// ]);
+				//
+				// document.getElementById('nav').replaceChildren(
+				// 	new FirebaseSignInButton(),
+				// 	new FirebaseSignOutButton(),
+				// );
+			})
+		</script>
 	</head>
 	<body class="grid border-box background-primary color-default font-main">
 		<header id="header" class="contain-content center">
@@ -50,14 +74,25 @@
 					<path stroke-width="0.2" stroke-linejoin="round" d="M 15.9994,19.9981L 19.9994,19.9981L 19.9994,15.9981L 15.9994,15.9981M 15.9994,13.9981L 19.9994,13.9981L 19.9994,9.99807L 15.9994,9.99807M 9.99938,7.99807L 13.9994,7.99807L 13.9994,3.99807L 9.99938,3.99807M 15.9994,7.99807L 19.9994,7.99807L 19.9994,3.99807L 15.9994,3.99807M 9.99938,13.9981L 13.9994,13.9981L 13.9994,9.99807L 9.99938,9.99807M 3.99938,13.9981L 7.99938,13.9981L 7.99938,9.99807L 3.99938,9.99807M 3.99938,19.9981L 7.99938,19.9981L 7.99938,15.9981L 3.99938,15.9981M 9.99938,19.9981L 13.9994,19.9981L 13.9994,15.9981L 9.99938,15.9981M 3.99938,7.99807L 7.99938,7.99807L 7.99938,3.99807L 3.99938,3.99807L 3.99938,7.99807 Z "/>
 				</svg>
 			</button>
-			<share-to-button class="grow-1" target="facebook" text="The CDN for KernValley US sites"></share-to-button>
+			<span class="grow-1"></span>
+			<firebase-auth-signin-button class="btn btn-primary" hidden="">
+				<svg slot="icon" class="icon" width="28" height="32" fill="currentColor" viewBox="0 0 14 16">
+					<path fill-rule="evenodd" d="M7 6.75V12h4V8h1v4c0 .55-.45 1-1 1H7v3l-5.45-2.72c-.33-.17-.55-.52-.55-.91V1c0-.55.45-1 1-1h9c.55 0 1 .45 1 1v3h-1V1H3l4 2v2.25L10 3v2h4v2h-4v2L7 6.75z"/>
+				</svg>
+			</firebase-auth-signin-button>
+			<firebase-auth-signout-button class="btn btn-primary" hidden="">
+				<svg slot="icon" class="icon" width="32" height="32" fill="currentColor" viewBox="0 0 16 16">
+					<path fill-rule="evenodd" d="M11.992 8.994V6.996H7.995v-2h3.997V2.999l3.998 2.998-3.998 2.998zm-1.998 2.998H5.996V2.998L2 1h7.995v2.998h1V1c0-.55-.45-.999-1-.999H.999A1.001 1.001 0 0 0 0 1v11.372c0 .39.22.73.55.91L5.996 16v-3.008h3.998c.55 0 1-.45 1-1V7.996h-1v3.998z"/>
+				</svg>
+			</firebase-auth-signout-button>
+			<!-- <share-to-button class="grow-1" target="facebook" text="The CDN for KernValley US sites"></share-to-button>
 			<share-to-button class="grow-1" target="twitter" text="The CDN for KernValley US sites"></share-to-button>
 			<share-to-button class="grow-1" target="gmail" text="The CDN for KernValley US sites"></share-to-button>
 			<share-to-button class="grow-1" target="linkedin" text="The CDN for KernValley US sites"></share-to-button>
 			<share-to-button class="grow-1" target="reddit" text="The CDN for KernValley US sites"></share-to-button>
 			<share-to-button class="grow-1" target="pinterest" text="The CDN for KernValley US sites"></share-to-button>
 			<share-to-button class="grow-1" target="telegram" text="The CDN for KernValley US sites"></share-to-button>
-			<share-to-button class="grow-1" target="tumblr" text="The CDN for KernValley US sites"></share-to-button>
+			<share-to-button class="grow-1" target="tumblr" text="The CDN for KernValley US sites"></share-to-button> -->
 		</nav>
 		<main id="main" class="contain-content card shadow">
 			<blockquote>

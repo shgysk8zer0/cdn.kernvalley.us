@@ -1,0 +1,37 @@
+* {
+	box-sizing: border-box;
+	max-width: 100%;
+}
+
+.center {
+	text-align: center;
+}
+
+.flex:not([hidden]) {
+	display: flex;
+}
+
+.flex.row {
+	flex-direction: row;
+}
+
+.flex.column {
+	flex-direction: column;
+}
+
+.flex > .grow-1 {
+	flex-grow: 1;
+}
+
+.round {
+	border-radius: 50%;
+}
+
+.btn {
+	padding: 0.4em 1.6em;
+	max-width: 250px;
+}
+
+.btn.btn-accept {
+	/**/
+}

@@ -1,13 +1,15 @@
 import { meta } from '../import.meta.js';
 import { getHTML } from '../js/std-js/http.js';
-import { loadStylesheet, loadScript } from '../js/std-js/loader.js';
-export { registerCustomElement } from '../js/std-js/custom-elements.js';
+import { loadStylesheet, loadScript, loadImage } from '../js/std-js/loader.js';
+export { registerCustomElement, getCustomElement } from '../js/std-js/custom-elements.js';
 export { on, off, create, css } from '../js/std-js/dom.js';
 import { getDeferred, resolveOn } from '../js/std-js/promises.js';
 import * as data from '../js/std-js/protectedData.js';
+export { extend } from '../js/std-js/extend.js';
 export const baseURL = new URL('./firebase/', meta.url);
 export const VERSION = '8.3.1';
 export const Plugins = {
+	app: `https://www.gstatic.com/firebasejs/${VERSION}/firebase-app.js`,
 	analytics: `https://www.gstatic.com/firebasejs/${VERSION}/firebase-analytics.js`,
 	auth: `https://www.gstatic.com/firebasejs/${VERSION}/firebase-auth.js`,
 	firestore: `https://www.gstatic.com/firebasejs/${VERSION}/firebase-firestore.js`,
@@ -47,7 +49,7 @@ export async function init(credentials) {
 export async function loadPlugin(...plugins) {
 	await Promise.all(plugins.map(name => {
 		if (Plugins.hasOwnProperty(name)) {
-			return loadScript(Plugins[name], { crossorigin: null });
+			return loadScript(Plugins[name], { crossOrigin: null });
 		}
 	}));
 }
@@ -58,6 +60,10 @@ export async function getTemplate(path, params = {}) {
 
 export async function getStylesheet(path, params = {}) {
 	return await loadStylesheet(new URL(path, meta.url), params);
+}
+
+export async function getBaseStyleshseet(shadow) {
+	return await getStylesheet('./firebase/base.css', { parent: shadow });
 }
 
 export async function ready(el) {
@@ -77,7 +83,7 @@ export async function whenInitialized() {
 		await resolveOn(eventTarget, Events.initialized);
 	}
 
-	return window.firebase;
+	return globalThis.firebase;
 }
 
-export { data, getDeferred, resolveOn };
+export { data, getDeferred, resolveOn, loadImage };
