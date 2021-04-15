@@ -3,6 +3,8 @@ img/icons.svg
 /local/*
 !/local/.gitkeep
 data/github.json
+/local/*
+!/local/.gitkeep
 node_modules/
 *.min.*
 *.map

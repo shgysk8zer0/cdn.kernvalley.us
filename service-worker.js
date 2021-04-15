@@ -1,6 +1,14 @@
 /* eslint-env serviceworker */
 /* eslint no-unused-vars: 0 */
 
+function getURL({ request: { url }}) {
+	if (url.includes('#')) {
+		return url.substr(0, url.indexOf('#'));
+	} else {
+		return url;
+	}
+}
+
 function init(worker, config) {
 	worker.addEventListener('install', async event => {
 		event.waitUntil((async () => {
@@ -24,8 +32,10 @@ function init(worker, config) {
 	worker.addEventListener('fetch', event => {
 		if (event.request.method === 'GET') {
 			event.respondWith((async () => {
-				if (Array.isArray(config.stale) && config.stale.includes(event.request.url)) {
+				const url = getURL(event);
+				if (Array.isArray(config.stale) && config.stale.includes(url)) {
 					const cached = await caches.match(event.request);
+
 					if (cached instanceof Response) {
 						return cached;
 					} else {
@@ -40,7 +50,7 @@ function init(worker, config) {
 
 						return resp;
 					}
-				} else if (Array.isArray(config.fresh) && config.fresh.includes(event.request.url)) {
+				} else if (Array.isArray(config.fresh) && config.fresh.includes(url)) {
 					if (navigator.onLine) {
 						const [resp, cache] = await Promise.all([
 							fetch(event.request).catch(console.error),
@@ -50,11 +60,12 @@ function init(worker, config) {
 						if (resp.ok) {
 							cache.put(event.request, resp.clone()).catch(console.error);
 						}
+
 						return resp;
 					} else {
 						return caches.match(event.request);
 					}
-				} else if (Array.isArray(config.staleFirst) && config.staleFirst.includes(event.request.url)) {
+				} else if (Array.isArray(config.staleFirst) && config.staleFirst.includes(url)) {
 					if (navigator.onLine) {
 						const cached = await caches.match(event.request);
 
@@ -65,6 +76,7 @@ function init(worker, config) {
 							if (resp.ok) {
 								cache.put(event.request, resp.clone()).catch(console.error);
 							}
+
 							return resp;
 						});
 
@@ -77,9 +89,7 @@ function init(worker, config) {
 						return caches.match(event.request);
 					}
 				} else if (Array.isArray(config.allowed) && config.allowed.some(entry => (
-					entry instanceof RegExp
-						? entry.test(event.request.url)
-						: event.request.url.startsWith(entry)
+					entry instanceof RegExp ? entry.test(url) : url.startsWith(entry)
 				))) {
 					const resp = await caches.match(event.request);
 
@@ -97,9 +107,7 @@ function init(worker, config) {
 						}
 					}
 				} else if (Array.isArray(config.allowedFresh) && config.allowedFresh.some(entry => (
-					entry instanceof RegExp
-						? entry.test(event.request.url)
-						: event.request.url.startsWith(entry)
+					entry instanceof RegExp ? entry.test(url) : url.startsWith(entry)
 				))) {
 					if (navigator.onLine) {
 						const [resp, cache] = await Promise.all([
@@ -110,6 +118,7 @@ function init(worker, config) {
 						if (resp.ok) {
 							cache.put(event.request, resp.clone());
 						}
+
 						return resp;
 					} else {
 						return caches.match(event.request);
