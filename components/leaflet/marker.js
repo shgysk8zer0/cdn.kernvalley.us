@@ -1,6 +1,6 @@
 import { marker, icon, latLng } from 'https://unpkg.com/leaflet@1.7.1/dist/leaflet-src.esm.js';
 import { registerCustomElement } from '../../js/std-js/custom-elements.js';
-import { parseHTML } from '../../js/std-js/dom.js';
+import { parse } from '../../js/std-js/dom.js';
 import { getJSON } from '../../js/std-js/http.js';
 import { getSchemaIcon } from './schema-icon.js';
 import { MARKER_TYPES } from './marker-types.js';
@@ -249,7 +249,7 @@ registerCustomElement('leaflet-marker', class HTMLLeafletMarkerElement extends H
 			container.append(val);
 			this.popup = container;
 		} else if (typeof val === 'string') {
-			this.popup = parseHTML(val);
+			this.popup = parse(val);
 		}
 	}
 
