@@ -1,8 +1,21 @@
 const protectedData = new WeakMap();
 
-customElements.define('placeholder-img', class HTMLPlaceholderImageElement extends HTMLImageElement {
+export function generateURL({ width = 640, height, backgroundColor, color, text, format } = {}) {
+	const size = [width, height].filter(p => typeof p === 'number').join('x');
+	const parts = [size, backgroundColor, color].filter(p => typeof p === 'string');
+	const url = new URL(`/${[...parts].join('/')}.${format}`, 'https://via.placeholder.com');
+
+	if (typeof text === 'string') {
+		url.searchParams.set('text', text);
+	}
+
+	return url.href;
+}
+
+export class HTMLPlaceholderImageElement extends HTMLImageElement {
 	constructor({ width, height, color, backgroundColor, text, format } = {}) {
 		super();
+
 		if (Number.isInteger(width)) {
 			this.width = width;
 		}
@@ -85,16 +98,7 @@ customElements.define('placeholder-img', class HTMLPlaceholderImageElement exten
 	}
 
 	update() {
-		const { width = 640, height, backgroundColor, color, text, format } = this;
-		const size = [width, height].filter(p => typeof p === 'number').join('x');
-		const parts = [size, backgroundColor, color].filter(p => typeof p === 'string');
-		const url = new URL(`/${[...parts].join('/')}.${format}`, 'https://via.placeholder.com');
-
-		if (typeof text === 'string') {
-			url.searchParams.set('text', text);
-		}
-
-		this.src = url.href;
+		this.src = generateURL(this);
 	}
 
 	attributeChangedCallback() {
@@ -111,4 +115,6 @@ customElements.define('placeholder-img', class HTMLPlaceholderImageElement exten
 	static get observedAttributes() {
 		return ['width', 'height', 'color', 'backgroundcolor', 'text', 'format'];
 	}
-}, { extends: 'img' });
+}
+
+customElements.define('placeholder-img', HTMLPlaceholderImageElement, { extends: 'img' });
