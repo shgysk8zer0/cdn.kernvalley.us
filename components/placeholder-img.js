@@ -1,18 +1,6 @@
 const protectedData = new WeakMap();
 
-export function generateURL({ width = 640, height, backgroundColor, color, text, format } = {}) {
-	const size = [width, height].filter(p => typeof p === 'number').join('x');
-	const parts = [size, backgroundColor, color].filter(p => typeof p === 'string');
-	const url = new URL(`/${[...parts].join('/')}.${format}`, 'https://via.placeholder.com');
-
-	if (typeof text === 'string') {
-		url.searchParams.set('text', text);
-	}
-
-	return url.href;
-}
-
-export class HTMLPlaceholderImageElement extends HTMLImageElement {
+class HTMLPlaceholderImageElement extends HTMLImageElement {
 	constructor({ width, height, color, backgroundColor, text, format } = {}) {
 		super();
 
@@ -98,7 +86,7 @@ export class HTMLPlaceholderImageElement extends HTMLImageElement {
 	}
 
 	update() {
-		this.src = generateURL(this);
+		this.src = HTMLPlaceholderImageElement.generateURL(this);
 	}
 
 	attributeChangedCallback() {
@@ -114,6 +102,18 @@ export class HTMLPlaceholderImageElement extends HTMLImageElement {
 
 	static get observedAttributes() {
 		return ['width', 'height', 'color', 'backgroundcolor', 'text', 'format'];
+	}
+
+	static generateURL({ width = 640, height, backgroundColor, color, text, format } = {}) {
+		const size = [width, height].filter(p => typeof p === 'number').join('x');
+		const parts = [size, backgroundColor, color].filter(p => typeof p === 'string');
+		const url = new URL(`/${[...parts].join('/')}.${format}`, 'https://via.placeholder.com');
+
+		if (typeof text === 'string') {
+			url.searchParams.set('text', text);
+		}
+
+		return url.href;
 	}
 }
 
