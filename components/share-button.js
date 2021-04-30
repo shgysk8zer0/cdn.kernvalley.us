@@ -3,20 +3,17 @@ import { registerCustomElement } from '../js/std-js/custom-elements.js';
 import { shim } from '../js/std-js/share.js';
 import { GET } from '../js/std-js/http.js';
 import { hasGa, send } from '../js/std-js/google-analytics.js';
+import UTM from '../js/std-js/UTM.js';
 import { Facebook, Twitter, LinkedIn, Reddit, Gmail, Pinterest, Telegram, Tumblr,
 	Email } from '../js/std-js/share-targets.js';
 
 shim([Facebook, Twitter, LinkedIn, Reddit, Tumblr, Pinterest, Telegram, Gmail, Email]);
 
-function log(btn) {
+function log({ url: eventAction, shareTitle: eventLabel, hitType = 'event',
+	transport = 'beacon', eventCategory = 'share-button'
+}) {
 	if (hasGa()) {
-		send({
-			hitType: 'event',
-			eventCategory: 'share-button',
-			eventAction: btn.url,
-			eventLabel: btn.shareTitle,
-			transport: 'beacon',
-		});
+		send({ hitType, eventCategory, eventAction, eventLabel, transport });
 	}
 }
 
@@ -42,15 +39,18 @@ async function getFiles(file) {
 	}
 }
 
-export default class HTMLShareButtonElement extends HTMLButtonElement {
-	constructor({ title = null, text = null, url = null, file = null, source = null, medium = null, content = null } = {}) {
+registerCustomElement('share-button', class HTMLShareButtonElement extends HTMLButtonElement {
+	constructor({ shareTitle, title, text, url, file, source, medium, content } = {}) {
 		super();
 
 		this.addEventListener('connected', () => {
-			this.hidden = !(navigator.share instanceof Function);
+			this.hidden = ! (navigator.share instanceof Function);
 
-			if (typeof title === 'string') {
-				this.title = title;
+			if (typeof shareTitle === 'string') {
+				this.shareTitle = shareTitle;
+			} else if (typeof title === 'string') {
+				console.warn('Use of `title` is deprecated. Please use `shareTitle` instead.');
+				this.shareTitle = title;
 			}
 
 			if (typeof text === 'string') {
@@ -180,45 +180,14 @@ export default class HTMLShareButtonElement extends HTMLButtonElement {
 
 	get url() {
 		if (this.hasAttribute('url')) {
-			const url = new URL(this.getAttribute('url'), location.href);
+			const url = this.getAttribute('url');
 			const { source, medium, content } = this;
 
-			if (typeof source === 'string' && typeof medium === 'string') {
-				if (! url.searchParams.has('utm_source')) {
-					url.searchParams.set('utm_source', source);
-				}
-
-				if (! url.searchParams.has('utm_medium')) {
-					url.searchParams.set('utm_medium', medium);
-				}
-
-				if (! url.searchParams.has('utm_content')) {
-					url.searchParams.set('utm_content', content);
-				}
-			}
-
-			return url.href;
+			return new UTM(url, { source, medium, content }).href;
 		} else {
 			const { source, medium, content } = this;
 
-			if (typeof source === 'string' && typeof medium === 'string') {
-				const url = new URL(location.href);
-
-				if (! url.searchParams.has('utm_source')) {
-					url.searchParams.set('utm_source', source);
-				}
-
-				if (! url.searchParams.has('utm_medium')) {
-					url.searchParams.set('utm_medium', medium);
-				}
-
-				if (! url.searchParams.has('utm_content')) {
-					url.searchParams.set('utm_content', content);
-				}
-				return url.href;
-			} else {
-				return location.href;
-			}
+			return new UTM(location.href, { source, medium, content });
 		}
 	}
 
@@ -230,13 +199,19 @@ export default class HTMLShareButtonElement extends HTMLButtonElement {
 		}
 	}
 
+	/**
+	 * @deprecated
+	 */
 	get title() {
+		console.warn('Use of `title` is deprecated. Please use `shareTitle` instead');
 		return this.hasAttribute('title') ? this.getAttribute('title') : document.title;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	set title(title) {
+		console.warn('Use of `title` is deprecated. Please use `shareTitle` instead');
 		this.setAttribute('title', title);
 	}
-}
-
-registerCustomElement('share-button', HTMLShareButtonElement, { extends: 'button' });
+}, { extends: 'button' });

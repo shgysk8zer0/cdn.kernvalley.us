@@ -21,6 +21,9 @@ HTMLCustomElement.register('toast-message', class HTMLToastMessageElement extend
 
 			if (typeof message === 'string') {
 				this.text = message;
+			} else if (message instanceof Element) {
+				message.slot = 'content';
+				this.append(message);
 			}
 		});
 	}
@@ -198,6 +201,7 @@ HTMLCustomElement.register('toast-message', class HTMLToastMessageElement extend
 					this.dispatchEvent(new Event('close'));
 				}
 				break;
+
 			case 'color':
 				if (newVal !== null) {
 					this.style.setProperty('--toast-color', newVal);
@@ -205,6 +209,7 @@ HTMLCustomElement.register('toast-message', class HTMLToastMessageElement extend
 					this.style.removeProperty('--toast-color');
 				}
 				break;
+
 			case 'background':
 				if (newVal !== null) {
 					this.style.setProperty('--toast-background', newVal);
