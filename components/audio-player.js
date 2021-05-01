@@ -1,5 +1,5 @@
 /* global MediaMetadata */
-import { registerCustomElement } from '../js/std-js/functions.js';
+import { registerCustomElement } from '../js/std-js/custom-elements.js';
 
 /**
  * Adds `navigator.mediaSession` functionality to native `<audio>` elements

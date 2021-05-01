@@ -1,5 +1,5 @@
 import HTMLCustomElement from '../custom-element.js';
-import { sleep } from '../../js/std-js/functions.js';
+import { sleep } from '../../js/std-js/promises.js';
 
 async function visible() {
 	if (document.visibilityState === 'hidden') {
