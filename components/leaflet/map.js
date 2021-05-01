@@ -1,4 +1,5 @@
-import { getLocation, debounce } from '../../js/std-js/functions.js';
+import { debounce } from '../../js/std-js/events.js';
+import { get as getLocation } from '../../js/std-js/geo.js';
 import { on, off, create, query } from '../../js/std-js/dom.js';
 import { loadStylesheet } from '../../js/std-js/loader.js';
 import { getCustomElement } from '../../js/std-js/custom-elements.js';
