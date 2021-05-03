@@ -20,17 +20,17 @@ function log(eventAction, ad, transport = 'beacon') {
 }
 
 function keypress(event) {
-	if (event.keyCode === 32 && event.isTrusted !== false) {
-		return openLink.apply(this);
+	if (event instanceof Event && event.keyCode === 13) {
+		return openLink.call(this, event);
 	}
 }
 
 function openLink(event) {
-	if (event.isTrusted !== false) {
+	if (event instanceof Event && event.isTrusted !== false) {
 		const ad = this.closest('ad-block');
 
 		if (! ad.preview && ! (this instanceof HTMLAnchorElement)) {
-			const url = this.url;
+			const url = this.getUrl();
 
 			if (typeof url !== 'string') {
 				throw new Error('No URL');
@@ -439,9 +439,10 @@ HTMLCustomElement.register('ad-block', class HTMLAdBlockElement extends HTMLCust
 	}
 
 	getUrl() {
-		const { url, source, medium, term, content, campaign } = this;
-
-		return new UTM(url, { source, medium, term, content, campaign }).href;
+		if (this.hasAttribute('url')) {
+			const { url, source, medium, term, content, campaign } = this;
+			return new UTM(url, { source, medium, term, content, campaign }).href;
+		}
 	}
 
 	async getJSON() {
