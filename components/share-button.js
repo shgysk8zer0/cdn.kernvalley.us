@@ -81,23 +81,26 @@ registerCustomElement('share-button', class HTMLShareButtonElement extends HTMLB
 		this.addEventListener('click', async event => {
 			event.preventDefault();
 			event.stopPropagation();
-			this.disabled = true;
 
-			try {
-				const { shareTitle: title, text, url, file } = this;
+			if (event.isTrusted !== false) {
+				this.disabled = true;
 
-				if (supportsFiles && typeof file === 'string') {
-					const files = await getFiles(file);
-					await navigator.share({ title, text, url, files });
-					log(this);
-				} else {
-					await navigator.share({ title, text, url });
-					log(this);
+				try {
+					const { shareTitle: title, text, url, file } = this;
+
+					if (supportsFiles && typeof file === 'string') {
+						const files = await getFiles(file);
+						await navigator.share({ title, text, url, files });
+						log(this);
+					} else {
+						await navigator.share({ title, text, url });
+						log(this);
+					}
+				} catch (err) {
+					console.error(err);
+				} finally {
+					this.disabled = false;
 				}
-			} catch (err) {
-				console.error(err);
-			} finally {
-				this.disabled = false;
 			}
 		});
 	}
