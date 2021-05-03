@@ -3,6 +3,7 @@ import { save, open } from '../../js/std-js/filesystem.js';
 import { openWindow } from '../../js/std-js/functions.js';
 import { css, attr, on, off, loaded } from '../../js/std-js/dom.js';
 import { hasGa, send } from '../../js/std-js/google-analytics.js';
+import UTM from '../../js/std-js/UTM.js';
 
 function log(eventAction, ad, transport = 'beacon') {
 	if (hasGa() && ! ad.preview) {
@@ -239,7 +240,7 @@ HTMLCustomElement.register('ad-block', class HTMLAdBlockElement extends HTMLCust
 										break;
 
 									case 'image':
-										attr(el, { itemprop: 'image', role: 'image' });
+										attr(el, { itemprop: 'image', role: 'img' });
 										break;
 								}
 							});
@@ -440,35 +441,7 @@ HTMLCustomElement.register('ad-block', class HTMLAdBlockElement extends HTMLCust
 	getUrl() {
 		const { url, source, medium, term, content, campaign } = this;
 
-		if (typeof source !== 'string' && source.length !== 0) {
-			return url;
-		} else {
-			const u = new URL(url, document.baseURI);
-
-			if (! u.searchParams.has('utm_source')) {
-				u.searchParams.set('utm_source', source);
-			}
-
-			if (! u.searchParams.has('utm_medium') && typeof medium === 'string' && medium.length !== 0) {
-				u.searchParams.set('utm_medium', medium);
-			} else if (! u.searchParams.has('utm_medium')) {
-				u.searchParams.set('utm_medium', 'web');
-			}
-
-			if (! u.searchParams.has('utm_campaign') && typeof campaign === 'string' && campaign.length !== 0) {
-				u.searchParams.set('utm_campaign', campaign);
-			}
-
-			if (! u.searchParams.has('utm_term') && typeof term === 'string' && term.length !== 0) {
-				u.searchParams.set('utm_term', term);
-			}
-
-			if (! u.searchParams.has('utm_content') && typeof content === 'string' && content.length !== 0) {
-				u.searchParams.set('utm_content', content);
-			}
-
-			return u.href;
-		}
+		return new UTM(url, { source, medium, term, content, campaign }).href;
 	}
 
 	async getJSON() {
@@ -635,7 +608,8 @@ HTMLCustomElement.register('ad-block', class HTMLAdBlockElement extends HTMLCust
 			img.decoding = 'async';
 			img.src = val;
 			img.alt = '';
-			this.image = img;
+			img.loading = 'lazy';
+			this.setSlot('image', img);
 		} else if (val instanceof HTMLElement) {
 			this.setSlot('image', val);
 		} else {
