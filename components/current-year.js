@@ -8,4 +8,4 @@ export default class HTMLCurrentYearElement extends HTMLTimeElement {
 	}
 }
 
-registerCustomElement('current-year', HTMLCurrentYearElement, {extends: 'time'});
+registerCustomElement('current-year', HTMLCurrentYearElement, { extends: 'time' });

@@ -1,5 +1,8 @@
-import { $ } from '../../js/std-js/esQuery.js';
-import { getJSON } from '../../js/std-js/http.js';
+import { text, attr, remove, on } from '../../js/std-js/dom.js';
+import { getJSON, getHTML } from '../../js/std-js/http.js';
+import { meta } from '../../import.meta.js';
+import { loadStylesheet } from '../../js/std-js/loader.js';
+import { getDeferred } from '../../js/std-js/promises.js';
 const ENDPOINT = 'https://api.github.com';
 import HTMLCustomElement from '../custom-element.js';
 
@@ -19,6 +22,7 @@ async function getUser(user) {
 HTMLCustomElement.register('github-user', class HTMLGitHubUserElement extends HTMLCustomElement {
 	constructor(user = null) {
 		super();
+
 		this.attachShadow({ mode: 'open' });
 
 		Promise.resolve().then(() => {
@@ -30,12 +34,28 @@ HTMLCustomElement.register('github-user', class HTMLGitHubUserElement extends HT
 				this.whenLoad,
 				this.whenConnected,
 			]).then(() => {
-				this.getTemplate('./components/github/user.html').then(tmp => {
+				Promise.all([
+					getHTML(new URL('./components/github/user.html', meta.url)),
+					loadStylesheet(new URL('./components/github/user.css', meta.url), { parent: this.shadowRoot }),
+				]).then(([tmp]) => {
 					this.shadowRoot.append(tmp);
 					this.dispatchEvent(new Event('ready'));
 				});
+				// this.getTemplate('./components/github/user.html').then(tmp => {
+				// });
 			});
 		});
+	}
+
+	get ready() {
+		const { resolve, promise } = getDeferred();
+
+		if (this.shadowRoot.childElementCount < 2) {
+			on([this], ['ready'], () => resolve(), { once: true });
+		} else {
+			resolve();
+		}
+		return promise;
 	}
 
 	get bio() {
@@ -68,58 +88,60 @@ HTMLCustomElement.register('github-user', class HTMLGitHubUserElement extends HT
 				if (typeof newVal === 'string' && newVal.length !== 0) {
 					this.ready.then(async () => {
 						try {
-							const shadow = this.shadowRoot;
+							const base = this.shadowRoot;
 							const user = await getUser(this.user);
 
-							$('[part~="avatar"]', shadow).attr({
+							attr('[part~="avatar"]', {
 								src: `${user.avatar_url}&s=64`,
 								height: 64,
 								width: 64,
-							});
+							}, { base });
 
-							$('[part~="username"]', shadow).text(user.login);
-							$('[part~="name"]', shadow).text(user.name);
-							$('[part~="github"]', shadow).attr({
+							text('[part~="username"]', user.login, { base });
+							text('[part~="name"]', user.name, { base });
+							attr('[part~="github"]', {
 								href: user.html_url,
 								title: `View ${user.login}'s profile on GitHub`,
-							});
+							}, { base });
 
 							if (user.bio !== null) {
-								$('[part~="bio"]', shadow).text(user.bio);
-								$('[part~="bio"]').unhide();
+								text('[part~="bio"]', user.bio, { base });
+								attr('[part~="bio"]', { hidden: false }, { base });
 							} else {
-								$('[part~="bio-container"]', shadow).hide();
+								attr('[part~="bio"]', { hidden: true }, { base });
 							}
 
 							if (user.location !== null) {
-								$('[part~="location"]', shadow).text(user.location);
-								$('[part~="location-container"]', shadow).unhide();
+								text('[part~="location"]', user.location, { base });
+								attr('[part~="location-container"]', { hidden: false }, { base });
 							} else {
-								$('[part~="location-container"]', shadow).hide();
+								attr('[part~="location-container"]', { hidden: true }, { base });
 							}
 
 							if (user.email !== null) {
-								$('[part~="email"]', shadow).text(user.email);
-								$('[part~="email"]', shadow).attr({href: `mailto:${user.email}`});
-								$('[part~="email-container"]', shadow).unhide();
+								text('[part~="email"]', user.email, { base });
+								attr('[part~="email"]',{ href: `mailto:${user.email}`}, { base });
+								attr('[part~="email-container"]', { hidden: false }, { base });
 							} else {
-								$('[part~="email-container"]', shadow).hide();
+								attr('[part~="email-container"]', { hidden: true }, { base });
 							}
 
 							if (user.company !== null) {
-								$('[part~="company"]', shadow).text(user.company);
-								$('[part~="company"]', shadow).attr({href: `https://github.com/${user.company.replace('@', '')}`});
-								$('[part~="company-container"]', shadow).unhide();
+								text('[part~="company"]', user.company, { base });
+								attr('[part~="company"]', {
+									href: `https://github.com/${user.company.replace('@', '')}`,
+								}, { base });
+								attr('[part~="company-container"]', { hidden: false }, { base });
 							} else {
-								$('[part~="company-container"]', shadow).hide();
+								attr('[part~="company-container"]', { hidden: true }, { base });
 							}
 
 							if (typeof user.blog === 'string' && user.blog.length !== 0) {
 								const blog = new URL(user.blog);
-								$('[part~="blog"]', shadow).attr({href: blog.href});
-								$('[part~="blog"]', shadow).text(blog.hostname);
+								attr('[part~="blog"]', { href: blog.href }, { base });
+								text('[part~="blog"]', blog.hostname, { base });
 							} else {
-								$('[part~="blog-container"]', shadow).remove();
+								remove('[part~="blog-container"]', { base });
 							}
 						} catch(err) {
 							console.error(err);

@@ -1,6 +1,6 @@
 import HTMLCustomElement from '../custom-element.js';
 import { save, open } from '../../js/std-js/filesystem.js';
-import { openWindow } from '../../js/std-js/functions.js';
+import { popup } from '../../js/std-js/popup.js';
 import { css, attr, on, off, loaded } from '../../js/std-js/dom.js';
 import { hasGa, send } from '../../js/std-js/google-analytics.js';
 import UTM from '../../js/std-js/UTM.js';
@@ -40,7 +40,7 @@ function openLink(event) {
 				setTimeout(() => location.href = this.getUrl(), 20);
 			} else {
 				log('ad-click', this);
-				openWindow(this.getUrl());
+				popup(this.getUrl());
 				this.dispatchEvent(new Event('opened'));
 			}
 		}

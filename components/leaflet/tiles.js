@@ -1,5 +1,5 @@
-export /* @SEE https://leaflet-extras.github.io/leaflet-providers/preview/ */
-const TILES = {
+/* @SEE https://leaflet-extras.github.io/leaflet-providers/preview/ */
+export const TILES = {
 	wikimedia: {
 		tileSrc: 'https://maps.wikimedia.org/osm-intl/{z}/{x}/{y}{r}.png',
 		crossOrigin: 'anonymous',

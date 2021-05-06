@@ -303,8 +303,6 @@ HTMLCustomElement.register('leaflet-map', class HTMLLeafletMapElement extends HT
 					await this.loadMarkers(...this.dataset.markers.split(' ')).catch(console.error);
 				}
 			});
-
-
 		});
 	}
 

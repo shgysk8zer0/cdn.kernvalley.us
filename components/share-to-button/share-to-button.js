@@ -1,11 +1,12 @@
 import HTMLCustomElement from '../custom-element.js';
-import { openWindow } from '../../js/std-js/functions.js';
+import { hasGa, send } from '../../js/std-js/google-analytics.js';
+import { popup } from '../../js/std-js/popup.js';
 import { Facebook, Twitter, Reddit, LinkedIn, Gmail, Pinterest, Email, Tumblr, Telegram, getShareURL }
 	from '../../js/std-js/share-targets.js';
 
 function log(btn) {
-	if (window.ga instanceof Function) {
-		window.ga('send', {
+	if (hasGa()) {
+		send({
 			hitType: 'event',
 			eventCategory: `${btn.tagName.toLowerCase()} | ${btn.target}`,
 			eventAction: btn.url,
@@ -16,7 +17,7 @@ function log(btn) {
 }
 
 function openShare(target, { title, text, url, height = 360, width = 720, name = 'SharePopup' } = {}) {
-	openWindow(getShareURL(target, { title, text, url }), { height, width, name });
+	return popup(getShareURL(target, { title, text, url }), { height, width, name });
 }
 
 async function share({
