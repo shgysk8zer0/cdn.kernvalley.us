@@ -183,14 +183,16 @@ registerCustomElement('share-button', class HTMLShareButtonElement extends HTMLB
 
 	get url() {
 		if (this.hasAttribute('url')) {
-			const url = this.getAttribute('url');
+			const url = new URL(this.getAttribute('url'), location.href).href;
 			const { source, medium, content } = this;
 
 			return new UTM(url, { source, medium, content }).href;
-		} else {
+		} else if (this.hasAttribute('source')) {
 			const { source, medium, content } = this;
 
 			return new UTM(location.href, { source, medium, content });
+		} else {
+			return location.href;
 		}
 	}
 
