@@ -17,10 +17,10 @@ function log({ url: eventAction, shareTitle: eventLabel, hitType = 'event',
 	}
 }
 
-const supportsFiles = navigator.canShare instanceof Function && navigator.canShare({ text: 'hi', files: [new File([''], 'text.txt', { type: 'text/plain' })]});
-
 async function getFiles(file) {
-	if (supportsFiles && typeof file === 'string') {
+	if (typeof file !== 'string' || ! (navigator.canShare instanceof Function)) {
+		return [];
+	} else {
 		const resp = await GET(file);
 
 		if (! resp.ok) {
@@ -32,10 +32,8 @@ async function getFiles(file) {
 			const name = path[path.length - 1];
 			const type = resp.headers.get('Content-Type').split(';')[0];
 			const files = [new File([await resp.blob()], name, { type })];
-			return files;
+			return navigator.canShare({ title: 'test', files }) ? files : [];
 		}
-	} else {
-		return [];
 	}
 }
 
@@ -90,7 +88,7 @@ registerCustomElement('share-button', class HTMLShareButtonElement extends HTMLB
 				try {
 					const { shareTitle: title, text, url, file } = this;
 
-					if (supportsFiles && typeof file === 'string') {
+					if (typeof file === 'string' && navigator.canShare instanceof Function) {
 						const files = await getFiles(file);
 						await navigator.share({ title, text, url, files });
 						log(this);
