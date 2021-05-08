@@ -44,8 +44,6 @@ registerCustomElement('share-button', class HTMLShareButtonElement extends HTMLB
 		super();
 
 		this.addEventListener('connected', () => {
-			this.hidden = ! (navigator.share instanceof Function);
-
 			if (typeof shareTitle === 'string') {
 				this.shareTitle = shareTitle;
 			} else if (typeof title === 'string') {
@@ -77,6 +75,10 @@ registerCustomElement('share-button', class HTMLShareButtonElement extends HTMLB
 				this.file = file;
 			}
 		}, { once: true });
+	}
+
+	connectedCallback() {
+		this.hidden = ! (navigator.share instanceof Function);
 
 		this.addEventListener('click', async event => {
 			event.preventDefault();
@@ -103,9 +105,7 @@ registerCustomElement('share-button', class HTMLShareButtonElement extends HTMLB
 				}
 			}
 		});
-	}
 
-	connectedCallback() {
 		this.dispatchEvent(new Event('connected'));
 	}
 
