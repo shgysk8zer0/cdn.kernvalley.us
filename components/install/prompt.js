@@ -1,10 +1,10 @@
-import { registerCustomElement } from '../../js/std-js/custom-elements.js';
+import { registerCustomElement, getCustomElement } from '../../js/std-js/custom-elements.js';
 import { meta } from '../../import.meta.js';
 import { loadStylesheet } from '../../js/std-js/loader.js';
 import { getHTML, getManifest } from '../../js/std-js/http.js';
 import { query, create, text, on, off } from '../../js/std-js/dom.js';
 import { hasGa, send } from '../../js/std-js/google-analytics.js';
-import { confirm } from '../../js/std-js/asyncDialog.js';
+import '../notification/html-notification.js';
 
 function getBySize(opts, width) {
 	if (Array.isArray(opts)) {
@@ -92,16 +92,35 @@ if ('serviceWorker' in navigator && 'serviceWorker' in document.documentElement.
 	navigator.serviceWorker.register(serviceWorker, { scope }).catch(console.error);
 
 	if ('reloadOnUpdate' in document.documentElement.dataset) {
-		navigator.serviceWorker.getRegistration().then(reg => {
-			reg.addEventListener('updatefound', async () => {
-				const [resp] = await Promise.all([
-					confirm('App updated in background. Would you like to reload to see updates?'),
-					reg.update(),
-				]);
+		navigator.serviceWorker.ready.then(reg => {
+			reg.addEventListener('updatefound', ({ target }) => {
+				target.update();
+				getCustomElement('html-notification').then(HTMLNotificationElement => {
+					const notification = new HTMLNotificationElement('Update available', {
+						body: 'App updated in background. Would you like to reload to see updates?',
+						requireInteraction: true,
+						actions: [{
+							title: 'Reload',
+							action: 'reload',
+						}, {
+							title: 'Dismiss',
+							action: 'dismiss',
+						}]
+					});
 
-				if (resp === true) {
-					location.reload();
-				}
+					notification.addEventListener('notificationclick', ({ target, action }) => {
+						switch(action) {
+							case 'dismiss':
+								target.close();
+								break;
+
+							case 'reload':
+								target.close();
+								location.reload();
+								break;
+						}
+					});
+				});
 			});
 		});
 	}
