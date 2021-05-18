@@ -33,8 +33,14 @@ function init(worker, config) {
 		if (event.request.method === 'GET') {
 			event.respondWith((async () => {
 				const url = getURL(event);
+				const cacheOpts = {
+					ignoreSearch: event.request.mode === 'navigate',
+					ignoreMethod: false,
+					ignoreVary: false,
+				};
+
 				if (Array.isArray(config.stale) && config.stale.includes(url)) {
-					const cached = await caches.match(event.request);
+					const cached = await caches.match(event.request, cacheOpts);
 
 					if (cached instanceof Response) {
 						return cached;
@@ -63,11 +69,11 @@ function init(worker, config) {
 
 						return resp;
 					} else {
-						return caches.match(event.request);
+						return caches.match(event.request, cacheOpts);
 					}
 				} else if (Array.isArray(config.staleFirst) && config.staleFirst.includes(url)) {
 					if (navigator.onLine) {
-						const cached = await caches.match(event.request);
+						const cached = await caches.match(event.request, cacheOpts);
 
 						const promise = Promise.all([
 							fetch(event.request).catch(console.error),
@@ -86,12 +92,12 @@ function init(worker, config) {
 							return await promise;
 						}
 					} else {
-						return caches.match(event.request);
+						return caches.match(event.request, cacheOpts);
 					}
 				} else if (Array.isArray(config.allowed) && config.allowed.some(entry => (
 					entry instanceof RegExp ? entry.test(url) : url.startsWith(entry)
 				))) {
-					const resp = await caches.match(event.request);
+					const resp = await caches.match(event.request, cacheOpts);
 
 					if (resp instanceof Response) {
 						return resp;
@@ -121,7 +127,7 @@ function init(worker, config) {
 
 						return resp;
 					} else {
-						return caches.match(event.request);
+						return caches.match(event.request, cacheOpts);
 					}
 				} else {
 					return fetch(event.request);
