@@ -4,32 +4,38 @@
 		<meta charset="utf-8" />
 	</head>
 	<body>
-		<h2 class="center" part="title">
-			<abbr title="Kern River Valley">KRV</abbr>
-			<span>Events Calendar</span>
-		</h2>
+		<a class="app-link" href="https://events.kernvalley.us/" rel="noopener noreferrer external">
+			<h2 class="center" part="title">
+				<slot name="title">KRV Events Calendar</slot>
+				<svg width="12" height="16" fill="currentColor" viewBox="0 0 12 16" part="icon link-icon">
+					<path fill-rule="evenodd" d="M11 10h1v3c0 .55-.45 1-1 1H1c-.55 0-1-.45-1-1V3c0-.55.45-1 1-1h3v1H1v10h10v-3zM6 2l2.25 2.25L5 7.5 6.5 9l3.25-3.25L12 8V2H6z"/>
+				</svg>
+			</h2>
+		</a>
 		<div id="events-list" part="list"></div>
 		<template id="event-template">
-			<a class="event-url container" href="" rel="noopener noreferrer external">
+			<div class="container">
 				<h3 part="name">
-					<span class="event-name">Untitled Event</span>
-					<svg width="12" height="16" fill="currentColor" viewBox="0 0 12 16" part="icon link-icon">
-						<path fill-rule="evenodd" d="M11 10h1v3c0 .55-.45 1-1 1H1c-.55 0-1-.45-1-1V3c0-.55.45-1 1-1h3v1H1v10h10v-3zM6 2l2.25 2.25L5 7.5 6.5 9l3.25-3.25L12 8V2H6z"/>
-					</svg>
+					<a href="" class="event-url" rel="noopener noreferrer external">
+						<span class="event-name">Untitled Event</span>
+						<svg width="12" height="16" fill="currentColor" viewBox="0 0 12 16" part="icon link-icon">
+							<path fill-rule="evenodd" d="M11 10h1v3c0 .55-.45 1-1 1H1c-.55 0-1-.45-1-1V3c0-.55.45-1 1-1h3v1H1v10h10v-3zM6 2l2.25 2.25L5 7.5 6.5 9l3.25-3.25L12 8V2H6z"/>
+						</svg>
+					</a>
 				</h3>
-				<div class="event-section">
+				<div class="event-section" part="time">
 					<svg width="14" height="16" fill="currentColor" viewBox="0 0 14 16" class="icon" part="icon cal-icon">
 						<path fill-rule="evenodd" d="M13 2h-1v1.5c0 .28-.22.5-.5.5h-2c-.28 0-.5-.22-.5-.5V2H6v1.5c0 .28-.22.5-.5.5h-2c-.28 0-.5-.22-.5-.5V2H2c-.55 0-1 .45-1 1v11c0 .55.45 1 1 1h11c.55 0 1-.45 1-1V3c0-.55-.45-1-1-1zm0 12H2V5h11v9zM5 3H4V1h1v2zm6 0h-1V1h1v2zM6 7H5V6h1v1zm2 0H7V6h1v1zm2 0H9V6h1v1zm2 0h-1V6h1v1zM4 9H3V8h1v1zm2 0H5V8h1v1zm2 0H7V8h1v1zm2 0H9V8h1v1zm2 0h-1V8h1v1zm-8 2H3v-1h1v1zm2 0H5v-1h1v1zm2 0H7v-1h1v1zm2 0H9v-1h1v1zm2 0h-1v-1h1v1zm-8 2H3v-1h1v1zm2 0H5v-1h1v1zm2 0H7v-1h1v1zm2 0H9v-1h1v1z"/>
 					</svg>
 					<time class="event-start-time" part="start-time"></time>
-					<span>&mdash;</span>
+					<span part="thru">&mdash;</span>
 					<time class="event-end-time" part="end-time"></time>
 				</div>
-				<div class="clearfix event-section">
+				<div class="clearfix event-section" part="description">
 					<svg width="14" height="16" fill="currentColor" viewBox="0 0 14 16" class="icon float-left" part="icon note-icon">
 						<path fill-rule="evenodd" d="M3 10h4V9H3v1zm0-2h6V7H3v1zm0-2h8V5H3v1zm10 6H1V3h12v9zM1 2c-.55 0-1 .45-1 1v9c0 .55.45 1 1 1h12c.55 0 1-.45 1-1V3c0-.55-.45-1-1-1H1z"/>
 					</svg>
-					<blockquote class="event-description float-left" part="description">This event has no description.</blockquote>
+					<blockquote class="event-description float-left">This event has no description.</blockquote>
 				</div>
 				<div class="event-section">
 					<svg width="12" height="16" fill="currentColor" viewBox="0 0 12 16" part="icon location-icon">
@@ -37,7 +43,7 @@
 					</svg>
 					<span class="event-location" part="location">Unknown Location</span>
 				</div>
-			</a>
+			</div>
 		</template>
 	</body>
 </html>
