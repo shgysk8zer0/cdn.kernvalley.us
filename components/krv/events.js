@@ -4,18 +4,29 @@ import { registerCustomElement } from '../../js/std-js/custom-elements.js';
 import { loadStylesheet } from '../../js/std-js/loader.js';
 import { meta } from '../../import.meta.js';
 
+const protectedData = new WeakMap();
+
 registerCustomElement('krv-events', class HTMLKRVEventsElement extends HTMLElement {
 	constructor() {
 		super();
-		const parent = this.attachShadow({ mode: 'open' });
+		const parent = this.attachShadow({ mode: 'closed' });
 
 		Promise.all([
 			getHTML(new URL('./components/krv/events.html', meta.url).href),
 			loadStylesheet(new URL('./components/krv/events.css', meta.url).href, { parent }),
 		]).then(([frag]) => {
-			this.shadowRoot.append(frag);
+			parent.append(frag);
+			protectedData.set(this, { shadow: parent });
 			this.dispatchEvent(new Event('ready'));
 		});
+	}
+
+	get ready() {
+		if (! protectedData.has(this)) {
+			return when(this, 'ready');
+		} else {
+			return Promise.resolve();
+		}
 	}
 
 	connectedCallback() {
@@ -25,10 +36,10 @@ registerCustomElement('krv-events', class HTMLKRVEventsElement extends HTMLEleme
 	async render() {
 		const [data] = await Promise.all([
 			getJSON('https://events.kernvalley.us/events.json'),
-			when(this, 'ready'),
+			this.ready,
 		]);
 
-		const tmp = this.shadowRoot.getElementById('event-template').content;
+		const tmp = protectedData.get(this).shadow.getElementById('event-template').content;
 		const events = data.splice(0, this.count).map(({ name, url: href, description, startDate, endDate, location }) => {
 			const base = tmp.cloneNode(true);
 			const container = document.createElement('div');
@@ -57,7 +68,7 @@ registerCustomElement('krv-events', class HTMLKRVEventsElement extends HTMLEleme
 			return container;
 		});
 
-		this.shadowRoot.getElementById('events-list').replaceChildren(...events);
+		protectedData.get(this).shadow.getElementById('events-list').replaceChildren(...events);
 	}
 
 	get theme() {
@@ -92,10 +103,11 @@ registerCustomElement('krv-events', class HTMLKRVEventsElement extends HTMLEleme
 		}
 	}
 
-	attributeChangedCallback(name/*, oldval, newVal*/) {
+	attributeChangedCallback(name, oldVal, newVal) {
+		console.log({ name, oldVal, newVal });
 		switch(name) {
 			case 'count':
-				this.render();
+				this.render().catch(console.error);
 				break;
 
 			default:
