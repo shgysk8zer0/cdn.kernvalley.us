@@ -60,8 +60,8 @@ registerCustomElement('krv-events', class HTMLKRVEventsElement extends HTMLEleme
 			text('.event-end-time', end.toLocaleTimeString(), { base });
 			attr('.event-end-time', { datetime: end.toISOString() }, { base });
 
-			if (typeof location !== 'undefined' && location.hasOwnProperty('address')) {
-				text('.event-location', location.address.addressLocality, { base });
+			if (typeof location !== 'undefined') {
+				text('.event-location', location.name || location.address.addressLocality, { base });
 			}
 
 			container.append(base);
