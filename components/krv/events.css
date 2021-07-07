@@ -1,7 +1,6 @@
 :host {
 	display: block;
 	text-align: initial;
-	padding: 4px 8px;
 	background-color: #fafafa;
 	color: #343434;
 	line-height: 1.3;
@@ -10,6 +9,7 @@
 	max-width: 100%;
 	box-sizing: border-box;
 	overflow: auto;
+	padding: 4px 12px;
 }
 
 * {
