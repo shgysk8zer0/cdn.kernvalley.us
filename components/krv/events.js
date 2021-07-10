@@ -109,10 +109,6 @@ registerCustomElement('krv-events', class HTMLKRVEventsElement extends HTMLEleme
 
 			container.classList.add('event');
 
-			if ('part' in container) {
-				container.part.add('event');
-			}
-
 			attr('.event-url', { href: utm(url, { campaign, content, medium, source, term}) }, { base }).forEach(a => {
 				a.addEventListener('click', handler, { signal: controller.signal });
 			});
