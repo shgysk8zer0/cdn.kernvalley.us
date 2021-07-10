@@ -2,7 +2,7 @@
   X-Frame-Options: DENY
   X-XSS-Protection: 1; mode=block
   Referrer-Policy: no-referrer
-  Content-Security-Policy: default-src 'self';  style-src 'self' cdn.kernvalley.us unpkg.com; script-src 'self' 'unsafe-inline' cdn.kernvalley.us cdn.polyfill.io/v3/polyfill.min.js unpkg.com www.gstatic.com/firebasejs/; connect-src 'self' *.kernvalley.us api.github.com api.openweathermap.org/data/ baconipsum.com/api/; img-src *; media-src *; font-src 'self' cdn.kernvalley.us; upgrade-insecure-requests;
+  Content-Security-Policy: default-src 'self';  style-src 'self' cdn.kernvalley.us unpkg.com; script-src 'self' 'unsafe-inline' cdn.kernvalley.us unpkg.com www.gstatic.com/firebasejs/; connect-src 'self' *.kernvalley.us api.github.com api.openweathermap.org/data/ baconipsum.com/api/; img-src *; media-src *; font-src 'self' cdn.kernvalley.us; upgrade-insecure-requests;
 
 /img/sprites.svg
   Referrer-Policy: no-referrer
