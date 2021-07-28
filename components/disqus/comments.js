@@ -3,24 +3,34 @@ import { loadScript } from '../../js/std-js/loader.js';
 const protectedData = new WeakMap();
 
 registerCustomElement('disqus-comments', class HTMLDisqusCommentsElement extends HTMLElement {
-	constructor(identifier) {
+	constructor(site) {
 		super();
 		const shadow = this.attachShadow({ mode: 'closed' });
 		const slot = document.createElement('slot');
 		slot.name = 'comments';
 		shadow.append(slot);
 
-		if (typeof identifier === 'string') {
-			loadScript(`https://${identifier}.disqus.com/embed.js`, { crossOrigin: null }).then(script => {
+		if (typeof site === 'string') {
+			loadScript(`https://${site}.disqus.com/embed.js`, { crossOrigin: null }).then(script => {
 				script.setAttribute('data-timestamp', Date.now());
-				this.identifier = identifier;
+				this.site = site;
 				protectedData.set(this, { shadow });
+				this.dispatchEvent(new Event('ready'));
 			});
 		} else {
-			loadScript(`https://${this.identifier}.disqus.com/embed.js`, { crossOrigin: null }).then(script => {
+			loadScript(`https://${this.site}.disqus.com/embed.js`, { crossOrigin: null }).then(script => {
 				script.setAttribute('data-timestamp', Date.now());
 				protectedData.set(this, { shadow });
+				this.dispatchEvent(new Event('ready'));
 			});
+		}
+	}
+
+	get ready() {
+		if (! protectedData.has(this)) {
+			return new Promise(resolve => this.addEventListener('ready', () => resolve(), { once: true }));
+		} else{
+			return Promise.resolve();
 		}
 	}
 
@@ -31,15 +41,17 @@ registerCustomElement('disqus-comments', class HTMLDisqusCommentsElement extends
 		this.append(container);
 	}
 
-	get identifier() {
-		return this.getAttribute('identifier');
+	get site() {
+		return this.getAttribute('site');
 	}
 
-	set identifier(val) {
+	set site(val) {
 		if (typeof val === 'string' && val.length !==0) {
-			this.setAttribute('identifier', val);
+			this.setAttribute('site', val);
+			this.dispatchEvent(new Event('sitechange'));
 		} else {
-			this.removeAttribute('identifier');
+			this.removeAttribute('site');
+			this.dispatchEvent(new Event('sitechange'));
 		}
 	}
 });
