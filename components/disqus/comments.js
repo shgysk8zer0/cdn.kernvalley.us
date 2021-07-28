@@ -1,12 +1,30 @@
 import { registerCustomElement } from '../../js/std-js/custom-elements.js';
-import { loadScript } from '../../js/std-js/loader.js';
+import { loadScript, preload } from '../../js/std-js/loader.js';
 const protectedData = new WeakMap();
+const preloadOpts = {
+	as: 'script',
+	crossOrigin: null,
+	importance: 'low',
+};
+const observer = new IntersectionObserver((entries, observer) => {
+	entries.forEach(({ target, isIntersecting }) => {
+		if (isIntersecting) {
+			observer.unobserve(target);
+			loadScript(`https://${target.site}.disqus.com/embed.js`,  { crossOrigin: null, parent: target })
+				.then(script => script.setAttribute('data-timestamp', Date.now()))
+				.then(() => parent.dispatchEvent(new Event('ready')));
+		}
+	});
+}, {
+	rootMargin: `${Math.floor(screen.height * 0.3)}px`,
+});
 
 registerCustomElement('disqus-comments', class HTMLDisqusCommentsElement extends HTMLElement {
 	constructor(site) {
 		super();
 		const shadow = this.attachShadow({ mode: 'closed' });
-		const slot = document.createElement('slot');const container = document.createElement('div');
+		const slot = document.createElement('slot');
+		const container = document.createElement('div');
 		container.id = 'disqus_thread';
 		container.slot = 'comments';
 		slot.name = 'comments';
@@ -14,18 +32,14 @@ registerCustomElement('disqus-comments', class HTMLDisqusCommentsElement extends
 		this.append(container);
 
 		if (typeof site === 'string') {
-			loadScript(`https://${site}.disqus.com/embed.js`, { crossOrigin: null, parent: this }).then(script => {
-				script.setAttribute('data-timestamp', Date.now());
+			preload(`https://${site}.disqus.com/embed.js`, preloadOpts);
+			requestIdleCallback(() => {
 				this.site = site;
-				protectedData.set(this, { shadow });
-				this.dispatchEvent(new Event('ready'));
+				observer.observe(this);
 			});
 		} else {
-			loadScript(`https://${this.site}.disqus.com/embed.js`, { crossOrigin: null, parent: this }).then(script => {
-				script.setAttribute('data-timestamp', Date.now());
-				protectedData.set(this, { shadow });
-				this.dispatchEvent(new Event('ready'));
-			});
+			preload(`https://${this.site}.disqus.com/embed.js`, preloadOpts);
+			observer.observe(this);
 		}
 	}
 
