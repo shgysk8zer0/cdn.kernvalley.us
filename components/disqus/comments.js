@@ -14,14 +14,14 @@ registerCustomElement('disqus-comments', class HTMLDisqusCommentsElement extends
 		this.append(container);
 
 		if (typeof site === 'string') {
-			loadScript(`https://${site}.disqus.com/embed.js`, { crossOrigin: null }).then(script => {
+			loadScript(`https://${site}.disqus.com/embed.js`, { crossOrigin: null, parent: this }).then(script => {
 				script.setAttribute('data-timestamp', Date.now());
 				this.site = site;
 				protectedData.set(this, { shadow });
 				this.dispatchEvent(new Event('ready'));
 			});
 		} else {
-			loadScript(`https://${this.site}.disqus.com/embed.js`, { crossOrigin: null }).then(script => {
+			loadScript(`https://${this.site}.disqus.com/embed.js`, { crossOrigin: null, parent: this }).then(script => {
 				script.setAttribute('data-timestamp', Date.now());
 				protectedData.set(this, { shadow });
 				this.dispatchEvent(new Event('ready'));
