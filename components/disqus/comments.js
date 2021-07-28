@@ -6,9 +6,12 @@ registerCustomElement('disqus-comments', class HTMLDisqusCommentsElement extends
 	constructor(site) {
 		super();
 		const shadow = this.attachShadow({ mode: 'closed' });
-		const slot = document.createElement('slot');
+		const slot = document.createElement('slot');const container = document.createElement('div');
+		container.id = 'disqus_thread';
+		container.slot = 'comments';
 		slot.name = 'comments';
 		shadow.append(slot);
+		this.append(container);
 
 		if (typeof site === 'string') {
 			loadScript(`https://${site}.disqus.com/embed.js`, { crossOrigin: null }).then(script => {
@@ -32,13 +35,6 @@ registerCustomElement('disqus-comments', class HTMLDisqusCommentsElement extends
 		} else{
 			return Promise.resolve();
 		}
-	}
-
-	connectedCallback() {
-		const container = document.createElement('div');
-		container.id = 'disqus_thread';
-		container.slot = 'comments';
-		this.append(container);
 	}
 
 	get site() {
