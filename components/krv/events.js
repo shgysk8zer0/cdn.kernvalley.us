@@ -12,6 +12,7 @@ function utm(url, { campaign, content, medium, source, term }) {
 		const u = new URL(url);
 
 		u.searchParams.set('utm_source', source);
+		u.searchParams.set('utm_campaign', 'krv-events-el');
 
 		if (typeof campaign === 'string' && campaign.length !== 0) {
 			u.searchParams.set('utm_campaign', campaign);
