@@ -160,7 +160,7 @@ registerCustomElement('krv-events', class HTMLKRVEventsElement extends HTMLEleme
 	}
 
 	get medium() {
-		return this.getAttribute('medium') || 'referrer';
+		return this.getAttribute('medium') || 'referral';
 	}
 
 	set medium(val) {
