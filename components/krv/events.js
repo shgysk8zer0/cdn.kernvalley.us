@@ -46,8 +46,10 @@ registerCustomElement('krv-events', class HTMLKRVEventsElement extends HTMLEleme
 			loadStylesheet(new URL('./components/krv/events.css', meta.url).href, { parent }),
 			this.whenConnected,
 		]).then(([frag]) => {
+			const link = frag.querySelector('.app-link');
+			link.target = this.target;
+
 			if (this.hasAttribute('source')) {
-				const link = frag.querySelector('.app-link');
 				link.href = utm(link.href, this);
 			}
 
@@ -85,7 +87,7 @@ registerCustomElement('krv-events', class HTMLKRVEventsElement extends HTMLEleme
 		]);
 
 		const tmp = protectedData.get(this).shadow.getElementById('event-template').content;
-		const { campaign, content, medium, source, term } = this;
+		const { campaign, content, medium, source, term, target } = this;
 
 		const events = data.splice(0, this.count).map(({ name, url, description, startDate, endDate, location }) => {
 			const base = tmp.cloneNode(true);
@@ -110,7 +112,7 @@ registerCustomElement('krv-events', class HTMLKRVEventsElement extends HTMLEleme
 
 			container.classList.add('event');
 
-			attr('.event-url', { href: utm(url, { campaign, content, medium, source, term}) }, { base }).forEach(a => {
+			attr('.event-url', { href: utm(url, { campaign, content, medium, source, term}), target }, { base }).forEach(a => {
 				a.addEventListener('click', handler, { signal: controller.signal });
 			});
 
@@ -181,6 +183,18 @@ registerCustomElement('krv-events', class HTMLKRVEventsElement extends HTMLEleme
 			this.setAttribute('source', val);
 		} else {
 			this.removeAttribute('source');
+		}
+	}
+
+	get target() {
+		return this.getAttribute('target') || '_self';
+	}
+
+	set target(val) {
+		if (typeof val === 'string' && val.length !== 0) {
+			this.setAttribute('target', val);
+		} else {
+			this.removeAttribute('target');
 		}
 	}
 
