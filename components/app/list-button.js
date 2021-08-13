@@ -116,7 +116,7 @@ registerCustomElement('app-list', class HTMLKernValleyAppListButtonlement extend
 	}
 
 	get medium() {
-		return this.getAttribute('medium') || 'web';
+		return this.getAttribute('medium') || 'referral';
 	}
 
 	set medium(value) {
