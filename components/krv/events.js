@@ -81,6 +81,7 @@ registerCustomElement('krv-events', class HTMLKRVEventsElement extends HTMLEleme
 	}
 
 	async render() {
+		const now = new Date().toISOString();
 		const [data] = await Promise.all([
 			getJSON('https://events.kernvalley.us/events.json'),
 			this.ready,
@@ -89,47 +90,49 @@ registerCustomElement('krv-events', class HTMLKRVEventsElement extends HTMLEleme
 		const tmp = protectedData.get(this).shadow.getElementById('event-template').content;
 		const { campaign, content, medium, source, term, target } = this;
 
-		const events = data.splice(0, this.count).map(({ name, url, description, startDate, endDate, location }) => {
-			const base = tmp.cloneNode(true);
-			const container = document.createElement('div');
-			const start = new Date(startDate);
-			const end = new Date(endDate);
-			const controller = new AbortController();
+		const events = data.filter(({ endDate }) => endDate > now)
+			.splice(0, this.count)
+			.map(({ name, url, description, startDate, endDate, location }) => {
+				const base = tmp.cloneNode(true);
+				const container = document.createElement('div');
+				const start = new Date(startDate);
+				const end = new Date(endDate);
+				const controller = new AbortController();
 
-			function handler() {
-				if (hasGa()) {
-					send({
-						hitType: 'event',
-						eventCategory: 'krv-event',
-						eventLabel: this.querySelector('.event-name').textContent,
-						eventAction: 'open',
-						transport: 'beacon',
-					});
-				} else {
-					controller.abort();
+				function handler() {
+					if (hasGa()) {
+						send({
+							hitType: 'event',
+							eventCategory: 'krv-event',
+							eventLabel: this.querySelector('.event-name').textContent,
+							eventAction: 'open',
+							transport: 'beacon',
+						});
+					} else {
+						controller.abort();
+					}
 				}
-			}
 
-			container.classList.add('event');
+				container.classList.add('event');
 
-			attr('.event-url', { href: utm(url, { campaign, content, medium, source, term}), target }, { base }).forEach(a => {
-				a.addEventListener('click', handler, { signal: controller.signal });
+				attr('.event-url', { href: utm(url, { campaign, content, medium, source, term}), target }, { base }).forEach(a => {
+					a.addEventListener('click', handler, { signal: controller.signal });
+				});
+
+				text('.event-name', name, { base });
+				text('.event-description', description, { base });
+				text('.event-start-time', start.toLocaleString(), { base });
+				attr('.event-start-time', { datetime: start.toISOString() }, { base });
+				text('.event-end-time', end.toLocaleString(), { base });
+				attr('.event-end-time', { datetime: end.toISOString() }, { base });
+
+				if (typeof location !== 'undefined') {
+					text('.event-location', location.name || location.address.addressLocality, { base });
+				}
+
+				container.append(base);
+				return container;
 			});
-
-			text('.event-name', name, { base });
-			text('.event-description', description, { base });
-			text('.event-start-time', start.toLocaleString(), { base });
-			attr('.event-start-time', { datetime: start.toISOString() }, { base });
-			text('.event-end-time', end.toLocaleTimeString(), { base });
-			attr('.event-end-time', { datetime: end.toISOString() }, { base });
-
-			if (typeof location !== 'undefined') {
-				text('.event-location', location.name || location.address.addressLocality, { base });
-			}
-
-			container.append(base);
-			return container;
-		});
 
 		protectedData.get(this).shadow.getElementById('events-list').replaceChildren(...events);
 	}
