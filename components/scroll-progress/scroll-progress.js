@@ -1,7 +1,8 @@
 /* global ScrollTimeline, CSSUnitValue, globalThis */
-import { css } from 'https://cdn.kernvalley.us/js/std-js/dom.js';
+import { css } from '../../js/std-js/dom.js';
+import { registerCustomElement } from '../../js/std-js/custom-elements.js';
 
-customElements.define('scroll-progress', class HTMLScrollProgressElement extends HTMLElement {
+registerCustomElement('scroll-progress', class HTMLScrollProgressElement extends HTMLElement {
 	async connectedCallback() {
 		if ('ScrollTimeline' in globalThis) {
 			const shadow = this.attachShadow({ mode: 'closed' });
