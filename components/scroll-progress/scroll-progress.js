@@ -59,8 +59,12 @@ registerCustomElement('scroll-progress', class HTMLScrollProgressElement extends
 		}
 	}
 
+	static get supported() {
+		return 'ScrollTimeline' in globalThis;
+	}
+
 	static async shim() {
-		if (! ('ScrollTimeline' in globalThis)) {
+		if (! HTMLScrollProgressElement.supported) {
 			await loadScript(POLYFILL);
 			return true;
 		} else {
