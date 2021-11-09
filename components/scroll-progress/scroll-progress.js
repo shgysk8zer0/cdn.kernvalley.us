@@ -1,23 +1,12 @@
-import { css } from 'https://cdn.kernvalley.us/js/std-js/dom.js';
-import { loadScript } from 'https://cdn.kernvalley.us/js/std-js/loader.js';
 /* global ScrollTimeline, CSSUnitValue, globalThis */
+import { css } from 'https://cdn.kernvalley.us/js/std-js/dom.js';
 
-async function shim() {
-	if (! ('ScrollTimeline' in globalThis)) {
-		await loadScript('https://flackr.github.io/scroll-timeline/dist/scroll-timeline.js');
-	}
-}
-
-const protectedData = new WeakMap();
-
-customElements.define(
-	'scroll-progress',
-	class HTMLScrollProgressElement extends HTMLElement {
-		constructor() {
-			super();
+customElements.define('scroll-progress', class HTMLScrollProgressElement extends HTMLElement {
+	async connectedCallback() {
+		if ('ScrollTimeline' in globalThis) {
 			const shadow = this.attachShadow({ mode: 'closed' });
 			const progress = document.createElement('div');
-			protectedData.set(this, { shadow, progress });
+			progress.setAttribute('part', 'progress');
 			css(this, { display: 'block' });
 			shadow.append(progress);
 			css(progress, {
@@ -27,11 +16,6 @@ customElements.define(
 				'transform-origin': '0 50%',
 				transform: 'scaleX(0)'
 			});
-		}
-
-		async connectedCallback() {
-			await shim();
-			const { progress } = protectedData.get(this);
 			// Animate Progress Bar on Scroll
 			progress.animate({
 				transform: ['scaleX(0)', 'scaleX(1)']
@@ -47,25 +31,27 @@ customElements.define(
 					]
 				})
 			});
-		}
-
-		get source() {
-			if (this.hasAttribute('source')) {
-				return (
-					document.querySelector(this.getAttribute('source')) ||
-					document.scrollingElement
-				);
-			} else {
-				return document.scrollingElement;
-			}
-		}
-
-		set source(val) {
-			if (typeof val === 'string' && val.length !== 0) {
-				this.setAttribute('source', val);
-			} else {
-				this.removeAttribute('source');
-			}
+		} else {
+			this.remove();
 		}
 	}
-);
+
+	get source() {
+		if (this.hasAttribute('source')) {
+			return (
+				document.querySelector(this.getAttribute('source')) ||
+				document.scrollingElement
+			);
+		} else {
+			return document.scrollingElement;
+		}
+	}
+
+	set source(val) {
+		if (typeof val === 'string' && val.length !== 0) {
+			this.setAttribute('source', val);
+		} else {
+			this.removeAttribute('source');
+		}
+	}
+});
