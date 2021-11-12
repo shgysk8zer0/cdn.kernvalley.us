@@ -221,7 +221,7 @@ registerCustomElement('install-prompt', class HTMLInstallPromptElement extends H
 					case 'windows':
 						Promise.resolve(base.querySelector(`[data-platform="${platform}"]`)).then(btn => {
 							if (btn instanceof HTMLAnchorElement) {
-								const link = new URL(url, btn.href);
+								const link = typeof url === 'string' ? new URL(url, btn.href) : new URL(btn.href);
 
 								if (platform === 'play' && typeof id === 'string') {
 									link.searchParams.set('id', id);
