@@ -1,3 +1,7 @@
+/**
+ * @deprecated on 2021-11-19
+ * Use `<media-query>` instead
+ */
 import { registerCustomElement } from '../js/std-js/custom-elements.js';
 
 registerCustomElement('match-media', class HTMLMatchMediaElement extends HTMLElement {
