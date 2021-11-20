@@ -30,6 +30,11 @@
 				</span>
 				<div id="store-banners" part="banner">
 					<div id="platforms-container">
+						<button type="button" data-platform="webapp" part="store-badge pwa-badge" class="inline-block" title="Install Web App" hidden="">
+							<slot name="webapp-badge">
+								<img src="https://cdn.kernvalley.us/img/logos/play-badge.svg" height="53" width="180" loading="lazy" decoding="async" crossorigin="anonymous" referrerpolicy="no-referrer" alt="Google Play Store" />
+							</slot>
+						</button>
 						<a href="https://play.google.com/store/apps/details?id=" data-platform="play" part="store-badge play-badge" class="inline-block" title="Get it on Google Play" target="_blank" rel="norefferer noopener external" hidden="">
 							<slot name="play-badge">
 								<img src="https://cdn.kernvalley.us/img/logos/play-badge.svg" height="53" width="180" loading="lazy" decoding="async" crossorigin="anonymous" referrerpolicy="no-referrer" alt="Google Play Store" />

@@ -1,4 +1,5 @@
 import HTMLCustomElement from '../custom-element.js';
+import { registerButton } from '../../js/pwa-install.js';
 
 function getBySize(opts, width) {
 	if (Array.isArray(opts)) {
@@ -90,9 +91,9 @@ HTMLCustomElement.register('pwa-prompt', class HTMLPWAPromptElement extends HTML
 		screenshots          = null,
 		features             = null,
 		related_applications = [],
-	} = {}, event) {
+	} = {}) {
 		super();
-		this.attachShadow({mode: 'open'});
+		this.attachShadow({ mode: 'open' });
 
 		this.getTemplate('./components/pwa/prompt.html').then(tmp => {
 			tmp.querySelectorAll('[data-click]').forEach(el => {
@@ -102,15 +103,7 @@ HTMLCustomElement.register('pwa-prompt', class HTMLPWAPromptElement extends HTML
 						break;
 
 					case 'install':
-						if (event instanceof Event && event.prompt instanceof Function) {
-							el.addEventListener('click', async () => {
-								await event.prompt();
-								this.close({ install: true });
-							});
-						} else {
-							console.info({event});
-							el.addEventListener('click', () => this.close({ install: false }));
-						}
+						registerButton(el).catch(() => {});
 						break;
 				}
 			});
@@ -141,7 +134,7 @@ HTMLCustomElement.register('pwa-prompt', class HTMLPWAPromptElement extends HTML
 
 		if (Array.isArray(related_applications)) {
 			this.ready.then(() => {
-				related_applications.forEach(({platform, id, url}) => {
+				related_applications.forEach(({ platform, id, url }) => {
 					const btn = this.shadowRoot.querySelector(`[data-platform="${platform}"]`);
 
 					if (btn instanceof HTMLAnchorElement) {
@@ -156,6 +149,9 @@ HTMLCustomElement.register('pwa-prompt', class HTMLPWAPromptElement extends HTML
 						} else {
 							console.error(`Invalid entry for platform: ${platform}`);
 						}
+					} else if (btn instanceof HTMLButtonElement && btn.dataset.platform === 'webapp') {
+						//registerButton(btn).catch(nullFunction);
+						// should already be registered
 					}
 				});
 			});
