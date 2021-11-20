@@ -4,9 +4,13 @@
 import { registerCustomElement } from '../../js/std-js/custom-elements.js';
 import { getManifest } from '../../js/std-js/http.js';
 import { loadImage } from '../../js/std-js/loader.js';
+import { registerButton, promise, signal } from '../../js/std-js/pwa-install.js';
+import { css } from '../../js/std-js/dom.js';
 
 const loading = 'lazy';
 const height = 53;
+
+const styleImg = (img) => css(img, { width: 'auto', height: `${height}px` });
 
 if (! (navigator.getInstalledRelatedApps instanceof Function)) {
 	navigator.getInstalledRelatedApps = async () => [];
@@ -34,6 +38,7 @@ registerCustomElement('app-stores', class HTMLAppStoresElement extends HTMLEleme
 							height,
 							loading
 						}).then(img => {
+							styleImg(img);
 							const a = document.createElement('a');
 							a.classList.add('app-store', `store-${platform}`);
 							a.relList.add('noopener', 'noreferrer', 'external');
@@ -58,6 +63,7 @@ registerCustomElement('app-stores', class HTMLAppStoresElement extends HTMLEleme
 							height,
 							loading,
 						}).then(img => {
+							styleImg(img);
 							const a = document.createElement('a');
 							a.classList.add('app-store', `store-${platform}`);
 							a.relList.add('noopener', 'noreferrer', 'external');
@@ -77,6 +83,7 @@ registerCustomElement('app-stores', class HTMLAppStoresElement extends HTMLEleme
 							height,
 							loading,
 						}).then(img => {
+							styleImg(img);
 							const a = document.createElement('a');
 							a.classList.add('app-store', `store-${platform}`);
 							a.relList.add('noopener', 'noreferrer', 'external');
@@ -90,9 +97,41 @@ registerCustomElement('app-stores', class HTMLAppStoresElement extends HTMLEleme
 						}).catch(console.error);
 
 					case 'webapp':
-					case 'chrome_web_store':
-						console.info(`${platform} not currently supported`);
-						return '';
+						return loadImage('https://cdn.kernvalley.us/img/logos/pwa-badge.svg', {
+							alt: 'Web App',
+							part: ['store-badge', 'pwa-badge'],
+							width: 158,
+							height,
+							loading,
+						}).then(img => {
+							styleImg(img);
+							const btn = document.createElement('button');
+							btn.type = 'button';
+							btn.disabled = true;
+							btn.classList.add('app-store', `store-${platform}`);
+							btn.append(img);
+							css(btn, {
+								'appearance': 'none',
+								'-webkit-appearance': 'none',
+								'border': 'none',
+								'padding': '0',
+								'filter': 'grayscale(1)',
+								'cursor': 'not-allowed',
+							});
+
+							promise.then(() => {
+								css(btn, { 'filter': false, 'cursor': 'pointer' });
+							});
+
+							signal.addEventListener('abort', () => {
+								css(btn, { 'filter': 'grayscale(1)', 'cursor': 'not-allowed' });
+							}, { once: true });
+
+							registerButton(btn).catch(() => {});
+							return btn;
+						});
+
+						// case 'chrome_web_store':
 
 					default:
 						console.error(`Unknown platform: ${platform}`);

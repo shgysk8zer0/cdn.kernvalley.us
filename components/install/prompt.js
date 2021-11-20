@@ -4,6 +4,7 @@ import { loadStylesheet } from '../../js/std-js/loader.js';
 import { getHTML, getManifest } from '../../js/std-js/http.js';
 import { query, create, text, on, off } from '../../js/std-js/dom.js';
 import { hasGa, send } from '../../js/std-js/google-analytics.js';
+import { registerButton } from '../../js/std-js/pwa-install.js';
 import '../notification/html-notification.js';
 
 function getBySize(opts, width) {
@@ -80,13 +81,6 @@ function getIcon(...icons) {
 	}
 }
 
-const beforeinstallprompt = new Promise(resolve => {
-	window.addEventListener('beforeinstallprompt', event => {
-		event.preventDefault();
-		resolve(event);
-	}, { once: true });
-});
-
 if ('serviceWorker' in navigator && 'serviceWorker' in document.documentElement.dataset) {
 	const { serviceWorker, scope = '/' } = document.documentElement.dataset;
 	navigator.serviceWorker.register(serviceWorker, { scope }).catch(console.error);
@@ -143,6 +137,8 @@ registerCustomElement('install-prompt', class HTMLInstallPromptElement extends H
 				related_applications: relatedApps = [],/* prefer_related_applications: preferRelatedApps = false,*/
 			} = manifest;
 
+			registerButton(base.querySelector('.header-btn.install-btn')).catch(() => {});
+
 			if (Array.isArray(screenshots) && screenshots.length !==0) {
 				const screenshot = getPicture({
 					opts:         screenshots,
@@ -192,27 +188,7 @@ registerCustomElement('install-prompt', class HTMLInstallPromptElement extends H
 						Promise.resolve(base.querySelector('[data-platform="webapp"]')).then(btn => {
 							btn.hidden = false;
 
-							beforeinstallprompt.then(event => {
-								const installHandler = async () => {
-									const btns = query('[data-click="install"]', shadow);
-									btns.forEach(btn => btn.disabled = true);
-									off(btns, installHandler, { once: true });
-
-									await event.prompt();
-									const resp = await event.userChoice;
-
-									if (resp === 'accepted') {
-										this.open = false;
-									}
-								};
-
-								requestAnimationFrame(() => {
-									const btns = query('[data-click="install"]', shadow);
-
-									on(btns, 'click', installHandler, { once: true });
-									btns.forEach(btn => btn.disabled = false);
-								});
-							});
+							registerButton(btn).catch(() => {});
 						});
 						break;
 
