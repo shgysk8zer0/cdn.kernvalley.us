@@ -13,14 +13,48 @@ function init(worker, config) {
 	worker.addEventListener('install', async event => {
 		event.waitUntil((async () => {
 			try {
-				for (const key of await caches.keys()) {
-					if (key !== 'user') {
-						await caches.delete(key);
-					}
-				}
+				await caches.keys().then(async keys => {
+					await Promise.allSettled(keys.filter(key => ! [config.version, 'user'].include(key)).map(key => {
+						return caches.delete(key);
+					}));
+				}).catch(console.error);
 
 				const cache = await caches.open(config.version);
 				await cache.addAll([...config.stale || [], ...config.fresh || []]).catch(console.error);
+
+				if ('periodicSync' in config && 'periodicSync' in worker.registration) {
+					const tags = await worker.registration.periodicSync.getTags();
+					await Promise.allSettled(Object.entries(config.periodicSync).map(async ([tag, { minInterval, callback } = {}]) => {
+						if (typeof tag !== 'string') {
+							throw new TypeError('PeriodicSync tag must be a string');
+						} else if (! Number.isSafeInteger(minInterval)) {
+							throw new TypeError('PeriodicSync minInterval must be an integer');
+						} else if (! (callback instanceof Function)) {
+							throw new TypeError('PeriodicSync callback must be a function');
+						} else if (! tags.includess(tag)) {
+							await worker.registration.periodicSync.register(tag, { minInterval });
+						}
+					}));
+
+					await Promise.allSettled(tags.map(async tag => {
+						if (! (tag in config.periodicSync)) {
+							await worker.registration.periodicSync.unregister(tag);
+						}
+					}));
+
+					worker.addEventListener('periodicsync', event => {
+						const { callback } = config.periodicSync[event.tag];
+						if (callback instanceof Function) {
+							try {
+								callback.call(worker, { event, config });
+							} catch(err) {
+								console.error(err);
+							}
+						} else {
+							console.error(`Unhandled periodicSync tag: "${event.tag}"`);
+						}
+					});
+				}
 			} catch (err) {
 				console.error(err);
 			}
