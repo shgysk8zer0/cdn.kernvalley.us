@@ -29,8 +29,8 @@ function init(worker, config) {
 
 	if ('periodicSync' in config) {
 		worker.addEventListener('periodicsync', event => {
-			if (config[event.tag] instanceof Function) {
-				event.waitUntil(config[event.tag].call(worker, { config, event }));
+			if (config.periodicSync[event.tag] instanceof Function) {
+				event.waitUntil(config.periodicSync[event.tag].call(worker, { config, event }));
 			} else {
 				throw new Error(`Unhandled PeriodicSync tag: "${event.tag}"`);
 			}
