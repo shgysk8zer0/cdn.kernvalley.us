@@ -1,6 +1,3 @@
-/* @SEE https://github.com/w3c/manifest/wiki/Platforms */
-/* @TODO Handle `"webapp"` platform */
-
 import { registerCustomElement } from '../../js/std-js/custom-elements.js';
 import { getManifest } from '../../js/std-js/http.js';
 import { loadImage } from '../../js/std-js/loader.js';
@@ -111,12 +108,13 @@ registerCustomElement('app-stores', class HTMLAppStoresElement extends HTMLEleme
 							btn.classList.add('app-store', `store-${platform}`);
 							btn.append(img);
 							css(btn, {
-								'appearance': 'none',
 								'-webkit-appearance': 'none',
-								'border': 'none',
+								'appearance': 'none',
+								'border': '0 none',
 								'padding': '0',
 								'filter': 'grayscale(1)',
 								'cursor': 'not-allowed',
+								'background-color': 'transparent',
 							});
 
 							promise.then(() => {
