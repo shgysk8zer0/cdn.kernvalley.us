@@ -9,23 +9,22 @@ function getURL({ request: { url }}) {
 	}
 }
 
-function init(worker, config) {
-	worker.addEventListener('install', async event => {
-		event.waitUntil((async () => {
-			try {
-				await caches.keys().then(async keys => {
-					await Promise.allSettled(keys.filter(key => ! [config.version, 'user'].include(key)).map(key => {
-						return caches.delete(key);
-					}));
-				}).catch(console.error);
+async function clearOldCaches(...keep) {
+	return caches.keys().then(keys => Promise.allSettled(keys.map(key => {
+		if (keep.includes(key)) {
+			return Promise.resolve();
+		} else {
+			return caches.delete(key);
+		}
+	})));
+}
 
-				const cache = await caches.open(config.version);
-				await cache.addAll([...config.stale || [], ...config.fresh || []]).catch(console.error);
-			} catch (err) {
-				console.error(err);
-			}
-		})());
-	});
+function init(worker, config) {
+	worker.addEventListener('install', event => event.waitUntil(caches.open(config.version).then(async cache => {
+		await clearOldCaches(config.version);
+
+		await cache.addAll([...config.stale || [], ...config.fresh || []]).catch(console.error);
+	})));
 
 	if ('periodicSync' in config) {
 		worker.addEventListener('periodicsync', event => {
@@ -37,7 +36,10 @@ function init(worker, config) {
 		});
 	}
 
-	worker.addEventListener('activate', event => event.waitUntil(clients.claim()));
+	worker.addEventListener('activate', event => event.waitUntil(Promise.allSettled([
+		clients.claim(),
+		clearOldCaches(config.version),
+	])));
 
 	worker.addEventListener('fetch', event => {
 		if (event.request.method === 'GET') {
