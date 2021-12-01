@@ -35,6 +35,7 @@ function render(target) {
 
 	iframe.referrerPolicy = 'no-referrer';
 	iframe.sandbox.add('allow-scripts');
+	iframe.frameBorder = 0;
 
 	if (! Number.isNaN(width)) {
 		iframe.width = width;
