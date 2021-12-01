@@ -31,6 +31,8 @@ function render(target) {
 		src.searchParams.set('file', file);
 	}
 
+	script.referrerPolicy = 'no-referrer';
+	// script.crossOrigin = 'anonymous';
 	script.src = src.href;
 
 	iframe.referrerPolicy = 'no-referrer';
@@ -49,7 +51,7 @@ function render(target) {
 		iframe.part.add('embed');
 	}
 
-	iframe.srcdoc = `<!DOCTYPE html><head>${link.outerHTML}</head><html><body>${script.outerHTML}</body></html>`;
+	iframe.srcdoc = `<!DOCTYPE html><html><head>${link.outerHTML}</head><body>${script.outerHTML}</body></html>`;
 	shadow.append(iframe);
 }
 
