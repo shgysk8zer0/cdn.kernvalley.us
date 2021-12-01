@@ -31,6 +31,8 @@ function render(target) {
 		src.searchParams.set('file', file);
 	}
 
+	script.referrerPolicy = 'no-referrer';
+	// script.crossOrigin = 'anonymous';
 	script.src = src.href;
 
 	iframe.referrerPolicy = 'no-referrer';
