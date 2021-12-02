@@ -14,7 +14,13 @@ async function render(target) {
 			const iframe = document.createElement('iframe');
 			const script = document.createElement('script');
 			const parser = new DOMParser();
-			const doc = parser.parseFromString('<!DOCTYPE html><html><head></head><body><script>document.querySelectorAll("a").forEach(function(a){a.target="_blank";})</script></body></html>', 'text/html');
+			/*
+			 * Hacky method to avoid writing out a closing script tag.
+			 * This is the only way to write a script with inline code.
+			 * Iterate through all links and set target to _blank
+			 * The Gist script will be inserted before this one.
+			 */
+			const doc = parser.parseFromString('<script>document.querySelectorAll("a").forEach(function(a){a.target="_blank"})</'+'script>', 'text/html');
 			const link = document.createElement('link');
 			const src = new URL(`/${user}/${gist}.js`, 'https://gist.github.com');
 			link.rel = 'preconnect';
@@ -46,7 +52,6 @@ async function render(target) {
 			}
 
 			iframe.srcdoc = `<!DOCTYPE html><html>${doc.head.outerHTML}${doc.body.outerHTML}</html>`;
-			console.log(iframe.srcdoc);
 			shadow.replaceChildren(iframe);
 			target.dispatchEvent(new Event('rendered'));
 			protectedData.set(target, { shadow, timeout: null });
