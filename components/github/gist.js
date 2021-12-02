@@ -5,7 +5,7 @@ function render(target) {
 
 	if (Number.isInteger(timeout)) {
 		cancelAnimationFrame(timeout);
-		protectedData.set(this, { shadow, timeout: null });
+		protectedData.set(target, { shadow, timeout: null });
 	}
 	
 	protectedData.set(target, {
@@ -43,7 +43,7 @@ function render(target) {
 			iframe.srcdoc = `<!DOCTYPE html><head>${link.outerHTML}</head><html><body>${script.outerHTML}</body></html>`;
 			shadow.replaceChildren(iframe);
 			target.dispatchEvent(new Event('rendered'));
-			protectedData.set(this, { shadow, timeout: null });
+			protectedData.set(target, { shadow, timeout: null });
 		}),
 		shadow
 	}, 100);
