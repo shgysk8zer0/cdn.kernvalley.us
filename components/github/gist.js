@@ -56,7 +56,6 @@ const observer = new IntersectionObserver((entries, observer) => {
 		if (isIntersecting && protectedData.has(target)) {
 			observer.unobserve(target);
 			render(target);
-			protectedData.delete(target);
 		}
 	});
 }, {
