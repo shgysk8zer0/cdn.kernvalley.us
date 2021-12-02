@@ -20,7 +20,7 @@ async function render(target) {
 			 * Iterate through all links and set target to _blank
 			 * The Gist script will be inserted before this one.
 			 */
-			const doc = parser.parseFromString('<script>document.querySelectorAll("a").forEach(function(a){a.target="_blank"})</'+'script>', 'text/html');
+			const doc = parser.parseFromString('<body><script>document.querySelectorAll("a").forEach(function(a){a.target="_blank"})</'+'script></body>', 'text/html');
 			const link = document.createElement('link');
 			const src = new URL(`/${user}/${gist}.js`, 'https://gist.github.com');
 			link.rel = 'preconnect';
