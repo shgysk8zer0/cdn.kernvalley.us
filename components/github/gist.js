@@ -13,14 +13,7 @@ async function render(target) {
 			const { user, gist, file, height, width } = target;
 			const iframe = document.createElement('iframe');
 			const script = document.createElement('script');
-			const parser = new DOMParser();
-			/*
-			 * Hacky method to avoid writing out a closing script tag.
-			 * This is the only way to write a script with inline code.
-			 * Iterate through all links and set target to _blank
-			 * The Gist script will be inserted before this one.
-			 */
-			const doc = parser.parseFromString('<body><script>document.querySelectorAll("a").forEach(function(a){a.target="_blank"})</'+'script></body>', 'text/html');
+			const secondScript = document.createElement('script');
 			const link = document.createElement('link');
 			const src = new URL(`/${user}/${gist}.js`, 'https://gist.github.com');
 			link.rel = 'preconnect';
@@ -31,9 +24,7 @@ async function render(target) {
 			}
 
 			script.src = src.href;
-			
-			doc.head.append(link);
-			doc.body.prepend(script);
+			secondScript.text = 'document.querySelectorAll("a").forEach(function(a){a.target="_blank"});';
 
 			iframe.referrerPolicy = 'no-referrer';
 			iframe.sandbox.add('allow-scripts', 'allow-popups');
@@ -51,7 +42,7 @@ async function render(target) {
 				iframe.part.add('embed');
 			}
 
-			iframe.srcdoc = `<!DOCTYPE html><html>${doc.head.outerHTML}${doc.body.outerHTML}</html>`;
+			iframe.srcdoc = `<!DOCTYPE html><html><head>${link.outerHTML}</head><body>${script.outerHTML}${secondScript.outerHTML}</body></html>`;
 			shadow.replaceChildren(iframe);
 			target.dispatchEvent(new Event('rendered'));
 			protectedData.set(target, { shadow, timeout: null });
@@ -75,12 +66,55 @@ const observer = new IntersectionObserver((entries, observer) => {
 customElements.define('github-gist', class HTMLGitHubGistElement extends HTMLElement {
 	constructor() {
 		super();
-		const shadow = this.attachShadow({ mode: 'open' });
+		const shadow = this.attachShadow({ mode: 'closed' });
 		protectedData.set(this, { shadow, timeout: null });
 	}
 	
 	connectedCallback() {
 		this.dispatchEvent(new Event('connected'));
+	}
+	
+	async attributeChangedCallback(name, oldValue, newValue) {
+		if (oldValue !== newValue) {
+			await this.whenConnected;
+
+			switch(name) {
+				case 'loading':
+					if (protectedData.get(this).shadow.childElementCount === 0) {
+						if (newValue === 'lazy') {
+							observer.observe(this);
+						} else {
+							observer.unobserve(this);
+							render(this);
+						}
+					}
+					break;
+
+				case 'user':
+				case 'gist':
+				case 'file':
+					if (this.loading !== 'lazy') {
+						render(this);
+					}
+					break;
+
+				case 'width':
+				case 'height':
+					this.rendered.then(() => {
+						const iframe = protectedData.get(this).shadow.querySelector('iframe');
+
+						if (typeof newValue === 'string') {
+							iframe.setAttribute(name, newValue);
+						} else {
+							iframe.removeAttribute(name);
+						}
+					});
+					break;
+
+				default:
+					throw new DOMException(`Unhandled attribute changed: ${name}`);
+			}
+		}
 	}
 
 	get file() {
@@ -176,49 +210,6 @@ customElements.define('github-gist', class HTMLGitHubGistElement extends HTMLEle
 				this.addEventListener('connected', () => resolve(), { once: true });
 			}
 		});
-	}
-	
-	async attributeChangedCallback(name, oldValue, newValue) {
-		if (oldValue !== newValue) {
-			await this.whenConnected;
-
-			switch(name) {
-				case 'loading':
-					if (protectedData.get(this).shadow.childElementCount === 0) {
-						if (newValue === 'lazy') {
-							observer.observe(this);
-						} else {
-							observer.unobserve(this);
-							render(this);
-						}
-					}
-					break;
-
-				case 'user':
-				case 'gist':
-				case 'file':
-					if (this.loading !== 'lazy') {
-						render(this);
-					}
-					break;
-
-				case 'width':
-				case 'height':
-					this.rendered.then(() => {
-						const iframe = protectedData.get(this).shadow.querySelector('iframe');
-
-						if (typeof newValue === 'string') {
-							iframe.setAttribute(name, newValue);
-						} else {
-							iframe.removeAttribute(name);
-						}
-					});
-					break;
-
-				default:
-					throw new DOMException(`Unhandled attribute changed: ${name}`);
-			}
-		}
 	}
 	
 	static get observedAttributes() {
