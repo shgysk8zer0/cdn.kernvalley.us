@@ -25,7 +25,7 @@ function render(target) {
 			script.src = src.href;
 
 			iframe.referrerPolicy = 'no-referrer';
-			iframe.sandbox.add('allow-scripts');
+			iframe.sandbox.add('allow-scripts', 'allow-top-navigation-by-user-activation');
 			iframe.frameBorder = 0;
 
 			if (! Number.isNaN(width)) {
