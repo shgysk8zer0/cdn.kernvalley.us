@@ -42,7 +42,7 @@ function render(target) {
 
 			iframe.srcdoc = `<!DOCTYPE html><head>${link.outerHTML}</head><html><body>${script.outerHTML}</body></html>`;
 			shadow.replaceChildren(iframe);
-			target.dispatchEvent(new Event('load'));
+			target.dispatchEvent(new Event('rendered'));
 			protectedData.set(this, { shadow, timeout: null });
 		}),
 		shadow
@@ -131,6 +131,19 @@ customElements.define('github-gist', class HTMLGitHubGistElement extends HTMLEle
 			this.removeAtttribute('user');
 		}
 	}
+	
+	get rendered() {
+		return new Promise(async resolve => {
+			await this.whenConnected;
+			const { shadow } = protectedData.get(this);
+			
+			if (shadow.childElementCount === 0) {
+				this.addEventListener('rendered', () => resolve(), { once: true });
+			} else {
+				resolve();
+			}
+		});
+	}
 
 	get width() {
 		return parseInt(this.getAttribute('width'));
@@ -155,15 +168,45 @@ customElements.define('github-gist', class HTMLGitHubGistElement extends HTMLEle
 	}
 	
 	async attributeChangedCallback(name, oldValue, newValue) {
-		await this.whenConnected;
-		switch(name) {
-			case 'loading':
-				newValue === 'lazy' ? observer.observe(this) : observer.unobserve(this);
-				break;
-			default: 
-				if (this.loading !== 'lazy') {
-					render(this);
-				}
+		if (oldValue !== newValue) {
+			await this.whenConnected;
+
+			switch(name) {
+				case 'loading':
+					if (protectedData.get(this).shadow.childElementCount === 0) {
+						if (newValue === 'lazy') {
+							observer.observe(this);
+						} else {
+							observer.unobserve(this);
+							render(this);
+						}
+					}
+					break;
+
+				case 'user':
+				case 'gist':
+				case 'file':
+					if (this.loading !== 'lazy') {
+						render(this);
+					}
+					break;
+
+				case 'width':
+				case 'height':
+					this.rendered.then(() => {
+						const iframe = protectedData.get(this).shadow.querySelector('iframe');
+
+						if (typeof newValue === 'string') {
+							iframe.setAttribute(name, newValue);
+						} else {
+							iframe.removeAttribute(name);
+						}
+					});
+					break;
+
+				default:
+					throw new DOMException(`Unhandled attribute changed: ${name}`);
+			}
 		}
 	}
 	
