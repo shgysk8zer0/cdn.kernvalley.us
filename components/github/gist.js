@@ -55,7 +55,7 @@ const observer = new IntersectionObserver((entries, observer) => {
 	entries.forEach(({ target, isIntersecting }) => {
 		if (isIntersecting && protectedData.has(target)) {
 			observer.unobserve(target);
-			render(target);Do 
+			render(target);
 		}
 	});
 }, {
