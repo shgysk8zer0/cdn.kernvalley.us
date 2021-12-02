@@ -1,58 +1,52 @@
 const protectedData = new WeakMap();
 
 function render(target) {
-	const { user, gist, file, height, width } = target;
-	const { shadow } = protectedData.get(target);
-	const iframe = document.createElement('iframe');
-	const script = document.createElement('script');
-	const link = document.createElement('link');
-	const src = new URL(`/${user}/${gist}.js`, 'https://gist.github.com');
-	const controller = new AbortController();
-	link.rel = 'preconnect';
-	link.href = 'https://github.githubassets.com';
+	const { shadow, timeout } = protectedData.get(target);
 
-	iframe.addEventListener('load', () => {
-		target.dispatchEvent(new Event('load'));
-		controller.abort();
-	}, {
-		signal: controller.signal,
-		once: true,
-	});
-
-	iframe.addEventListener('error', () => {
-		target.dispatchEvent(new Event('error'));
-		controller.abort();
-	}, {
-		signal: controller.signal,
-		once: true,
-	});
-
-	if (typeof file === 'string' && file.length !== 0) {
-		src.searchParams.set('file', file);
+	if (Number.isInteger(timeout)) {
+		cancelAnimationFrame(timeout);
+		protectedData.set(this, { shadow, timeout: null });
 	}
+	
+	protectedData.set(target, {
+		timeout: requestAnimationFrame(() => {
+			const { user, gist, file, height, width } = target;
+			const iframe = document.createElement('iframe');
+			const script = document.createElement('script');
+			const link = document.createElement('link');
+			const src = new URL(`/${user}/${gist}.js`, 'https://gist.github.com');
+			link.rel = 'preconnect';
+			link.href = 'https://github.githubassets.com';
 
-	script.referrerPolicy = 'no-referrer';
-	// script.crossOrigin = 'anonymous';
-	script.src = src.href;
+			if (typeof file === 'string' && file.length !== 0) {
+				src.searchParams.set('file', file);
+			}
 
-	iframe.referrerPolicy = 'no-referrer';
-	iframe.sandbox.add('allow-scripts');
-	iframe.frameBorder = 0;
+			script.src = src.href;
 
-	if (! Number.isNaN(width)) {
-		iframe.width = width;
-	}
+			iframe.referrerPolicy = 'no-referrer';
+			iframe.sandbox.add('allow-scripts');
+			iframe.frameBorder = 0;
 
-	if (! Number.isNaN(height)) {
-		iframe.height = height;
-	}
+			if (! Number.isNaN(width)) {
+				iframe.width = width;
+			}
 
-	if ('part' in iframe) {
-		iframe.part.add('embed');
-	}
+			if (! Number.isNaN(height)) {
+				iframe.height = height;
+			}
 
-	iframe.srcdoc = `<!DOCTYPE html><html><head>${link.outerHTML}</head><body>${script.outerHTML}</body></html>`;
-	shadow.append(iframe);
+			if ('part' in iframe) {
+				iframe.part.add('embed');
+			}
+
+			iframe.srcdoc = `<!DOCTYPE html><head>${link.outerHTML}</head><html><body>${script.outerHTML}</body></html>`;
+			shadow.replaceChildren(iframe);
+			target.dispatchEvent(new Event('load'));
+			protectedData.set(this, { shadow, timeout: null });
+		}),
+		shadow
+	}, 100);
 }
 
 const observer = new IntersectionObserver((entries, observer) => {
@@ -64,26 +58,18 @@ const observer = new IntersectionObserver((entries, observer) => {
 		}
 	});
 }, {
-	rootMargin: `${Math.round(0.5 * screen.height)}px`,
-	root: document.body,
+	rootMargin: `${Math.floor(0.5 * Math.max(screen.height, 200))}px`,
 });
 
 customElements.define('github-gist', class HTMLGitHubGistElement extends HTMLElement {
 	constructor() {
 		super();
 		const shadow = this.attachShadow({ mode: 'open' });
-		protectedData.set(this, { shadow });
+		protectedData.set(this, { shadow, timeout: null });
 	}
-
+	
 	connectedCallback() {
-		switch(this.loading) {
-			case 'lazy':
-				observer.observe(this);
-				break;
-
-			default:
-				render(this);
-		}
+		this.dispatchEvent(new Event('connected'));
 	}
 
 	get file() {
@@ -94,7 +80,7 @@ customElements.define('github-gist', class HTMLGitHubGistElement extends HTMLEle
 		if (typeof val === 'string' && val.length !== 0) {
 			this.setAttribute('file', val);
 		} else {
-			this.removeAtttribute('file');
+			this.removeAttribute('file');
 		}
 	}
 
@@ -106,7 +92,7 @@ customElements.define('github-gist', class HTMLGitHubGistElement extends HTMLEle
 		if (typeof val === 'string' && val.length !== 0) {
 			this.setAttribute('gist', val);
 		} else {
-			this.removeAtttribute('gist');
+			this.removeAttribute('gist');
 		}
 	}
 
@@ -156,5 +142,32 @@ customElements.define('github-gist', class HTMLGitHubGistElement extends HTMLEle
 		} else {
 			this.removeAttribute('width');
 		}
+	}
+	
+	get whenConnected() {
+		return new Promise(resolve => {
+			if (this.isConnected) {
+				resolve();
+			} else {
+				this.addEventListener('connected', () => resolve(), { once: true });
+			}
+		});
+	}
+	
+	async attributeChangedCallback(name, oldValue, newValue) {
+		await this.whenConnected;
+		switch(name) {
+			case 'loading':
+				newValue === 'lazy' ? observer.observe(this) : observer.unobserve(this);
+				break;
+			default: 
+				if (this.loading !== 'lazy') {
+					render(this);
+				}
+		}
+	}
+	
+	static get observedAttributes() {
+		return ['user', 'gist', 'file', 'loading', 'width', 'height'];
 	}
 });
