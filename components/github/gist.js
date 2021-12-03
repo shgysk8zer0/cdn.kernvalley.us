@@ -214,4 +214,16 @@ customElements.define('github-gist', class HTMLGitHubGistElement extends HTMLEle
 	static get observedAttributes() {
 		return ['user', 'gist', 'file', 'loading', 'width', 'height'];
 	}
+	
+	static getGist({ user, gist, file, loading = 'eager', height = 250, width = 400 }) {
+		const el = new HTMLGitHubGistElement();
+		el.loading = loading;
+		el.height = height;
+		el.width = width;
+		el.user = user;
+		el.gist = gist;
+		el.file = file;
+
+		return el;
+	}
 });
