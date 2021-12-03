@@ -22,7 +22,7 @@ function render(el) {
 	}
 	
 	iframe.src = src.href;
-	el.shadowRoot.replaceChildren(iframe);
+	shadowRoot.replaceChildren(iframe);
 }
 customElements.define('codepen-embed', class HTMLCodePenEmbedElement extends HTMLElement {
 	constructor() {
