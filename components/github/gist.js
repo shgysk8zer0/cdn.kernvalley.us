@@ -172,7 +172,7 @@ customElements.define('github-gist', class HTMLGitHubGistElement extends HTMLEle
 		if (typeof val === 'string' && val.length !== 0) {
 			this.setAttribute('user', val);
 		} else {
-			this.removeAtttribute('user');
+			this.removeAttribute('user');
 		}
 	}
 	
