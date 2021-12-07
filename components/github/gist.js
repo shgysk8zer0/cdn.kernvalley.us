@@ -13,18 +13,18 @@ async function render(target) {
 			const { user, gist, file, height, width } = target;
 			const iframe = document.createElement('iframe');
 			const script = document.createElement('script');
-			const secondScript = document.createElement('script');
 			const link = document.createElement('link');
+			const base = document.createElement('base');
 			const src = new URL(`/${user}/${gist}.js`, 'https://gist.github.com');
 			link.rel = 'preconnect';
 			link.href = 'https://github.githubassets.com';
+			base.target = '_blank';
 
 			if (typeof file === 'string' && file.length !== 0) {
 				src.searchParams.set('file', file);
 			}
 
 			script.src = src.href;
-			secondScript.text = 'document.querySelectorAll("a").forEach(function(a){a.target="_blank"});';
 
 			iframe.referrerPolicy = 'no-referrer';
 			iframe.sandbox.add('allow-scripts', 'allow-popups');
@@ -42,7 +42,7 @@ async function render(target) {
 				iframe.part.add('embed');
 			}
 
-			iframe.srcdoc = `<!DOCTYPE html><html><head>${link.outerHTML}</head><body>${script.outerHTML}${secondScript.outerHTML}</body></html>`;
+			iframe.srcdoc = `<!DOCTYPE html><html><head>${base.outerHTML}${link.outerHTML}</head><body>${script.outerHTML}</body></html>`;
 			shadow.replaceChildren(iframe);
 			target.dispatchEvent(new Event('rendered'));
 			protectedData.set(target, { shadow, timeout: null });
