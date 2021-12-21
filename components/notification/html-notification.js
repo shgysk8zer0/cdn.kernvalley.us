@@ -1,4 +1,5 @@
 import HTMLCustomElement from '../custom-element.js';
+import { getDeferred } from '../../js/std-js/promises.js';
 
 function getSlot(name, base) {
 	const slot = base.shadowRoot.querySelector(`slot[name="${name}"]`);
@@ -39,6 +40,7 @@ export class HTMLNotificationElement extends HTMLCustomElement {
 		timestamp = Date.now(),
 		requireInteraction = false,
 		actions = [],
+		signal = undefined,
 	} = {}) {
 		super();
 		this.attachShadow({ mode: 'open' });
@@ -54,7 +56,7 @@ export class HTMLNotificationElement extends HTMLCustomElement {
 			this.onerror = null;
 		});
 
-		this.getTemplate('./components/notification/html-notification.html').then(tmp => {
+		this.getTemplate('./components/notification/html-notification.html', { signal }).then(tmp => {
 			tmp.querySelector('[part="close"]').addEventListener('click', () => this.close(), {
 				capture: true,
 				once: true,
@@ -185,7 +187,7 @@ export class HTMLNotificationElement extends HTMLCustomElement {
 		}
 
 		this.addEventListener('close', () => {
-			if (this.animate instanceof Function) {
+			if (! this.hidden && this.isConnected && this.animate instanceof Function) {
 				this.animate([{
 					opacity: 1,
 					transform: 'none',
@@ -204,27 +206,58 @@ export class HTMLNotificationElement extends HTMLCustomElement {
 			once: true,
 		});
 
-		if (! (this.parentElement instanceof HTMLElement)) {
+		if (! this.isConnected && ! (signal instanceof AbortSignal && signal.aborted)) {
 			document.body.append(this);
 		}
 
-		if (! this.requireInteraction) {
-			setTimeout(() => this.close(), 5000);
-		}
-
 		this.addEventListener('show', () => {
+			if (! this.requireInteraction) {
+				setTimeout(() => this.close(), 5000);
+			}
+
 			const pattern = this.vibrate;
 			if (! this.silent && pattern.length !== 0 && ! pattern.every(n => n === 0)  && (navigator.vibrate instanceof Function)) {
 				navigator.vibrate(this.vibrate);
 			}
 		}, {
 			once: true,
+			signal,
 		});
 
+		if (signal instanceof AbortSignal && ! signal.aborted) {
+			signal.addEventListener('abort', () => {
+				if (this.hidden) {
+					this.remove();
+				} else {
+					this.close();
+				}
+			}, { once: true });
+		}
+
 		this.stylesLoaded.then(() => {
-			this.hidden = false;
-			this.dispatchEvent(new Event('show'));
+			if ('locks' in navigator && navigator.locks.request instanceof Function) {
+				navigator.locks.request('html-notification', { mode: 'exclusive', signal }, async () => {
+					const { resolve, promise } = getDeferred();
+					this.hidden = false;
+					this.dispatchEvent(new Event('show'));
+					this.addEventListener('close', resolve);
+					await promise;
+				});
+			} else {
+				this.hidden = false;
+				this.dispatchEvent(new Event('show'));
+			}
 		});
+	}
+
+	connectedCallback() {
+		this.dispatchEvent(new Event('connected'));
+	}
+
+	disconnectedCallback() {
+		if (! this.hidden) {
+			this.dispatchEvent(new Event('close'));
+		}
 	}
 
 	get actions() {
@@ -357,6 +390,16 @@ export class HTMLNotificationElement extends HTMLCustomElement {
 		} else if (Number.isInteger(value) || typeof value === 'string') {
 			this.setAttribute('vibrate', value);
 		}
+	}
+
+	get whenConnected() {
+		return new Promise(resolve => {
+			if (this.isConnected) {
+				resolve();
+			} else {
+				this.addEventListener('connected', () => resolve(), { once: true });
+			}
+		});
 	}
 
 	close() {
