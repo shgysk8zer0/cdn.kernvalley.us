@@ -1,3 +1,6 @@
+import { polyfill } from './std-js/CookieStore.js';
+polyfill();
+
 export async function setTheme(value, { name = 'theme', domain = null, expires = null, strict = true, sameSite = 'Lax' } = {}) {
 	return cookieStore.set({ name, value, domain, expires, strict, sameSite });
 }
