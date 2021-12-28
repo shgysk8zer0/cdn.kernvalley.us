@@ -50,6 +50,7 @@
     "build": "npm run build:js && npm run build:icons && npm run build:markers",
     "build:js": "npm run build:js:maps && npm run build:js:ads && npm run build:js:events && npm run build:js:weather && npm run build:js:share",
     "build:js:ads": "if [ -f 'rollup.ads.config.js' ]; then rollup -c rollup.ads.config.js; fi",
+    "build:js:polyfill": "if [ -f 'rollup.polyfill.config.js' ]; then rollup -c rollup.polyfill.config.js; fi",
     "build:js:events": "if [ -f 'rollup.events.config.js' ]; then rollup -c rollup.events.config.js; fi",
     "build:js:maps": "if [ -f 'rollup.map.config.js' ]; then rollup -c rollup.map.config.js; fi",
     "build:js:share": "if [ -f 'rollup.share.config.js' ]; then rollup -c rollup.share.config.js; fi",
