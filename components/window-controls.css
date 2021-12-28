@@ -44,6 +44,7 @@
 	}
 
 	::slotted([slot="titlebar"]) {
+		margin: 0;
 		-webkit-app-region: no-drag;
 		app-region: no-drag;
 	}

@@ -17,16 +17,14 @@ function getUpdateDisplayCallback(el) {
 		const titlebar = el[symbols.shadow].querySelector('slot[name="titlebar"]');
 		const fallback = el[symbols.shadow].querySelector('slot[name="fallback"]');
 
-		if (navigator.windowControlsOverlay.visible) {
-			titlebar.hidden = false;
-			fallback.hidden = true;
-			el.hidden = false;
+		if (el.overlayVisible) {
+			[el, titlebar, ...titlebar.assignedElements()].forEach(el => el.hidden = false);
+			[fallback, ...fallback.assignedElements()].forEach(el => el.hidden = true);
 		} else if (fallback.assignedElements().length === 0) {
 			el.hidden = true;
 		} else {
-			el.hidden = false;
-			titlebar.hidden = true;
-			fallback.hidden = false;
+			[titlebar, ...titlebar.assignedElements()].forEach(el => el.hidden = true);
+			[el, fallback, ...fallback.assignedElements()].forEach(el => el.hidden = false);
 		}
 	});
 }
@@ -61,6 +59,9 @@ registerCustomElement('window-controls', class HTMLWindowControlsElements extend
 			callback();
 			navigator.windowControlsOverlay.addEventListener('geometrychange', callback);
 			this.dispatchEvent(new Event('connected'));
+		} else {
+			const callback = getUpdateDisplayCallback(this);
+			callback();
 		}
 	}
 
