@@ -3,6 +3,7 @@ import { displayMode } from '../js/std-js/media-queries.js';
 import { loadStylesheet } from '../js/std-js/loader.js';
 import { getDeferred } from '../js/std-js/promises.js';
 import { debounce } from '../js/std-js/events.js';
+import { meta } from '../import.meta.js';
 const symbols = {
 	shadow: Symbol('shadow'),
 };
@@ -47,7 +48,7 @@ registerCustomElement('window-controls', class HTMLWindowControlsElements extend
 
 		requestAnimationFrame(async () => {
 			container.append(titlebar, fallback, grabRegion);
-			await loadStylesheet('/components/window-controls.css', { parent: this[symbols.shadow] });
+			await loadStylesheet(new URL('./components/window-controls.css', meta.url), { parent: this[symbols.shadow] });
 			this[symbols.shadow].append(container);
 			this.dispatchEvent(new Event('load'));
 		});
