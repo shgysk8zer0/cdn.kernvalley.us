@@ -5,6 +5,7 @@
 		<meta name="viewport" content="width=device-width" />
 		<meta name="referrer" content="no-referrer" />
 		<meta name="color-scheme" content="light dark" />
+		<link rel="manifest" href="/webapp.webmanifest" />
 		<link rel="icon" href="/img/kernvalley-icons/kernvalley.svg" type="image/svg+xml" />
 		<link rel="preload" href="/components/github/user.html" as="fetch" type="text/html" referrerpolicy="no-referrer" />
 		<link rel="preload" href="/components/leaflet/map.css" as="style" type="text/css" referrerpolicy="no-referrer" crossorigin="anonymous" />
@@ -20,6 +21,7 @@
 		<script type="module" src="/components/github/user.js" referrerpolicy="no-referrer"></script>
 		<script type="module" src="/components/ad/block.js" referrerpolicy="no-referrer"></script>
 		<script type="module" src="/components/share-button.js" referrerpolicy="no-referrer"></script>
+		<script type="module" src="/components/window-controls.js" referrerpolicy="no-referrer"></script>
 		<script type="module" src="/components/share-to-button/share-to-button.js" referrerpolicy="no-referrer"></script>
 		<script type="module" src="/components/weather/current.js" referrerpolicy="no-referrer"></script>
 		<script type="module" src="/components/leaflet/map.js" referrerpolicy="no-referrer"></script>
@@ -39,6 +41,9 @@
 		<link rel="stylesheet" href="/css/core-css/forms.css" referrerpolicy="no-referrer" />
 		<link rel="stylesheet" href="/css/core-css/layout/right-sidebar/index.css" referrerpolicy="no-referrer" media="screen" />
 		<title>KernValley.us | CDN</title>
+		<script type="module">
+			navigator.serviceWorker.register('/sw.js').catch(console.error);
+		</script>
 	</head>
 	<body class="grid border-box background-primary color-default font-main">
 		<header id="header" class="contain-content center">
@@ -46,9 +51,20 @@
 			<github-user user="kernvalley"></github-user>
 			<github-user user="shgysk8zer0"></github-user>
 		</header>
+		<window-controls hidden="">
+			<div class="flex row no-wrap" slot="titlebar" hidden="">
+				<button is="app-list" class="btn btn-default" title="Show KRV Apps" source="krv-cdn" hidden="">
+					<svg fill="currentColor" class="icon" width="32" height="32" viewBox="0 0 24.00 24.00">
+						<path stroke-width="0.2" stroke-linejoin="round" d="M 15.9994,19.9981L 19.9994,19.9981L 19.9994,15.9981L 15.9994,15.9981M 15.9994,13.9981L 19.9994,13.9981L 19.9994,9.99807L 15.9994,9.99807M 9.99938,7.99807L 13.9994,7.99807L 13.9994,3.99807L 9.99938,3.99807M 15.9994,7.99807L 19.9994,7.99807L 19.9994,3.99807L 15.9994,3.99807M 9.99938,13.9981L 13.9994,13.9981L 13.9994,9.99807L 9.99938,9.99807M 3.99938,13.9981L 7.99938,13.9981L 7.99938,9.99807L 3.99938,9.99807M 3.99938,19.9981L 7.99938,19.9981L 7.99938,15.9981L 3.99938,15.9981M 9.99938,19.9981L 13.9994,19.9981L 13.9994,15.9981L 9.99938,15.9981M 3.99938,7.99807L 7.99938,7.99807L 7.99938,3.99807L 3.99938,3.99807L 3.99938,7.99807 Z "/>
+					</svg>
+				</button>
+				<img src="/img/branding/kernvalley.us.svg" alt="logo" height="32" width="32" loading="lazy" />
+				<b >KernValley.US CDN</b>
+			</div>
+		</window-controls>
 		<nav id="nav" class="contain-content background-primary adwaita-toolbar sticky top shadow z-4 flex row no-wrap overflow-x-auto">
-			<button is="app-list" class="btn btn-primary" title="Show KRV Apps" source="krv-cdn" hidden="">
-				<svg fill="currentColor" class="icon" width="24" height="24" viewBox="0 0 24.00 24.00">
+			<button is="app-list" class="btn btn-default" title="Show KRV Apps" source="krv-cdn" slot="titlebar" hidden="">
+				<svg fill="currentColor" class="icon" width="32" height="32" viewBox="0 0 24.00 24.00">
 					<path stroke-width="0.2" stroke-linejoin="round" d="M 15.9994,19.9981L 19.9994,19.9981L 19.9994,15.9981L 15.9994,15.9981M 15.9994,13.9981L 19.9994,13.9981L 19.9994,9.99807L 15.9994,9.99807M 9.99938,7.99807L 13.9994,7.99807L 13.9994,3.99807L 9.99938,3.99807M 15.9994,7.99807L 19.9994,7.99807L 19.9994,3.99807L 15.9994,3.99807M 9.99938,13.9981L 13.9994,13.9981L 13.9994,9.99807L 9.99938,9.99807M 3.99938,13.9981L 7.99938,13.9981L 7.99938,9.99807L 3.99938,9.99807M 3.99938,19.9981L 7.99938,19.9981L 7.99938,15.9981L 3.99938,15.9981M 9.99938,19.9981L 13.9994,19.9981L 13.9994,15.9981L 9.99938,15.9981M 3.99938,7.99807L 7.99938,7.99807L 7.99938,3.99807L 3.99938,3.99807L 3.99938,7.99807 Z "/>
 				</svg>
 			</button>
