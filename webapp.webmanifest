@@ -1,0 +1,29 @@
+{
+  "name": "KernValley.US CDN",
+  "short_name": "KRV CDN",
+  "id": "cdn",
+  "icons": [{
+    "src": "/img/branding/kernvalley.us.svg",
+    "type": "image/svg+xml",
+    "sizes": "any",
+    "purpose": "any"
+  }],
+  "version": "1.0.0",
+  "start_url": "/",
+  "lang": "en",
+  "description": "CDN for KernValley.US sites & apps",
+  "theme_color": "#228282",
+  "background_color": "#343434",
+  "display": "standalone",
+  "display_override": ["window-controls-overlay"],
+  "orientation": "any",
+  "categories": [
+    "business",
+    "utilities"
+  ],
+  "prefer_related_applications": false,
+  "related_applications":  [{
+    "platform": "webapp",
+    "url": "/webapp.webmanifest"
+  }]
+}
