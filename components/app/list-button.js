@@ -1,8 +1,14 @@
 import { css, attr } from '../../js/std-js/dom.js';
 import { registerCustomElement } from '../../js/std-js/custom-elements.js';
-import { loadImage } from '../../js/std-js/loader.js';
+import { loadImage, preload } from '../../js/std-js/loader.js';
 import { getJSON } from '../../js/std-js/http.js';
 import { hasGa, send } from '../../js/std-js/google-analytics.js';
+import { getDeferred } from '../../js/std-js/promises.js';
+const { resolve, promise: def } = getDeferred();
+
+const SRC = 'https://apps.kernvalley.us/apps.json';
+
+const appPromise = def.then(() => getJSON(SRC));
 
 const X = '<svg width="12" height="16" fill="currentColor" viewBox="0 0 12 16"><path fill-rule="evenodd" d="M7.48 8l3.75 3.75-1.48 1.48L6 9.48l-3.75 3.75-1.48-1.48L4.52 8 .77 4.25l1.48-1.48L6 6.52l3.75-3.75 1.48 1.48L7.48 8z"/></svg>';
 
@@ -227,10 +233,19 @@ registerCustomElement('app-list', class HTMLKernValleyAppListButtonlement extend
 		dialog.showModal();
 	}
 
+	static preloadData() {
+		preload(SRC, {
+			as: 'fetch',
+			type: 'application/json',
+			importance: 'high',
+		});
+	}
+
 	static async getAppList({ source = null, medium = null, content = null,
 		dev = false, host = false,
 	} = {}) {
-		const list = await getJSON('https://apps.kernvalley.us/apps.json');
+		resolve();
+		const list = await appPromise;
 
 		if (Array.isArray(list)) {
 			const apps = list.map(app => {
