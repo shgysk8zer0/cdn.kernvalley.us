@@ -2,8 +2,18 @@ import HTMLCustomElement from '../custom-element.js';
 import { save, open } from '../../js/std-js/filesystem.js';
 import { popup } from '../../js/std-js/popup.js';
 import { css, attr, on, off, loaded } from '../../js/std-js/dom.js';
+import { loadStylesheet } from '../../js/std-js/loader.js';
 import { hasGa, send } from '../../js/std-js/google-analytics.js';
+import { getHTML } from '../../js/std-js/http.js';
+import { meta } from '../../import.meta.js';
 import UTM from '../../js/std-js/UTM.js';
+
+const templatePromise = getHTML(new URL('./components/ad/block.html', meta.url));
+
+async function getTemplate() {
+	const tmp = await templatePromise;
+	return tmp.cloneNode(true);
+}
 
 function log(eventAction, ad, transport = 'beacon') {
 	if (hasGa() && ! ad.preview) {
@@ -224,8 +234,9 @@ HTMLCustomElement.register('ad-block', class HTMLAdBlockElement extends HTMLCust
 		Promise.allSettled([
 			this.whenConnected,
 			this.whenLoad,
+			loadStylesheet(new URL('./components/ad/block.css', meta.url), { parent: this.shadowRoot }),
 		]).then(() => {
-			this.getTemplate('./components/ad/block.html').then(tmp => {
+			getTemplate().then(tmp => {
 				tmp.querySelectorAll('slot[name]').forEach(el => {
 					if (['label', 'description', 'image'].includes(el.name)) {
 						el.addEventListener('slotchange', ({ target }) => {

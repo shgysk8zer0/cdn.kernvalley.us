@@ -1,11 +1,16 @@
 import { registerCustomElement } from '../../js/std-js/custom-elements.js';
-import { getManifest } from '../../js/std-js/http.js';
+import { manifestPromise } from '../../js/std-js/promises.js';
 import { loadImage } from '../../js/std-js/loader.js';
 import { registerButton, promise, signal } from '../../js/std-js/pwa-install.js';
 import { css } from '../../js/std-js/dom.js';
+import { meta } from '../../import.meta.js';
 
 const loading = 'lazy';
 const height = 53;
+
+const getManifest = async () => await manifestPromise;
+
+const getLogoUrl(path => new URL(path, meta.url).href);
 
 const styleImg = (img) => css(img, { width: 'auto', height: `${height}px` });
 
@@ -28,7 +33,7 @@ registerCustomElement('app-stores', class HTMLAppStoresElement extends HTMLEleme
 			}).map(({ platform, id, url }) => {
 				switch(platform) {
 					case 'play':
-						return loadImage('https://cdn.kernvalley.us/img/logos/play-badge.svg', {
+						return loadImage(getLogoUrl('./img/logos/play-badge.svg'), {
 							alt: 'Google Play Store',
 							part: ['store-badge', 'play-store-badge'],
 							width: 180,
@@ -53,7 +58,7 @@ registerCustomElement('app-stores', class HTMLAppStoresElement extends HTMLEleme
 						}).catch(console.error);
 
 					case 'itunes':
-						return loadImage('https://cdn.kernvalley.us/img/logos/itunes-badge.svg', {
+						return loadImage(getLogoUrl('./img/logos/itunes-badge.svg'), {
 							alt: 'App Store',
 							part: ['store-badge', 'app-store-badge'],
 							width: 158,
@@ -72,8 +77,48 @@ registerCustomElement('app-stores', class HTMLAppStoresElement extends HTMLEleme
 							return a;
 						}).catch(console.error);
 
+					case 'f-droid':
+						return loadImage(getLogoUrl('./img/logos/f-droid-badge.svg'), {
+							alt: 'F-Droid',
+							part: ['store-badge', 'f-droid-badge'],
+							width: 158,
+							height,
+							loading,
+						}).then(img => {
+							styleImg(img);
+							const a = document.createElement('a');
+							a.classList.add('app-store', `store-${platform}`);
+							a.relList.add('noopener', 'noreferrer', 'external');
+
+							if (typeof url === 'string') {
+								a.href = new URL(url, document.baseURI).href;
+							}
+							a.append(img);
+							return a;
+						}).catch(console.error);
+
+					case 'amazon':
+						return loadImage(getLogoUrl('./img/logos/amazon-appstore-badge.svg'), {
+							alt: 'App Store',
+							part: ['store-badge', 'amazon-appstore-badge'],
+							width: 158,
+							height,
+							loading,
+						}).then(img => {
+							styleImg(img);
+							const a = document.createElement('a');
+							a.classList.add('app-store', `store-${platform}`);
+							a.relList.add('noopener', 'noreferrer', 'external');
+
+							if (typeof url === 'string') {
+								a.href = new URL(url, document.baseURI).href;
+							}
+							a.append(img);
+							return a;
+						}).catch(console.error);
+
 					case 'windows':
-						return loadImage('https://cdn.kernvalley.us/img/logos/windows-badge.svg', {
+						return loadImage(getLogoUrl('./img/logos/windows-badge.svg'), {
 							alt: 'Microsoft Store',
 							part: ['store-badge', 'windows-store-badge'],
 							width: 158,
@@ -94,7 +139,7 @@ registerCustomElement('app-stores', class HTMLAppStoresElement extends HTMLEleme
 						}).catch(console.error);
 
 					case 'webapp':
-						return loadImage('https://cdn.kernvalley.us/img/logos/pwa-badge.svg', {
+						return loadImage(getLogoUrl('/img/logos/pwa-badge.svg'), {
 							alt: 'Web App',
 							part: ['store-badge', 'pwa-badge'],
 							width: 158,

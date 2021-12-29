@@ -1,11 +1,21 @@
 import { registerCustomElement, getCustomElement } from '../../js/std-js/custom-elements.js';
 import { meta } from '../../import.meta.js';
 import { loadStylesheet } from '../../js/std-js/loader.js';
-import { getHTML, getManifest } from '../../js/std-js/http.js';
+import { getHTML } from '../../js/std-js/http.js';
 import { query, create, text, on, off } from '../../js/std-js/dom.js';
 import { hasGa, send } from '../../js/std-js/google-analytics.js';
 import { registerButton } from '../../js/std-js/pwa-install.js';
+import { manifestPromise } from '../../js/std-js/promises.js';
 import '../notification/html-notification.js';
+
+const getManifest = async () => await manifestPromise;
+
+const templatePromise = getHTML(new URL('./components/install/prompt.html', meta.url));
+
+async function getTemplate() {
+	const tmp = await templatePromise;
+	return tmp.cloneNode(true);
+}
 
 function getBySize(opts, width) {
 	if (Array.isArray(opts)) {
@@ -126,7 +136,7 @@ registerCustomElement('install-prompt', class HTMLInstallPromptElement extends H
 		const shadow = this.attachShadow({ mode: 'closed' });
 
 		Promise.all([
-			getHTML(new URL('./components/install/prompt.html', meta.url)),
+			getTemplate(),
 			getManifest(),
 			loadStylesheet(new URL('./components/install/prompt.css', meta.url), { parent: shadow }),
 		]).then(async ([base, manifest]) => {

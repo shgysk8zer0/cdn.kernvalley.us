@@ -1,8 +1,9 @@
 import './prompt.js';
 import { confirm } from '../../js/std-js/asyncDialog.js';
 import { registerCustomElement } from '../../js/std-js/custom-elements.js';
-import { getManifest } from '../../js/std-js/http.js';
+import { manifestPromise } from '../../js/std-js/promises.js';
 import { hasGa, send } from '../../js/std-js/google-analytics.js';
+const getManifest = async () => manifestPromise;
 
 registerCustomElement('pwa-install', class HTMLPWAInstallButton extends HTMLButtonElement {
 	constructor(src = null, {
