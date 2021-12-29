@@ -5,10 +5,11 @@ import { loadStylesheet } from '../../js/std-js/loader.js';
 import { getDeferred } from '../../js/std-js/promises.js';
 const ENDPOINT = 'https://api.github.com';
 import HTMLCustomElement from '../custom-element.js';
-
-const templatePromise = getHTML(new URL('./components/github/user.html', meta.url));
+const { resolve, promise: def } = getDeferred();
+const templatePromise = def.then(() => getHTML(new URL('./components/github/user.html', meta.url)));
 
 async function getTemplate() {
+	resolve();
 	const tmp = await templatePromise;
 	return tmp.cloneNode(true);
 }

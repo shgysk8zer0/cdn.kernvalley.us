@@ -3,13 +3,17 @@ import { hasGa, send } from '../../js/std-js/google-analytics.js';
 import { popup } from '../../js/std-js/popup.js';
 import { getHTML } from '../../js/std-js/http.js';
 import { meta } from '../../import.meta.js';
+import { getDeferred } from '../../js/std-js/promises.js';
 import { loadStylesheet } from '../../js/std-js/loader.js';
 import { Facebook, Twitter, Reddit, LinkedIn, Gmail, Pinterest, Email, Tumblr, Telegram, getShareURL }
 	from '../../js/std-js/share-targets.js';
 
-const templatePromise = getHTML(new URL('./components/share-to-button/share-to-button.html', meta.url));
+const { resolve, promise: def } = getDeferred();
+
+const templatePromise = def.then(() => getHTML(new URL('./components/share-to-button/share-to-button.html', meta.url)));
 
 async function getTemplate() {
+	resolve();
 	const tmp = await templatePromise;
 	return tmp.cloneNode(true);
 }

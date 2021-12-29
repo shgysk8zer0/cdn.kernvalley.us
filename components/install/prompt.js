@@ -5,14 +5,15 @@ import { getHTML } from '../../js/std-js/http.js';
 import { query, create, text, on, off } from '../../js/std-js/dom.js';
 import { hasGa, send } from '../../js/std-js/google-analytics.js';
 import { registerButton } from '../../js/std-js/pwa-install.js';
-import { manifestPromise } from '../../js/std-js/promises.js';
+import { manifestPromise, getDeferred } from '../../js/std-js/promises.js';
 import '../notification/html-notification.js';
-
+const { resolve, promise: def } = getDeferred();
 const getManifest = async () => await manifestPromise;
 
-const templatePromise = getHTML(new URL('./components/install/prompt.html', meta.url));
+const templatePromise = def.then(() => getHTML(new URL('./components/install/prompt.html', meta.url)));
 
 async function getTemplate() {
+	resolve();
 	const tmp = await templatePromise;
 	return tmp.cloneNode(true);
 }

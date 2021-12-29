@@ -6,11 +6,15 @@ import { loadStylesheet } from '../../js/std-js/loader.js';
 import { hasGa, send } from '../../js/std-js/google-analytics.js';
 import { getHTML } from '../../js/std-js/http.js';
 import { meta } from '../../import.meta.js';
+import { getDeferred } from '../../js/std-js/promises.js';
 import UTM from '../../js/std-js/UTM.js';
 
-const templatePromise = getHTML(new URL('./components/ad/block.html', meta.url));
+const { resolve, promise: def } = getDeferred();
+
+const templatePromise = def.then(() => getHTML(new URL('./components/ad/block.html', meta.url)));
 
 async function getTemplate() {
+	resolve();
 	const tmp = await templatePromise;
 	return tmp.cloneNode(true);
 }
