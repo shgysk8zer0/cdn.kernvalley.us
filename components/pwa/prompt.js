@@ -1,5 +1,14 @@
 import HTMLCustomElement from '../custom-element.js';
 import { registerButton } from '../../js/pwa-install.js';
+import { getHTML } from '../../js/std-js/http.js';
+import { meta } from '../../import.meta.js';
+
+const templatePromise = getHTML(new URL('./components/pwa/prompt.html', meta.url));
+
+async function getTemplate() {
+	const tmp = await templatePromise;
+	return tmp.cloneNode(true);
+}
 
 function getBySize(opts, width) {
 	if (Array.isArray(opts)) {
@@ -95,7 +104,7 @@ HTMLCustomElement.register('pwa-prompt', class HTMLPWAPromptElement extends HTML
 		super();
 		this.attachShadow({ mode: 'open' });
 
-		this.getTemplate('./components/pwa/prompt.html').then(tmp => {
+		getTemplate().then(tmp => {
 			tmp.querySelectorAll('[data-click]').forEach(el => {
 				switch(el.dataset.click) {
 					case 'close':

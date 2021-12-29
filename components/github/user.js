@@ -5,6 +5,14 @@ import { loadStylesheet } from '../../js/std-js/loader.js';
 import { getDeferred } from '../../js/std-js/promises.js';
 const ENDPOINT = 'https://api.github.com';
 import HTMLCustomElement from '../custom-element.js';
+const { resolve, promise: def } = getDeferred();
+const templatePromise = def.then(() => getHTML(new URL('./components/github/user.html', meta.url)));
+
+async function getTemplate() {
+	resolve();
+	const tmp = await templatePromise;
+	return tmp.cloneNode(true);
+}
 
 async function getUser(user) {
 	const key = `github-user-${user}`;
@@ -35,14 +43,12 @@ HTMLCustomElement.register('github-user', class HTMLGitHubUserElement extends HT
 				this.whenConnected,
 			]).then(() => {
 				Promise.all([
-					getHTML(new URL('./components/github/user.html', meta.url)),
+					getTemplate(),
 					loadStylesheet(new URL('./components/github/user.css', meta.url), { parent: this.shadowRoot }),
 				]).then(([tmp]) => {
 					this.shadowRoot.append(tmp);
 					this.dispatchEvent(new Event('ready'));
 				});
-				// this.getTemplate('./components/github/user.html').then(tmp => {
-				// });
 			});
 		});
 	}

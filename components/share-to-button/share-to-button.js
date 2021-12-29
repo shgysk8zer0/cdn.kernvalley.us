@@ -1,8 +1,22 @@
 import HTMLCustomElement from '../custom-element.js';
 import { hasGa, send } from '../../js/std-js/google-analytics.js';
 import { popup } from '../../js/std-js/popup.js';
+import { getHTML } from '../../js/std-js/http.js';
+import { meta } from '../../import.meta.js';
+import { getDeferred } from '../../js/std-js/promises.js';
+import { loadStylesheet } from '../../js/std-js/loader.js';
 import { Facebook, Twitter, Reddit, LinkedIn, Gmail, Pinterest, Email, Tumblr, Telegram, getShareURL }
 	from '../../js/std-js/share-targets.js';
+
+const { resolve, promise: def } = getDeferred();
+
+const templatePromise = def.then(() => getHTML(new URL('./components/share-to-button/share-to-button.html', meta.url)));
+
+async function getTemplate() {
+	resolve();
+	const tmp = await templatePromise;
+	return tmp.cloneNode(true);
+}
 
 function log(btn) {
 	if (hasGa()) {
@@ -92,7 +106,7 @@ HTMLCustomElement.register('share-to-button', class HTMLShareToButtonElement ext
 			this.setAttribute('role', 'button');
 		});
 
-		this.getTemplate('./components/share-to-button/share-to-button.html').then(tmp => {
+		getTemplate().then(tmp => {
 			const wasHidden = this.hidden;
 			this.hidden = true;
 			if (typeof target === 'string') {
@@ -115,7 +129,8 @@ HTMLCustomElement.register('share-to-button', class HTMLShareToButtonElement ext
 				this.content = content;
 			}
 			this.shadowRoot.append(tmp);
-			this.stylesLoaded.then(() => {
+
+			loadStylesheet(new URL('./components/share-to-button/share-to-button.css', meta.url), { parent: this.shadowRoot }).then(() => {
 				this.dispatchEvent(new Event('ready'));
 				this.hidden = wasHidden;
 			});
