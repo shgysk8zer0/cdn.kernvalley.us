@@ -10,7 +10,7 @@ const height = 53;
 
 const getManifest = async () => await manifestPromise;
 
-const getLogoUrl(path => new URL(path, meta.url).href);
+const getLogoUrl = path => new URL(path, meta.url).href;
 
 const styleImg = (img) => css(img, { width: 'auto', height: `${height}px` });
 

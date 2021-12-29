@@ -205,6 +205,8 @@ registerCustomElement('install-prompt', class HTMLInstallPromptElement extends H
 					case 'play':
 					case 'itunes':
 					case 'windows':
+					case 'f-droid':
+					case 'amazon':
 						Promise.resolve(base.querySelector(`[data-platform="${platform}"]`)).then(btn => {
 							if (btn instanceof HTMLAnchorElement) {
 								const link = typeof url === 'string' ? new URL(url, btn.href) : new URL(btn.href);
