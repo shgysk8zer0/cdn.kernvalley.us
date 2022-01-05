@@ -3,6 +3,7 @@ import './js/std-js/shims.js';
 import { polyfill as trustPolyfill } from './js/std-js/TrustedTypes.js';
 import { polyfill as locksPolyfill } from './js/std-js/LockManager.js';
 import { loadScript } from './js/std-js/loader.js';
+import { enforce } from './js/std-js/trust-enforcer.js';
 const modules = [
 	'./components/current-year.js',
 	'./components/github/user.js',
@@ -37,6 +38,8 @@ Promise.allSettled([
 			}
 		}
 	});
+
+	enforce([policy.name, 'sanitize#html', 'empty#html', 'empty#script']);
 
 	await Promise.allSettled(
 		modules.map(src => loadScript(policy.createScriptURL(new URL(src, document.baseURI)), { type: 'module' }))
