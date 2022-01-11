@@ -30,9 +30,11 @@ const modules = [
 
 const policy = createPolicy('default', {
 	createHTML: input => {
-		console.info(input);
-		console.trace();
-		return new Sanitizer().sanitizeFor('div', input).innerHTML;
+		if (input.includes('<')) {
+			return new Sanitizer().sanitizeFor('div', input).innerHTML;
+		} else {
+			return input;
+		}
 	},
 	// createScript: input => {
 	// 	throw new DOMException(`Untrusted attempt to create script: "${input}"`);
