@@ -1,4 +1,4 @@
-/* global ScrollTimeline, CSSUnitValue, globalThis */
+/* global ScrollTimeline, CSSUnitValue */
 import { css } from '../../js/std-js/dom.js';
 import { loadScript } from '../../js/std-js/loader.js';
 import { registerCustomElement } from '../../js/std-js/custom-elements.js';
@@ -7,7 +7,7 @@ const POLYFILL = 'https://flackr.github.io/scroll-timeline/dist/scroll-timeline.
 
 registerCustomElement('scroll-progress', class HTMLScrollProgressElement extends HTMLElement {
 	async connectedCallback() {
-		if ('ScrollTimeline' in globalThis) {
+		if (HTMLScrollProgressElement.supported) {
 			const shadow = this.attachShadow({ mode: 'closed' });
 			const progress = document.createElement('div');
 			progress.setAttribute('part', 'progress');

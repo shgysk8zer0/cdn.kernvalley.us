@@ -1,4 +1,5 @@
 import HTMLCustomElement from '../custom-element.js';
+import { purify as policy } from '../../js/std-js/purify.js';
 
 HTMLCustomElement.register('html-popup', class HTMLPopupElement extends HTMLCustomElement {
 	constructor(content = null, {
@@ -11,7 +12,7 @@ HTMLCustomElement.register('html-popup', class HTMLPopupElement extends HTMLCust
 		this.attachShadow({ mode: 'open' });
 		this.addEventListener('click', () => this.close(), { passive: true, capture: true });
 
-		this.getTemplate('./components/popup/html-popup.html').then(tmp => {
+		this.getTemplate('./components/popup/html-popup.html', { policy }).then(tmp => {
 			this.shadowRoot.append(tmp);
 			this.dispatchEvent(new Event('ready'));
 		});

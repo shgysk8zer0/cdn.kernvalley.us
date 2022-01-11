@@ -2,10 +2,14 @@ import HTMLCustomElement from '../custom-element.js';
 import { registerButton } from '../../js/pwa-install.js';
 import { getHTML } from '../../js/std-js/http.js';
 import { meta } from '../../import.meta.js';
+import { getDeferred } from '../../js/std-js/promises.js';
+import { purify as policy } from '../../js/std-js/purify.js';
+const { resolve, promise: def } = getDeferred();
 
-const templatePromise = getHTML(new URL('./components/pwa/prompt.html', meta.url));
+const templatePromise = def.then(() => getHTML(new URL('./components/pwa/prompt.html', meta.url),  { policy }));
 
 async function getTemplate() {
+	resolve();
 	const tmp = await templatePromise;
 	return tmp.cloneNode(true);
 }

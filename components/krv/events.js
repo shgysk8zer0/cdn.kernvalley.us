@@ -4,7 +4,17 @@ import { registerCustomElement } from '../../js/std-js/custom-elements.js';
 import { loadStylesheet } from '../../js/std-js/loader.js';
 import { hasGa, send } from '../../js/std-js/google-analytics.js';
 import { meta } from '../../import.meta.js';
+import { getDeferred } from '../../js/std-js/promises.js';
+import { purify as policy } from '../../js/std-js/purify.js';
 
+const { resolve, promise: def } = getDeferred();
+const templatePromise = def.then(() => getHTML(new URL('./components/krv/events.html', meta.url), { policy }));
+
+async function getTemplate() {
+	resolve();
+	const tmp = await templatePromise;
+	return tmp.cloneNode(true);
+}
 const protectedData = new WeakMap();
 
 function utm(url, { campaign, content, medium, source, term }) {
@@ -42,7 +52,7 @@ registerCustomElement('krv-events', class HTMLKRVEventsElement extends HTMLEleme
 		const parent = this.attachShadow({ mode: 'closed' });
 
 		Promise.all([
-			getHTML(new URL('./components/krv/events.html', meta.url).href),
+			getTemplate(),
 			loadStylesheet(new URL('./components/krv/events.css', meta.url).href, { parent }),
 			this.whenConnected,
 		]).then(([frag]) => {

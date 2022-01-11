@@ -1,5 +1,6 @@
 import HTMLCustomElement from '../custom-element.js';
 import { sleep } from '../../js/std-js/promises.js';
+import { purify as policy } from '../../js/std-js/purify.js';
 
 async function visible() {
 	if (document.visibilityState === 'hidden') {
@@ -30,7 +31,7 @@ HTMLCustomElement.register('slide-show', class HTMLSlideShowElement extends HTML
 			}
 		});
 
-		this.getTemplate('./components/slide-show/slide-show.html').then(async tmp => {
+		this.getTemplate('./components/slide-show/slide-show.html', { policy }).then(async tmp => {
 			const actionHandler = async action => {
 				switch (action) {
 					case 'next':

@@ -1,4 +1,5 @@
 import HTMLCustomElement from './custom-element.js';
+import { purify as policy } from '../js/std-js/purify.js';
 
 HTMLCustomElement.register('toast-message', class HTMLToastMessageElement extends HTMLCustomElement {
 	constructor(message = null) {
@@ -9,7 +10,7 @@ HTMLCustomElement.register('toast-message', class HTMLToastMessageElement extend
 			this.hidden = ! this.open;
 		});
 
-		this.getTemplate(('./components/toast-message.html')).then(async frag => {
+		this.getTemplate(('./components/toast-message.html'), { policy }).then(async frag => {
 			frag.getElementById('close-toast-button').addEventListener('click', () => {
 				this.close();
 			}, {

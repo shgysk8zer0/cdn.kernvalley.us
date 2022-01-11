@@ -6,11 +6,13 @@ import { query, create, text, on, off } from '../../js/std-js/dom.js';
 import { hasGa, send } from '../../js/std-js/google-analytics.js';
 import { registerButton } from '../../js/std-js/pwa-install.js';
 import { manifestPromise, getDeferred } from '../../js/std-js/promises.js';
-import '../notification/html-notification.js';
+import { purify as policy } from '../../js/std-js/purify.js';
 const { resolve, promise: def } = getDeferred();
+
+import '../notification/html-notification.js';
 const getManifest = async () => await manifestPromise;
 
-const templatePromise = def.then(() => getHTML(new URL('./components/install/prompt.html', meta.url)));
+const templatePromise = def.then(() => getHTML(new URL('./components/install/prompt.html', meta.url), { policy }));
 
 async function getTemplate() {
 	resolve();

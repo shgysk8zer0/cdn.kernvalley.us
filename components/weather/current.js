@@ -1,6 +1,8 @@
 import { shadows, clearSlot, getWeatherByPostalCode, createIcon, getIcon, getSprite } from './helper.js';
 import HTMLCustomElement from '../custom-element.js';
 
+import { purify as policy } from '../../js/std-js/purify.js';
+
 HTMLCustomElement.register('weather-current', class HTMLWeatherForecastElement extends HTMLCustomElement {
 	constructor({ appId = null, postalCode = null, loading = null } = {}) {
 		super();
@@ -21,7 +23,7 @@ HTMLCustomElement.register('weather-current', class HTMLWeatherForecastElement e
 
 			await Promise.all([this.whenConnected, this.whenLoad]);
 
-			const tmp = await this.getTemplate('./components/weather/current.html');
+			const tmp = await this.getTemplate('./components/weather/current.html', { policy });
 			shadow.append(tmp);
 			shadows.set(this, shadow);
 			this.dispatchEvent(new Event('ready'));

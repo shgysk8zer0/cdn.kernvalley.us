@@ -1,5 +1,6 @@
 import HTMLCustomElement from '../custom-element.js';
 import { getDeferred } from '../../js/std-js/promises.js';
+import { purify as policy } from '../../js/std-js/purify.js';
 
 function getSlot(name, base) {
 	const slot = base.shadowRoot.querySelector(`slot[name="${name}"]`);
@@ -56,7 +57,7 @@ export class HTMLNotificationElement extends HTMLCustomElement {
 			this.onerror = null;
 		});
 
-		this.getTemplate('./components/notification/html-notification.html', { signal }).then(tmp => {
+		this.getTemplate('./components/notification/html-notification.html', { signal, policy }).then(tmp => {
 			tmp.querySelector('[part="close"]').addEventListener('click', () => this.close(), {
 				capture: true,
 				once: true,

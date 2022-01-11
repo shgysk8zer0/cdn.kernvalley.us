@@ -15,20 +15,7 @@
 		<link rel="preload" href="/components/share-to-button/share-to-button.html" as="fetch" type="text/html" referrerpolicy="no-referrer" />
 		<link rel="preload" href="/components/share-to-button/share-to-button.css" as="style" type="text/css" referrerpolicy="no-referrer" />
 		<link rel="preconnect" href="https://api.github.com" crossorigin="anonymous" referrerpolicy="no-referrer" />
-		<script type="module" src="/js/std-js/deprefixer.js" referrerpolicy="no-referrer"></script>
-		<script type="module" src="/js/std-js/shims.js" referrerpolicy="no-referrer"></script>
-		<script type="module" src="/components/current-year.js" referrerpolicy="no-referrer"></script>
-		<script type="module" src="/components/github/user.js" referrerpolicy="no-referrer"></script>
-		<script type="module" src="/components/ad/block.js" referrerpolicy="no-referrer"></script>
-		<script type="module" src="/components/share-button.js" referrerpolicy="no-referrer"></script>
-		<script type="module" src="/components/window-controls.js" referrerpolicy="no-referrer"></script>
-		<script type="module" src="/components/share-to-button/share-to-button.js" referrerpolicy="no-referrer"></script>
-		<script type="module" src="/components/weather/current.js" referrerpolicy="no-referrer"></script>
-		<script type="module" src="/components/leaflet/map.js" referrerpolicy="no-referrer"></script>
-		<script type="module" src="/components/leaflet/marker.js" referrerpolicy="no-referrer"></script>
-		<script type="module" src="/components/app/list-button.js" referrerpolicy="no-referrer"></script>
-		<script type="module" src="/components/app/stores.js" referrerpolicy="no-referrer"></script>
-		<script type="module" src="/js/std-js/theme-cookie.js" referrerpolicy="no-referrer"></script>
+		<script type="module" src="/index.js" referrerpolicy="no-referrer"></script>
 		<link rel="stylesheet" href="/css/core-css/theme/properties.css" referrerpolicy="no-referrer" media="screen" />
 		<link rel="stylesheet" title="Adwaita Theme" href="/css/core-css/theme/adwaita/index.css" referrerpolicy="no-referrer" media="screen" />
 		<link rel="alternate stylesheet" title="Default Theme" href="/css/core-css/theme/default/index.css" referrerpolicy="no-referrer" media="screen" />
@@ -42,9 +29,6 @@
 		<link rel="stylesheet" href="/css/core-css/forms.css" referrerpolicy="no-referrer" />
 		<link rel="stylesheet" href="/css/core-css/layout/right-sidebar/index.css" referrerpolicy="no-referrer" media="screen" />
 		<title>KernValley.us | CDN</title>
-		<script type="module">
-			navigator.serviceWorker.register('/sw.js').catch(console.error);
-		</script>
 	</head>
 	<body class="grid border-box background-primary color-default font-main">
 		<header id="header" class="contain-content center">
@@ -60,7 +44,7 @@
 					</svg>
 				</button>
 				<img src="/img/branding/kernvalley.us.svg" alt="logo" height="32" width="32" loading="lazy" />
-				<b >KernValley.US CDN</b>
+				<b>KernValley.US CDN</b>
 			</div>
 		</window-controls>
 		<nav id="nav" class="contain-content background-primary adwaita-toolbar sticky top shadow z-4 flex row no-wrap overflow-x-auto">
@@ -81,6 +65,7 @@
 				<i>(JavaScript, Stylesheets, Images, &amp; Fonts)</i> are shared and accessible
 				on a number of different sites.
 			</blockquote>
+			<weather-forecast postalcode="93240" appid="6be145cbc5791c9f80471ff39d8523ed" theme="auto"></weather-forecast>
 			<div class="center">
 				<leaflet-map center="35.753003,-118.424572" zoom="13" crossorigin="anonymous" detectretina="" loading="lazy" router="" zoomcontrol="" data-markers="towns restaurants campgrounds stores landmarks"></leaflet-map>
 			</div>
