@@ -6,8 +6,7 @@ import './js/std-js/shims/locks.js';
 import './js/std-js/shims/cookieStore.js';
 // import { polyfill as trustPolyfill } from './js/std-js/TrustedTypes.js';
 import { loadScript } from './js/std-js/loader.js';
-// import { SanitizerConfig as config } from './js/std-js/SanitizerConfig.js';
-import { enforce } from './js/std-js/trust-enforcer.js';
+import { SanitizerConfig as config } from './js/std-js/SanitizerConfig.js';
 import { createPolicy } from './js/std-js/trust.js';
 const modules = [
 	'./components/current-year.js',
@@ -26,12 +25,17 @@ const modules = [
 	'./js/std-js/theme-cookie.js',
 ];
 
-// const sanitizer = new globalThis.Sanitizer(config);
+const trustedOrigins = [
+	location.origin,
+	'https://cdn.kernvalley.us',
+];
+
+const sanitizer = new globalThis.Sanitizer(config);
 
 const policy = createPolicy('default', {
 	createHTML: input => {
-		if (input.includes('<')) {
-			return new Sanitizer().sanitizeFor('div', input).innerHTML;
+		if (['<', '>'].some(char => input.includes(char))) {
+			return sanitizer.sanitizeFor('div', input).innerHTML;
 		} else {
 			return input;
 		}
@@ -40,7 +44,7 @@ const policy = createPolicy('default', {
 	// 	throw new DOMException(`Untrusted attempt to create script: "${input}"`);
 	// },
 	createScriptURL: input => {
-		if ([location.origin, 'https://cdn.kernvalley.us'].includes(new URL(input, document.baseURI).origin)) {
+		if (trustedOrigins.includes(new URL(input, document.baseURI).origin)) {
 			return input;
 		} else {
 			throw new DOMException(`Untrusted script src: <${input}>`);
