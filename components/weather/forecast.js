@@ -1,12 +1,21 @@
 import { meta } from '../../../import.meta.js';
 import {shadows, clearSlot, clearSlots, getForecastByPostalCode, createIcon, getSprite} from './helper.js';
 import HTMLCustomElement from '../custom-element.js';
+import { purify as policy } from '../../js/std-js/purify.js';
+import { getHTML } from '../../js/std-js/http.js';
+
+async function getTemplate() {
+	const url = new URL('./components/weather/forecast.html', meta.url);
+	const tmp = await getHTML(url, { policy });
+	tmp.querySelectorAll('link[href]').forEach(link => link.href = new URL(link.getAttribute('href'), url.href));
+	return tmp;
+}
 
 HTMLCustomElement.register('weather-forecast', class HTMLWeatherForecastElement extends HTMLElement {
 	constructor({ appId = null, postalCode = null } = {}) {
 		super();
 
-		Promise.resolve(this.attachShadow({mode: 'closed'})).then(async shadow => {
+		Promise.resolve(this.attachShadow({ mode: 'closed' })).then(async shadow => {
 			if (typeof appId === 'string') {
 				this.appId = appId;
 			}
@@ -15,12 +24,7 @@ HTMLCustomElement.register('weather-forecast', class HTMLWeatherForecastElement 
 				this.postalCode = postalCode;
 			}
 
-			const resp = await fetch(new URL('./components/weather/forecast.html', meta.url));
-			const html = await resp.text();
-			const parser = new DOMParser();
-			const doc = parser.parseFromString(html, 'text/html');
-			doc.querySelectorAll('link[href]').forEach(link => link.href = new URL(link.getAttribute('href'), resp.url));
-			shadow.append(...doc.head.children, ...doc.body.children);
+			shadow.append(await getTemplate());
 			shadows.set(this, shadow);
 			this.dispatchEvent(new Event('ready'));
 		});

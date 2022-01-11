@@ -8,10 +8,11 @@ import { getHTML } from '../../js/std-js/http.js';
 import { meta } from '../../import.meta.js';
 import { getDeferred } from '../../js/std-js/promises.js';
 import UTM from '../../js/std-js/UTM.js';
+import { purify as policy } from '../../js/std-js/purify.js';
 
 const { resolve, promise: def } = getDeferred();
 
-const templatePromise = def.then(() => getHTML(new URL('./components/ad/block.html', meta.url)));
+const templatePromise = def.then(() => getHTML(new URL('./components/ad/block.html', meta.url), { policy }));
 
 async function getTemplate() {
 	resolve();

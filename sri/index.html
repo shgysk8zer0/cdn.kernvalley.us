@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="color-scheme" content="light dark" />
+		<meta name="viewport" content="width=device-width" />
+		<title>SRI Generator</title>
+		<base href="/sri/" />
+		<link rel="manifest" href="/webapp.webmanifest" />
+		<link rel="icon" href="/img/kernvalley-icons/kernvalley.svg" type="image/svg+xml" />
+		<link rel="preconnect" href="https://api.github.com" crossorigin="anonymous" referrerpolicy="no-referrer" />
+		<link rel="preload" href="/components/github/user.html" as="fetch" type="text/html" referrerpolicy="no-referrer" />
+		<link rel="preload" href="/components/github/user.css" as="style" type="text/css" referrerpolicy="no-referrer" />
+		<script type="module" src="/js/std-js/shims.js" referrerpolicy="no-referrer"></script>
+		<script type="module" src="/sri/index.js" referrerpolicy="no-referrer"></script>
+		<script type="module" src="/components/github/user.js" referrerpolicy="no-referrer"></script>
+		<link rel="stylesheet" href="/sri/index.css" referrerpolicy="no-referrer" media="all" />
+		<link rel="stylesheet" href="/css/core-css/theme/default/index.css" referrerpolicy="no-referrer" media="all" />
+		<link rel="stylesheet" href="/css/core-css/element.css" referrerpolicy="no-referrer" media="all" />
+		<link rel="stylesheet" href="/css/core-css/class-rules.css" referrerpolicy="no-referrer" media="all" />
+		<link rel="stylesheet" href="/css/core-css/forms.css" referrerpolicy="no-referrer" media="all" />
+		<link rel="stylesheet" href="/css/core-css/accordion.css" referrerpolicy="no-referrer" media="all" />
+		<link rel="stylesheet" href="/css/core-css/fonts.css" referrerpolicy="no-referrer" media="all" />
+		<link rel="stylesheet" href="/css/core-css/scrollbar.css" referrerpolicy="no-referrer" media="all" />
+	</head>
+	<body class="background-primary color-default font-main border-box grid">
+		<dialog id="error-dialog">
+			<pre class="status-box error"><code id="error-msg"></code></pre>
+			<hr />
+			<div class="center">
+				<button type="button" class="btn btn-reject" data-close="#error-dialog">Close</button>
+			</div>
+		</dialog>
+		<header id="header"></header>
+		<main id="main">
+			<form id="request" class="card" autocomplete="off">
+				<fieldset class="no-border" disabled="">
+					<legend>Select a File</legend>
+					<div class="form-group">
+						<label for="file" class="input-label required">File</label>
+						<input type="file" name="file" id="file" class="input" accept="text/html text/css application/javascript application/json" required="" />
+					</div>
+					<details class="accordion">
+						<summary>Options</summary>
+						<div class="form-group">
+							<label for="algo" class="input-label required">Hashing Algo</label>
+							<select name="algo" id="algo" class="input" required="">
+								<option value="SHA-256">SHA-256</option>
+								<option value="SHA-384" selected="">SHA-384</option>
+								<option value="SHA-512">SHA-512</option>
+							</select>
+						</div>
+					</details>
+					<br />
+					<div class="flex row no-wrap output">
+						<output id="hash" class="grow-1">Generated hash will appear here</output>
+						<button type="button" id="copy-btn" class="btn btn-primary" disabled="">Copy</button>
+					</div>
+				</fieldset>
+				<hr />
+				<div class="flex row btns">
+					<button type="submit" class="btn btn-accept" disabled="">Hash</button>
+					<button type="reset" class="btn btn-reject" disabled="">Clear</button>
+				</div>
+			</form>
+		</main>
+		<footer id="footer">
+			<div class="flex row wrap space-evenly">
+				<github-user user="shgysk8zer0"></github-user>
+				<github-user user="kernvalley"></github-user>
+			</div>
+		</footer>
+	</body>
+</html>

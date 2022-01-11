@@ -1,4 +1,5 @@
 import HTMLCustomElement from '../custom-element.js';
+import { purify as policy } from '../../js/std-js/purify.js';
 
 const SPOTIFY = 'https://open.spotify.com/embed/';
 const TYPES = [
@@ -68,7 +69,7 @@ HTMLCustomElement.register('spotify-player', class HTMLSpotifyTrackElement exten
 		super();
 		this.attachShadow({ mode: 'open' });
 
-		this.getTemplate('./components/spotify/player.html').then(tmp => {
+		this.getTemplate('./components/spotify/player.html', { policy }).then(tmp => {
 			this.shadowRoot.append(tmp.cloneNode(true));
 			this.dispatchEvent(new Event('ready'));
 		});
