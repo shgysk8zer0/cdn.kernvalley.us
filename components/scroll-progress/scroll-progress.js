@@ -7,7 +7,7 @@ const POLYFILL = 'https://flackr.github.io/scroll-timeline/dist/scroll-timeline.
 
 registerCustomElement('scroll-progress', class HTMLScrollProgressElement extends HTMLElement {
 	async connectedCallback() {
-		if ('ScrollTimeline' in globalThis) {
+		if (HTMLScrollProgressElement.supported) {
 			const shadow = this.attachShadow({ mode: 'closed' });
 			const progress = document.createElement('div');
 			progress.setAttribute('part', 'progress');
