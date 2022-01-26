@@ -1,7 +1,7 @@
 import { meta } from '../../../import.meta.js';
 import {shadows, clearSlot, clearSlots, getForecastByPostalCode, createIcon, getSprite} from './helper.js';
 import HTMLCustomElement from '../custom-element.js';
-import { purify as policy } from '../../js/std-js/purify.js';
+import { purify as policy } from '../../js/std-js/htmlpurify.js';
 import { getHTML } from '../../js/std-js/http.js';
 
 async function getTemplate() {

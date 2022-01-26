@@ -1,7 +1,7 @@
 import { shadows, clearSlot, getWeatherByPostalCode, createIcon, getIcon, getSprite } from './helper.js';
 import HTMLCustomElement from '../custom-element.js';
 
-import { purify as policy } from '../../js/std-js/purify.js';
+import { purify as policy } from '../../js/std-js/htmlpurify.js';
 
 HTMLCustomElement.register('weather-current', class HTMLWeatherForecastElement extends HTMLCustomElement {
 	constructor({ appId = null, postalCode = null, loading = null } = {}) {

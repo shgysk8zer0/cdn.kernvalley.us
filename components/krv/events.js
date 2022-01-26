@@ -5,7 +5,7 @@ import { loadStylesheet } from '../../js/std-js/loader.js';
 import { hasGa, send } from '../../js/std-js/google-analytics.js';
 import { meta } from '../../import.meta.js';
 import { getDeferred } from '../../js/std-js/promises.js';
-import { purify as policy } from '../../js/std-js/purify.js';
+import { purify as policy } from '../../js/std-js/htmlpurify.js';
 
 const { resolve, promise: def } = getDeferred();
 const templatePromise = def.then(() => getHTML(new URL('./components/krv/events.html', meta.url), { policy }));

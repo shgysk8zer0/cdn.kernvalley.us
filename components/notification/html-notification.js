@@ -1,6 +1,6 @@
 import HTMLCustomElement from '../custom-element.js';
 import { getDeferred } from '../../js/std-js/promises.js';
-import { purify as policy } from '../../js/std-js/purify.js';
+import { purify as policy } from '../../js/std-js/htmlpurify.js';
 
 function getSlot(name, base) {
 	const slot = base.shadowRoot.querySelector(`slot[name="${name}"]`);
