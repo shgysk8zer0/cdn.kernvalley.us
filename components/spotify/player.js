@@ -1,5 +1,5 @@
 import HTMLCustomElement from '../custom-element.js';
-import { purify as policy } from '../../js/std-js/purify.js';
+import { purify as policy } from '../../js/std-js/htmlpurify.js';
 
 const SPOTIFY = 'https://open.spotify.com/embed/';
 const TYPES = [

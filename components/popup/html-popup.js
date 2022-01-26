@@ -1,5 +1,5 @@
 import HTMLCustomElement from '../custom-element.js';
-import { purify as policy } from '../../js/std-js/purify.js';
+import { purify as policy } from '../../js/std-js/htmlpurify.js';
 
 HTMLCustomElement.register('html-popup', class HTMLPopupElement extends HTMLCustomElement {
 	constructor(content = null, {

@@ -3,7 +3,7 @@ import { getJSON, getHTML } from '../../js/std-js/http.js';
 import { meta } from '../../import.meta.js';
 import { loadStylesheet } from '../../js/std-js/loader.js';
 import { getDeferred } from '../../js/std-js/promises.js';
-import { purify as policy } from '../../js/std-js/purify.js';
+import { purify as policy } from '../../js/std-js/htmlpurify.js';
 
 const ENDPOINT = 'https://api.github.com';
 import HTMLCustomElement from '../custom-element.js';

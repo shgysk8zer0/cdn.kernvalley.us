@@ -3,7 +3,7 @@ import { registerButton } from '../../js/pwa-install.js';
 import { getHTML } from '../../js/std-js/http.js';
 import { meta } from '../../import.meta.js';
 import { getDeferred } from '../../js/std-js/promises.js';
-import { purify as policy } from '../../js/std-js/purify.js';
+import { purify as policy } from '../../js/std-js/htmlpurify.js';
 const { resolve, promise: def } = getDeferred();
 
 const templatePromise = def.then(() => getHTML(new URL('./components/pwa/prompt.html', meta.url),  { policy }));

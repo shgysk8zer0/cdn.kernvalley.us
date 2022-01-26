@@ -8,7 +8,7 @@ import { loadStylesheet } from '../../js/std-js/loader.js';
 import { Facebook, Twitter, Reddit, LinkedIn, Gmail, Pinterest, Email, Tumblr, Telegram, getShareURL }
 	from '../../js/std-js/share-targets.js';
 
-import { purify as policy } from '../../js/std-js/purify.js';
+import { purify as policy } from '../../js/std-js/htmlpurify.js';
 const { resolve, promise: def } = getDeferred();
 
 const templatePromise = def.then(() => getHTML(new URL('./components/share-to-button/share-to-button.html', meta.url), { policy }));
