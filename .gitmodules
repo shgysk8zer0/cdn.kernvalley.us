@@ -25,3 +25,6 @@
 [submodule "img/kernvalley-icons"]
 	path = img/kernvalley-icons
 	url = https://github.com/kernvalley/kernvalley-icons.git
+[submodule "js/konami"]
+	path = js/konami
+	url = https://github.com/shgysk8zer0/konami.git
