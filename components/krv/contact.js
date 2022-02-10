@@ -38,7 +38,7 @@ registerCustomElement('krv-contact', class HTMLKRVContactElement extends HTMLEle
 							body: data.get('body'),
 						});
 
-						if (resp.ok) {
+						if (resp.success) {
 							this.dispatchEvent(new Event('sent'));
 							event.target.reset();
 						} else {
