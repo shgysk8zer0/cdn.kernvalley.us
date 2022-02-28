@@ -1,5 +1,6 @@
 import { registerCustomElement } from '../../js/std-js/custom-elements.js';
 import { getDeferred } from '../../js/std-js/promises.js';
+import { whenIntersecting } from '../../intersect.js';
 
 const symbols = {
 	shadow: Symbol('shadow'),
@@ -60,10 +61,11 @@ registerCustomElement('facebook-post', class HTMLFacebookPostElement extends HTM
 	}
 
 	connectedCallback() {
+		observer.observer(this);
 		this.dispatchEvent(new Event('connected'));
 	}
 
-	async render() {
+	async render({ signal } = {}) {
 		const { postURL, height, width, showText } = this;
 
 		if (typeof postURL === 'string') {
@@ -79,7 +81,6 @@ registerCustomElement('facebook-post', class HTMLFacebookPostElement extends HTM
 				url.searchParams.set('show_text', 'true');
 			}
 
-			iframe.loading = 'lazy';
 			iframe.frameBorder = '0';
 			iframe.scrolling = 'no';
 			iframe.referrerPolicy = 'origin';
@@ -103,6 +104,7 @@ registerCustomElement('facebook-post', class HTMLFacebookPostElement extends HTM
 				controller.abort();
 			}, { once: true, signal });
 
+			await whenIntersecting(this. { signal });
 			iframe.src = url.href;
 			this[symbols.shadow].replaceChildren(iframe);
 

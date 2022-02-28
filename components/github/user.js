@@ -4,6 +4,7 @@ import { meta } from '../../import.meta.js';
 import { loadStylesheet } from '../../js/std-js/loader.js';
 import { getDeferred } from '../../js/std-js/promises.js';
 import { purify as policy } from '../../js/std-js/htmlpurify.js';
+import { whenIntersecting } from '../../js/std-js/intersect.js';
 
 const ENDPOINT = 'https://api.github.com';
 import HTMLCustomElement from '../custom-element.js';
@@ -43,6 +44,7 @@ HTMLCustomElement.register('github-user', class HTMLGitHubUserElement extends HT
 			Promise.allSettled([
 				this.whenLoad,
 				this.whenConnected,
+				whenIntersecting(this),
 			]).then(() => {
 				Promise.all([
 					getTemplate(),

@@ -2,7 +2,7 @@
   X-Frame-Options: DENY
   X-XSS-Protection: 1; mode=block
   Referrer-Policy: no-referrer
-  Content-Security-Policy: default-src 'self';  style-src 'self' cdn.kernvalley.us unpkg.com; script-src 'self' 'unsafe-inline' cdn.kernvalley.us unpkg.com www.googletagmanager.com/gtag/ www.google-analytics.com/analytics.js www.gstatic.com/firebasejs/; connect-src 'self' *.kernvalley.us api.github.com api.openweathermap.org/data/ baconipsum.com/api/; img-src *; media-src *; font-src 'self' cdn.kernvalley.us; require-trusted-types-for 'script'; trusted-types default empty#html empty#script fetch#html sanitizer-raw#html sanitizer#html purify-raw#html purify#html dompurify; upgrade-insecure-requests;
+  #Content-Security-Policy: default-src 'self';  style-src 'self' cdn.kernvalley.us unpkg.com; script-src 'self' 'unsafe-inline' cdn.kernvalley.us unpkg.com www.googletagmanager.com/gtag/ www.google-analytics.com/analytics.js www.gstatic.com/firebasejs/; connect-src 'self' *.kernvalley.us api.github.com api.openweathermap.org/data/ baconipsum.com/api/; img-src *; media-src *; font-src 'self' cdn.kernvalley.us; require-trusted-types-for 'script'; trusted-types default empty#html empty#script fetch#html sanitizer-raw#html sanitizer#html purify-raw#html purify#html dompurify; upgrade-insecure-requests;
 
 /sw.js
   Referrer-Policy: no-referrer

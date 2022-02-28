@@ -1,3 +1,4 @@
+import { whenIntersecting } from '../../js/std-js/intersect.js';
 const protectedData = new WeakMap();
 
 async function render(target) {
@@ -7,9 +8,9 @@ async function render(target) {
 		cancelAnimationFrame(timeout);
 		protectedData.set(target, { shadow, timeout: null });
 	}
-	
+
 	protectedData.set(target, {
-		timeout: requestAnimationFrame(() => {
+		timeout: requestAnimationFrame(async () => {
 			const { user, gist, file, height, width } = target;
 			const iframe = document.createElement('iframe');
 			const script = document.createElement('script');
@@ -41,6 +42,9 @@ async function render(target) {
 			if ('part' in iframe) {
 				iframe.part.add('embed');
 			}
+			if (target.loading === 'lazy') {
+				await whenIntersecting(target);
+			}
 
 			iframe.srcdoc = `<!DOCTYPE html><html><head>${base.outerHTML}${link.outerHTML}</head><body>${script.outerHTML}</body></html>`;
 			shadow.replaceChildren(iframe);
@@ -51,44 +55,22 @@ async function render(target) {
 	}, 100);
 }
 
-const observer = new IntersectionObserver((entries, observer) => {
-	entries.forEach(({ target, isIntersecting }) => {
-		if (isIntersecting && protectedData.has(target)) {
-			observer.unobserve(target);
-			render(target);
-		}
-	});
-}, {
-	rootMargin: `${Math.floor(0.5 * Math.max(screen.height, 200))}px`,
-});
-
 customElements.define('github-gist', class HTMLGitHubGistElement extends HTMLElement {
 	constructor() {
 		super();
 		const shadow = this.attachShadow({ mode: 'closed' });
 		protectedData.set(this, { shadow, timeout: null });
 	}
-	
+
 	connectedCallback() {
 		this.dispatchEvent(new Event('connected'));
 	}
-	
+
 	async attributeChangedCallback(name, oldValue, newValue) {
 		if (oldValue !== newValue) {
 			await this.whenConnected;
 
 			switch(name) {
-				case 'loading':
-					if (protectedData.get(this).shadow.childElementCount === 0) {
-						if (newValue === 'lazy') {
-							observer.observe(this);
-						} else {
-							observer.unobserve(this);
-							render(this);
-						}
-					}
-					break;
-
 				case 'user':
 				case 'gist':
 				case 'file':
@@ -175,12 +157,12 @@ customElements.define('github-gist', class HTMLGitHubGistElement extends HTMLEle
 			this.removeAttribute('user');
 		}
 	}
-	
+
 	get rendered() {
 		return new Promise(async resolve => {
 			await this.whenConnected;
 			const { shadow } = protectedData.get(this);
-			
+
 			if (shadow.childElementCount === 0) {
 				this.addEventListener('rendered', () => resolve(), { once: true });
 			} else {
@@ -200,7 +182,7 @@ customElements.define('github-gist', class HTMLGitHubGistElement extends HTMLEle
 			this.removeAttribute('width');
 		}
 	}
-	
+
 	get whenConnected() {
 		return new Promise(resolve => {
 			if (this.isConnected) {
@@ -210,11 +192,11 @@ customElements.define('github-gist', class HTMLGitHubGistElement extends HTMLEle
 			}
 		});
 	}
-	
+
 	static get observedAttributes() {
-		return ['user', 'gist', 'file', 'loading', 'width', 'height'];
+		return ['user', 'gist', 'file', 'width', 'height'];
 	}
-	
+
 	static getGist({ user, gist, file, loading = 'eager', height = 250, width = 400 }) {
 		const el = new HTMLGitHubGistElement();
 		el.loading = loading;

@@ -1,4 +1,5 @@
 import { registerCustomElement } from '../../js/std-js/custom-elements.js';
+import { whenIntersecting } from '../../js/std-js/intersect.js';
 
 function getIframe({ uri, details, theme, followers }) {
 	const iframe = document.createElement('iframe');
@@ -130,13 +131,10 @@ registerCustomElement('spotify-follow', class HTMLFollowElement extends HTMLElem
 			case 'artist':
 			case 'details':
 			case 'theme':
-				this.shadowRoot.childNodes.forEach(el => el.remove());
-				this.shadowRoot.append(getIframe({
-					theme,
-					details,
-					uri: `spotify:artist:${artist}`,
-					followers,
-				}));
+				await whenIntersecting(this);
+
+				this.shadowRoot.replaceChildren(getIframe({ theme, details, uri: `spotify:artist:${artist}`, followers }));
+
 				break;
 		}
 	}
