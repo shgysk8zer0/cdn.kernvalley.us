@@ -3,6 +3,7 @@ import { registerCustomElement } from '../js/std-js/custom-elements.js';
 import { when } from '../js/std-js/dom.js';
 import { getHTML } from '../js/std-js/http.js';
 import { getDeferred } from '../js/std-js/promises.js';
+import { whenIntersecting } from '../js/std-js/intersect.js';
 
 let metaUrl = meta.url;
 let base    = null;
@@ -26,6 +27,9 @@ const observer = ('IntersectionObserver' in window)
 	: {observe: () => {}, has: () => false, unobserve: () => {}};
 
 export default class HTMLCustomElement extends HTMLElement {
+	/**
+	 * @deprecated Use `whenIntersecting` instead
+	 */
 	lazyLoad(lazy = true) {
 		if (lazy && ! observed.has(this)) {
 			const opts = { resolve: null, resolved: false, promise: Promise.resolve() };
@@ -104,14 +108,10 @@ export default class HTMLCustomElement extends HTMLElement {
 	}
 
 	get whenLoad() {
-		if (! ('IntersectionObserver' in window)) {
-			return Promise.resolve();
-		} else if (observed.has(this)) {
-			const { promise } = observed.get(this);
-			return promise;
+		if (! ('IntersectionObserver' in globalThis)) {
+			return Promise.resolve(this);
 		} else if (this.loading === 'lazy') {
-			this.lazyLoad();
-			return this.whenLoad;
+			return whenIntersecting(this).then(() => this);
 		} else {
 			return Promise.resolve(this);
 		}

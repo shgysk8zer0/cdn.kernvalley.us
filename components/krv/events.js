@@ -6,6 +6,7 @@ import { hasGa, send } from '../../js/std-js/google-analytics.js';
 import { meta } from '../../import.meta.js';
 import { getDeferred } from '../../js/std-js/promises.js';
 import { purify as policy } from '../../js/std-js/htmlpurify.js';
+import { whenIntersecting } from '../../js/std-js/intersect.js';
 
 const { resolve, promise: def } = getDeferred();
 const templatePromise = def.then(() => getHTML(new URL('./components/krv/events.html', meta.url), { policy }));
@@ -85,8 +86,13 @@ registerCustomElement('krv-events', class HTMLKRVEventsElement extends HTMLEleme
 		}
 	}
 
-	connectedCallback() {
+	async connectedCallback() {
 		this.dispatchEvent(new Event('connected'));
+
+		if (this.loading === 'lazy') {
+			await whenIntersecting(this);
+		}
+
 		this.render();
 	}
 
@@ -144,7 +150,9 @@ registerCustomElement('krv-events', class HTMLKRVEventsElement extends HTMLEleme
 				return container;
 			});
 
-		protectedData.get(this).shadow.getElementById('events-list').replaceChildren(...events);
+		if (events.length !== 0) {
+			protectedData.get(this).shadow.getElementById('events-list').replaceChildren(...events);
+		}
 	}
 
 	get count() {
@@ -172,6 +180,18 @@ registerCustomElement('krv-events', class HTMLKRVEventsElement extends HTMLEleme
 			this.setAttribute('count', val);
 		} else {
 			this.removeAttribute('count');
+		}
+	}
+
+	get loading() {
+		return this.getAttribute('loading') || 'eager';
+	}
+
+	set loading(val) {
+		if (typeof val === 'string' && val.length !== 0) {
+			this.setAttribute('loading', val);
+		} else {
+			this.removeAttribute('loading');
 		}
 	}
 

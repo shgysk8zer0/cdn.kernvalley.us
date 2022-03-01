@@ -4,6 +4,7 @@ import { loadStylesheet } from '../../js/std-js/loader.js';
 import { getHTML } from '../../js/std-js/http.js';
 import { meta } from '../../import.meta.js';
 import { send } from '../../js/std-js/slack.js';
+import { whenIntersecting } from '../../js/std-js/intersect.js';
 const ENDPOINT = 'https://contact.kernvalley.us/api/slack';
 
 const symbols = {
@@ -17,11 +18,14 @@ registerCustomElement('krv-contact', class HTMLKRVContactElement extends HTMLEle
 		this[symbols.shadow] = shadow;
 		this.addEventListener('error', console.error);
 
-		Promise.all([
-			getHTML(new URL('./components/krv/contact.html', meta.url).href),
-			loadStylesheet(new URL('./components/krv/contact.css', meta.url).href, { parent: shadow }),
-			loadStylesheet('https://cdn.kernvalley.us/css/core-css/forms.css', { parent: shadow }),
-		]).then(async ([tmp]) => {
+		whenIntersecting(this).then(async () => {
+			const [tmp] = await Promise.all([
+				getHTML(new URL('./components/krv/contact.html', meta.url).href),
+				loadStylesheet(new URL('./components/krv/contact.css', meta.url).href, { parent: shadow }),
+				loadStylesheet('https://cdn.kernvalley.us/css/core-css/forms.css', { parent: shadow }),
+				whenIntersecting(this),
+			]);
+
 			on(tmp.querySelector('form'), {
 				reset: () => this.dispatchEvent(new Event('reset')),
 				submit: async event => {
