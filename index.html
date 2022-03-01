@@ -33,8 +33,8 @@
 	<body class="grid border-box background-primary color-default font-main">
 		<header id="header" class="contain-content center">
 			<h1 class="center">This is the <abbr title="Content Delivery Network">CDN</abbr> for <a class="underline" href="https://kernvalley.us">KernValley.us</a></h1>
-			<github-user user="kernvalley"></github-user>
-			<github-user user="shgysk8zer0"></github-user>
+			<github-user user="kernvalley" loading="lazy"></github-user>
+			<github-user user="shgysk8zer0" loading="lazy"></github-user>
 		</header>
 		<window-controls hidden="">
 			<div class="flex row no-wrap" slot="titlebar" hidden="">
@@ -65,21 +65,13 @@
 				<i>(JavaScript, Stylesheets, Images, &amp; Fonts)</i> are shared and accessible
 				on a number of different sites.
 			</blockquote>
-			<krv-contact><script type="module" src="/components/krv/contact.js"></script></krv-contact>
-			<github-gist user="shgysk8zer0" gist="2335949e359b4df43d677fc18e1c554b" loading="lazy" width="500" height="800">
-				<script type="module" src="/components/github/gist.js"></script>
-			</github-gist>
 			<weather-forecast postalcode="93240" appid="6be145cbc5791c9f80471ff39d8523ed" theme="auto" loading="lazy"></weather-forecast>
-			<disqus-comments site="krv-events" loading="lazy">
-				<script type="module" src="/components/disqus/comments.js"></script>
-			</disqus-comments>
 			<div class="center">
 				<leaflet-map center="35.753003,-118.424572" zoom="13" crossorigin="anonymous" detectretina="" loading="lazy" router="" zoomcontrol="" data-markers="towns restaurants campgrounds stores landmarks"></leaflet-map>
 			</div>
 		</main>
 		<aside id="sidebar" class="center">
-			<weather-current postalcode="93240" appid="6be145cbc5791c9f80471ff39d8523ed" theme="auto"></weather-current>
-			<krv-events><script type="module" src="/components/krv/events.js"></script></krv-events>
+			<weather-current postalcode="93240" appid="6be145cbc5791c9f80471ff39d8523ed" theme="auto" loading="lazy"></weather-current>
 			<ad-block url="https://ads.kernvalley.us" layout="card" theme="auto" loading="lazy" source="krv-cdn" medium="web" campaign="krv-ads" content="sidebar">
 				<span slot="label">Kern Valley Ads</span>
 				<span slot="description">Advertise on local websites throughout the Kern River Valley</span>
