@@ -12,7 +12,15 @@
 				</svg>
 			</h2>
 		</a>
-		<div id="events-list" part="list" itemtype="https://schema.org/ItemList" itemscope=""></div>
+		<div id="events-list" part="list" itemtype="https://schema.org/ItemList" itemscope="">
+			<div part="no-events">
+				<p>There are currently no events listed on KRV Events.</p>
+				<p>
+					<span>If you would like to add an event, you may submit one</span>
+					<a href="https://forms.gle/9NPNcvcjLDoVw52w7" target="_blank" rel="noreferrer noopener external">here.</a>
+				</p>
+			</div>
+		</div>
 		<template id="event-template">
 			<div class="container" part="event" itemprop="itemListElement" itemtype="https://schema.org/Event" itemscope="">
 				<h3 part="name" itemprop="name">

@@ -56,7 +56,6 @@ registerCustomElement('krv-events', class HTMLKRVEventsElement extends HTMLEleme
 			getTemplate(),
 			loadStylesheet(new URL('./components/krv/events.css', meta.url).href, { parent }),
 			this.whenConnected,
-			whenIntersecting(this),
 		]).then(([frag]) => {
 			const link = frag.querySelector('.app-link');
 			link.target = this.target;
@@ -87,8 +86,13 @@ registerCustomElement('krv-events', class HTMLKRVEventsElement extends HTMLEleme
 		}
 	}
 
-	connectedCallback() {
+	async connectedCallback() {
 		this.dispatchEvent(new Event('connected'));
+
+		if (this.loading === 'lazy') {
+			await whenIntersecting(this);
+		}
+
 		this.render();
 	}
 
@@ -146,7 +150,9 @@ registerCustomElement('krv-events', class HTMLKRVEventsElement extends HTMLEleme
 				return container;
 			});
 
-		protectedData.get(this).shadow.getElementById('events-list').replaceChildren(...events);
+		if (events.length !== 0) {
+			protectedData.get(this).shadow.getElementById('events-list').replaceChildren(...events);
+		}
 	}
 
 	get count() {
@@ -174,6 +180,18 @@ registerCustomElement('krv-events', class HTMLKRVEventsElement extends HTMLEleme
 			this.setAttribute('count', val);
 		} else {
 			this.removeAttribute('count');
+		}
+	}
+
+	get loading() {
+		return this.getAttribute('loading') || 'eager';
+	}
+
+	set loading(val) {
+		if (typeof val === 'string' && val.length !== 0) {
+			this.setAttribute('loading', val);
+		} else {
+			this.removeAttribute('loading');
 		}
 	}
 
