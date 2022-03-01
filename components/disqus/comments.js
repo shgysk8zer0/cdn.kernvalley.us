@@ -60,12 +60,12 @@ registerCustomElement('disqus-comments', class HTMLDisqusCommentsElement extends
 				}
 				break;
 
-				default: throw new Error(`Unhandled attribute changed: "${name}"`);
+			default: throw new Error(`Unhandled attribute changed: "${name}"`);
 		}
 	}
 
 	get ready() {
-		if (! protectedData.has(this)) {
+		if (this[symbols.shadow].childElementCount === 0) {
 			return new Promise(resolve => this.addEventListener('ready', () => resolve(), { once: true }));
 		} else{
 			return Promise.resolve();

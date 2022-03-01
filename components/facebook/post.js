@@ -61,7 +61,6 @@ registerCustomElement('facebook-post', class HTMLFacebookPostElement extends HTM
 	}
 
 	connectedCallback() {
-		observer.observer(this);
 		this.dispatchEvent(new Event('connected'));
 	}
 
@@ -73,7 +72,6 @@ registerCustomElement('facebook-post', class HTMLFacebookPostElement extends HTM
 			const url = new URL('https://www.facebook.com/plugins/post.php');
 			const { resolve, reject, promise } = getDeferred();
 			const controller = new AbortController();
-			const signal = controller.signal;
 
 			url.searchParams.set('href', postURL);
 
@@ -97,14 +95,14 @@ registerCustomElement('facebook-post', class HTMLFacebookPostElement extends HTM
 			iframe.addEventListener('load', () => {
 				resolve();
 				controller.abort();
-			}, { once: true, signal });
+			}, { once: true, signal: controller.signal });
 
 			iframe.addEventListener('error', () => {
 				reject(new DOMException('Error loading Facebook post'));
 				controller.abort();
-			}, { once: true, signal });
+			}, { once: true, signal: controller.signal });
 
-			await whenIntersecting(this. { signal });
+			await whenIntersecting(this, { signal });
 			iframe.src = url.href;
 			this[symbols.shadow].replaceChildren(iframe);
 
