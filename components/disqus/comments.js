@@ -17,6 +17,7 @@ registerCustomElement('disqus-comments', class HTMLDisqusCommentsElement extends
 		const shadow = this.attachShadow({ mode: 'closed' });
 		const slot = document.createElement('slot');
 		const container = document.createElement('div');
+
 		Object.defineProperty(this, symbols.shadow, {
 			enumerable: false,
 			configurable: false,
@@ -88,13 +89,15 @@ registerCustomElement('disqus-comments', class HTMLDisqusCommentsElement extends
 		return this.getAttribute('site');
 	}
 
-	set site(val) {
-		if (typeof val === 'string' && val.length !==0) {
-			this.setAttribute('site', val);
-			this.dispatchEvent(new Event('sitechange'));
+	set site(newValue) {
+		const oldValue = this.getAttribute('site') || null;
+
+		if (typeof newValue === 'string' && newValue.length !==0) {
+			this.setAttribute('site', newValue);
+			this.dispatchEvent(new CustomEvent('sitechange',{ detail: { oldValue, newValue }}));
 		} else {
 			this.removeAttribute('site');
-			this.dispatchEvent(new Event('sitechange'));
+			this.dispatchEvent(new CustomEvent('sitechange',{ detail: { oldValue, newValue: null }}));
 		}
 	}
 
