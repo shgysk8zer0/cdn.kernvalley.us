@@ -1,6 +1,8 @@
 const ENDPOINT = 'https://baconipsum.com/api/';
+import { registerCustomElement } from '../js/std-js/custom-elements.js';
+import { getJSON } from '../js/std-js/http.js';
 
-export default class HTMLBaconIpsumElement extends HTMLElement {
+registerCustomElement('bacon-ipsum', class HTMLBaconIpsumElement extends HTMLElement {
 	constructor() {
 		super();
 		this.update();
@@ -25,8 +27,8 @@ export default class HTMLBaconIpsumElement extends HTMLElement {
 					throw new TypeError('Attempting to set line to a non-string non-element');
 				}
 			});
-			this.clear();
-			this.append(...els);
+
+			this.replaceChildren(...els);
 		}
 	}
 
@@ -55,12 +57,12 @@ export default class HTMLBaconIpsumElement extends HTMLElement {
 	}
 
 	clear() {
-		this.lines.forEach(el => el.remove());
+		this.replaceChildren();
 	}
 
-	async update() {
-		const {paras, startWithLorem, filler} = this;
-		const lines = await HTMLBaconIpsumElement.generate({paras, startWithLorem, filler});
+	async update({ signal } = {}) {
+		const { paras, startWithLorem, filler } = this;
+		const lines = await HTMLBaconIpsumElement.generate({paras, startWithLorem, filler, signal });
 		this.lines = lines;
 	}
 
@@ -68,9 +70,9 @@ export default class HTMLBaconIpsumElement extends HTMLElement {
 		paras          = 5,
 		startWithLorem = true,
 		filler         = false,
+		signal,
 	} = {}) {
 		const url = new URL(ENDPOINT);
-		const headers = new Headers();
 
 		url.searchParams.set('paras', paras);
 		url.searchParams.set('format', 'json');
@@ -85,18 +87,7 @@ export default class HTMLBaconIpsumElement extends HTMLElement {
 			url.searchParams.set('type', 'all-meat');
 		}
 
-		headers.set('Accept', 'application/json');
-
-		const resp = await fetch(url, {
-			headers,
-			mode: 'cors',
-		});
-
-		if (resp.ok) {
-			return await resp.json();
-		} else {
-			throw new Error(`${resp.url} [${resp.status} ${resp.statusText}]`);
-		}
+		return getJSON(url, { signal });
 	}
 
 	attributeChangedCallback(/*name, oldValue, newValue*/) {
@@ -112,6 +103,4 @@ export default class HTMLBaconIpsumElement extends HTMLElement {
 			'filler',
 		];
 	}
-}
-
-customElements.define('bacon-ipsum', HTMLBaconIpsumElement);
+});

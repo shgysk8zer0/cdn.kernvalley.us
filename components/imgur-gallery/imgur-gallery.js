@@ -1,5 +1,7 @@
-import {wait, importLink} from '/js/std-js/functions.js';
-import {pageVisible} from '/js/std-js/functions.js';
+import { importLink } from '../../js/std-js/functions.js';
+import { registerCustomElement } from '../../js/std-js/custom-elements.js';
+import { sleep } from '../../js/std-js/promises.js';
+import { whenVisible } from '../../js/std-js/events.js';
 
 export default class HTMLImgurGalleryElement extends HTMLElement {
 	constructor() {
@@ -205,8 +207,8 @@ export default class HTMLImgurGalleryElement extends HTMLElement {
 		while (true) {
 			yield this.nextImage;
 			await this.imgChanged();
-			await wait(this.delay);
-			await pageVisible();
+			await sleep(this.delay);
+			await whenVisible();
 		}
 	}
 
@@ -222,10 +224,10 @@ export default class HTMLImgurGalleryElement extends HTMLElement {
 
 	async attributeChangedCallback(name, oldValue, newValue) {
 		switch(name) {
-		default:
-			console.log({name, oldValue, newValue});
+			default:
+				console.log({name, oldValue, newValue});
 		}
 	}
 }
 
-customElements.define('imgur-gallery', HTMLImgurGalleryElement);
+registerCustomElement('imgur-gallery', HTMLImgurGalleryElement);

@@ -1,5 +1,8 @@
-import {importLink} from '/js/std-js/functions.js';
+/* global google */
+import { importLink } from '../../js/std-js/functions.js';
+import { registerCustomElement } from '../../js/std-js/custom-elements.js';
 // @see https://developers.google.com/maps/documentation/javascript/tutorial
+
 export default class GoogleMapElement extends HTMLElement {
 	constructor() {
 		super();
@@ -139,11 +142,11 @@ export default class GoogleMapElement extends HTMLElement {
 		if (this.isConnected) {
 			await this.ready();
 			switch(name) {
-			case 'zoom':
-				this.gMap.zoom = parseFloat(newValue);
-				break;
-			default:
-				console.error(`Unhandled attribute change: ${name}`);
+				case 'zoom':
+					this.gMap.zoom = parseFloat(newValue);
+					break;
+				default:
+					console.error(`Unhandled attribute change: ${name}`);
 			}
 		}
 	}
@@ -157,4 +160,4 @@ export default class GoogleMapElement extends HTMLElement {
 	}
 }
 
-customElements.define('google-map', GoogleMapElement);
+registerCustomElement('google-map', GoogleMapElement);

@@ -1,20 +1,25 @@
 import { meta } from '../../import.meta.js';
 import {shadows, clearSlot, clearSlots, getForecastByPostalCode, createIcon, getSprite} from './weather-helper.js';
+import HTMLCustomElement from './custom-element.js';
 
-customElements.define('weather-forecast', class HTMLWeatherForecastElement extends HTMLElement {
-	constructor() {
+HTMLCustomElement.register('weather-forecast', class HTMLWeatherForecastElement extends HTMLElement {
+	constructor({ appId = null, postalCode = null } = {}) {
 		super();
-		const url = new URL(location.href);
-
-		if (url.searchParams.has('postalcode')) {
-			this.postalCode = url.searchParams.get('postalcode');
-		}
 
 		Promise.resolve(this.attachShadow({mode: 'closed'})).then(async shadow => {
-			const resp = await fetch(new URL('weather-forecast.html', meta.url));
+			if (typeof appId === 'string') {
+				this.appId = appId;
+			}
+
+			if (typeof postalCode === 'string' || typeof postalCode === 'number') {
+				this.postalCode = postalCode;
+			}
+
+			const resp = await fetch(new URL('./components/weather-forecast.html', meta.url));
 			const html = await resp.text();
 			const parser = new DOMParser();
 			const doc = parser.parseFromString(html, 'text/html');
+			doc.querySelectorAll('link[href]').forEach(link => link.href = new URL(link.getAttribute('href'), resp.url));
 			shadow.append(...doc.head.children, ...doc.body.children);
 			shadows.set(this, shadow);
 			this.dispatchEvent(new Event('ready'));
@@ -22,6 +27,7 @@ customElements.define('weather-forecast', class HTMLWeatherForecastElement exten
 	}
 
 	async connectedCallback() {
+		this.dispatchEvent(new Event('connected'));
 		await this.ready;
 		this.update();
 	}
@@ -30,8 +36,12 @@ customElements.define('weather-forecast', class HTMLWeatherForecastElement exten
 		return this.getAttribute('appid');
 	}
 
-	set appid(val) {
-		this.setAttribute('appid', val);
+	set appId(val) {
+		if (typeof val === 'string') {
+			this.setAttribute('appid', val);
+		} else {
+			this.removeAttribute('appid');
+		}
 	}
 
 	set city(val) {
@@ -65,43 +75,51 @@ customElements.define('weather-forecast', class HTMLWeatherForecastElement exten
 
 	set theme(val) {
 		switch(val.toLowerCase()) {
-		case 'light':
-			this.setAttribute('theme', 'light');
-			break;
+			case 'light':
+				this.setAttribute('theme', 'light');
+				break;
 
-		case 'dark':
-			this.setAttribute('theme', 'dark');
-			break;
+			case 'dark':
+				this.setAttribute('theme', 'dark');
+				break;
 
-		case '':
-		case 'auto':
-			this.removeAttribute('theme');
-			break;
+			case '':
+			case 'auto':
+				this.removeAttribute('theme');
+				break;
 
-		default:
-			throw new Error(`Unsupported theme: ${val}`);
+			default:
+				throw new Error(`Unsupported theme: ${val}`);
+		}
+	}
+
+	get whenConnected() {
+		if (this.isConnected) {
+			return Promise.resolve();
+		} else {
+			return new Promise(resolve => this.addEventListener('connected', () => resolve(), { once: true }));
 		}
 	}
 
 	async attributeChangedCallback(name, oldValue, newValue) {
 		await this.ready;
 		switch(name) {
-		case 'appid':
-			this.dispatchEvent(new CustomEvent('appidchange', {detail: {oldValue, newValue}}));
-			break;
-		case 'postalcode':
-			this.dispatchEvent(new CustomEvent('locationchange', {detail: {oldValue, newValue}}));
-			break;
+			case 'appid':
+				this.dispatchEvent(new CustomEvent('appidchange', {detail: {oldValue, newValue}}));
+				break;
+			case 'postalcode':
+				this.dispatchEvent(new CustomEvent('locationchange', {detail: {oldValue, newValue}}));
+				break;
 
-		case 'theme':
-			this.dispatchEvent(new CustomEvent('themechange', {detail: {oldValue, newValue}}));
-			break;
+			case 'theme':
+				this.dispatchEvent(new CustomEvent('themechange', {detail: {oldValue, newValue}}));
+				break;
 
-		case 'units':
-			this.dispatchEvent(new CustomEvent('unitschange', {detail: {oldValue, newValue}}));
-			break;
+			case 'units':
+				this.dispatchEvent(new CustomEvent('unitschange', {detail: {oldValue, newValue}}));
+				break;
 
-		default: throw new Error(`Unhandled attribute changed: ${name}`);
+			default: throw new Error(`Unhandled attribute changed: ${name}`);
 		}
 	}
 

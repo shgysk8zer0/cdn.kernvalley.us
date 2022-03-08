@@ -1,7 +1,8 @@
+import { registerCustomElement } from '../js/std-js/custom-elements.js';
 /**
  * Imports SVG sprites from a remote src and allows getting of full `<svg>`s
  */
-customElements.define('svg-icons', class SVGIconsElement extends HTMLElement {
+registerCustomElement('svg-icons', class SVGIconsElement extends HTMLElement {
 	constructor() {
 		super();
 		this.hidden = true;
@@ -9,21 +10,21 @@ customElements.define('svg-icons', class SVGIconsElement extends HTMLElement {
 
 	attributeChangedCallback(attr, oldVal, newVal) {
 		switch(attr) {
-		case 'src':
-			if (typeof newVal === 'string' && newVal !== '') {
-				this.dispatchEvent(new CustomEvent('srcchange', {detail: {newVal, oldVal}}));
-				this.getIcons().then(async svg => {
-					[...this.children].forEach(el => el.remove());
-					this.append(svg);
-					this.dispatchEvent(new Event('load'));
-				});
-			} else {
-				this.dispatchEvent(new CustomEvent('srcclear', {detail: {newVal, oldVal}}));
-			}
-			break;
+			case 'src':
+				if (typeof newVal === 'string' && newVal !== '') {
+					this.dispatchEvent(new CustomEvent('srcchange', {detail: {newVal, oldVal}}));
+					this.getIcons().then(async svg => {
+						[...this.children].forEach(el => el.remove());
+						this.append(svg);
+						this.dispatchEvent(new Event('load'));
+					});
+				} else {
+					this.dispatchEvent(new CustomEvent('srcclear', {detail: {newVal, oldVal}}));
+				}
+				break;
 
-		default:
-			throw new Error(`Invalid attribute changed: ${attr}`);
+			default:
+				throw new Error(`Invalid attribute changed: ${attr}`);
 		}
 	}
 

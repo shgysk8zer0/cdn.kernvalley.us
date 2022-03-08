@@ -1,3 +1,7 @@
+import { registerCustomElement, on } from '../js/std-js/custom-elements.js';
+import { save } from '../js/std-js/filesystem.js';
+import { loadImage } from '../js/std-js/loader.js';
+
 export default class HTMLDrawingCanvasElement extends HTMLCanvasElement {
 	connectedCallback() {
 		this.ctx = this.getContext('2d', {alpha: this.alpha});
@@ -51,10 +55,12 @@ export default class HTMLDrawingCanvasElement extends HTMLCanvasElement {
 			}
 		};
 
-		this.addEventListener('touchstart', begin, config);
-		this.addEventListener('touchend', end, config);
-		this.addEventListener('mousedown', begin, config);
-		this.addEventListener('mouseup', end, config);
+		on(this, {
+			touchstart: begin,
+			mousedown: begin,
+			touchend: end,
+			mouseup: end,
+		}, config);
 	}
 
 	get coords() {
@@ -86,7 +92,7 @@ export default class HTMLDrawingCanvasElement extends HTMLCanvasElement {
 	}
 
 	get exportQuality() {
-		return parseInt(this.getAttribute('export-quality')) || 1;
+		return parseFloat(this.getAttribute('export-quality')) || 1;
 	}
 
 	set exportQuality(quality) {
@@ -143,6 +149,18 @@ export default class HTMLDrawingCanvasElement extends HTMLCanvasElement {
 		return this.getImageData();
 	}
 
+	async saveAs({ filename = 'canvas.png', type = 'image/png', quality = 0.8}) {
+		const blob = await this.toBlob(type, quality);
+		const file = new File([blob], filename, { type });
+		await save(file);
+	}
+
+	async import(src, { x = 0, y = 0 } = {}) {
+		const img = await loadImage(src);
+		await img.decode();
+		return this.ctx.drawImage(img, x, y);
+	}
+
 	async ready() {
 		if (! (this.ctx instanceof CanvasRenderingContext2D)) {
 			await new Promise(resolve => this.addEventListener('ready', resolve, {once: true}));
@@ -180,17 +198,17 @@ export default class HTMLDrawingCanvasElement extends HTMLCanvasElement {
 	async attributeChangedCallback(name, oldValue, newValue) {
 		await this.ready();
 		switch(name) {
-		case 'fill':
-			this.ctx.fillStyle = newValue;
-			break;
-		case 'stroke':
-			this.ctx.strokeStyle = newValue;
-			break;
-		case 'line-width':
-			this.ctx.lineWidth = newValue;
-			break;
-		default:
-			throw new Error(`Unhandled attribute change: "${name}"`);
+			case 'fill':
+				this.ctx.fillStyle = newValue;
+				break;
+			case 'stroke':
+				this.ctx.strokeStyle = newValue;
+				break;
+			case 'line-width':
+				this.ctx.lineWidth = newValue;
+				break;
+			default:
+				throw new Error(`Unhandled attribute change: "${name}"`);
 		}
 	}
 
@@ -203,4 +221,4 @@ export default class HTMLDrawingCanvasElement extends HTMLCanvasElement {
 	}
 }
 
-customElements.define('drawing-canvas', HTMLDrawingCanvasElement, {extends: 'canvas'});
+registerCustomElement('drawing-canvas', HTMLDrawingCanvasElement, {extends: 'canvas'});

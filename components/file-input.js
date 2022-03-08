@@ -1,3 +1,5 @@
+import { registerCustomElement } from '../js/std-js/custom-elements.js';
+
 export default class HTMLFileInputElement extends HTMLInputElement {
 	constructor() {
 		super();
@@ -49,24 +51,24 @@ export default class HTMLFileInputElement extends HTMLInputElement {
 				});
 
 				switch(as) {
-				case 'data':
-					reader.readAsDataURL(file);
-					break;
-				case 'text':
-					reader.readAsText(file);
-					break;
-				case 'binary':
-					reader.readAsBinaryString(file);
-					break;
-				case 'arraybuffer':
-					reader.readAsArrayBuffer(file);
-					break;
-				default:
-					throw new Error(`Invalid option for "as" attribute: ${as}`);
+					case 'data':
+						reader.readAsDataURL(file);
+						break;
+					case 'text':
+						reader.readAsText(file);
+						break;
+					case 'binary':
+						reader.readAsBinaryString(file);
+						break;
+					case 'arraybuffer':
+						reader.readAsArrayBuffer(file);
+						break;
+					default:
+						throw new Error(`Invalid option for "as" attribute: ${as}`);
 				}
 			});
 		}
 	}
 }
 
-customElements.define('file-input', HTMLFileInputElement, {extends: 'input'});
+registerCustomElement('file-input', HTMLFileInputElement, {extends: 'input'});

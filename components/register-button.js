@@ -1,11 +1,13 @@
 import User from '/js/User.js';
+import { registerCustomElement } from '../js/std-js/custom-elements.js';
 
 export default class HTMLRegisterButton extends HTMLButtonElement {
 	constructor() {
 		super();
 		document.addEventListener('login', () => this.hidden = true);
 		document.addEventListener('logout', () => this.hidden = false);
-		this.hidden = User.loggedIn;
+		this.whenConnected.then(() => this.hidden = User.loggedIn);
+
 		this.addEventListener('click', async () => {
 			await customElements.whenDefined('registration-form');
 			const form = document.querySelector('registration-form');
@@ -19,6 +21,18 @@ export default class HTMLRegisterButton extends HTMLButtonElement {
 			}
 		});
 	}
+
+	connectedCallback() {
+		this.dispatchEvent(new Event('connected'));
+	}
+
+	get whenConnected() {
+		if (this.isConnected) {
+			return Promise.resolve();
+		} else {
+			return new Promise(resolve => this.addEventListener('connected', () => resolve(), { once: true }));
+		}
+	}
 }
 
-customElements.define('register-button', HTMLRegisterButton, {extends: 'button'});
+registerCustomElement('register-button', HTMLRegisterButton, {extends: 'button'});

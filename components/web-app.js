@@ -9,8 +9,9 @@ import './gravatar-img.js';
 import './imgur-img.js';
 import './login-form/login-form.js';
 import './registration-form/registration-form.js';
+import { registerCustomElement } from '../js/std-js/custom-elements.js';
 
-customElements.define('web-app', class HTMLWebAppElement extends HTMLHtmlElement {
+registerCustomElement('web-app', class HTMLWebAppElement extends HTMLHtmlElement {
 	constructor() {
 		super();
 
@@ -283,31 +284,31 @@ customElements.define('web-app', class HTMLWebAppElement extends HTMLHtmlElement
 	async attributeChangedCallback(name, oldVal, newVal) {
 		if (this.isConnected) {
 			switch(name.toLowerCase()) {
-			case 'serviceworker':
-				if ('serviceWorker' in navigator) {
-					if (oldVal !== null) {
-						const worker = await this.serviceWorker;
-						if (worker) {
-							await worker.unregister();
+				case 'serviceworker':
+					if ('serviceWorker' in navigator) {
+						if (oldVal !== null) {
+							const worker = await this.serviceWorker;
+							if (worker) {
+								await worker.unregister();
+							}
+						}
+
+						if (newVal !== null) {
+							await navigator.serviceWorker.register(newVal, {scope: this.scope});
 						}
 					}
-
-					if (newVal !== null) {
-						await navigator.serviceWorker.register(newVal, {scope: this.scope});
-					}
-				}
-				break;
-			case 'theme':
-				this.dispatchEvent(new Event('themechange'));
-				break;
-			case 'layout':
-				this.dispatchEvent(new Event('layoutchange'));
-				break;
-			case 'scope':
-				this.dispatchEvent(new Event('scopechange'));
-				break;
-			default:
-				throw new Error(`Unhandled attribute changed: ${name}`);
+					break;
+				case 'theme':
+					this.dispatchEvent(new Event('themechange'));
+					break;
+				case 'layout':
+					this.dispatchEvent(new Event('layoutchange'));
+					break;
+				case 'scope':
+					this.dispatchEvent(new Event('scopechange'));
+					break;
+				default:
+					throw new Error(`Unhandled attribute changed: ${name}`);
 			}
 		}
 	}

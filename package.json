@@ -1,6 +1,6 @@
 {
   "name": "cdn.kernvalley.us",
-  "version": "1.0.1",
+  "version": "1.2.0",
   "private": true,
   "description": "Static assets for modern web development",
   "repository": {
@@ -15,7 +15,7 @@
     "web components",
     "custom elements"
   ],
-  "author": "Chris Zuber <shgysk8zer0@gmail.com>",
+  "author": "Chris Zuber <admin@kernvalley.us>",
   "homepage": "https://cdn.kernvalley.us",
   "license": "MIT",
   "bugs": {
@@ -31,35 +31,43 @@
       "css": "css/ components/",
       "js": "js/ components/",
       "img": "img/",
-      "html": "components/"
+      "html": "components/**/*.html components/*.html *.html"
     }
   },
   "scripts": {
-    "preinstall": "git submodule update --init --recursive",
+    "test": "npm run lint:js && npm run lint:css && npm run lint:html",
+    "start": "npm run netlify",
+    "preinstall": "npm run git:submodules",
     "postinstall": "npm run build",
-    "start": "npm run netlify:live",
-    "build": "svg-sprite-generate -c icons.csv -o img/icons.svg",
-    "test": "npm run lint:js && npm run lint:css",
-    "lint:css": "stylelint ${npm_package_config_dir_css}",
-    "lint:js": "eslint ${npm_package_config_dir_js}",
-    "fix:css": "stylelint ${npm_package_config_dir_css} --fix",
-    "fix:js": "eslint ${npm_package_config_dir_js} --fix",
-    "fix": "npm run fix:js && npm run fix:css",
+    "preversion": "npm test",
+    "git:fetch": "git fetch --prune --tags",
+    "git:submodules": "if [ -f '.gitmodules' ]; then git submodule update --init --recursive; fi",
+    "lint:css": "if [ -f '.stylelintrc.json' ]; then stylelint ${npm_package_config_dir_css}; fi",
+    "lint:html": "if [ -f '.htmlhintrc' ]; then htmlhint ${npm_package_config_dir_html}; fi",
+    "lint:js": "if [ -f '.eslintrc.json' ]; then eslint .; fi",
+    "fix:css": "if [ -f './stylelintrc.json' ]; then stylelint ${npm_package_config_dir_css} --fix; fi",
+    "fix:js": "if [ -f '.eslintrc.json' ]; then eslint. --fix; fi",
+    "build": "npm run build:js && npm run build:icons && npm run build:markers",
+    "build:js": "npm run build:js:maps && npm run build:js:ads && npm run build:js:events && npm run build:js:weather && npm run build:js:share",
+    "build:js:ads": "if [ -f 'rollup.ads.config.js' ]; then rollup -c rollup.ads.config.js; fi",
+    "build:js:events": "if [ -f 'rollup.events.config.js' ]; then rollup -c rollup.events.config.js; fi",
+    "build:js:maps": "if [ -f 'rollup.map.config.js' ]; then rollup -c rollup.map.config.js; fi",
+    "build:js:share": "if [ -f 'rollup.share.config.js' ]; then rollup -c rollup.share.config.js; fi",
+    "build:js:weather": "if [ -f 'rollup.weather.config.js' ]; then rollup -c rollup.weather.config.js; fi",
+    "build:icons": "if [ -f 'icons.csv' ]; then svg-sprite-generate -c icons.csv -o img/icons.svg; fi",
+    "build:markers": "if [ -d 'img/markers/' ]; then node markers.js img/markers/ img/markers.svg; fi",
+    "netlify": "if [ -f '.netlify/state.json' ]; then npm run netlify:live; else npm run netlify:serve; fi",
     "netlify:deploy": "netlify deploy",
     "netlify:serve": "netlify dev",
-    "netlify:live": "netlify dev --live"
+    "netlify:live": "netlify dev --live",
+    "netlify:link": "netlify link",
+    "version:bump": "npm run version:bump:patch",
+    "version:bump:patch": "npm version --no-git-tag-version patch",
+    "version:bump:minor": "npm version --no-git-tag-version minor",
+    "version:bump:major": "npm version --no-git-tag-version patch"
   },
   "dependencies": {
-    "svg-sprite-generator": "0.0.7"
-  },
-  "devDependencies": {
-    "babel-eslint": "^10.0.1",
-    "eslint": "^5.7.0",
-    "eslint-plugin-async-await": "0.0.0",
-    "eslint-plugin-babel": "^5.2.1",
-    "stylelint": "^9.6.0",
-    "stylelint-config-recommended": "^2.1.0",
-    "stylelint-config-standard": "^18.2.0",
-    "svgo": "^1.1.1"
+    "netlify-js-app": "^1.1.0",
+    "svg-sprite-standardized": "^1.1.0"
   }
 }

@@ -1,6 +1,21 @@
-import { $ } from '../../js/std-js/functions.js';
+import { text, attr, remove, on } from '../../js/std-js/dom.js';
+import { getJSON, getHTML } from '../../js/std-js/http.js';
+import { meta } from '../../import.meta.js';
+import { loadStylesheet } from '../../js/std-js/loader.js';
+import { getDeferred } from '../../js/std-js/promises.js';
+import { purify as policy } from '../../js/std-js/htmlpurify.js';
+import { whenIntersecting } from '../../js/std-js/intersect.js';
+
 const ENDPOINT = 'https://api.github.com';
-import CustomElement from '../custom-element.js';
+import HTMLCustomElement from '../custom-element.js';
+const { resolve, promise: def } = getDeferred();
+const templatePromise = def.then(() => getHTML(new URL('./components/github/user.html', meta.url), { policy }));
+
+async function getTemplate() {
+	resolve();
+	const tmp = await templatePromise;
+	return tmp.cloneNode(true);
+}
 
 async function getUser(user) {
 	const key = `github-user-${user}`;
@@ -8,44 +23,49 @@ async function getUser(user) {
 	if (sessionStorage.hasOwnProperty(key)) {
 		return JSON.parse(sessionStorage.getItem(key));
 	} else {
-		const url = new URL(`/users/${user}`, ENDPOINT);
-		const resp = await fetch(url, {
-			mode: 'cors',
-			referrerPolicy: 'no-referrer',
-			crossorigin: 'anonymous',
-			cache: 'default',
-			headers: new Headers({
-				Accept: 'application/json',
-			})
-		});
-
-		if (resp.ok) {
-			sessionStorage.setItem(key, await resp.clone().text());
-			return await resp.json();
-		} else {
-			/**
-			 * @TODO Handle API errors (service down, rate limit, etc.
-			 */
-			throw new Error(`${resp.url} [${resp.status} ${resp.statusText}]`);
-		}
+		const data = await getJSON(new URL(`/users/${user}`, ENDPOINT));
+		sessionStorage.setItem(key, JSON.stringify(data));
+		return data;
 	}
 
 }
 
-customElements.define('github-user', class HTMLGitHubUserElement extends CustomElement {
+HTMLCustomElement.register('github-user', class HTMLGitHubUserElement extends HTMLCustomElement {
 	constructor(user = null) {
 		super();
-		this.hidden = true;
-		this.attachShadow({mode: 'open'});
 
-		if (typeof user === 'string') {
-			this.user = user;
-		}
+		this.attachShadow({ mode: 'open' });
 
-		this.getTemplate('./components/github/user.html').then(tmp => {
-			this.shadowRoot.append(tmp);
-			this.dispatchEvent(new Event('ready'));
+		Promise.resolve().then(() => {
+			if (typeof user === 'string') {
+				this.user = user;
+			}
+
+			Promise.allSettled([
+				this.whenLoad,
+				this.whenConnected,
+				whenIntersecting(this),
+			]).then(() => {
+				Promise.all([
+					getTemplate(),
+					loadStylesheet(new URL('./components/github/user.css', meta.url), { parent: this.shadowRoot }),
+				]).then(([tmp]) => {
+					this.shadowRoot.append(tmp);
+					this.dispatchEvent(new Event('ready'));
+				});
+			});
 		});
+	}
+
+	get ready() {
+		const { resolve, promise } = getDeferred();
+
+		if (this.shadowRoot.childElementCount < 2) {
+			on([this], ['ready'], () => resolve(), { once: true });
+		} else {
+			resolve();
+		}
+		return promise;
 	}
 
 	get bio() {
@@ -70,76 +90,82 @@ customElements.define('github-user', class HTMLGitHubUserElement extends CustomE
 
 	attributeChangedCallback(name, oldVal, newVal) {
 		switch(name) {
-		case 'user':
-			if (typeof newVal === 'string' && newVal.length !== 0) {
-				this.ready.then(async () => {
-					try {
-						const shadow = this.shadowRoot;
-						const user = await getUser(this.user);
+			case 'loading':
+				this.lazyLoad(newVal === 'lazy');
+				break;
 
-						$('[part~="avatar"]', shadow).attr({
-							src: `${user.avatar_url}&s=64`,
-							height: 64,
-							width: 64,
-						});
+			case 'user':
+				if (typeof newVal === 'string' && newVal.length !== 0) {
+					this.ready.then(async () => {
+						try {
+							const base = this.shadowRoot;
+							const user = await getUser(this.user);
 
-						$('[part~="username"]', shadow).text(user.login);
-						$('[part~="name"]', shadow).text(user.name);
-						$('[part~="github"]', shadow).attr({
-							href: user.html_url,
-							title: `View ${user.login}'s profile on GitHub`,
-						});
+							attr('[part~="avatar"]', {
+								src: `${user.avatar_url}&s=64`,
+								height: 64,
+								width: 64,
+							}, { base });
 
-						if (user.bio !== null) {
-							$('[part~="bio"]', shadow).text(user.bio);
-							$('[part~="bio"]').unhide();
-						} else {
-							$('[part~="bio-container"]', shadow).hide();
+							text('[part~="username"]', user.login, { base });
+							text('[part~="name"]', user.name, { base });
+							attr('[part~="github"]', {
+								href: user.html_url,
+								title: `View ${user.login}'s profile on GitHub`,
+							}, { base });
+
+							if (user.bio !== null) {
+								text('[part~="bio"]', user.bio, { base });
+								attr('[part~="bio"]', { hidden: false }, { base });
+							} else {
+								attr('[part~="bio"]', { hidden: true }, { base });
+							}
+
+							if (user.location !== null) {
+								text('[part~="location"]', user.location, { base });
+								attr('[part~="location-container"]', { hidden: false }, { base });
+							} else {
+								attr('[part~="location-container"]', { hidden: true }, { base });
+							}
+
+							if (user.email !== null) {
+								text('[part~="email"]', user.email, { base });
+								attr('[part~="email"]',{ href: `mailto:${user.email}`}, { base });
+								attr('[part~="email-container"]', { hidden: false }, { base });
+							} else {
+								attr('[part~="email-container"]', { hidden: true }, { base });
+							}
+
+							if (user.company !== null) {
+								text('[part~="company"]', user.company, { base });
+								attr('[part~="company"]', {
+									href: `https://github.com/${user.company.replace('@', '')}`,
+								}, { base });
+								attr('[part~="company-container"]', { hidden: false }, { base });
+							} else {
+								attr('[part~="company-container"]', { hidden: true }, { base });
+							}
+
+							if (typeof user.blog === 'string' && user.blog.length !== 0) {
+								const blog = new URL(user.blog);
+								attr('[part~="blog"]', { href: blog.href }, { base });
+								text('[part~="blog"]', blog.hostname, { base });
+							} else {
+								remove('[part~="blog-container"]', { base });
+							}
+						} catch(err) {
+							console.error(err);
+							this.hidden = true;
 						}
-
-						if (user.location !== null) {
-							$('[part~="location"]', shadow).text(user.location);
-							$('[part~="location-container"]', shadow).unhide();
-						} else {
-							$('[part~="location-container"]', shadow).hide();
-						}
-
-						if (user.email !== null) {
-							$('[part~="email"]', shadow).text(user.email);
-							$('[part~="email"]', shadow).attr({href: `mailto:${user.email}`});
-							$('[part~="email-container"]', shadow).unhide();
-						} else {
-							$('[part~="email-container"]', shadow).hide();
-						}
-
-						if (user.company !== null) {
-							$('[part~="company"]', shadow).text(user.company);
-							$('[part~="company"]', shadow).attr({href: `https://github.com/${user.company.replace('@', '')}`});
-							$('[part~="company-container"]', shadow).unhide();
-						} else {
-							$('[part~="company-container"]', shadow).hide();
-						}
-
-						if (typeof user.blog === 'string' && user.blog.length !== 0) {
-							const blog = new URL(user.blog);
-							$('[part~="blog"]', shadow).attr({href: blog.href});
-							$('[part~="blog"]', shadow).text(blog.hostname);
-						} else {
-							$('[part~="blog-container"]', shadow).remove();
-						}
-						this.hidden = false;
-					} catch(err) {
-						console.error(err);
-						this.hidden = true;
-					}
-				});
-			}
-			break;
+					});
+				}
+				break;
 		}
 	}
 
 	static get observedAttributes() {
 		return [
+			'loading',
 			'user',
 		];
 	}

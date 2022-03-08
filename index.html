@@ -1,41 +1,102 @@
 <!DOCTYPE html>
-<html lang="en" dir="ltr" data-layout="wide">
+<html lang="en" dir="ltr" data-layout="right-sidebar" data-theme="auto">
 	<head>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width" />
-		<link rel="icon" href="https://kernvalley.us/favicon.ico" />
-		<script type="module" src="/js/std-js/deprefixer.js" async=""></script>
-		<script type="module" src="/js/std-js/shims.js" async=""></script>
-		<script type="module" src="/components/current-year.js" async=""></script>
-		<script type="module" src="/components/github/user.js" async=""></script>
-		<link rel="stylesheet" href="/css/core-css/theme/default/index.css" media="screen" />
-		<link rel="stylesheet" href="/css/core-css/rem.css" media="screen" />
-		<link rel="stylesheet" href="/css/core-css/viewport.css" media="screen" />
-		<link rel="stylesheet" href="/css/core-css/element.css" media="screen" />
-		<link rel="stylesheet" href="/css/core-css/class-rules.css" media="screen" />
-		<link rel="stylesheet" href="/css/core-css/fonts.css" media="screen" />
-		<link rel="stylesheet" href="/css/core-css/scrollbar.css" media="screen" />
-		<link rel="stylesheet" href="/css/accessibility.css" media="screen" />
-		<link rel="stylesheet" href="/css/core-css/layout/wide/index.css" media="screen" />
+		<meta name="referrer" content="no-referrer" />
+		<meta name="color-scheme" content="light dark" />
+		<link rel="manifest" href="/webapp.webmanifest" />
+		<link rel="icon" href="/img/kernvalley-icons/kernvalley.svg" type="image/svg+xml" />
+		<link rel="preload" href="/components/github/user.html" as="fetch" type="text/html" referrerpolicy="no-referrer" />
+		<link rel="preload" href="/components/leaflet/map.css" as="style" type="text/css" referrerpolicy="no-referrer" crossorigin="anonymous" />
+		<link rel="preload" href="/components/weather/current.css" as="style" type="text/css" referrerpolicy="no-referrer" crossorigin="anonymous" />
+		<link rel="preload" href="/components/github/user.css" as="style" type="text/css" referrerpolicy="no-referrer" />
+		<link rel="preload" href="/components/ad/block.css" as="style" type="text/css" referrerpolicy="no-referrer" />
+		<link rel="preload" href="/components/share-to-button/share-to-button.html" as="fetch" type="text/html" referrerpolicy="no-referrer" />
+		<link rel="preload" href="/components/share-to-button/share-to-button.css" as="style" type="text/css" referrerpolicy="no-referrer" />
+		<link rel="preconnect" href="https://api.github.com" crossorigin="anonymous" referrerpolicy="no-referrer" />
+		<script type="module" src="/index.js" referrerpolicy="no-referrer"></script>
+		<link rel="stylesheet" href="/css/core-css/theme/properties.css" referrerpolicy="no-referrer" media="screen" />
+		<link rel="stylesheet" title="Adwaita Theme" href="/css/core-css/theme/adwaita/index.css" referrerpolicy="no-referrer" media="screen" />
+		<link rel="alternate stylesheet" title="Default Theme" href="/css/core-css/theme/default/index.css" referrerpolicy="no-referrer" media="screen" />
+		<link rel="stylesheet" href="/css/core-css/rem.css" referrerpolicy="no-referrer" media="screen" />
+		<link rel="stylesheet" href="/css/core-css/viewport.css" referrerpolicy="no-referrer" media="screen" />
+		<link rel="stylesheet" href="/css/core-css/element.css" referrerpolicy="no-referrer" media="screen" />
+		<link rel="stylesheet" href="/css/core-css/class-rules.css" referrerpolicy="no-referrer" media="screen" />
+		<link rel="stylesheet" href="/css/core-css/fonts.css" referrerpolicy="no-referrer" media="screen" />
+		<link rel="stylesheet" href="/css/core-css/scrollbar.css" referrerpolicy="no-referrer" media="screen" />
+		<link rel="stylesheet" href="/css/accessibility.css" referrerpolicy="no-referrer" media="screen" />
+		<link rel="stylesheet" href="/css/core-css/forms.css" referrerpolicy="no-referrer" />
+		<link rel="stylesheet" href="/css/core-css/layout/right-sidebar/index.css" referrerpolicy="no-referrer" media="screen" />
 		<title>KernValley.us | CDN</title>
 	</head>
 	<body class="grid border-box background-primary color-default font-main">
 		<header id="header" class="contain-content center">
 			<h1 class="center">This is the <abbr title="Content Delivery Network">CDN</abbr> for <a class="underline" href="https://kernvalley.us">KernValley.us</a></h1>
-			<github-user user="kernvalley"></github-user>
+			<github-user user="kernvalley" loading="lazy"></github-user>
+			<github-user user="shgysk8zer0" loading="lazy"></github-user>
 		</header>
-		<nav id="nav" class="contain-content"></nav>
+		<window-controls hidden="">
+			<div class="flex row no-wrap" slot="titlebar" hidden="">
+				<button is="app-list" class="btn btn-default" title="Show KRV Apps" source="krv-cdn" hidden="">
+					<svg fill="currentColor" class="icon" width="32" height="32" viewBox="0 0 24.00 24.00">
+						<path stroke-width="0.2" stroke-linejoin="round" d="M 15.9994,19.9981L 19.9994,19.9981L 19.9994,15.9981L 15.9994,15.9981M 15.9994,13.9981L 19.9994,13.9981L 19.9994,9.99807L 15.9994,9.99807M 9.99938,7.99807L 13.9994,7.99807L 13.9994,3.99807L 9.99938,3.99807M 15.9994,7.99807L 19.9994,7.99807L 19.9994,3.99807L 15.9994,3.99807M 9.99938,13.9981L 13.9994,13.9981L 13.9994,9.99807L 9.99938,9.99807M 3.99938,13.9981L 7.99938,13.9981L 7.99938,9.99807L 3.99938,9.99807M 3.99938,19.9981L 7.99938,19.9981L 7.99938,15.9981L 3.99938,15.9981M 9.99938,19.9981L 13.9994,19.9981L 13.9994,15.9981L 9.99938,15.9981M 3.99938,7.99807L 7.99938,7.99807L 7.99938,3.99807L 3.99938,3.99807L 3.99938,7.99807 Z "/>
+					</svg>
+				</button>
+				<img src="/img/branding/kernvalley.us.svg" alt="logo" height="32" width="32" loading="lazy" />
+				<b>KernValley.US CDN</b>
+			</div>
+		</window-controls>
+		<nav id="nav" class="contain-content background-primary adwaita-toolbar sticky top shadow z-4 flex row no-wrap overflow-x-auto">
+			<button is="app-list" class="btn btn-default" title="Show KRV Apps" source="krv-cdn" slot="titlebar" hidden="">
+				<svg fill="currentColor" class="icon" width="32" height="32" viewBox="0 0 24.00 24.00">
+					<path stroke-width="0.2" stroke-linejoin="round" d="M 15.9994,19.9981L 19.9994,19.9981L 19.9994,15.9981L 15.9994,15.9981M 15.9994,13.9981L 19.9994,13.9981L 19.9994,9.99807L 15.9994,9.99807M 9.99938,7.99807L 13.9994,7.99807L 13.9994,3.99807L 9.99938,3.99807M 15.9994,7.99807L 19.9994,7.99807L 19.9994,3.99807L 15.9994,3.99807M 9.99938,13.9981L 13.9994,13.9981L 13.9994,9.99807L 9.99938,9.99807M 3.99938,13.9981L 7.99938,13.9981L 7.99938,9.99807L 3.99938,9.99807M 3.99938,19.9981L 7.99938,19.9981L 7.99938,15.9981L 3.99938,15.9981M 9.99938,19.9981L 13.9994,19.9981L 13.9994,15.9981L 9.99938,15.9981M 3.99938,7.99807L 7.99938,7.99807L 7.99938,3.99807L 3.99938,3.99807L 3.99938,7.99807 Z "/>
+				</svg>
+			</button>
+			<share-to-button class="grow-1" target="facebook" text="The CDN for KernValley US sites"></share-to-button>
+			<share-to-button class="grow-1" target="twitter" text="The CDN for KernValley US sites"></share-to-button>
+			<share-to-button class="grow-1" target="gmail" text="The CDN for KernValley US sites"></share-to-button>
+			<share-to-button class="grow-1" target="linkedin" text="The CDN for KernValley US sites"></share-to-button>
+			<share-to-button class="grow-1" target="reddit" text="The CDN for KernValley US sites"></share-to-button>
+		</nav>
 		<main id="main" class="contain-content card shadow">
 			<blockquote>
 				This site is not intended for regular browsing. Rather, its resources
 				<i>(JavaScript, Stylesheets, Images, &amp; Fonts)</i> are shared and accessible
 				on a number of different sites.
 			</blockquote>
+			<weather-forecast postalcode="93240" appid="6be145cbc5791c9f80471ff39d8523ed" theme="auto" loading="lazy"></weather-forecast>
+			<div class="center">
+				<leaflet-map center="35.753003,-118.424572" zoom="13" crossorigin="anonymous" detectretina="" loading="lazy" router="" zoomcontrol="" data-markers="towns restaurants campgrounds stores landmarks"></leaflet-map>
+			</div>
 		</main>
+		<aside id="sidebar" class="center">
+			<weather-current postalcode="93240" appid="6be145cbc5791c9f80471ff39d8523ed" theme="auto" loading="lazy"></weather-current>
+			<ad-block url="https://ads.kernvalley.us" layout="card" theme="auto" loading="lazy" source="krv-cdn" medium="web" campaign="krv-ads" content="sidebar">
+				<span slot="label">Kern Valley Ads</span>
+				<span slot="description">Advertise on local websites throughout the Kern River Valley</span>
+				<span slot="calltoaction">Click here to get started!</span>
+				<img src="https://cdn.kernvalley.us/img/branding/ads.kernvalley.us.svg" slot="image" loading="lazy" decoding="async" width="64" height="64" alt="KRV Ads" crossorigin="anonymous" referrerpolicy="no-referrer" />
+			</ad-block>
+			<ad-block url="https://guide.kernvalley.us" layout="card" theme="auto" loading="lazy" source="krv-cdn" medium="web" campaign="krv-ads" content="sidebar">
+				<span slot="label">Kern Valley Guide</span>
+				<span slot="description">Looking for the address of a new burger place? Tired of Google showing results from out-of-town?</span>
+				<span slot="calltoaction">Search Local Businesses</span>
+				<img src="https://cdn.kernvalley.us/img/branding/guide.kernvalley.us.svg" slot="image" loading="lazy" decoding="async" width="64" height="64" alt="KRV Ads" crossorigin="anonymous" referrerpolicy="no-referrer" />
+			</ad-block>
+		</aside>
 		<footer id="footer" class="contain-content">
-			<span>&copy;</span>
+			<app-stores class="flex row wrap space-evenly"></app-stores>
+			<hr />
+			<span>©</span>
 			<time is="current-year">2020</time>
-			<a href="https://kernvalley.us" rel="noopener external">KernValley.US</a>
+			<a href="https://kernvalley.us" rel="noopener noreferrer external">KernValley.US</a>
 		</footer>
+		<button type="button" is="share-button" url="https://cdn.kernvalley.us" text="The CDN for KernValley.US sites" class="btn btn-primary round fixed bottom right z-4" hidden="">
+			<svg width="16" height="16" fill="currentColor" class="icon" viewBox="0 0 16 16" role="img" aria-hidden="true">
+				<path d="M5.969 7.969a2.969 2.969 0 1 1-5.938 0 2.969 2.969 0 1 1 5.938 0zm9.969 5a2.969 2.969 0 1 1-5.938 0 2.969 2.969 0 1 1 5.938 0zm0-10a2.969 2.969 0 1 1-5.938 0 2.969 2.969 0 1 1 5.938 0z" overflow="visible"/>
+				<path d="M12.625 2.156L2.562 7.031.75 7.938l1.812.906 10.032 5.062.906-1.812-8.22-4.156 8.219-4-.875-1.782z" overflow="visible"/>
+			</svg>
+		</button>
 	</body>
 </html>

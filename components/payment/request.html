@@ -2,10 +2,291 @@
 <html lang="en" dir="ltr">
 	<head>
 		<meta charset="UTF-8" />
+		<link rel="stylesheet" href="https://cdn.kernvalley.us/css/core-css/element.css" crossorigin="anonymous" referrerpolicy="no-referrer" media="all" />
+		<link rel="stylesheet" href="https://cdn.kernvalley.us/css/core-css/class-rules.css" crossorigin="anonymous" referrerpolicy="no-referrer" media="all" />
+		<link rel="stylesheet" href="https://cdn.kernvalley.us/css/core-css/forms.css" crossorigin="anonymous" referrerpolicy="no-referrer" media="all" />
 	</head>
 	<body>
-		<form name="PaymentRequest">
-			<button type="submit">Submit</button>
-		</form>
+		<div id="payment-request-dialog" part="dialog" hidden="">
+			<form id="payment-request-form" name="PaymentRequest">
+				<header part="header" class="clearfix">
+					<button type="reset" id="rest-button" class="border-none background-none color-inherit float-right">X</button>
+					<div class="float-left inline-block">
+						<h2 class="site-name"></h2>
+						<div>
+							<svg width="15" height="20" viewBox="0 0 12 16" fill="#3bb33c" part="https-icon" class="icon">
+								<path fill-rule="evenodd" d="M4 13H3v-1h1v1zm8-6v7c0 .55-.45 1-1 1H1c-.55 0-1-.45-1-1V7c0-.55.45-1 1-1h1V4c0-2.2 1.8-4 4-4s4 1.8 4 4v2h1c.55 0 1 .45 1 1zM3.8 6h4.41V4c0-1.22-.98-2.2-2.2-2.2-1.22 0-2.2.98-2.2 2.2v2H3.8zM11 7H2v7h9V7zM4 8H3v1h1V8zm0 2H3v1h1v-1z"/>
+							</svg>
+							<span class="site-hostname"></span>
+						</div>
+					</div>
+				</header>
+				<input type="hidden" name="id" id="payment-id" />
+				<section id="order-summary">
+					<h4 class="payment-heading" part="heading">Order Summary</h4>
+					<div class="clearfix" part="order-total">
+						<slot name="total-label" class="float-left">
+							<b>Order Total</b>
+						</slot>
+						<span class="float-right">
+							<slot name="total-currency">
+								<span>$</span>
+							</slot>
+							<slot name="total-amount-value">
+								<span>0.00</span>
+							</slot>
+						</span>
+					</div>
+					<slot name="display-item"></slot>
+				</section>
+				<fieldset id="payment-contact-section" class="no-border" part="section contact-info">
+					<legend class="payment-heading" part="heading">
+						<slot name="contact-legend">Basic Contact Info</slot>
+					</legend>
+					<div class="form-group" id="payer-name-field">
+						<label for="payment-name" class="input-label required" part="label">
+							<span>Name</span>
+						</label>
+						<input type="text" name="name" id="payment-name" class="input" placeholder="First Last" autocomplete="name" part="input" required="" />
+					</div>
+					<div class="form-group" id="payer-email-field">
+						<label for="payment-email" class="input-label required" part="label">
+							<span>Email</span>
+						</label>
+						<input type="email" name="email" id="payment-email" class="input" placeholder="user@example.com" autocomplete="email" part="input" required="" />
+					</div>
+					<div class="form-group" id="payer-phone-field">
+						<label for="payment-phone" class="input-label required" part="label">
+							<span>Phone</span>
+						</label>
+						<input type="tel" name="telephone" id="payment-phone" class="input" placeholder="+1-555-555-5555" autocomplete="tel" part="input" required="" />
+					</div>
+				</fieldset>
+				<fieldset id="payment-shipping-address" class="no-border" part="section shipping-address">
+					<legend class="payment-heading" part="heading">
+						<slot name="shipping-address-legend">Shipping address</slot>
+					</legend>
+					<div class="form-group">
+						<label for="payment-shipping-recipient" class="input-label required">
+							<span>Recipient</span>
+						</label>
+						<input type="text" name="shipping-recipient" id="payment-shipping-recipient" class="input" placeholder="First Last" part="input" autocomplete="shipping name" required="" />
+					</div>
+					<div class="form-group">
+						<label for="payment-shipping-organization" class="input-label">
+							<span>Organization</span>
+						</label>
+						<input type="text" name="shipping-organization" id="payment-shipping-organization" class="input" placeholder="Acme Inc" part="input" autocomplete="shipping organization" />
+					</div>
+					<div class="form-group">
+						<label for="payment-shipping-street-address" class="input-label required" part="label">
+							<span>Street Address</span>
+						</label>
+						<input type="text" name="shipping-street-address" id="payment-shipping-street-address" class="input" placeholder="123 Easy St." part="input" autocomplete="shipping address-line1" required="" />
+						<input type="text" name="shipping-street-address2" id="payment-shipping-street-address2" class="input" placeholder="PO Box 123" part="input" autocomplete="shipping address-line2" />
+					</div>
+					<div class="form-group">
+						<label for="payment-shipping-city" class="input-label required" part="label">
+							<span>City</span>
+						</label>
+						<input type="text" name="shipping-city" id="payment-shipping-city" class="input" placeholder="Pleasant Town" part="input" autocomplete="shipping address-level2" required="" />
+					</div>
+					<div class="form-group">
+						<label for="payment-shipping-state" class="input-label required" part="label">
+							<span>State</span>
+						</label>
+						<select name="shipping-region" id="payment-shipping-state" class="input states" part="input" autocomplete="shipping address-level1" required=""></select>
+					</div>
+					<div class="form-group">
+						<label for="payment-shipping-postal-code" class="input-label required" part="label">
+							<span>Postal Code</span>
+						</label>
+						<input type="text" name="shipping-postal-code" id="payment-shipping-postal-code" class="input" placeholder="12345" part="input" autocomplete="shipping postal-code" required="" />
+					</div>
+				</fieldset>
+				<fieldset id="payment-shipping-method" class="no-border" part="section shipping-method">
+					<legend class="payment-heading" part="heading">
+						<slot name="shipping-method-legend">Shipping Method</slot>
+					</legend>
+				</fieldset>
+				<fieldset id="payment-address" class="no-border" part="section payment-method">
+					<legend class="payment-heading" part="heading">
+						<slot name="payment-method-legend">Payment method</slot>
+					</legend>
+					<div class="form-group">
+						<label for="payment-billing-cc-name" class="input-label required" part="label">
+							<span>Name on Card</span>
+						</label>
+						<input type="text" name="cc-name" id="payment-billing-cc-name" class="input" placeholder="First Last" autocomplete="cc-name" part="input" required="" />
+					</div>
+					<div class="form-group">
+						<label for="payment-billing-cc-type" class="input-label required" part="label">
+							<span>Card Type</span>
+						</label>
+						<select name="cc-type" id="payment-billing-cc-type" class="input" autocomplete="cc-type" part="input" required="">
+							<option value="">Select Card Type</option>
+						</select>
+						<!-- <input type="text" name="cc-name" id="payment-billing-cc-name" class="input" placeholder="First Last" autocomplete="cc-name" part="input" required="" /> -->
+					</div>
+					<div class="form-group">
+						<label for="payment-billing-cc-number" class="input-label required" part="label">
+							<span>Card number</span>
+						</label>
+						<input type="text" name="cc-num" id="payment-billing-cc-number" class="input" placeholder="****-****-****-****" pattern="(\d{4}[ \-]?){3}\d{4,5}" autocomplete="cc-number" part="input" required="" />
+					</div>
+					<div class="form-group">
+						<label for="payment-billing-cc-expiry" class="input-label required" part="label">
+							<span>Expiration Date</span>
+						</label>
+						<input type="month" name="cc-expiry" id="payment-billing-cc-expiry" class="input" placeholder="YYYY-MM" autocomplete="cc-exp" part="input" pattern="\d{4}-\d{2}" required="" />
+					</div>
+					<div class="form-group">
+						<label for="payment-billing-cc-cvc" class="input-label required" part="label">
+							<abbr title="Card Verification Code">CVC</abbr>
+						</label>
+						<input type="number" name="cc-cvc" id="payment-billing-cc-cvc" class="input" part="input" placeholder="###" min="1" max="999" autocomplete="cc-csc" required="" />
+					</div>
+					<div class="form-group">
+						<label for="payment-billing-organization" class="input-label">
+							<span>Organization</span>
+						</label>
+						<input type="text" name="billing-organization" id="payment-billing-organization" class="input" placeholder="Acme Inc" part="input" autocomplete="billing organization" />
+					</div>
+					<div class="form-group">
+						<label for="payment-billing-street-address" class="input-label required" part="label">
+							<span>Billing Address</span>
+						</label>
+						<input type="text" name="billing-street-address" id="payment-billing-street-address" class="input" placeholder="123 Easy St." part="input" autocomplete="billing address-line1" required="" />
+						<input type="text" name="billing-street-address2" id="payment-billing-street-address2" class="input" placeholder="PO Box 123" part="input" autocomplete="billing address-line2" />
+					</div>
+					<div class="form-group">
+						<label for="payment-billing-city" class="input-label required" part="label">
+							<span>City</span>
+						</label>
+						<input type="text" name="billing-city" id="payment-billing-city" class="input" placeholder="Pleasant Town" part="input" autocomplete="billing address-level2" required="" />
+					</div>
+					<div class="form-group">
+						<label for="payment-billing-state" class="input-label required" part="label">
+							<span>State</span>
+						</label>
+						<!-- <input type="text" name="billing-region" id="payment-billing-state" class="input" placeholder="CA" part="input" autocomplete="billing address-level1" required="" /> -->
+						<select name="billing-region" id="payment-billing-state" class="input" part="input" autocomplete="billing address-level1" required=""></select>
+					</div>
+					<div class="form-group">
+						<label for="payment-billing-postal-code" class="input-label required" part="label">
+							<span>Postal Code</span>
+						</label>
+						<input type="text" name="billing-postal-code" id="payment-billing-postal-code" class="input" placeholder="12345" part="input" autocomplete="billing postal-code" required="" />
+					</div>
+				</fieldset>
+				<br />
+				<div class="btns">
+					<button type="reset" class="btn btn-reject grow-1" title="Cancel" part="button cancel-button">
+						<slot name="cancel-icon">
+							<svg width="15" height="20" viewBox="0 0 12 16" fill="currentColor" class="icon">
+								<path fill-rule="evenodd" d="M7.48 8l3.75 3.75-1.48 1.48L6 9.48l-3.75 3.75-1.48-1.48L4.52 8 .77 4.25l1.48-1.48L6 6.52l3.75-3.75 1.48 1.48L7.48 8z"/>
+							</svg>
+						</slot>
+						<slot name="cancel-text">Cancel</slot>
+					</button>
+					<button type="submit" class="btn btn-accept grow-1" title="Pay" part="button pay-button">
+						<slot name="pay-icon">
+							<svg width="15" height="20" viewBox="0 0 12 16" fill="currentColor" class="icon">
+								<path fill-rule="evenodd" d="M12 5l-8 8-4-4 1.5-1.5L4 10l6.5-6.5L12 5z"/>
+							</svg>
+						</slot>
+						<slot name="pay-text">Pay</slot>
+					</button>
+				</div>
+			</form>
+		</div>
+		<div id="payment-request-backdrop" part="backdrop" hidden=""></div>
+		<template id="display-item-template">
+			<div class="display-item" slot="display-item">
+				<span class="item-label"></span>
+				<span class="item-currency-symbol">$</span><span class="item-amount-value">0.00</span>
+			</div>
+		</template>
+		<template id="shipping-option-template">
+			<div class="shipping-option">
+				<label class="block clearfix">
+					<input type="radio" name="shippingOption" class="shipping-option-checkbox float-left" value="" />
+					<span class="float-left">
+						<span class="shipping-option-label"></span>
+						<br />
+						<span class="shipping-option-amount-currency-symbol">$</span><span class="shipping-option-amount-value">0.00</span>
+					</span>
+				</label>
+			</div>
+		</template>
+		<template id="states-options">
+			<option value="">Select State or Territory</option>
+			<optgroup label="States and DC">
+				<option value="AL">Alabama</option>
+				<option value="AK">Alaska</option>
+				<option value="AZ">Arizona</option>
+				<option value="AR">Arkansas</option>
+				<option value="CA">California</option>
+				<option value="CO">Colorado</option>
+				<option value="CT">Connecticut</option>
+				<option value="DE">Delaware</option>
+				<option value="DC">District Of Columbia</option>
+				<option value="FL">Florida</option>
+				<option value="GA">Georgia</option>
+				<option value="HI">Hawaii</option>
+				<option value="ID">Idaho</option>
+				<option value="IL">Illinois</option>
+				<option value="IN">Indiana</option>
+				<option value="IA">Iowa</option>
+				<option value="KS">Kansas</option>
+				<option value="KY">Kentucky</option>
+				<option value="LA">Louisiana</option>
+				<option value="ME">Maine</option>
+				<option value="MD">Maryland</option>
+				<option value="MA">Massachusetts</option>
+				<option value="MI">Michigan</option>
+				<option value="MN">Minnesota</option>
+				<option value="MS">Mississippi</option>
+				<option value="MO">Missouri</option>
+				<option value="MT">Montana</option>
+				<option value="NE">Nebraska</option>
+				<option value="NV">Nevada</option>
+				<option value="NH">New Hampshire</option>
+				<option value="NJ">New Jersey</option>
+				<option value="NM">New Mexico</option>
+				<option value="NY">New York</option>
+				<option value="NC">North Carolina</option>
+				<option value="ND">North Dakota</option>
+				<option value="OH">Ohio</option>
+				<option value="OK">Oklahoma</option>
+				<option value="OR">Oregon</option>
+				<option value="PA">Pennsylvania</option>
+				<option value="RI">Rhode Island</option>
+				<option value="SC">South Carolina</option>
+				<option value="SD">South Dakota</option>
+				<option value="TN">Tennessee</option>
+				<option value="TX">Texas</option>
+				<option value="UT">Utah</option>
+				<option value="VT">Vermont</option>
+				<option value="VA">Virginia</option>
+				<option value="WA">Washington</option>
+				<option value="WV">West Virginia</option>
+				<option value="WI">Wisconsin</option>
+				<option value="WY">Wyoming</option>
+			</optgroup>
+			<optgroup label="US Outlying Territories">
+				<option value="AS">American Samoa</option>
+				<option value="GU">Guam</option>
+				<option value="MP">Northern Mariana Islands</option>
+				<option value="PR">Puerto Rico</option>
+				<option value="UM">United States Minor Outlying Islands</option>
+				<option value="VI">Virgin Islands</option>
+			</optgroup>
+			<optgroup label="Armed Forces">
+				<option value="AA">Armed Forces Americas</option>
+				<option value="AP">Armed Forces Pacific</option>
+				<option value="AE">Armed Forces Others</option>
+			</optgroup>
+		</template>
 	</body>
 </html>

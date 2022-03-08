@@ -1,7 +1,8 @@
-import { imageOverlay } from 'https://unpkg.com/leaflet@1.6.0/dist/leaflet-src.esm.js';
+import { imageOverlay } from 'https://unpkg.com/leaflet@1.7.1/dist/leaflet-src.esm.js';
 const map = new Map();
+import { registerCustomElement } from '../../js/std-js/custom-elements.js';
 
-customElements.define('leaflet-image-overlay', class HTMLLeafletImageOverlayElement extends HTMLElement {
+registerCustomElement('leaflet-image-overlay', class HTMLLeafletImageOverlayElement extends HTMLElement {
 	constructor() {
 		super();
 		this._map = null;
@@ -60,8 +61,13 @@ customElements.define('leaflet-image-overlay', class HTMLLeafletImageOverlayElem
 	get image() {
 		const slot = this._shadow.querySelector('slot[name="image"]');
 		const nodes = slot.assignedNodes();
-		if (nodes.length === 1) {
-			return nodes[0];
+		if (nodes.length === 1 && nodes[0] instanceof HTMLElement) {
+			const img = nodes[0];
+			if (img.tagName === 'TEMPLATE') {
+				return img.cloneNode(true).firstElementChild;
+			} else {
+				return img;
+			}
 		} else {
 			return null;
 		}
@@ -99,16 +105,16 @@ customElements.define('leaflet-image-overlay', class HTMLLeafletImageOverlayElem
 		const marker = map.get(this);
 		if (marker) {
 			switch(name) {
-			case 'hidden':
-				if (this.hidden) {
-					marker.remove();
-				} else if (this._map instanceof HTMLElement) {
-					this._map.ready.then(el => marker.addTo(el.map));
-				}
-				break;
+				case 'hidden':
+					if (this.hidden) {
+						marker.remove();
+					} else if (this._map instanceof HTMLElement) {
+						this._map.ready.then(el => marker.addTo(el.map));
+					}
+					break;
 
-			default:
-				throw new Error(`Unhandled attribute changed: ${name}`);
+				default:
+					throw new Error(`Unhandled attribute changed: ${name}`);
 			}
 		}
 	}

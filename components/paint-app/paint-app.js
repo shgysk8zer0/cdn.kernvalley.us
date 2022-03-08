@@ -1,8 +1,10 @@
-import '/components/file-input.js';
-import '/components/drawing-canvas.js';
-import '/js/std-js/shims.js';
-import {$, importLink} from '/js/std-js/functions.js';
-import {confirm} from '/js/std-js/asyncDialog.js';
+import '../file-input.js';
+import '../drawing-canvas.js';
+import '../../js/std-js/shims.js';
+import { importLink } from '../../js/std-js/functions.js';
+import { registerCustomElement } from '../../js/std-js/custom-elements.js';
+import { $ } from '../../js/std-js/esQuery.js';
+import { confirm } from '../../js/std-js/asyncDialog.js';
 
 export default class HTMLPaintAppElement extends HTMLElement {
 	constructor() {
@@ -112,29 +114,29 @@ export default class HTMLPaintAppElement extends HTMLElement {
 	async attributeChangedCallback(name, oldValue, newValue) {
 		await this.ready();
 		switch(name) {
-		case 'fill':
-			this.canvas.fill = newValue;
-			break;
-		case 'stroke':
-			this.ctx.stroke = newValue;
-			break;
-		case 'line-width':
-			this.canvas.lineWidth = newValue;
-			break;
-		case 'export-format':
-			this.canvas.exportFormat = newValue;
-			break;
-		case 'export-quality':
-			this.canvas.exportQuality = newValue;
-			break;
-		case 'height':
-			this.canvas.height = newValue;
-			break;
-		case 'width':
-			this.canvas.width = newValue;
-			break;
-		default:
-			throw new Error(`Unhandled attribute change: "${name}"`);
+			case 'fill':
+				this.canvas.fill = newValue;
+				break;
+			case 'stroke':
+				this.ctx.stroke = newValue;
+				break;
+			case 'line-width':
+				this.canvas.lineWidth = newValue;
+				break;
+			case 'export-format':
+				this.canvas.exportFormat = newValue;
+				break;
+			case 'export-quality':
+				this.canvas.exportQuality = newValue;
+				break;
+			case 'height':
+				this.canvas.height = newValue;
+				break;
+			case 'width':
+				this.canvas.width = newValue;
+				break;
+			default:
+				throw new Error(`Unhandled attribute change: "${name}"`);
 		}
 	}
 
@@ -151,4 +153,4 @@ export default class HTMLPaintAppElement extends HTMLElement {
 	}
 }
 
-customElements.define('paint-app', HTMLPaintAppElement);
+registerCustomElement('paint-app', HTMLPaintAppElement);

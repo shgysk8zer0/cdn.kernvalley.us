@@ -1,58 +1,59 @@
-if (('customElements' in self) && customElements.get('theme-toggle') === undefined) {
-	customElements.define('theme-toggle', class HTMLThemeToggleElement extends HTMLElement {
-		constructor() {
-			super();
-			this.attachShadow({mode: 'open'});
-			const light = document.createElement('button');
-			const dark = document.createElement('button');
-			const lightSlot = document.createElement('slot');
-			const darkSlot = document.createElement('slot');
-			const media = matchMedia('(prefers-color-scheme: dark)');
+import { registerCustomElement } from '../js/std-js/custom-elements.js';
 
-			light.type= 'button';
-			light.title = 'Light theme';
-			dark.type = 'button';
-			dark.title = 'Dark theme';
+registerCustomElement('theme-toggle', class HTMLThemeToggleElement extends HTMLElement {
+	constructor() {
+		super();
+		this.attachShadow({ mode: 'open' });
+		const light = document.createElement('button');
+		const dark = document.createElement('button');
+		const lightSlot = document.createElement('slot');
+		const darkSlot = document.createElement('slot');
+		const media = matchMedia('(prefers-color-scheme: dark)');
 
-			if ('part' in HTMLElement.prototype) {
-				light.part.add('button', 'light-btn');
-				dark.part.add('button', 'dark-btn');
-			}
+		light.type= 'button';
+		light.title = 'Light theme';
+		dark.type = 'button';
+		dark.title = 'Dark theme';
 
-			lightSlot.name = 'light';
-			lightSlot.textContent = 'light';
-			darkSlot.name = 'dark';
-			darkSlot.textContent = 'dark';
+		if ('part' in HTMLElement.prototype) {
+			light.part.add('button', 'light-btn');
+			dark.part.add('button', 'dark-btn');
+		}
 
-			light.append(lightSlot);
-			dark.append(darkSlot);
+		lightSlot.name = 'light';
+		lightSlot.textContent = 'light';
+		darkSlot.name = 'dark';
+		darkSlot.textContent = 'dark';
 
-			if (media.matches || document.documentElement.dataset.thene === 'dark') {
-				dark.disabled = true;
-			} else {
-				light.disabled = true;
-			}
+		light.append(lightSlot);
+		dark.append(darkSlot);
 
-			media.addListener(({matches}) => {
-				this.dispatchEvent(new CustomEvent('themechange', {detail: matches ? 'dark' : 'light'}));
-			});
+		if (media.matches || document.documentElement.dataset.theme === 'dark') {
+			dark.disabled = true;
+		} else {
+			light.disabled = true;
+		}
 
-			light.addEventListener('click', () => {
-				this.dispatchEvent(new CustomEvent('themechange', {detail: 'light'}));
-			}, {
-				capture: true,
-			});
+		media.addListener(({matches}) => {
+			this.dispatchEvent(new CustomEvent('themechange', {detail: matches ? 'dark' : 'light'}));
+		});
 
-			dark.addEventListener('click', () => {
-				this.dispatchEvent(new CustomEvent('themechange', {detail: 'dark'}));
-			}, {
-				capture: true,
-			});
+		light.addEventListener('click', () => {
+			this.dispatchEvent(new CustomEvent('themechange', {detail: 'light'}));
+		}, {
+			capture: true,
+		});
 
-			this.shadowRoot.append(light, dark);
+		dark.addEventListener('click', () => {
+			this.dispatchEvent(new CustomEvent('themechange', {detail: 'dark'}));
+		}, {
+			capture: true,
+		});
 
-			this.addEventListener('themechange', ({detail}) => {
-				switch (detail) {
+		this.shadowRoot.append(light, dark);
+
+		this.addEventListener('themechange', ({detail}) => {
+			switch (detail) {
 				case 'light':
 					light.disabled = true;
 					dark.disabled = false;
@@ -66,8 +67,19 @@ if (('customElements' in self) && customElements.get('theme-toggle') === undefin
 					break;
 
 				default: throw new Error(`Unsupported theme: ${detail}`);
-				}
-			});
+			}
+		});
+	}
+
+	get whenConnected() {
+		if (this.isConnected) {
+			return Promise.resolve();
+		} else {
+			return new Promise(resolve => this.addEventListener('connected', () => resolve(), { once: true }));
 		}
-	});
-}
+	}
+
+	connectedCallback() {
+		this.dispatchEvent(new Event('connected'));
+	}
+});

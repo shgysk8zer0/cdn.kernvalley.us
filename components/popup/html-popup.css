@@ -1,0 +1,39 @@
+:host {
+	position: fixed;
+	bottom: 0.3rem;
+	left: 50vw;
+	transform: translateX(-50%);
+}
+
+[part="body"] {
+	display: inline-block;
+	box-sizing: border-box;
+	padding: 12px 14px;
+	min-width: 200px;
+	min-height: 64px;
+	max-width: 80vw;
+	max-height: 80vh;
+	overflow: auto;
+	background-color: #fefefe;
+	font-size: clamp(16px, 1.3vmax, 24px);
+	text-align: center;
+	border: 1px solid #a7a7a7;
+	border-radius: 4px;
+	box-shadow: 0 2px 10px 0 rgba(0, 0, 0, 0.2);
+	cursor: pointer;
+	scrollbar-width: thin;
+}
+
+@media (prefers-color-scheme: dark) {
+	[part="body"] {
+		background-color: #212121;
+		color: #fafafa;
+	}
+}
+
+::slotted([slot="content"]) {
+	background: inherit;
+	color: inherit;
+	white-space: pre-line;
+	pointer-events: none;
+}

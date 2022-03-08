@@ -1,11 +1,12 @@
 import User from '/js/User.js';
+import { registerCustomElement } from '../js/std-js/custom-elements.js';
+
 import '/components/login-form/login-form.js';
 
 export default class HTMLLoginButton extends HTMLButtonElement {
 	constructor() {
 		super();
-		this.disabled = ! navigator.onLine;
-		this.hidden = User.loggedIn;
+
 		document.addEventListener('login', () => this.hidden = true);
 		document.addEventListener('logout', () => this.hidden = false);
 		window.addEventListener('offline', () => this.disabled = true);
@@ -25,7 +26,12 @@ export default class HTMLLoginButton extends HTMLButtonElement {
 				}
 			}
 		});
+
+		Promise.resolve().then(() => {
+			this.disabled = ! navigator.onLine;
+			this.hidden = User.loggedIn;
+		});
 	}
 }
 
-customElements.define('login-button', HTMLLoginButton, {extends: 'button'});
+registerCustomElement('login-button', HTMLLoginButton, {extends: 'button'});

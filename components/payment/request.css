@@ -1,0 +1,43 @@
+:host(:not([hidden])) {
+	display: block;
+}
+
+#payment-request-form {
+	background-color: #fafafa;
+	color: #212121;
+	padding: 12px;
+	position: fixed;
+	top: 2vh;
+	left: 5vw;
+	right: 5vw;
+	bottom: 2vw;
+	width: 90vw;
+	height: 96vh;
+	overflow: auto;
+	z-index: 999;
+}
+
+@media (prefers-color-scheme: dark) {
+	#payment-request-form {
+		background-color: #212121;
+		color: #fafafa;
+	}
+}
+
+.payment-heading {
+	color: #007bff;
+	font-size: 18px;
+}
+
+#payment-request-backdrop:not([hidden]) {
+	position: fixed;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 100vw;
+	height: 100vh;
+	overflow: hidden;
+	background-color: rgba(0, 0, 0, 0.7);
+	z-index: 998;
+}

@@ -1,8 +1,9 @@
 import { meta } from '../../import.meta.js';
+import { registerCustomElement } from '../js/std-js/custom-elements.js';
 
 const now = new Date();
 
-customElements.define('calendar-view', class CalendarElement extends HTMLElement {
+registerCustomElement('calendar-view', class CalendarElement extends HTMLElement {
 	constructor(month = null, year = null) {
 		super();
 		this.attachShadow({mode: 'open'});
@@ -138,10 +139,10 @@ customElements.define('calendar-view', class CalendarElement extends HTMLElement
 
 	attributeChangedCallback(name/*, oldVal, newVal*/) {
 		switch(name) {
-		case 'year':
-		case 'month':
-			this.render();
-			break;
+			case 'year':
+			case 'month':
+				this.render();
+				break;
 		}
 	}
 

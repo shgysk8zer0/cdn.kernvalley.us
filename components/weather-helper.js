@@ -18,25 +18,25 @@ export const shadows = new Map();
 export function getSprite(icon) {
 	// @SEE https://openweathermap.org/weather-conditions
 	switch(icon) {
-	case '01d': return 'weather-clear';
-	case '01n': return 'weather-clear-night';
-	case '02d':
-	case '03d':
-	case '04d': return 'weather-few-clouds';
-	case '02n':
-	case '03n':
-	case '04n': return 'weather-few-clouds-night';
-	case '09d':
-	case '09n': return 'weather-showers-scattered';
-	case '10d':
-	case '10n': return 'weather-showers';
-	case '11d':
-	case '11n': return 'weather-storm';
-	case '13d':
-	case '13n': return 'weather-snow';
-	case '50d':
-	case '50n': return 'weather-fog';
-	default: return 'weather-storm';
+		case '01d': return 'weather-clear';
+		case '01n': return 'weather-clear-night';
+		case '02d':
+		case '03d':
+		case '04d': return 'weather-few-clouds';
+		case '02n':
+		case '03n':
+		case '04n': return 'weather-few-clouds-night';
+		case '09d':
+		case '09n': return 'weather-showers-scattered';
+		case '10d':
+		case '10n': return 'weather-showers';
+		case '11d':
+		case '11n': return 'weather-storm';
+		case '13d':
+		case '13n': return 'weather-snow';
+		case '50d':
+		case '50n': return 'weather-fog';
+		default: return 'weather-storm';
 	}
 }
 

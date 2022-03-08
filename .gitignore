@@ -1,6 +1,11 @@
 img/icons.svg
+/img/markers.svg
 data/github.json
+/local/*
+!/local/.gitkeep
 node_modules/
+*.min.*
+*.map
 
 # Local Netlify folder
 .netlify

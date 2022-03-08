@@ -1,4 +1,5 @@
 import md5 from '/js/std-js/md5.js';
+import { registerCustomElement } from '../js/std-js/custom-elements.js';
 
 const GRAVATAR = 'https://secure.gravatar.com/avatar/';
 const SIZES = [
@@ -64,33 +65,35 @@ export default class HTMLGravatarImageElement extends HTMLImageElement {
 	} = {}) {
 		super(width, height);
 
-		if (typeof referrerPolicy === 'string') {
-			this.referrerPolicy = referrerPolicy;
-		}
+		Promise.resolve().then(() => {
+			if (typeof referrerPolicy === 'string') {
+				this.referrerPolicy = referrerPolicy;
+			}
 
-		if (typeof decoding === 'string') {
-			this.decoding = decoding;
-		}
+			if (typeof decoding === 'string') {
+				this.decoding = decoding;
+			}
 
-		if (typeof sizes === 'string') {
-			this.sizes = sizes;
-		}
+			if (typeof sizes === 'string') {
+				this.sizes = sizes;
+			}
 
-		this.fallback = fallback;
-		this.rating = rating;
-		this.force = force;
-		this.defaultSize = defaultSize;
+			this.fallback = fallback;
+			this.rating = rating;
+			this.force = force;
+			this.defaultSize = defaultSize;
 
-		if (typeof email === 'string') {
-			this.email = email;
-		} else if (typeof hash === 'string') {
-			this.hash = hash;
-		}
+			if (typeof email === 'string') {
+				this.email = email;
+			} else if (typeof hash === 'string') {
+				this.hash = hash;
+			}
 
 
-		if (Array.isArray(sizeList)) {
-			this.sizeList = sizeList;
-		}
+			if (Array.isArray(sizeList)) {
+				this.sizeList = sizeList;
+			}
+		});
 	}
 
 	set email(email) {
@@ -186,19 +189,19 @@ export default class HTMLGravatarImageElement extends HTMLImageElement {
 
 	attributeChangedCallback(name, oldValue, newValue) {
 		switch (name) {
-		case 'hash':
-			if (newValue !== null) {
-				update(this);
-			}
-			break;
-		case 'email':
-			if (newValue !== null) {
-				this.hash = md5(newValue);
-				this.removeAttribute('email');
-			}
-			break;
-		default:
-			throw new Error(`Unhandled attribute change: "${name}"`);
+			case 'hash':
+				if (newValue !== null) {
+					update(this);
+				}
+				break;
+			case 'email':
+				if (newValue !== null) {
+					this.hash = md5(newValue);
+					this.removeAttribute('email');
+				}
+				break;
+			default:
+				throw new Error(`Unhandled attribute change: "${name}"`);
 		}
 	}
 
@@ -209,4 +212,4 @@ export default class HTMLGravatarImageElement extends HTMLImageElement {
 	}
 }
 
-customElements.define('gravatar-img', HTMLGravatarImageElement, {extends: 'img'});
+registerCustomElement('gravatar-img', HTMLGravatarImageElement, {extends: 'img'});

@@ -1,3 +1,4 @@
+import { registerCustomElement } from '../js/std-js/custom-elements.js';
 const ENDPOINT = 'https://i.imgur.com';
 
 export default class HTMLImgurImgElement extends HTMLPictureElement {
@@ -200,19 +201,19 @@ export default class HTMLImgurImgElement extends HTMLPictureElement {
 
 	static getType(ext) {
 		switch(ext.toLowerCase()) {
-		case '.jpg':
-		case '.jpeg':
-			return 'image/jpeg';
-		case '.png':
-			return 'image/png';
-		case '.webp':
-			return 'image/webp';
-		case '.gif':
-			return 'image/gif';
-		default:
-			throw new Error(`Unknown image extension: "${ext}"`);
+			case '.jpg':
+			case '.jpeg':
+				return 'image/jpeg';
+			case '.png':
+				return 'image/png';
+			case '.webp':
+				return 'image/webp';
+			case '.gif':
+				return 'image/gif';
+			default:
+				throw new Error(`Unknown image extension: "${ext}"`);
 		}
 	}
 }
 
-customElements.define('imgur-img', HTMLImgurImgElement, {extends: 'picture'});
+registerCustomElement('imgur-img', HTMLImgurImgElement, {extends: 'picture'});

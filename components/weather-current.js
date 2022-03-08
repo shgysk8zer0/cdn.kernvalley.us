@@ -1,27 +1,34 @@
-import { meta } from '../../import.meta.js';
-import {shadows, clearSlot, getWeatherByPostalCode, createIcon, getIcon, getSprite} from './weather-helper.js';
+import { shadows, clearSlot, getWeatherByPostalCode, createIcon, getIcon, getSprite } from './weather-helper.js';
+import HTMLCustomElement from './custom-element.js';
 
-customElements.define('weather-current', class HTMLWeatherForecastElement extends HTMLElement {
-	constructor() {
+HTMLCustomElement.register('weather-current', class HTMLWeatherForecastElement extends HTMLCustomElement {
+	constructor({ appId = null, postalCode = null, loading = null } = {}) {
 		super();
-		const url = new URL(location.href);
 
-		if (url.searchParams.has('postalcode')) {
-			this.postalCode = url.searchParams.get('postalcode');
-		}
+		Promise.resolve(this.attachShadow({ mode: 'closed' })).then(async shadow => {
+			if (typeof appId === 'string') {
+				this.appId = appId;
+			}
 
-		Promise.resolve(this.attachShadow({mode: 'closed'})).then(async shadow => {
-			const resp = await fetch(new URL('weather-current.html', meta.url));
-			const html = await resp.text();
-			const parser = new DOMParser();
-			const doc = parser.parseFromString(html, 'text/html');
-			shadow.append(...doc.head.children, ...doc.body.children);
+			if (typeof postalCode === 'string' || typeof postalCode === 'number') {
+				this.postalCode = postalCode;
+			}
+
+			if (typeof loading === 'string') {
+				this.loading = loading;
+			}
+
+			await Promise.all([this.whenConnected, this.whenLoad]);
+
+			const tmp = await this.getTemplate('./components/weather-current.html');
+			shadow.append(tmp);
 			shadows.set(this, shadow);
 			this.dispatchEvent(new Event('ready'));
 		});
 	}
 
 	async connectedCallback() {
+		this.dispatchEvent(new Event('connected'));
 		this.update(this);
 	}
 
@@ -41,8 +48,12 @@ customElements.define('weather-current', class HTMLWeatherForecastElement extend
 		return this.getAttribute('appid');
 	}
 
-	set appid(val) {
-		this.setAttribute('appid', val);
+	set appId(val) {
+		if (typeof val === 'string') {
+			this.setAttribute('appid', val);
+		} else {
+			this.removeAttribute('appid');
+		}
 	}
 
 	set city(val) {
@@ -83,6 +94,26 @@ customElements.define('weather-current', class HTMLWeatherForecastElement extend
 		}
 	}
 
+	get loading() {
+		return this.getAttribute('loading') || 'auto';
+	}
+
+	set loading(val) {
+		if (typeof val === 'string' && val.length !== 0) {
+			this.setAttribute('loading', val);
+		} else {
+			this.removeAttribute('loading');
+		}
+	}
+
+	get whenConnected() {
+		if (this.isConnected) {
+			return Promise.resolve();
+		} else {
+			return new Promise(resolve => this.addEventListener('connected', () => resolve(), { once: true }));
+		}
+	}
+
 	set windSpeed(val) {
 		this._set('windSpeed', val);
 	}
@@ -115,21 +146,21 @@ customElements.define('weather-current', class HTMLWeatherForecastElement extend
 
 	set theme(val) {
 		switch(val.toLowerCase()) {
-		case 'light':
-			this.setAttribute('theme', 'light');
-			break;
+			case 'light':
+				this.setAttribute('theme', 'light');
+				break;
 
-		case 'dark':
-			this.setAttribute('theme', 'dark');
-			break;
+			case 'dark':
+				this.setAttribute('theme', 'dark');
+				break;
 
-		case '':
-		case 'auto':
-			this.removeAttribute('theme');
-			break;
+			case '':
+			case 'auto':
+				this.removeAttribute('theme');
+				break;
 
-		default:
-			throw new Error(`Unsupported theme: ${val}`);
+			default:
+				throw new Error(`Unsupported theme: ${val}`);
 		}
 	}
 
@@ -144,29 +175,34 @@ customElements.define('weather-current', class HTMLWeatherForecastElement extend
 
 	async attributeChangedCallback(name, oldValue, newValue) {
 		switch(name) {
-		case 'appid':
-			this.dispatchEvent(new CustomEvent('appidchange', {detail: {oldValue, newValue}}));
-			break;
+			case 'appid':
+				this.dispatchEvent(new CustomEvent('appidchange', {detail: {oldValue, newValue}}));
+				break;
 
-		case 'postalcode':
-			this.dispatchEvent(new CustomEvent('locationchange', {detail: {oldValue, newValue}}));
-			break;
+			case 'postalcode':
+				this.dispatchEvent(new CustomEvent('locationchange', {detail: {oldValue, newValue}}));
+				break;
 
-		case 'theme':
-			this.dispatchEvent(new CustomEvent('themechange', {detail: {oldValue, newValue}}));
-			break;
+			case 'theme':
+				this.dispatchEvent(new CustomEvent('themechange', {detail: {oldValue, newValue}}));
+				break;
 
-		case 'units':
-			this.dispatchEvent(new CustomEvent('unitschange', {detail: {oldValue, newValue}}));
-			break;
+			case 'units':
+				this.dispatchEvent(new CustomEvent('unitschange', {detail: {oldValue, newValue}}));
+				break;
 
-		default: throw new Error(`Unhandled attribute changed: ${name}`);
+			case 'loading':
+				this.lazyLoad(newValue === 'lazy');
+				break;
+
+			default: throw new Error(`Unhandled attribute changed: ${name}`);
 		}
 	}
 
 	static get observedAttributes() {
 		return [
 			'appid',
+			'loading',
 			'postalcode',
 			'units',
 			'theme',

@@ -1,13 +1,16 @@
 import User from '/js/User.js';
-import {confirm} from '/js/std-js/asyncDialog.js';
+import { confirm } from '/js/std-js/asyncDialog.js';
+import { registerCustomElement } from '../js/std-js/custom-elements.js';
 
 export default class HTMLLogoutButton extends HTMLButtonElement {
 	constructor() {
 		super();
-		this.hidden  =! User.loggedIn;
+
+		Promise.resolve().then(() => this.hidden  =! User.loggedIn);
 
 		document.addEventListener('login', () => this.hidden = false);
 		document.addEventListener('logout', () => this.hidden = true);
+
 		this.addEventListener('click', async () => {
 			if (await confirm('Are you sure you want to logout?')) {
 				User.logout();
@@ -16,4 +19,4 @@ export default class HTMLLogoutButton extends HTMLButtonElement {
 	}
 }
 
-customElements.define('logout-button', HTMLLogoutButton, {extends: 'button'});
+registerCustomElement('logout-button', HTMLLogoutButton, {extends: 'button'});
