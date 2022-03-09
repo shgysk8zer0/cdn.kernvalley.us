@@ -11,6 +11,7 @@ import { createPolicy } from './js/std-js/trust.js';
 const modules = [
 	'./components/current-year.js',
 	'./components/github/user.js',
+	'./components/github/repo.js',
 	'./components/ad/block.js',
 	'./components/share-button.js',
 	'./components/window-controls.js',
