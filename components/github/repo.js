@@ -129,7 +129,7 @@ registerCustomElement('github-repo', class HTMLGitHubRepoElement extends HTMLEle
 				if (typeof user === 'string' && typeof repo === 'string') {
 					const {
 						name, description, homepage, html_url: url, has_issues: hasIssues, message: error,
-						open_issues: openIssues, license: { name: license, key: licenseId, licenseURL } = {},
+						open_issues: openIssues, license: { name: license, key: licenseId, url: licenseURL } = {},
 						owner: { login: username, avatar_url: image, html_url: profile  } = {},
 					} = await getJSON(new URL(`./${user}/${repo}`, ENDPOINT), { signal });
 
@@ -149,7 +149,7 @@ registerCustomElement('github-repo', class HTMLGitHubRepoElement extends HTMLEle
 						hide('[part~="description"]', { base });
 					}
 
-					if (typeof homepage === 'string' && typeof licenseURL === 'string') {
+					if (typeof homepage === 'string' && homepage.startsWith('https://')) {
 						text('[part~="homepage-text"]', new URL(homepage).hostname, { base });
 						attr('[part~="homepage-url"]', { href: homepage }, { base });
 						unhide('[part~="homepage"]', { base });
@@ -157,7 +157,7 @@ registerCustomElement('github-repo', class HTMLGitHubRepoElement extends HTMLEle
 						hide('[part~="homepage"]', { base });
 					}
 
-					if (typeof licenseId === 'string' && licenseId !== 'other') {
+					if (typeof licenseId === 'string' && typeof licenseURL === 'string') {
 						text('[part~="license-name"]', license, { base });
 						attr('[part~="license-url"]', {
 							href: new URL(`./${licenseId}/`, 'http://choosealicense.com/licenses/').href,
