@@ -1,4 +1,3 @@
-/* global MediaMetadata */
 import { registerCustomElement } from '../js/std-js/custom-elements.js';
 
 /**
