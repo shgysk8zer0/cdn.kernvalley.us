@@ -9,7 +9,6 @@
 }
 
 :host([disabled]) {
-	background: ;
 	pointer-events: none;
 }
 
