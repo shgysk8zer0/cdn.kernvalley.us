@@ -1,0 +1,56 @@
+:host {
+	display: block;
+}
+
+[part="container"] {
+	--light-bg: #fefefe;
+	--light-color: #343434;
+	--light-bg-disabled: #dadada;
+	--light-color-disabled: #7E7E7E;
+	--light-border-color: #cacaca;
+	--dark-bg: #343434;
+	--dark-color: #dadada;
+	--dark-bg-disabled: #585858;
+	--dark-color-disabled: #adadad;
+	--dark-border-color: #4a4a4a;
+}
+
+button {
+	background-color: var(--light-bg);
+	color: var(--light-color);
+	border: 1px solid var(--light-border-color);
+	padding: 12px;
+	border-radius: 4px;
+	cursor: pointer;
+	transition: background-color 200ms linear, color 200ms linear, border-color 200ms linear;
+}
+
+button:disabled {
+	background-color: var(--light-bg-disabled);
+	color: var(--light-color-disabled);
+	cursor: not-allowed;
+}
+
+:host([theme="dark"]) button {
+	background-color: var(--dark-bg);
+	color: var(--dark-color);
+	border-color: var(--dark-border-color);
+}
+
+:host([theme="dark"]) button:disabled {
+	background-color: var(--dark-bg-disabled);
+	color: var(--dark-color-disabled);
+}
+
+@media (prefers-color-scheme: dark) {
+	:host(:not([theme="light"])) button {
+		background-color: var(--dark-bg);
+		color: var(--dark-color);
+		border-color: var(--dark-border-color);
+	}
+
+	:host(:not([theme="light"])) button:disabled {
+		background-color: var(--dark-bg-disabled);
+		color: var(--dark-color-disabled);
+	}
+}
