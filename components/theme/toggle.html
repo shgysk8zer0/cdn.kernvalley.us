@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+	</head>
+	<body>
+		<div part="container">
+			<button type="button" class="btn btn-primary" part="btn system-theme" data-theme="auto" title="Use System Theme">
+				<slot name="system">
+					<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+						<path d="M3.549.09a3.5 3.5 0 0 0-1.143.216l1.885 1.88c.387.386.387 1 0 1.387l-.711.708a.98.98 0 0 1-1.39 0L.303 2.401a3.473 3.473 0 0 0-.216 1.14 3.456 3.456 0 0 0 3.46 3.452 3.5 3.5 0 0 0 1.144-.216l1.174 1.171a2.472 2.465 0 0 1 .062 0l2.07-2.064-1.205-1.202a3.46 3.46 0 0 0 .217-1.14A3.456 3.456 0 0 0 3.549.09zm6.55 7.89l-2.07 2.064a2.472 2.465 0 0 1 .031.092l1.144 1.14a3.474 3.474 0 0 0-.217 1.14 3.456 3.456 0 0 0 3.461 3.452c.434 0 .854-.102 1.236-.247l-2.008-2.003a1.01 1.01 0 0 1 0-1.417l.68-.678a1.03 1.03 0 0 1 .71-.308c.253 0 .517.115.71.308l1.947 1.941c.105-.33.186-.683.186-1.047a3.456 3.456 0 0 0-3.46-3.452 3.5 3.5 0 0 0-1.144.216L10.1 7.979z" overflow="visible"/>
+						<path d="M13.858 0l-1.542 1.438c-.452.42-.53 1.148-.267 1.706L6.161 9.14a1.492 1.488 0 0 0-.031 0 1.492 1.488 0 0 0-.84-.148 1.492 1.488 0 0 0-.867.44L.477 13.43a1.494 1.49 0 1 0 2.13 2.09l3.946-3.997a1.492 1.488 0 0 0 .297-1.738l5.888-5.965c.558.249 1.273.147 1.707-.292l1.417-1.56L13.858 0z" overflow="visible"/>
+					</svg>
+				</slot>
+			</button>
+			<button type="button" class="btn btn-primary" part="btn light-theme" data-theme="light" title="Use Light Theme">
+				<slot name="light">
+					<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+						<g transform="translate(-81 -317)">
+							<rect width="3" height="2" x="81" y="324" overflow="visible" rx=".5" ry=".5"/>
+							<rect width="3" height="2" x="94" y="324" overflow="visible" rx=".5" ry=".5"/>
+							<rect width="3" height="2" x="-174.877" y="291.742" overflow="visible" rx=".5" ry=".5" transform="rotate(-45)"/>
+							<rect width="3" height="2" x="-161.877" y="291.742" overflow="visible" rx=".5" ry=".5" transform="rotate(-45)"/>
+							<rect width="3" height="2" x="-333" y="88" overflow="visible" rx=".5" ry=".5" transform="rotate(-90)"/>
+							<rect width="3" height="2" x="-320" y="88" overflow="visible" rx=".5" ry=".5" transform="rotate(-90)"/>
+							<rect width="3" height="2" x="-300.742" y="-167.877" overflow="visible" rx=".5" ry=".5" transform="rotate(-135)"/>
+							<rect width="3" height="2" x="-287.742" y="-167.877" overflow="visible" rx=".5" ry=".5" transform="rotate(-135)"/>
+							<path d="M88.989 321.008a3.98 3.98 0 0 0-3.98 3.979c0 2.197 1.782 4.009 3.98 4.009 2.197 0 4.008-1.812 4.008-4.009s-1.811-3.98-4.008-3.98zm0 1.99c1.116 0 2.018.873 2.018 1.989a2.017 2.017 0 0 1-2.018 2.019c-1.117 0-1.99-.903-1.99-2.019s.873-1.99 1.99-1.99z" overflow="visible"/>
+						</g>
+					</svg>
+				</slot>
+			</button>
+			<button type="button" class="btn btn-primary" part="btn dark-theme" data-theme="dark" title="Use Dark Theme">
+				<slot name="dark">
+					<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+						<path d="M6.81 1.102A7 7 0 0 0 1 8a7 7 0 0 0 7 7 7 7 0 0 0 4.594-1.729A8.797 8.797 0 0 1 6 4.766a8.797 8.797 0 0 1 .81-3.664z" overflow="visible"/>
+					</svg>
+				</slot>
+			</button>
+		</div>
+	</body>
+</html>

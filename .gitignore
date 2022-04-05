@@ -1,6 +1,7 @@
 img/icons.svg
 /img/markers.svg
 data/github.json
+.buildconfig
 /local/*
 !/local/.gitkeep
 node_modules/
