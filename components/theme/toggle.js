@@ -21,13 +21,40 @@ async function getTemplate() {
 }
 
 registerCustomElement('theme-toggle', class HTMLThemeToggleElement extends HTMLElement {
-	constructor() {
+	constructor({ domain, loading, maxAge, path, sameSite, secure } = {}) {
 		super();
+
 		Object.defineProperty(this, symbols.shadow, {
 			enumerable: false,
 			writable: false,
 			configurable: false,
 			value: this.attachShadow({ mode: 'closed' }),
+		});
+
+		queueMicrotask(() => {
+			if (typeof domain === 'string') {
+				this.domain = domain;
+			}
+
+			if (typeof loading === 'string') {
+				this.loading = loading;
+			}
+
+			if (Number.isSafeInteger(maxAge)) {
+				this.maxAge = maxAge;
+			}
+
+			if (typeof path === 'string') {
+				this.path = path;
+			}
+
+			if (typeof sameSite === 'string') {
+				this.sameSite = sameSite;
+			}
+
+			if (typeof secure === 'boolean') {
+				this.secure = secure;
+			}
 		});
 	}
 
@@ -91,7 +118,7 @@ registerCustomElement('theme-toggle', class HTMLThemeToggleElement extends HTMLE
 		if (val instanceof URL) {
 			this.setAttribute('domain', val.host);
 		} else if (typeof value === 'string' && val.length !== 0) {
-			this.setAttribute('domain', new URL(val, location.origin).host);
+			this.setAttribute('domain', val);
 		} else {
 			this.removeAttribute('domain');
 		}
@@ -180,5 +207,51 @@ registerCustomElement('theme-toggle', class HTMLThemeToggleElement extends HTMLE
 		} else {
 			this.removeAttribute('theme');
 		}
+	}
+
+	static async asDialog({ domain, maxAge, path, sameSite, secure, signal, text = 'Choose theme' } = {}) {
+		const { resolve, reject, promise } = getDeferred();
+
+		if (signal instanceof AbortSignal && signal.aborted) {
+			reject(signal.reason);
+		} else {
+			const dialog = document.createElement('dialog');
+			const close = document.createElement('button');
+			const toggle = new HTMLThemeToggleElement({ domain, path, sameSite, secure, maxAge });
+			const h = document.createElement('h4');
+
+			close.classList.add('btn', 'btn-reject', 'float-right');
+			close.textContent = 'x';
+			close.style.setProperty('margin-left', '6px');
+
+			h.classList.add('center');
+			h.textContent = text;
+			h.append(close);
+
+			if (signal instanceof AbortSignal) {
+				signal.addEventListener('abort', ({ target: { reason }}) => {
+					reject(reason);
+					dialog.close();
+					dialog.remove();
+				}, { once: true });
+			}
+
+			close.addEventListener('click', ({ target }) => {
+				target.closest('dialog').close();
+			}, { signal });
+
+			dialog.addEventListener('close', ({ target }) => {
+				resolve();
+				target.remove();
+			}, { signal });
+
+			dialog.append(h, toggle);
+
+			document.body.append(dialog);
+			await toggle.ready;
+			dialog.showModal();
+		}
+
+		return promise;
 	}
 });
