@@ -40,6 +40,7 @@
       "cookieStore": "readonly",
       "showOpenFilePicker": "readonly",
       "showSaveFilePicker": "readonly",
+      "queueMicrotask": "readonly",
       "globalThis": "readonly",
       "MediaMetadata": "readonly"
     }
