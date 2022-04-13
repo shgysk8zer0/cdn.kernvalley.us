@@ -1,3 +1,15 @@
+:host {
+	color-scheme: light dark;
+}
+
+:host([theme="light"]) {
+	color-scheme: light;
+}
+
+:host([theme="dark"]) {
+	color-scheme: dark;
+}
+
 input {
 	background: inherit;
 	font-size: 1.2em;

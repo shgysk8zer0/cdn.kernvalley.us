@@ -10,6 +10,15 @@
 	box-sizing: border-box;
 	overflow: auto;
 	padding: 4px 12px;
+	color-scheme: light dark;
+}
+
+:host([theme="light"]) {
+	color-scheme: light;
+}
+
+:host([theme="dark"]) {
+	color-scheme: dark;
 }
 
 * {

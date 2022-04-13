@@ -9,6 +9,15 @@
 	overflow: auto;
 	line-height: 1.4;
 	box-sizing: border-box;
+	color-scheme: light dark;
+}
+
+:host([theme="light"]) {
+	color-scheme: light;
+}
+
+:host([theme="dark"]) {
+	color-scheme: dark;
 }
 
 [part~="link"] {

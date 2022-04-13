@@ -10,11 +10,17 @@
 	color: var(--color);
 	border: 1px solid #dadada;
 	border-radius: 6px;
+	color-scheme: light dark;
+}
+
+:host([theme="light"]) {
+	color-scheme: light;
 }
 
 :host([theme="dark"]) {
 	--background: #212121;
 	--color: #fefefe;
+	color-scheme: dark;
 }
 
 @media (prefers-color-scheme: dark) {

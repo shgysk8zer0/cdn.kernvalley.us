@@ -11,6 +11,15 @@
 	width: env(titlebar-area-width, var(--titlebar-area-width, 100%));
 	height: var(--titlebar-area-height, 33px);
 	height: env(titlebar-area-height, var(--titlebar-area-height, 33px));
+	color-scheme: light dark;
+}
+
+:host([theme="light"]) {
+	color-scheme: light;
+}
+
+:host([theme="dark"]) {
+	color-scheme: dark;
 }
 
 * {
