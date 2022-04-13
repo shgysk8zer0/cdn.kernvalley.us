@@ -1,6 +1,15 @@
 :host {
 	display: inline-block;
 	border: none;
+	color-scheme: light dark;
+}
+
+:host([theme="light"]) {
+	color-scheme: light;
+}
+
+:host([theme="dark"]) {
+	color-scheme: dark;
 }
 
 :host([url]) {

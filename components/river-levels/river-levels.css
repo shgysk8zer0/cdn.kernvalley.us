@@ -5,6 +5,15 @@
 	border-radius: 7px;
 	background: inherit;
 	color: inherit;
+	color-scheme: light dark;
+}
+
+:host([theme="light"]) {
+	color-scheme: light;
+}
+
+:host([theme="dark"]) {
+	color-scheme: dark;
 }
 
 [part~="section"] {

@@ -24,6 +24,15 @@
 	overflow-y: hidden;
 	z-index: 2147483647;
 	animation: NotificationFadeIn 300ms ease-in;
+	color-scheme: light dark;
+}
+
+:host([theme="light"]) {
+	color-scheme: light;
+}
+
+:host([theme="dark"]) {
+	color-scheme: dark;
 }
 
 @media (max-width: 550px) {
