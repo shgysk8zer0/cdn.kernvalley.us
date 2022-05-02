@@ -1,25 +1,33 @@
+import '/js/std-js/shims.js';
 import { fromFile } from '/js/std-js/integrity.js';
 import { enable, disable, on, ready, value } from '/js/std-js/dom.js';
 import { createPolicy } from '/js/std-js/trust.js';
 
 const policy = createPolicy('default', {
 	createScriptURL: input => {
-		if ([location.origin, 'https://cdn.kernvalley.us'].includes(new URL(input, location.origin).origin)) {
+		if (
+			[location.origin, 'https://cdn.kernvalley.us']
+				.includes(new URL(input, location.origin).origin)
+		) {
 			return input;
 		} else {
-			throw new DOMException(`Untrusted script url <${input}`);
+			throw new DOMException(`Untrusted script url <${input}>`);
 		}
 	}
 });
 
-navigator.serviceWorker.register(policy.createScriptURL('/sw.js')).catch(console.error);
+if (('serviceWorker' in navigator) && navigator.serviceWorker.register instanceof Function) {
+	navigator.serviceWorker.register(policy.createScriptURL('/sw.js')).catch(console.error);
+}
 
-ready().then(async () => {
-	on('#copy-btn', {
-		click: async () => {
-			await navigator.clipboard.writeText(document.getElementById('hash').value);
-		}
-	});
+ready().then(() => {
+	if (('clipboard' in navigator) && navigator.clipboard.writeText instanceof Function) {
+		on('#copy-btn', {
+			click: async () => {
+				await navigator.clipboard.writeText(document.getElementById('hash').value);
+			}
+		});
+	}
 
 	on('[data-close]', {
 		click: function() {
@@ -31,9 +39,9 @@ ready().then(async () => {
 		submit: async event => {
 			event.preventDefault();
 			const data = new FormData(event.target);
-			disable('.btn-accept, fieldset');
 			const controller = new AbortController();
 			const { signal } = controller;
+			disable('.btn-accept, fieldset');
 
 			signal.addEventListener('abort', () => {
 				enable('.btn-accept, fieldset');
@@ -43,8 +51,11 @@ ready().then(async () => {
 				on('.btn-reject', { click: () => controller.abort() }, { signal, once: true });
 				const integrity = await fromFile(data.get('file'), { algo: data.get('algo') });
 				value('#hash', integrity);
-				enable('#copy-btn');
 				document.getElementById('error-msg').replaceChildren();
+
+				if (('clipboard' in navigator) && navigator.clipboard.writeText instanceof Function) {
+					enable('#copy-btn');
+				}
 			} catch(err) {
 				disable('#copy-btn');
 				document.getElementById('error-msg').textContent = err;
