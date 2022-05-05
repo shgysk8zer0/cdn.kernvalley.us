@@ -374,11 +374,18 @@ HTMLCustomElement.register('slide-show', class HTMLSlideShowElement extends HTML
 						.style.setProperty('--slideshow-height', newVal);
 				});
 				break;
+			
+			case 'allowfullscreen':
+				if (typeof newVal === 'string' && ! (HTMLElement.prototype.allowfullscreen instanceof Function)) {
+					this.removeAttribute('allowfullscreen');
+				}
+				break;
 		}
 	}
 
 	static get observedAttributes() {
 		return [
+			'allowfullscreen',
 			'playing',
 			'width',
 			'height',
