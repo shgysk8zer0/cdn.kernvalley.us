@@ -1,16 +1,7 @@
 import HTMLCustomElement from '../custom-element.js';
 import { sleep } from '../../js/std-js/promises.js';
+import { whenPageVisible } from '../../js/std-js/dom.js';
 import { purify as policy } from '../../js/std-js/purify.js';
-
-async function visible() {
-	if (document.visibilityState === 'hidden') {
-		await new Promise(resolve => {
-			document.addEventListener('visibilitychange', () => resolve());
-		}, {
-			once: true,
-		});
-	}
-}
 
 HTMLCustomElement.register('slide-show', class HTMLSlideShowElement extends HTMLCustomElement {
 	constructor(...slides) {
@@ -250,7 +241,7 @@ HTMLCustomElement.register('slide-show', class HTMLSlideShowElement extends HTML
 		return !this.hasAttribute('playing');
 	}
 
-	async navigate({dir = 'next', pause = true} = {}) {
+	async navigate({ dir = 'next', pause = true } = {}) {
 		this.dispatchEvent(new CustomEvent('userchange', { detail: dir }));
 
 		if (pause) {
@@ -279,14 +270,12 @@ HTMLCustomElement.register('slide-show', class HTMLSlideShowElement extends HTML
 	async playing() {
 		if (this.paused) {
 			await new Promise(resolve => {
-				this.addEventListener('playing', () => resolve(this));
-			}, {
-				once: true,
+				this.addEventListener('playing', () => resolve(this), { once: true });
 			});
 		}
 	}
 
-	loopSlides(i = 0) {
+	loopSlides(i = 0, { signal } = {}) {
 		return (async function* slideGenerator() {
 			while (true) {
 				const slides = await this.slides;
@@ -309,7 +298,7 @@ HTMLCustomElement.register('slide-show', class HTMLSlideShowElement extends HTML
 							// Wait until slideshow is playing
 							this.playing(),
 							// And tab is visible
-							visible(),
+							whenPageVisible({ signal }),
 							// And image is decoded / loaded, if applicable
 							slide.decode instanceof Function ? slide.decode() : Promise.resolve(),
 							// And slide interval has passed
