@@ -4,6 +4,7 @@ import { parse } from '../../js/std-js/dom.js';
 import { getJSON } from '../../js/std-js/http.js';
 import { debounce } from '../../js/std-js/utility.js';
 import { watch as watchLocation, get as findLocation } from '../../js/std-js/geo.js';
+import { clamp } from '../../js/std-js/math.js';
 import { getSchemaIcon } from './schema-icon.js';
 import { MARKER_TYPES } from './marker-types.js';
 
@@ -23,22 +24,50 @@ function filterTypes(types) {
 	}
 }
 
+export const DEFAULT_ICON = {
+	iconUrl: 'https://cdn.kernvalley.us/img/markers.svg#map-marker',
+	iconSize: [24, 24],
+	crossOrigin: 'anonymous',
+};
+
 registerCustomElement('leaflet-marker', class HTMLLeafletMarkerElement extends HTMLElement {
-	constructor({ icon = null, popup = null, latitude = null, longitude = null,
-		open = null, minZoom = null, maxZoom = null } = {}) {
+	constructor({
+		icon: iconArg = null, popup = null, latitude = null, longitude = null,
+		open = null, minZoom = null, maxZoom = null,
+	} = {}) {
 		super();
 		this._map = null;
-		this._shadow = this.attachShadow({ mode: 'closed' });
+		this._shadow = this.attachShadow({ mode: 'open' });
 		const popupEl = document.createElement('slot');
 		const iconEl = document.createElement('slot');
 
 		popupEl.name = 'popup';
 		iconEl.name = 'icon';
 
+		popupEl.addEventListener('slotchange', debounce(async () => {
+			const slotted = popupEl.assignedElements();
+
+			if (data.has(this) && slotted.length !== 0) {
+				data.get(this).bindPopup(slotted[slotted.length - 1].innerHTML);
+			}
+		}));
+
+		iconEl.addEventListener('slotchange', debounce(async () => {
+			const slotted = iconEl.assignedElements();
+
+			if (data.has(this) && slotted.length !== 0) {
+				const { src: iconUrl, height, width, crossOrigin } = slotted[slotted.length - 1];
+				const iconSize = [height, width];
+				data.get(this).setIcon(icon({ iconUrl, iconSize, crossOrigin }));
+			} else if (data.has(this)) {
+				data.get(this).setIcon(icon(DEFAULT_ICON));
+			}
+		}, { delay: 50 }));
+
 		this._shadow.append(popupEl, iconEl);
 
-		if (typeof icon === 'string' || icon instanceof HTMLElement) {
-			this.iconImg = icon;
+		if (typeof iconArg === 'string' || iconArg instanceof HTMLElement) {
+			this.iconImg = iconArg;
 		}
 
 		if (popup) {
@@ -257,8 +286,25 @@ registerCustomElement('leaflet-marker', class HTMLLeafletMarkerElement extends H
 			const container = document.createElement('div');
 			container.append(val);
 			this.popup = container;
-		} else if (typeof val === 'string') {
+		} else if (HTMLElement.setHTML instanceof Function) {
+			const el = document.createElement('div');
+			el.setHTML(val, { sanitizer: new globalThis.Sanitizer() });
+			el.slot = 'popup';
+			this.popup = el;
+		} else {
 			this.popup = parse(val);
+		}
+	}
+
+	get opacity() {
+		return this.hasAttribute('opacity') ? clamp(0, parseFloat(this.getAttribute('opacity')), 1) : 1;
+	}
+
+	set opacity(val) {
+		if (typeof val === 'number') {
+			this.setAttribute('opacity', clamp(0, val, 1).toString());
+		} else {
+			this.removeAttribute('opacity');
 		}
 	}
 
@@ -339,12 +385,27 @@ registerCustomElement('leaflet-marker', class HTMLLeafletMarkerElement extends H
 		let m;
 
 		if (iconImg instanceof HTMLImageElement) {
-			m = marker([latitude, longitude], {title, icon: icon({
-				iconUrl: iconImg.src,
-				iconSize: [iconImg.height || 32, iconImg.width || 32],
-			})});
+			m = marker(
+				[latitude, longitude],
+				{
+					title,
+					riseOnHover: true,
+					icon: icon({
+						iconUrl: iconImg.src,
+						iconSize: [iconImg.height || 32, iconImg.width || 32],
+						crossOrigin: iconImg.crossOrigin,
+					})
+				}
+			);
 		} else {
-			m = marker([latitude, longitude], {title});
+			m = marker(
+				[latitude, longitude],
+				{
+					title,
+					riseOnHover: true,
+					icon: icon(DEFAULT_ICON),
+				}
+			);
 		}
 
 		m.on('click', eventDispatcher);
@@ -402,9 +463,10 @@ registerCustomElement('leaflet-marker', class HTMLLeafletMarkerElement extends H
 
 				case 'latitude':
 				case 'longitude':
-					if (typeof newVal === 'string' && typeof oldVal === 'string' && data.has(this)) {
+					if (data.has(this) && typeof newVal === 'string' && newVal.length !== 0) {
 						const marker = data.get(this);
 						const { latitude, longitude } = this;
+
 						if (updaters.has(this)) {
 							clearTimeout(updaters.get(this));
 						}
@@ -413,6 +475,14 @@ registerCustomElement('leaflet-marker', class HTMLLeafletMarkerElement extends H
 							marker.setLatLng(new latLng({ lat: latitude, lng: longitude }));
 							updaters.delete(this);
 						}), 17);
+					}
+					break;
+
+				case 'opacity':
+					if (data.has(this) && typeof newVal === 'string' && newVal.length !== 0) {
+						data.get(this).setOpacity(clamp(0, parseFloat(newVal), 1));
+					} else if (data.has(this)) {
+						data.get(this).setOpacity(1);
 					}
 					break;
 
@@ -467,6 +537,7 @@ registerCustomElement('leaflet-marker', class HTMLLeafletMarkerElement extends H
 			'hidden',
 			'latitude',
 			'longitude',
+			'opacity',
 		];
 	}
 });

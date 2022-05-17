@@ -1,4 +1,4 @@
-import { debounce } from '../../js/std-js/events.js';
+import { debounce } from '../../js/std-js/utility.js';
 import { get as getLocation } from '../../js/std-js/geo.js';
 import { on, off, create, query } from '../../js/std-js/dom.js';
 import { loadStylesheet } from '../../js/std-js/loader.js';
@@ -126,7 +126,7 @@ function close() {
 		if (location.hash.substr(1) === this.id) {
 			const url = new URL(location.pathname, location.origin).href;
 			document.title = initialTitle;
-			history.pushState(history.stat, document.title, url);
+			history.pushState(history.state, document.title, url);
 		}
 	}, 50);
 }
