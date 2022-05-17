@@ -11,7 +11,7 @@ import {
 	tileLayer as LeafletTileLayer,
 	point as Point,
 	latLng as LatLng,
-} from 'https://unpkg.com/leaflet@1.7.1/dist/leaflet-src.esm.js';
+} from 'https://unpkg.com/leaflet@1.8.0/dist/leaflet-src.esm.js';
 
 const initialTitle = document.title;
 const GEO_EXP = /#-?\d{1,3}\.\d+,-?\d{1,3}\.\d+(,\d{1,2})?/;

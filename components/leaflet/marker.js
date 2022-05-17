@@ -1,11 +1,15 @@
-import { marker, icon, latLng } from 'https://unpkg.com/leaflet@1.7.1/dist/leaflet-src.esm.js';
+import { marker, icon, latLng } from 'https://unpkg.com/leaflet@1.8.0/dist/leaflet-src.esm.js';
 import { registerCustomElement } from '../../js/std-js/custom-elements.js';
 import { parse } from '../../js/std-js/dom.js';
 import { getJSON } from '../../js/std-js/http.js';
+import { debounce } from '../../js/std-js/utility.js';
+import { watch as watchLocation, get as findLocation } from '../../js/std-js/geo.js';
 import { getSchemaIcon } from './schema-icon.js';
 import { MARKER_TYPES } from './marker-types.js';
 
 const data = new WeakMap();
+const controllers = new WeakMap();
+const updaters = new WeakMap();
 
 function filterTypes(types) {
 	if (Array.isArray(types)) {
@@ -42,7 +46,7 @@ registerCustomElement('leaflet-marker', class HTMLLeafletMarkerElement extends H
 		}
 
 		this.addEventListener('connected', () => {
-			this.slot   = 'markers';
+			this.slot = 'markers';
 
 			if (typeof latitude === 'number' || typeof latitude === 'string') {
 				this.latitude = latitude;
@@ -100,6 +104,11 @@ registerCustomElement('leaflet-marker', class HTMLLeafletMarkerElement extends H
 			marker.remove();
 			data.delete(this);
 			this._map = null;
+
+			if (controllers.has(this)) {
+				controllers.get(this).abort(new DOMException('Marker disconnected.'));
+				controllers.delete(this);
+			}
 		}
 	}
 
@@ -274,8 +283,48 @@ registerCustomElement('leaflet-marker', class HTMLLeafletMarkerElement extends H
 		}
 	}
 
+	async find({ enableHighAccuracy = true, maximumAge = 0, timeout, signal } = {}) {
+		const [{ coords }] = await Promise.all([
+			findLocation({ enableHighAccuracy, maximumAge, timeout, signal }),
+			this.ready,
+		]);
+
+		this.geo = coords;
+		this.parentElement.flyTo(coords);
+	}
+
+	async watch({ delay = 500, enableHighAccuracy = true, errorHandler = console.error, maximumAge = 0, timeout, signal } = {}) {
+		const controller = new AbortController();
+
+		if (signal instanceof AbortSignal) {
+			if (signal.aborted) {
+				controller.abort(signal.reason || new DOMException('Operation aborted.'));
+			} else {
+				signal.addEventListener('abort', ({ target }) => {
+					if (controllers.has(this)) {
+						controllers.get(this).abort(target.reason || new DOMException('Operation aborted.'));
+					}
+				}, { signal: controller.signal, once: true });
+			}
+		}
+
+		if (controller.signal.aborted) {
+			throw controller.signal.reason || new DOMException('Operation aborted.');
+		} else {
+			controllers.set(this, controller);
+			watchLocation(
+				debounce(({ coords }) =>  {
+					this.geo = coords;
+					this.parentElement.flyTo(coords);
+				}, { delay }),
+				err => errorHandler(err),
+				{ enableHighAccuracy, maximumAge, timeout, signal: controller.signal },
+			);
+		}
+	}
+
 	_make() {
-		const { latitude, longitude, title, iconImg, popup } = this;
+		const { latitude = 0, longitude = 0, title, iconImg, popup } = this;
 		const eventDispatcher = ({ containerPoint, latlng, originalEvent, type }) => {
 			this.dispatchEvent(new CustomEvent(`marker${type}`, {detail: {
 				coordinates: {
@@ -319,7 +368,7 @@ registerCustomElement('leaflet-marker', class HTMLLeafletMarkerElement extends H
 		return m;
 	}
 
-	async attributeChangedCallback(name/*, oldVal, newVal*/) {
+	async attributeChangedCallback(name, oldVal, newVal) {
 		await this.ready;
 		const marker = data.get(this);
 
@@ -348,6 +397,22 @@ registerCustomElement('leaflet-marker', class HTMLLeafletMarkerElement extends H
 
 							this.dispatchEvent(new Event(open ? 'open' : 'close'));
 						});
+					}
+					break;
+
+				case 'latitude':
+				case 'longitude':
+					if (typeof newVal === 'string' && typeof oldVal === 'string' && data.has(this)) {
+						const marker = data.get(this);
+						const { latitude, longitude } = this;
+						if (updaters.has(this)) {
+							clearTimeout(updaters.get(this));
+						}
+
+						updaters.set(this, setTimeout(() => {
+							marker.setLatLng(new latLng({ lat: latitude, lng: longitude }));
+							updaters.delete(this);
+						}), 17);
 					}
 					break;
 
@@ -400,6 +465,8 @@ registerCustomElement('leaflet-marker', class HTMLLeafletMarkerElement extends H
 		return [
 			'open',
 			'hidden',
+			'latitude',
+			'longitude',
 		];
 	}
 });
