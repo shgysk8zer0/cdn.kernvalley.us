@@ -1,4 +1,4 @@
-import { imageOverlay } from 'https://unpkg.com/leaflet@1.7.1/dist/leaflet-src.esm.js';
+import { imageOverlay } from 'https://unpkg.com/leaflet@1.9.0/dist/leaflet-src.esm.js';
 const map = new Map();
 import { registerCustomElement } from '../../js/std-js/custom-elements.js';
 

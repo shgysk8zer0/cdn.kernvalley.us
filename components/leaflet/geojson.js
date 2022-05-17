@@ -1,4 +1,4 @@
-import { geoJSON } from 'https://unpkg.com/leaflet@1.7.1/dist/leaflet-src.esm.js';
+import { geoJSON } from 'https://unpkg.com/leaflet@1.8.0/dist/leaflet-src.esm.js';
 import { registerCustomElement } from '../../js/std-js/custom-elements.js';
 const map = new Map();
 const MIME_TYPE = 'application/geo+json';
