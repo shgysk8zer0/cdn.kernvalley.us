@@ -1,163 +1,101 @@
 import { registerCustomElement } from '../js/std-js/custom-elements.js';
+import { create } from '../js/std-js/dom.js';
 
-function getActions(req, cache) {
-	const td = document.createElement('td');
-	const delBtn = document.createElement('button');
-	delBtn.textContent = 'Delete';
-	delBtn.classList.add('btn', 'btn-reject');
-	delBtn.addEventListener('click', async () => {
-		if (confirm('Delete this entry?')) {
-			await cache.delete(req);
-			delBtn.closest('tr').remove();
-		}
-	});
-	td.append(delBtn);
-	return td;
-}
+const protectedData = new WeakMap();
 
-registerCustomElement('cache-list', class HTMLCacheListElement extends HTMLTableElement {
-	constructor(version = null) {
+registerCustomElement('cache-list', class HTMLCacheListElement extends HTMLElement {
+	constructor() {
 		super();
-		[...this.children].forEach(el => el.remove());
+		const shadow = this.attachShadow({ mode: 'closed' });
+		protectedData.set(this, { shadow });
 
-		const caption = document.createElement('caption');
-		const btn = document.createElement('button');
-		const label = document.createElement('label');
-		const sLabel = document.createElement('label');
-		const select = document.createElement('select');
-		const thead = document.createElement('thead');
-		const tbody = document.createElement('tbody');
-		const tr = document.createElement('tr');
-		const search = document.createElement('input');
-		const dfltOpt = document.createElement('option');
-		dfltOpt.textContent = 'Select version';
-		dfltOpt.value = '';
-		label.textContent = 'Cache version: ';
-		sLabel.textContent = 'Search for: ';
-		search.type = 'search';
-		search.autoComplete = 'off';
-		search.placeholder = 'https://example.com/path.ext';
-		select.classList.add('input');
-		btn.textContent = 'Delete';
-
-		thead.hidden = true;
-
-		btn.classList.add('btn', 'btn-reject');
-
-		search.addEventListener('change', ({ target }) => {
-			if (target.value !== '') {
-				[...this.tBodies.item(0).rows].forEach(row => {
-					row.hidden = ! row.cells.item(0).textContent.includes(target.value);
-				});
-			} else {
-				[...this.tBodies.item(0).rows].forEach(tr => tr.hidden = false);
-			}
-		}, {
-			capture: true,
+		caches.keys().then(keys => {
+			shadow.append(create('form', {
+				part: ['form'],
+				events: {
+					submit: event => {
+						event.preventDefault();
+						const data = new FormData(event.target);
+						this.version = data.get('version');
+					}
+				},
+				children: [
+					create('label', { for: 'cache-versions', text: 'Cache Version' }),
+					create('select', {
+						name: 'version',
+						id: 'cache-versions',
+						required: true,
+						part: ['version-select'],
+						children: keys.map(key => create('option', { value: key, text: key })),
+					}),
+					create('div', {
+						children: [
+							create('button', { type: 'submit', text: 'List', part: ['submit', 'button'] }),
+							create('button', { type: 'reset', text: 'Reset', part: ['reset', 'button'] }),
+						]
+					})
+				]
+			}), create('table', {
+				part: ['table'],
+				children: [
+					create('thead', {
+						hidden: true,
+						children: [create('tr', {
+							children: ['Index', 'Method', 'Protocol', 'Host', 'Path', 'Actions']
+								.map(text => create('th', { text })),
+						})]
+					}),
+					create('tbody'),
+				]
+			}));
 		});
-
-		btn.addEventListener('click', () => {
-			if (confirm(`Delete cache version: ${this.version}?`)) {
-				caches.delete(this.version).then(() => {
-					[...select.selectedOptions].forEach(el => {
-						if (el.value) {
-							el.remove();
-						}
-					});
-					this.version = select.value;
-				}).catch(console.error);
-			}
-		}, {
-			capture: true
-		});
-
-
-		select.addEventListener('change', ({ target }) => {
-			this.version = target.value;
-		}, { capture: true });
-
-		['URL', 'Method', 'Mode', 'Referrer Policy', 'Credentials', 'Integrity', 'Actions'].forEach(label => {
-			const th = document.createElement('th');
-			th.textContent = label;
-			tr.append(th);
-		});
-
-		sLabel.append(search);
-		caption.append('Cache Versions and Entries', document.createElement('br'), label, btn, document.createElement('br'), sLabel);
-		thead.append(tr);
-		this.append(caption, thead, tbody);
-
-		caches.keys().then(vs => {
-			const version = this.version;
-			const opts = vs.map(v => {
-				const opt = document.createElement('option');
-				opt.value = v;
-				opt.textContent = v;
-				opt.checked = v === version;
-				return opt;
-			});
-			select.append(dfltOpt, ...opts);
-			label.append(select);
-		});
-
-		if (version) {
-			this.ready.then(() => this.version = version);
-		}
-	}
-
-	connectedCallback() {
-		this.dispatchEvent(new Event('connected'));
 	}
 
 	attributeChangedCallback(name, oldVal, newVal) {
 		switch(name) {
 			case 'version':
-
-				this.dispatchEvent(new CustomEvent('versionchange', { detail: { newVal, oldVal }}));
-
 				if (typeof newVal === 'string' && newVal.length !== 0) {
-					this.querySelector('caption select').value = newVal;
-					caches.open(newVal).then(async cache => {
-						const entries = await cache.keys();
-						const tbody = this.tBodies.item(0);
-						if (Array.isArray(entries)) {
-							const rows = entries.map(({ url, method, mode, referrerPolicy, credentials, integrity }) => {
-								const tr = document.createElement('tr');
-								const cells = [url, method, mode, referrerPolicy, credentials, integrity].map(txt => {
-									const td = document.createElement('td');
-									td.textContent = txt;
-									return td;
+					caches.open(newVal).then(cache => {
+						cache.keys().then(items => {
+							const { shadow } = protectedData.get(this);
+							const trs = items.map(({ method, url }, i) => {
+								const { protocol, host, pathname } = new URL(url);
+								return create('tr', {
+									dataset: { key: url },
+									part: ['row', i % 2 === 0 ? 'row-even' : 'row-odd'],
+									children: [
+										create('td', { text: i.toString(), part: ['index'] }),
+										...[method, protocol, host, pathname]
+											.map(text => create('td', { text })),
+										create('td', {
+											children: [create('button', {
+												type: 'button',
+												text: 'Delete',
+												dataset: { url },
+												part: ['delete', 'button'],
+												events: {
+													click: async ({ target}) => {
+														const cache = await caches.open(newVal);
+														await cache.delete(target.dataset.url);
+														target.closest('tr').remove();
+													}
+												}
+											})]
+										})
+									]
 								});
-								tr.append(...cells, getActions(url, cache));
-								return tr;
 							});
-							[...tbody.rows].forEach(row => row.remove());
-							const empty = rows.length === 0;
-							this.tHead.hidden = ! empty;
-							tbody.append(...rows);
-						}
+
+							shadow.querySelector('table > tbody').replaceChildren(...trs);
+							shadow.querySelector('table > thead').hidden = trs.length === 0;
+						});
 					});
-				} else {
-					[...this.tBodies.item(0).rows].forEach(tr => tr.remove());
-					this.tHead.hidden = true;
 				}
 				break;
 
 			default:
-				throw new Error(`Unhandled attribute changed: ${name}`);
+				throw new DOMException(`Unsupported attribtue changed: "${name}"`);
 		}
-	}
-
-	get connected() {
-		if (this.isConnected) {
-			return Promise.resolve();
-		} else {
-			return new Promise(resolve => this.addEventListener('connected', () => resolve(), { once: true }));
-		}
-	}
-
-	get ready() {
-		return Promise.resolve();
 	}
 
 	get version() {
@@ -165,7 +103,7 @@ registerCustomElement('cache-list', class HTMLCacheListElement extends HTMLTable
 	}
 
 	set version(val) {
-		if (typeof val === 'string' || typeof val === 'number') {
+		if (typeof val === 'string' && val.length !== 0) {
 			this.setAttribute('version', val);
 		} else {
 			this.removeAttribute('version');
@@ -175,6 +113,4 @@ registerCustomElement('cache-list', class HTMLCacheListElement extends HTMLTable
 	static get observedAttributes() {
 		return ['version'];
 	}
-}, {
-	extends: 'table',
 });
