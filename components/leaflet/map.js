@@ -2,6 +2,7 @@ import { debounce } from '../../js/std-js/utility.js';
 import { get as getLocation } from '../../js/std-js/geo.js';
 import { on, off, create, query } from '../../js/std-js/dom.js';
 import { loadStylesheet } from '../../js/std-js/loader.js';
+import { between } from '../../js/std-js/math.js';
 import { getCustomElement } from '../../js/std-js/custom-elements.js';
 import HTMLCustomElement from '../custom-element.js';
 import { MARKER_TYPES } from './marker-types.js';
@@ -233,11 +234,10 @@ HTMLCustomElement.register('leaflet-map', class HTMLLeafletMapElement extends HT
 			this.addEventListener('zoom', ({ detail: { zoom }}) => {
 				const markers = query('[slot="markers"][minzoom],[slot="markers"][maxzoom]', this);
 				markers.forEach(marker => {
-					const { minZoom, maxZoom, open } = marker;
+					const { minZoom = 0, maxZoom = 100, open } = marker;
 
 					if (! open) {
-						marker.hidden = (! Number.isNaN(minZoom) && zoom < minZoom)
-							|| (! Number.isNaN(maxZoom) && zoom > maxZoom);
+						marker.hidden = ! between(minZoom, zoom, maxZoom);
 					}
 				});
 			}, { passive: true });
@@ -251,6 +251,20 @@ HTMLCustomElement.register('leaflet-map', class HTMLLeafletMapElement extends HT
 				slotchange: ({ target }) => {
 					const detail = target.assignedElements();
 					this.dispatchEvent(new CustomEvent(`${target.name}change`, { detail }));
+					switch(target.name) {
+						case 'attribution':
+							this.ready.then(() => {
+								const ac = this.map.attributionControl;
+								Object.keys(ac._attributions).forEach(attr => ac.removeAttribution(attr));
+								target.assignedElements().forEach(el => {
+									const clone = el.cloneNode(true);
+									clone.removeAttribute('slot');
+									ac.addAttribution(clone.outerHTML);
+								});
+							});
+
+							break;
+					}
 				}
 			};
 
@@ -267,7 +281,7 @@ HTMLCustomElement.register('leaflet-map', class HTMLLeafletMapElement extends HT
 					}),
 					create('slot', {
 						events,
-						attrs: { name: 'attribution' },
+						name: 'attribution',
 						children: [
 							create('a', {
 								text: 'Wikimedia',
@@ -277,7 +291,7 @@ HTMLCustomElement.register('leaflet-map', class HTMLLeafletMapElement extends HT
 									rel: 'noopener noreferrer external',
 								}
 							})
-						]
+						],
 					}),
 					create('slot', { events, attrs: { name: 'markers' }}),
 					create('slot', { events, attrs: { name: 'overlays' }}),
@@ -286,8 +300,8 @@ HTMLCustomElement.register('leaflet-map', class HTMLLeafletMapElement extends HT
 			});
 
 			await Promise.allSettled([
-				loadStylesheet('https://unpkg.com/leaflet@1.7.1/dist/leaflet.css', {
-					integrity: 'sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A==',
+				loadStylesheet('https://unpkg.com/leaflet@1.8.0/dist/leaflet.css', {
+					integrity: 'sha512-hoalWLoI8r4UszCkZ5kL8vayOGVae1oxXe/2A4AO6J9+580uKHDO3JdHb7NzwwzK5xr/Fs0W40kiNHxM9vyTtQ==',
 					parent: this._shadow,
 				}),
 				loadStylesheet(new URL('./components/leaflet/map.css', HTMLCustomElement.base), {
@@ -328,10 +342,7 @@ HTMLCustomElement.register('leaflet-map', class HTMLLeafletMapElement extends HT
 			this.dispatchEvent(new CustomEvent(event, { detail }));
 		};
 
-		m.on({
-			move: handler,
-			zoom: handler,
-		});
+		m.on({ move: handler, zoom: handler });
 
 		const { latitude, longitude } = this.center;
 
