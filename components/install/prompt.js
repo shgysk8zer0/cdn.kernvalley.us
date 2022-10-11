@@ -1,5 +1,6 @@
 import { registerCustomElement, getCustomElement } from '../../js/std-js/custom-elements.js';
 import { meta } from '../../import.meta.js';
+import { getURLResolver } from '../../js/std-js/utility.js';
 import { loadStylesheet } from '../../js/std-js/loader.js';
 import { getHTML } from '../../js/std-js/http.js';
 import { query, create, text, on, off } from '../../js/std-js/dom.js';
@@ -11,8 +12,9 @@ const { resolve, promise: def } = getDeferred();
 
 import '../notification/html-notification.js';
 const getManifest = async () => await manifestPromise;
+const resolveURL = getURLResolver({ base: meta.url, path: '/components/install/' });
 
-const templatePromise = def.then(() => getHTML(new URL('./components/install/prompt.html', meta.url), { policy }));
+const templatePromise = def.then(() => getHTML(resolveURL('./prompt.html'), { policy }));
 
 async function getTemplate() {
 	resolve();
@@ -141,7 +143,7 @@ registerCustomElement('install-prompt', class HTMLInstallPromptElement extends H
 		Promise.all([
 			getTemplate(),
 			getManifest(),
-			loadStylesheet(new URL('./components/install/prompt.css', meta.url), { parent: shadow }),
+			loadStylesheet(resolveURL('./prompt.css'), { parent: shadow }),
 		]).then(async ([base, manifest]) => {
 			/**
 			 * @TODO: Handle `prefer_related_applications` somehow

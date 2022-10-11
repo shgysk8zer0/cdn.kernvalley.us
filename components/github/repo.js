@@ -5,9 +5,10 @@ import { purify as policy } from '../../js/std-js/htmlpurify.js';
 import { whenIntersecting } from '../../js/std-js/intersect.js';
 import { getDeferred } from '../../js/std-js/promises.js';
 import { registerCustomElement } from '../../js/std-js/custom-elements.js';
+import { getURLResolver } from '../../js/std-js/utility.js';
 import { meta } from '../../import.meta.js';
 
-
+const resolveURL = getURLResolver({ base: meta.url, path: '/components/github/' });
 const symbols = {
 	shadow: Symbol('shadow'),
 	timeout: Symbol('timeout'),
@@ -16,7 +17,7 @@ const symbols = {
 
 const ENDPOINT =  'https://api.github.com/repos/';
 const { resolve, promise: def } = getDeferred();
-const templatePromise = def.then(() => getHTML(new URL('./components/github/repo.html', meta.url), { policy }));
+const templatePromise = def.then(() => getHTML(resolveURL('./repo.html'), { policy }));
 
 async function getTemplate() {
 	resolve();
@@ -111,7 +112,7 @@ registerCustomElement('github-repo', class HTMLGitHubRepoElement extends HTMLEle
 		}
 
 		const tmp = await getTemplate();
-		await loadStylesheet(new URL('./components/github/repo.css', meta.url), { parent: this[symbols.shadow] });
+		await loadStylesheet(resolveURL('./repo.css'), { parent: this[symbols.shadow] });
 		this[symbols.shadow].append(tmp);
 		this.dispatchEvent(new Event('ready'));
 	}

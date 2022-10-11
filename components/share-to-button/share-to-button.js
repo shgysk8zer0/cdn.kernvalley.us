@@ -3,6 +3,7 @@ import { hasGa, send } from '../../js/std-js/google-analytics.js';
 import { popup } from '../../js/std-js/popup.js';
 import { getHTML } from '../../js/std-js/http.js';
 import { meta } from '../../import.meta.js';
+import { getURLResolver } from '../../js/std-js/utility.js';
 import { getDeferred } from '../../js/std-js/promises.js';
 import { loadStylesheet } from '../../js/std-js/loader.js';
 import { Facebook, Twitter, Reddit, LinkedIn, Gmail, Pinterest, Email, Tumblr, Telegram, getShareURL }
@@ -10,8 +11,9 @@ import { Facebook, Twitter, Reddit, LinkedIn, Gmail, Pinterest, Email, Tumblr, T
 
 import { purify as policy } from '../../js/std-js/htmlpurify.js';
 const { resolve, promise: def } = getDeferred();
+const resolveURL = getURLResolver({ base: meta.url, path: '/components/share-to-button/' });
 
-const templatePromise = def.then(() => getHTML(new URL('./components/share-to-button/share-to-button.html', meta.url), { policy }));
+const templatePromise = def.then(() => getHTML(resolveURL('./share-to-button.html'), { policy }));
 
 async function getTemplate() {
 	resolve();
@@ -131,7 +133,7 @@ HTMLCustomElement.register('share-to-button', class HTMLShareToButtonElement ext
 			}
 			this.shadowRoot.append(tmp);
 
-			loadStylesheet(new URL('./components/share-to-button/share-to-button.css', meta.url), { parent: this.shadowRoot }).then(() => {
+			loadStylesheet(resolveURL('./share-to-button.css'), { parent: this.shadowRoot }).then(() => {
 				this.dispatchEvent(new Event('ready'));
 				this.hidden = wasHidden;
 			});

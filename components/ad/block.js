@@ -8,11 +8,13 @@ import { getHTML } from '../../js/std-js/http.js';
 import { meta } from '../../import.meta.js';
 import { getDeferred } from '../../js/std-js/promises.js';
 import UTM from '../../js/std-js/UTM.js';
+import { getURLResolver } from '../../js/std-js/utility.js';
 import { purify as policy } from '../../js/std-js/htmlpurify.js';
 
 const { resolve, promise: def } = getDeferred();
+const resolveURL = getURLResolver({ base: meta.url, path: '/components/ad/' });
 
-const templatePromise = def.then(() => getHTML(new URL('./components/ad/block.html', meta.url), { policy }));
+const templatePromise = def.then(() => getHTML(resolveURL('./block.html'), { policy }));
 
 async function getTemplate() {
 	resolve();
@@ -239,7 +241,7 @@ HTMLCustomElement.register('ad-block', class HTMLAdBlockElement extends HTMLCust
 		Promise.allSettled([
 			this.whenConnected,
 			this.whenLoad,
-			loadStylesheet(new URL('./components/ad/block.css', meta.url), { parent: this.shadowRoot }),
+			loadStylesheet(resolveURL('./block.css'), { parent: this.shadowRoot }),
 		]).then(() => {
 			getTemplate().then(tmp => {
 				tmp.querySelectorAll('slot[name]').forEach(el => {
