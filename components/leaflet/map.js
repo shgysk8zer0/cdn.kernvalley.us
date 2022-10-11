@@ -1,4 +1,4 @@
-import { meta } from '../../../import.meta.js';
+import { meta } from '../../import.meta.js';
 import { debounce } from '../../js/std-js/utility.js';
 import { get as getLocation } from '../../js/std-js/geo.js';
 import { on, off, create, query } from '../../js/std-js/dom.js';
