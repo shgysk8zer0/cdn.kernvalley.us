@@ -3,11 +3,13 @@ import {shadows, clearSlot, clearSlots, getForecastByPostalCode, createIcon, get
 import HTMLCustomElement from '../custom-element.js';
 import { purify as policy } from '../../js/std-js/htmlpurify.js';
 import { getHTML } from '../../js/std-js/http.js';
+import { getURLResolver } from '../../js/std-js/utility.js';
+
+const resolveURL = getURLResolver({ base: meta.url, path: '/components/weather/' });
 
 async function getTemplate() {
-	const url = new URL('./components/weather/forecast.html', meta.url);
-	const tmp = await getHTML(url, { policy });
-	tmp.querySelectorAll('link[href]').forEach(link => link.href = new URL(link.getAttribute('href'), url.href));
+	const tmp = await getHTML(resolveURL('./forecast.html'), { policy });
+	tmp.querySelectorAll('link[href]').forEach(link => link.href = resolveURL(link.getAttribute('href')));
 	return tmp;
 }
 

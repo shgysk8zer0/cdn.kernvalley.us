@@ -5,11 +5,13 @@ import { loadStylesheet } from '../../js/std-js/loader.js';
 import { getDeferred } from '../../js/std-js/promises.js';
 import { purify as policy } from '../../js/std-js/htmlpurify.js';
 import { whenIntersecting } from '../../js/std-js/intersect.js';
+import { getURLResolver } from '../../js/std-js/utility.js';
 
 const ENDPOINT = 'https://api.github.com';
 import HTMLCustomElement from '../custom-element.js';
+const resolveURL = getURLResolver({ base : meta.url, path: '/components/github/' });
 const { resolve, promise: def } = getDeferred();
-const templatePromise = def.then(() => getHTML(new URL('./components/github/user.html', meta.url), { policy }));
+const templatePromise = def.then(() => getHTML(resolveURL('./user.html', meta.url), { policy }));
 
 async function getTemplate() {
 	resolve();
@@ -48,7 +50,7 @@ HTMLCustomElement.register('github-user', class HTMLGitHubUserElement extends HT
 			]).then(() => {
 				Promise.all([
 					getTemplate(),
-					loadStylesheet(new URL('./components/github/user.css', meta.url), { parent: this.shadowRoot }),
+					loadStylesheet(resolveURL('./user.css'), { parent: this.shadowRoot }),
 				]).then(([tmp]) => {
 					this.shadowRoot.append(tmp);
 					this.dispatchEvent(new Event('ready'));
