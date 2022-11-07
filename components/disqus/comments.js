@@ -54,6 +54,7 @@ registerCustomElement('disqus-comments', class HTMLDisqusCommentsElement extends
 					const script = await loadScript(`https://${newVal}.disqus.com/embed.js`, {
 						crossOrigin: preloadOpts.crossOrigin,
 						parent: this[symbols.shadow],
+						referrerPolicy: 'origin',
 					});
 
 					script.dataset.timestamp = Date.now();
