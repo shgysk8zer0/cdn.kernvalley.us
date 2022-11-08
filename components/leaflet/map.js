@@ -1,9 +1,11 @@
+import { meta } from '../../import.meta.js';
 import { debounce } from '../../js/std-js/utility.js';
 import { get as getLocation } from '../../js/std-js/geo.js';
 import { on, off, create, query } from '../../js/std-js/dom.js';
 import { loadStylesheet } from '../../js/std-js/loader.js';
 import { between } from '../../js/std-js/math.js';
 import { getCustomElement } from '../../js/std-js/custom-elements.js';
+import { getURLResolver } from '../../js/std-js/utility.js';
 import HTMLCustomElement from '../custom-element.js';
 import { MARKER_TYPES } from './marker-types.js';
 import { TILES } from './tiles.js';
@@ -16,6 +18,7 @@ import {
 
 const initialTitle = document.title;
 const GEO_EXP = /#-?\d{1,3}\.\d+,-?\d{1,3}\.\d+(,\d{1,2})?/;
+const resolveURL = getURLResolver({ base: meta.url, path: '/components/leaflet/' });
 
 let data = new WeakMap();
 
@@ -304,9 +307,7 @@ HTMLCustomElement.register('leaflet-map', class HTMLLeafletMapElement extends HT
 					integrity: 'sha512-hoalWLoI8r4UszCkZ5kL8vayOGVae1oxXe/2A4AO6J9+580uKHDO3JdHb7NzwwzK5xr/Fs0W40kiNHxM9vyTtQ==',
 					parent: this._shadow,
 				}),
-				loadStylesheet(new URL('./components/leaflet/map.css', HTMLCustomElement.base), {
-					parent: this._shadow,
-				}),
+				loadStylesheet(resolveURL('./map.css'), { parent: this._shadow }),
 			]);
 
 			requestAnimationFrame(async () => {

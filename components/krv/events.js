@@ -4,12 +4,14 @@ import { registerCustomElement } from '../../js/std-js/custom-elements.js';
 import { loadStylesheet } from '../../js/std-js/loader.js';
 import { hasGa, send } from '../../js/std-js/google-analytics.js';
 import { meta } from '../../import.meta.js';
+import { getURLResolver } from '../../js/std-js/utility.js';
 import { getDeferred } from '../../js/std-js/promises.js';
 import { purify as policy } from '../../js/std-js/htmlpurify.js';
 import { whenIntersecting } from '../../js/std-js/intersect.js';
 
 const { resolve, promise: def } = getDeferred();
-const templatePromise = def.then(() => getHTML(new URL('./components/krv/events.html', meta.url), { policy }));
+const resolveURL = getURLResolver({ base: meta.url, path: '/components/krv/' });
+const templatePromise = def.then(() => getHTML(resolveURL('./events.html'), { policy }));
 
 async function getTemplate() {
 	resolve();
@@ -54,7 +56,7 @@ registerCustomElement('krv-events', class HTMLKRVEventsElement extends HTMLEleme
 
 		Promise.all([
 			getTemplate(),
-			loadStylesheet(new URL('./components/krv/events.css', meta.url).href, { parent }),
+			loadStylesheet(resolveURL('./events.css'), { parent }),
 			this.whenConnected,
 		]).then(([frag]) => {
 			const link = frag.querySelector('.app-link');
