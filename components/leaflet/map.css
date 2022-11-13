@@ -80,6 +80,10 @@ slot[name="map"] {
 	overflow: auto;
 }
 
+.leaflet-popup-content img {
+	max-width: 100%;
+}
+
 @media (prefers-color-scheme: dark) {
 	.leaflet-popup-content-wrapper, .leaflet-popup-tip {
 		background-color: #212121;
