@@ -234,16 +234,22 @@ HTMLCustomElement.register('leaflet-map', class HTMLLeafletMapElement extends HT
 				}
 			}, 150), { passive: true });
 
-			this.addEventListener('zoom', ({ detail: { zoom }}) => {
+			this.addEventListener('zoom', debounce(({ detail: { zoom }}) => {
 				const markers = query('[slot="markers"][minzoom],[slot="markers"][maxzoom]', this);
 				markers.forEach(marker => {
 					const { minZoom = 0, maxZoom = 100, open } = marker;
 
 					if (! open) {
-						marker.hidden = ! between(minZoom, zoom, maxZoom);
+						if (Number.isNaN(minZoom)) {
+							marker.hidden = zoom > maxZoom;
+						} else if (Number.isNaN(maxZoom)) {
+							marker.hidden = zoom < minZoom;
+						} else {
+							marker.hidden = ! between(minZoom, zoom, maxZoom);
+						}
 					}
 				});
-			}, { passive: true });
+			}), { passive: true });
 		}, { once: true });
 
 		Promise.allSettled([
