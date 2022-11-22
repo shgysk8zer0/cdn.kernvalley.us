@@ -20,6 +20,8 @@ globals:
   Atomics: readonly
   SharedArrayBuffer: readonly
   ga: readonly
+  Sanitizer: readonly
+  scheduler: readonly
 
 ###############
 # Parser vars #
