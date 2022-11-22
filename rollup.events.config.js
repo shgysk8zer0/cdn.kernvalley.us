@@ -3,7 +3,7 @@ import urlResolve from 'rollup-plugin-url-resolve';
 import { terser } from 'rollup-plugin-terser';
 
 export default {
-	input: 'components/krv/events.js',
+	input: 'components/krv/events.config.js',
 	output: {
 		file: 'components/krv/events.min.js',
 		format: 'iife',
