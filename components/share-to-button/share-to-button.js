@@ -4,22 +4,15 @@ import { popup } from '../../js/std-js/popup.js';
 import { getHTML } from '../../js/std-js/http.js';
 import { meta } from '../../import.meta.js';
 import { getURLResolver } from '../../js/std-js/utility.js';
-import { getDeferred } from '../../js/std-js/promises.js';
 import { loadStylesheet } from '../../js/std-js/loader.js';
 import { Facebook, Twitter, Reddit, LinkedIn, Gmail, Pinterest, Email, Tumblr, Telegram, getShareURL }
 	from '../../js/std-js/share-targets.js';
 
 import { purify as policy } from '../../js/std-js/htmlpurify.js';
-const { resolve, promise: def } = getDeferred();
 const resolveURL = getURLResolver({ base: meta.url, path: '/components/share-to-button/' });
 
-const templatePromise = def.then(() => getHTML(resolveURL('./share-to-button.html'), { policy }));
 
-async function getTemplate() {
-	resolve();
-	const tmp = await templatePromise;
-	return tmp.cloneNode(true);
-}
+const getTemplate = (() => getHTML(resolveURL('./share-to-button.html'), { policy })).once();
 
 function log(btn) {
 	if (hasGa()) {
@@ -109,7 +102,7 @@ HTMLCustomElement.register('share-to-button', class HTMLShareToButtonElement ext
 			this.setAttribute('role', 'button');
 		});
 
-		getTemplate().then(tmp => {
+		getTemplate().then(tmp => tmp.cloneNode(true)).then(tmp => {
 			const wasHidden = this.hidden;
 			this.hidden = true;
 			if (typeof target === 'string') {

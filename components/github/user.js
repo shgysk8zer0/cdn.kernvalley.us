@@ -10,15 +10,7 @@ import { getURLResolver } from '../../js/std-js/utility.js';
 const ENDPOINT = 'https://api.github.com';
 import HTMLCustomElement from '../custom-element.js';
 const resolveURL = getURLResolver({ base : meta.url, path: '/components/github/' });
-const { resolve, promise: def } = getDeferred();
-const templatePromise = def.then(() => getHTML(resolveURL('./user.html', meta.url), { policy }));
-
-async function getTemplate() {
-	resolve();
-	const tmp = await templatePromise;
-	return tmp.cloneNode(true);
-}
-
+const getTemplate = (() => getHTML(resolveURL('./user.html', meta.url), { policy })).once();
 async function getUser(user) {
 	const key = `github-user-${user}`;
 
@@ -49,7 +41,7 @@ HTMLCustomElement.register('github-user', class HTMLGitHubUserElement extends HT
 				whenIntersecting(this),
 			]).then(() => {
 				Promise.all([
-					getTemplate(),
+					getTemplate().then(e => e.cloneNode(true)),
 					loadStylesheet(resolveURL('./user.css'), { parent: this.shadowRoot }),
 				]).then(([tmp]) => {
 					this.shadowRoot.append(tmp);

@@ -42,6 +42,8 @@
       "showSaveFilePicker": "readonly",
       "queueMicrotask": "readonly",
       "globalThis": "readonly",
-      "MediaMetadata": "readonly"
+      "MediaMetadata": "readonly",
+      "Sanitizer": "readonly",
+      "scheduler": "readonly"
     }
 }
