@@ -5,19 +5,12 @@ import { loadStylesheet } from '../../js/std-js/loader.js';
 import { hasGa, send } from '../../js/std-js/google-analytics.js';
 import { meta } from '../../import.meta.js';
 import { getURLResolver } from '../../js/std-js/utility.js';
-import { getDeferred } from '../../js/std-js/promises.js';
 import { purify as policy } from '../../js/std-js/htmlpurify.js';
 import { whenIntersecting } from '../../js/std-js/intersect.js';
 
-const { resolve, promise: def } = getDeferred();
 const resolveURL = getURLResolver({ base: meta.url, path: '/components/krv/' });
-const templatePromise = def.then(() => getHTML(resolveURL('./events.html'), { policy }));
-
-async function getTemplate() {
-	resolve();
-	const tmp = await templatePromise;
-	return tmp.cloneNode(true);
-}
+const getTemplate = (() => getHTML(resolveURL('events.html'), { policy })).once();
+const getEvents = (() => getJSON('https://events.kernvalley.us/events.json')).once();
 const protectedData = new WeakMap();
 
 function utm(url, { campaign, content, medium, source, term }) {
@@ -55,7 +48,7 @@ registerCustomElement('krv-events', class HTMLKRVEventsElement extends HTMLEleme
 		const parent = this.attachShadow({ mode: 'closed' });
 
 		Promise.all([
-			getTemplate(),
+			getTemplate().then(frag => frag.cloneNode(true)),
 			loadStylesheet(resolveURL('./events.css'), { parent }),
 			this.whenConnected,
 		]).then(([frag]) => {
@@ -101,7 +94,7 @@ registerCustomElement('krv-events', class HTMLKRVEventsElement extends HTMLEleme
 	async render() {
 		const now = new Date().toISOString();
 		const [data] = await Promise.all([
-			getJSON('https://events.kernvalley.us/events.json'),
+			getEvents(),
 			this.ready,
 		]);
 
