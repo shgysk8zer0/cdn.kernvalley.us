@@ -17,7 +17,7 @@ const symbols = {
 
 const ENDPOINT =  'https://api.github.com/repos/';
 
-const getTemplate = (() => getHTML(resolveURL('./repo.html'), { policy })).once()
+const getTemplate = (() => getHTML(resolveURL('./repo.html'), { policy })).once();
 
 async function getJSON(url, { signal } = {}) {
 	const key = `github-repo:${url}`;
