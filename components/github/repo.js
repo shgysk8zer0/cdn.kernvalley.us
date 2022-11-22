@@ -16,14 +16,8 @@ const symbols = {
 };
 
 const ENDPOINT =  'https://api.github.com/repos/';
-const { resolve, promise: def } = getDeferred();
-const templatePromise = def.then(() => getHTML(resolveURL('./repo.html'), { policy }));
 
-async function getTemplate() {
-	resolve();
-	const tmp = await templatePromise;
-	return tmp.cloneNode(true);
-}
+const getTemplate = (() => getHTML(resolveURL('./repo.html'), { policy })).once()
 
 async function getJSON(url, { signal } = {}) {
 	const key = `github-repo:${url}`;
@@ -111,8 +105,11 @@ registerCustomElement('github-repo', class HTMLGitHubRepoElement extends HTMLEle
 			await whenIntersecting(this);
 		}
 
-		const tmp = await getTemplate();
-		await loadStylesheet(resolveURL('./repo.css'), { parent: this[symbols.shadow] });
+		const [tmp] = await Promise.all([
+			getTemplate().then(e => e.cloneNode(true)),
+			loadStylesheet(resolveURL('./repo.css'), { parent: this[symbols.shadow] }),
+		]);
+
 		this[symbols.shadow].append(tmp);
 		this.dispatchEvent(new Event('ready'));
 	}

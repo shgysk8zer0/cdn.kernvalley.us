@@ -3,18 +3,10 @@ import { registerButton } from '../../js/pwa-install.js';
 import { getHTML } from '../../js/std-js/http.js';
 import { meta } from '../../import.meta.js';
 import { getURLResolver } from '../../js/std-js/utility.js';
-import { getDeferred } from '../../js/std-js/promises.js';
 import { purify as policy } from '../../js/std-js/htmlpurify.js';
 
-const { resolve, promise: def } = getDeferred();
 const resolveURL = getURLResolver({ base: meta.url, path: '/components/pwa/' });
-const templatePromise = def.then(() => getHTML(resolveURL('./prompt.html'),  { policy }));
-
-async function getTemplate() {
-	resolve();
-	const tmp = await templatePromise;
-	return tmp.cloneNode(true);
-}
+const getTemplate = (() => getHTML(resolveURL('./prompt.html'),  { policy })).once();
 
 function getBySize(opts, width) {
 	if (Array.isArray(opts)) {
@@ -110,7 +102,7 @@ HTMLCustomElement.register('pwa-prompt', class HTMLPWAPromptElement extends HTML
 		super();
 		this.attachShadow({ mode: 'open' });
 
-		getTemplate().then(tmp => {
+		getTemplate().then(e => e.cloneNode(true)).then(tmp => {
 			tmp.querySelectorAll('[data-click]').forEach(el => {
 				switch(el.dataset.click) {
 					case 'close':
