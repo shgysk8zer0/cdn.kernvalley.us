@@ -96,8 +96,14 @@ registerCustomElement('wfd-events', class HTMLWFDEventsElement extends HTMLEleme
 			text('[itemprop="endDate"]', end.toLocaleTimeString().replace(':00 ', ' '), { base });
 			text('[part~="name"]', name, { base });
 			text('[itemprop="location"] [itemprop="name"]', placeName.length === 0 ? 'Kernville' : placeName, { base });
-
-			base.querySelector('[itemprop="description"]').setHTML(description, { sanitizer });
+			
+			if (typeof description === 'string') {
+				try {
+					base.querySelector('[itemprop="description"]').setHTML(description, { sanitizer });
+				} catch(e) {
+					console.error(e);
+				}
+			}
 
 			return base;
 		}));
