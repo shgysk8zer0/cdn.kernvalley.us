@@ -29,24 +29,21 @@ registerCustomElement('wfd-events', class HTMLWFDEventsElement extends HTMLEleme
 		super();
 		const shadow = this.attachShadow({ mode: 'closed' });
 
-		scheduler.postTask(() => {
-			shadow.append(
-				create('a', {
-					href: getWFDLink('', { source: this.source, medium, content }),
-					target: '_blank',
-					rel: 'noopener noreferrer external',
-					part: ['text', 'link'],
-					children: [
-						create('slot', {
-							name: 'label',
-							children: [create('h2', { text: 'Whiskey Flat Days Events' })],
-						}),
-					]
-				}),
-				create('div', { part: ['list'] }),
-			);
-		}, { delay: 10 });
-
+		shadow.append(
+			create('a', {
+				href: getWFDLink('', { source: this.source, medium, content }),
+				target: '_blank',
+				rel: 'noopener noreferrer external',
+				part: ['text', 'link'],
+				children: [
+					create('slot', {
+						name: 'label',
+						children: [create('h2', { text: 'Whiskey Flat Days Events' })],
+					}),
+				]
+			}),
+			create('div', { part: ['list'] }),
+		);
 
 		protectedData.set(this, { shadow });
 	}
@@ -61,7 +58,7 @@ registerCustomElement('wfd-events', class HTMLWFDEventsElement extends HTMLEleme
 		]);
 		const source = this.source;
 
-		shadow.querySelector('[part="list"]').replaceChildren(...events.map(({
+		shadow.querySelector('[part~="list"]').replaceChildren(...events.map(({
 			'@identifier': identifier,
 			'@type': type,
 			'@context': context,
