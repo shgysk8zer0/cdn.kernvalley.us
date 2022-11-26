@@ -1,5 +1,6 @@
 import { text, attr, when } from '../../js/std-js/dom.js';
-import { getHTML, getJSON } from '../../js/std-js/http.js';
+import { getHTML } from '../../js/std-js/http.js';
+import { getEvents as getAllEvents } from '../../js/std-js/krv/events.js';
 import { registerCustomElement } from '../../js/std-js/custom-elements.js';
 import { loadStylesheet } from '../../js/std-js/loader.js';
 import { hasGa, send } from '../../js/std-js/google-analytics.js';
@@ -10,7 +11,7 @@ import { whenIntersecting } from '../../js/std-js/intersect.js';
 
 const resolveURL = getURLResolver({ base: meta.url, path: '/components/krv/' });
 const getTemplate = (() => getHTML(resolveURL('events.html'), { policy })).once();
-const getEvents = (() => getJSON('https://events.kernvalley.us/events.json')).once();
+const getEvents = (() => getAllEvents()).once();
 const protectedData = new WeakMap();
 
 function utm(url, { campaign, content, medium, source, term }) {
