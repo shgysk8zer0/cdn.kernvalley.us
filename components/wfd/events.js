@@ -1,4 +1,4 @@
-import { getJSON } from '../../js/std-js/http.js';
+import { getEvents as getAllEvents } from '../../js/std-js/krv/wfd.js';
 import { create } from '../../js/std-js/dom.js';
 import { registerCustomElement } from '../../js/std-js/custom-elements.js';
 import { whenIntersecting } from '../../js/std-js/intersect.js';
@@ -12,13 +12,12 @@ import { purify as policy } from '../../js/std-js/htmlpurify.js';
 
 const protectedData = new WeakMap();
 const WFD = 'https://whiskeyflatdays.com/';
-const src = new URL('/events.json', WFD);
 const medium = 'referral';
 const content = 'wfd-events';
 const sanitizer = new Sanitizer();
 const resolveURL = getURLResolver({ base : meta.url, path: '/components/wfd/' });
 const getTemplate = (() => getHTML(resolveURL('events.html'), { policy })).once();
-const getEvents = (() => getJSON(src)).once();
+const getEvents = (() => getAllEvents()).once();
 
 function getWFDLink(path, params) {
 	return setUTMParams(new URL(path, WFD), params);
