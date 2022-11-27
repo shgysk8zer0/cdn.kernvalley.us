@@ -25,12 +25,14 @@ registerCustomElement('disqus-comments', class HTMLDisqusCommentsElement extends
 			value: shadow,
 		});
 
-		container.id = 'disqus_thread';
 		container.slot = 'comments';
 		slot.name = 'comments';
 		shadow.append(slot);
 		this.append(container);
 
+		slot.addEventListener('slotchange', ({ target }) => {
+			target.assignedElements().forEach(el => el.id = 'disqus_thread');
+		});
 
 		if (typeof site === 'string') {
 			preload(`https://${site}.disqus.com/embed.js`, preloadOpts);
@@ -51,9 +53,12 @@ registerCustomElement('disqus-comments', class HTMLDisqusCommentsElement extends
 						await whenIntersecting(this);
 					}
 
+					/**
+					 * Can no longer load this script within the Shadow
+					 */
 					const script = await loadScript(`https://${newVal}.disqus.com/embed.js`, {
 						crossOrigin: preloadOpts.crossOrigin,
-						parent: this[symbols.shadow],
+						// parent: this[symbols.shadow],
 						referrerPolicy: 'origin',
 					});
 
