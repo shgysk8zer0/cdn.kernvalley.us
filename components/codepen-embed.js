@@ -1,18 +1,7 @@
+import { createIframe } from '../js/std-js/elements.js';
 function render(el) {
 	const { shadowRoot, user, pen, theme, loading, tab, height, editable, clickToLoad } = el;
-	const iframe = document.createElement('iframe');
 	const src = new URL(`https://codepen.io/${user}/embed/${clickToLoad ? 'preview/' : '/'}${pen}`);
-	iframe.sandbox = 'allow-scripts allow-popups';
-	iframe.loading = loading;
-	iframe.height = height;
-	iframe.allowTransparency = 'true';
-	iframe.allowFullscreen = 'true';
-	iframe.frameBorder = 'no';
-	iframe.style.setProperty('width', '100%');
-
-	if ('part' in iframe) {
-		iframe.part.add('embed');
-	}
 
 	src.searchParams.set('default-tab', tab);
 	src.searchParams.set('theme-id', theme);
@@ -20,8 +9,16 @@ function render(el) {
 	if (editable) {
 		src.searchParams.set('editable', 'true');
 	}
-	
-	iframe.src = src.href;
+	const iframe = createIframe(src, {
+		loading, height,
+		sandbox: ['allow-scripts', 'allow-popups'],
+		part: ['embed'],
+	});
+
+	iframe.allowTransparency = 'true';
+	iframe.allowFullscreen = 'true';
+	iframe.style.setProperty('width', '100%');
+
 	shadowRoot.replaceChildren(iframe);
 }
 customElements.define('codepen-embed', class HTMLCodePenEmbedElement extends HTMLElement {

@@ -1,6 +1,8 @@
 import { registerCustomElement } from '../../js/std-js/custom-elements.js';
 import { getDeferred } from '../../js/std-js/promises.js';
 import { whenIntersecting } from '../../intersect.js';
+import { createIframe } from '../../js/std-js/elements.js';
+import { loaded } from '../../js/std-js/events.js';
 
 const symbols = {
 	shadow: Symbol('shadow'),
@@ -67,46 +69,34 @@ registerCustomElement('facebook-post', class HTMLFacebookPostElement extends HTM
 	async render({ signal } = {}) {
 		const { postURL, height, width, showText } = this;
 
-		if (typeof postURL === 'string') {
-			const iframe = document.createElement('iframe');
+		if (signal instanceof AbortSignal && signal.aborted) {
+			throw signal.reason;
+		} else  if (typeof postURL === 'string') {
+			await whenIntersecting(this, { signal });
 			const url = new URL('https://www.facebook.com/plugins/post.php');
-			const { resolve, reject, promise } = getDeferred();
-			const controller = new AbortController();
-
 			url.searchParams.set('href', postURL);
 
 			if (showText) {
 				url.searchParams.set('show_text', 'true');
 			}
 
-			iframe.frameBorder = '0';
-			iframe.scrolling = 'no';
-			iframe.referrerPolicy = 'origin';
-			iframe.allow = 'encrypted-media; web-share';
-			iframe.sandbox = 'allow-scripts, allow-top-navigation';
-			iframe.part.add('embed');
-
-			if (! (Number.isNaN(width) || Number.isNaN(height))) {
-				iframe.width = width;
-				iframe.height = height;
+			if (! Number.isNaN(width)) {
 				url.searchParam.set('width', width);
 			}
 
-			iframe.addEventListener('load', () => {
-				resolve();
-				controller.abort();
-			}, { once: true, signal: controller.signal });
+			const iframe = createIframe(url, {
+				referrerPolicy: 'origin',
+				allow: ['encrypted-media', 'web-share'],
+				sandbox: ['allow-scripts', 'allow-top-navigation'],
+				part: ['embed'],
+				height,
+				width,
+			});
 
-			iframe.addEventListener('error', () => {
-				reject(new DOMException('Error loading Facebook post'));
-				controller.abort();
-			}, { once: true, signal: controller.signal });
-
-			await whenIntersecting(this, { signal });
-			iframe.src = url.href;
+			iframe.scrolling = 'no';
 			this[symbols.shadow].replaceChildren(iframe);
 
-			return promise;
+			return loaded(iframe);
 		}
 	}
 
