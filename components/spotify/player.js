@@ -1,5 +1,16 @@
-import HTMLCustomElement from '../custom-element.js';
+import { registerCustomElement } from '../../js/std-js/custom-elements.js';
+import { createIframe } from '../../js/std-js/elements.js';
+import { whenIntersecting } from '../../js/std-js/intersect.js';
 import { purify as policy } from '../../js/std-js/htmlpurify.js';
+import { loaded } from '../../js/std-js/events.js';
+import { getHTML } from '../../js/std-js/http.js';
+import { getURLResolver } from '../../js/std-js/utility.js';
+import { meta } from '../../import.meta.js';
+import { loadStylesheet } from '../../js/std-js/loader.js';
+
+const protectedData = new WeakMap();
+const resolveURL = getURLResolver({ path: '/components/spotify/', base: meta.url });
+const getTemplate = (() => getHTML(resolveURL('./player.html'), { policy })).once();
 
 const SPOTIFY = 'https://open.spotify.com/embed/';
 const TYPES = [
@@ -54,27 +65,22 @@ function parseURI(uri) {
 		throw new Error('URI is not a valid Spotify URI');
 	} else {
 		const [, type = '', id = ''] = uri.split(':');
+
 		if (! TYPES.includes(type)) {
 			throw new Error(`Unsupported type: ${type}`);
-		} else if (! /^[A-z\d]{22}$/.test(id)) {
-			throw new Error(`Invalid Spotify ID ${id}`);
 		} else {
-			return {type, id};
+			return { type, id };
 		}
 	}
 }
 
-HTMLCustomElement.register('spotify-player', class HTMLSpotifyTrackElement extends HTMLCustomElement {
+registerCustomElement('spotify-player', class HTMLSpotifyPlayerElement extends HTMLElement {
 	constructor({ uri = null, large = null, loading = null } = {}) {
 		super();
-		this.attachShadow({ mode: 'open' });
+		const shadow = this.attachShadow({ mode: 'open' });
+		protectedData.set(this, { shadow });
 
-		this.getTemplate('./components/spotify/player.html', { policy }).then(tmp => {
-			this.shadowRoot.append(tmp.cloneNode(true));
-			this.dispatchEvent(new Event('ready'));
-		});
-
-		this.addEventListener('connected', () => {
+		this.addEventListener('connected', async () => {
 			if (typeof uri === 'string') {
 				this.uri = uri;
 			}
@@ -86,7 +92,35 @@ HTMLCustomElement.register('spotify-player', class HTMLSpotifyTrackElement exten
 			if (typeof loading === 'string') {
 				this.loading = loading;
 			}
+
+			if (this.loading === 'lazy') {
+				await whenIntersecting(this);
+			}
+
+			Promise.all([
+				getTemplate(),
+				loadStylesheet(resolveURL('./player.css'),{ parent: shadow }),
+			]).then(([tmp]) => {
+				shadow.append(tmp.cloneNode(true));
+				this.dispatchEvent(new Event('ready'));
+			});
 		}, { once: true });
+	}
+
+	connectedCallback() {
+		this.dispatchEvent(new Event('connected'));
+	}
+
+	get ready() {
+		return new Promise(resolve => {
+			const { shadow } = protectedData.get(this);
+
+			if (shadow.childElementCount < 2) {
+				this.addEventListener('ready', () => resolve(), { once: true });
+			} else {
+				resolve();
+			}
+		});
 	}
 
 	get large() {
@@ -150,7 +184,7 @@ HTMLCustomElement.register('spotify-player', class HTMLSpotifyTrackElement exten
 	open() {
 		const link = this.link;
 		if (typeof link === 'string') {
-			window.open(link, '_blank', 'noopener,noreferrer');
+			globalThis.open(link, '_blank', 'noopener, noreferrer');
 			return true;
 		} else {
 			return false;
@@ -162,8 +196,9 @@ HTMLCustomElement.register('spotify-player', class HTMLSpotifyTrackElement exten
 			case 'large':
 				this.ready.then(async () => {
 					const size = newValue === null ? 80 : 380;
-					const nodes = await this.getSlotted('player');
-					nodes.forEach(el => el.height = size);
+					this.querySelectorAll('[slot="player"]').forEach(el => {
+						el.height = size;
+					});
 				});
 				break;
 
@@ -173,50 +208,32 @@ HTMLCustomElement.register('spotify-player', class HTMLSpotifyTrackElement exten
 					if (typeof newValue === 'string') {
 						const { uri, loading, large } = this;
 						const { type = null, id = null } = parseURI(uri);
-						const iframe = document.createElement('iframe');
-						iframe.width = 300;
-						iframe.height = large ? 380 : 80;
-						iframe.allowTransparency = true;
-						iframe.allow = ALLOW.join(';');
-						iframe.referrerPolicy = 'origin';
-						iframe.slot = 'player';
 
-						if ('sandbox' in iframe) {
-							iframe.sandbox.add(...SANDBOX);
+						if (loading === 'lazy') {
+							await whenIntersecting(this);
 						}
 
-						if ('loading' in iframe) {
-							iframe.loading = loading;
-							iframe.src = new URL(`${type}/${id}`, SPOTIFY).href;
-							this.append(iframe);
-						} else if (loading === 'lazy' && ('IntersectionObserver' in window)) {
-							iframe.setAttribute('loading', 'lazy');
-							new IntersectionObserver(([{ target, isIntersecting }], observer) => {
-								if (isIntersecting) {
-									iframe.src = new URL(`${type}/${id}`, SPOTIFY).href;
-									this.append(iframe);
-									observer.unobserve(target);
-									observer.disconnect();
-								}
-							}, {
-								rootMargin: `${Math.floor(0.2 * Math.max(screen.height, screen.width, 400))}px`,
-							}).observe(this);
-						} else {
-							iframe.src = new URL(`${type}/${id}`, SPOTIFY).href;
-							this.append(iframe);
-						}
+						const iframe = createIframe(new URL(`${type}/${id}`, SPOTIFY), {
+							width: 300,
+							height: large ? 380 : 80,
+							referrerPolicy: 'origin',
+							slot: 'player',
+							sandbox: SANDBOX,
+							allow: ALLOW,
+							title: 'Spotify Player',
+						});
 
-						iframe.addEventListener('load', async () => {
-							this.dispatchEvent(new CustomEvent('trackchange', {detail: {
+						loaded(iframe).then(() => {
+							this.dispatchEvent(new CustomEvent('trackchange', { detail: {
 								from: oldValue,
-								to: newValue,
+								to: newValue
 							}}));
-						}, {once: true});
+						});
 
-						iframe.addEventListener('error', console.error, {once: true});
-
+						this.querySelectorAll('[slot="player"]').forEach(el => el.remove());
+						this.append(iframe);
 					} else {
-						this.clearSlot('player');
+						this.querySelectorAll('[slot="player"]').forEach(el => el.remove());
 					}
 				});
 				break;

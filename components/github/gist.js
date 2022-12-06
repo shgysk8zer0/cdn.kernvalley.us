@@ -1,5 +1,7 @@
 import { whenIntersecting } from '../../js/std-js/intersect.js';
 import { getDeferred } from '../../js/std-js/promises.js';
+import { createIframe } from '../../js/std-js/elements.js';
+import { loaded } from '../../js/std-js/events.js';
 
 const protectedData = new WeakMap();
 
@@ -17,7 +19,6 @@ async function render(target, { signal } = {}) {
 		protectedData.set(target, {
 			timeout: requestAnimationFrame(async () => {
 				const { user, gist, file, height, width } = target;
-				const iframe = document.createElement('iframe');
 				const script = document.createElement('script');
 				const link = document.createElement('link');
 				const base = document.createElement('base');
@@ -32,26 +33,18 @@ async function render(target, { signal } = {}) {
 
 				script.src = src.href;
 
-				iframe.referrerPolicy = 'no-referrer';
-				iframe.sandbox.add('allow-scripts', 'allow-popups');
-				iframe.frameBorder = 0;
+				const iframe = createIframe(null, {
+					srcdoc: `<!DOCTYPE html><html><head>${base.outerHTML}${link.outerHTML}</head><body>${script.outerHTML}</body></html>`,
+					referrerPolicy: 'no-referrer',
+					sandbox: ['allow-scripts', 'allow-popups'],
+					width,
+					height,
+					part: ['embed'],
+				});
 
-				if (! Number.isNaN(width)) {
-					iframe.width = width;
-				}
-
-				if (! Number.isNaN(height)) {
-					iframe.height = height;
-				}
-
-				if ('part' in iframe) {
-					iframe.part.add('embed');
-				}
-
-				iframe.srcdoc = `<!DOCTYPE html><html><head>${base.outerHTML}${link.outerHTML}</head><body>${script.outerHTML}</body></html>`;
 				shadow.replaceChildren(iframe);
-				target.dispatchEvent(new Event('load'));
 				protectedData.set(target, { shadow, timeout: null });
+				loaded(iframe).then(() => target.dispatchEvent(new Event('load')));
 			}),
 			shadow,
 		}, 100);

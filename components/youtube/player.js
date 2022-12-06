@@ -1,36 +1,127 @@
-import HTMLCustomElement from '../custom-element.js';
+import { registerCustomElement } from '../../js/std-js/custom-elements.js';
+import { createIframe } from '../../js/std-js/elements.js';
+import { whenIntersecting } from '../../js/std-js/intersect.js';
+import { loaded } from '../../js/std-js/events.js';
+
 const YOUTUBE  = 'https://www.youtube.com/embed/';
 const NOCOOKIE = 'https://www.youtube-nocookie.com/embed/';
 const SANDBOX = ['allow-scripts', 'allow-popups', 'allow-same-origin', 'allow-presentation'];
 const ALLOW = ['accelerometer', 'encrypted-media', 'gyroscope', 'picture-in-picture'];
+const protectedData = new WeakMap();
 
-HTMLCustomElement.register('youtube-player', class HTMLYouTubeElement extends HTMLCustomElement {
-	constructor(video = null, { height = null, width = null, loading = null } = {}) {
+registerCustomElement('youtube-player', class HTMLYouTubePlayerElement extends HTMLElement {
+	constructor(video, { height, width, cookies, loading } = {}) {
 		super();
-		this.attachShadow({ mode: 'open' });
-		const slot = document.createElement('slot');
-		slot.name = 'player';
-		this.shadowRoot.append(slot);
 
-		this.addEventListener('connected', () => {
+		requestAnimationFrame(() => {
 			if (typeof video === 'string') {
 				this.video = video;
 			}
 
-			if (Number.isInteger(width)) {
+			if (typeof height === 'number') {
+				this.height = height;
+			}
+
+			if (typeof width === 'number') {
 				this.width = width;
 			}
 
-			if (Number.isInteger(height)) {
-				this.height = height;
+			if (typeof coookies === 'boolean') {
+				this.cookies = cookies;
 			}
 
 			if (typeof loading === 'string') {
 				this.loading = loading;
 			}
+		});
 
-			this.dispatchEvent(new Event('ready'));
-		}, { once: true });
+		protectedData.set(this, {
+			shadow: this.attachShadow({ mode: 'closed' }),
+			timeout: NaN,
+		});
+	}
+
+	attributeChangedCallback(name, oldVal, newVal) {
+		const { shadow, timeout } = protectedData.get(this);
+
+		switch(name) {
+			case 'height': {
+				const iframe = shadow.querySelector('iframe');
+
+				if (iframe instanceof HTMLIFrameElement) {
+					iframe.height = newVal;
+				}
+
+				break;
+			}
+
+			case 'width': {
+				const iframe = shadow.querySelector('iframe');
+
+				if (iframe instanceof HTMLIFrameElement) {
+					iframe.width = newVal;
+				}
+
+				break;
+			}
+
+			case 'cookies':
+			case 'video':
+				if (! Number.isNaN(timeout)) {
+					clearTimeout(timeout);
+				}
+
+				protectedData.set(this, {
+					shadow,
+					timeout: setTimeout(() => {
+						protectedData.set(this, { shadow, timeout: NaN });
+						this.render().catch(console.error);
+					}, 10),
+				});
+
+				break;
+
+			default:
+				throw new DOMException(`Unhandled attribute changed: "${name}"`);
+		}
+	}
+
+	async render() {
+		const { cookies, loading, height, width, video } = this;
+		const { shadow } = protectedData.get(this);
+
+		if (typeof video === 'string') {
+			const url = new URL(`./${video}`, cookies ? YOUTUBE : NOCOOKIE);
+			const iframe = createIframe(url, {
+				sandbox: SANDBOX,
+				allow: ALLOW,
+				width,
+				height,
+				referrerPolicy: 'origin',
+			});
+
+			if (loading === 'lazy') {
+				await whenIntersecting(this);
+			}
+
+			loaded(iframe).then(() => this.dispatchEvent(new Event('ready')));
+
+			shadow.replaceChildren(iframe);
+		} else {
+			shadow.replaceChildren();
+		}
+	}
+
+	get ready() {
+		return new Promise(resolve => {
+			const { shadow } = protectedData.get(this);
+
+			if (shadow.childElementCount === 0) {
+				this.addEventListener('ready', () => resolve(), { once: true });
+			} else {
+				resolve();
+			}
+		});
 	}
 
 	get height() {
@@ -109,76 +200,7 @@ HTMLCustomElement.register('youtube-player', class HTMLYouTubeElement extends HT
 		}
 	}
 
-	attributeChangedCallback(name, oldValue, newValue) {
-		switch(name) {
-			case 'height':
-			case 'width':
-				this.ready.then(() => {
-					const slot = this.shadowRoot.querySelector('slot[name="player"]');
-					slot.assignedNodes().forEach(el => el[name] = newValue);
-				});
-				break;
-
-			case 'video':
-				if (newValue !== null && newValue.length !== 0) {
-					this.ready.then(async () => {
-						const { video, cookies, loading } = this;
-						const url = new URL(`./${video}`, cookies ? YOUTUBE : NOCOOKIE);
-						const iframe = document.createElement('iframe');
-						iframe.slot = 'player';
-						iframe.height = this.height;
-						iframe.width = this.width;
-						iframe.allow = ALLOW.join(';');
-						iframe.allowFullscreen = true;
-						iframe.referrerPolicy = 'origin';
-
-						iframe.style.setProperty('border', 'none');
-
-						if ('sandbox' in iframe) {
-							iframe.sandbox.add(...SANDBOX);
-						}
-
-						iframe.addEventListener('load', () => {
-							this.dispatchEvent(new Event('load'));
-						}, {once: true});
-
-						this.shadowRoot.querySelector('slot[name="player"]')
-							.assignedNodes().forEach(el => el.remove());
-
-						if ('loading' in iframe) {
-							iframe.loading = loading;
-							iframe.src = url;
-							this.append(iframe);
-						} else  if (loading === 'lazy' && ('IntersectionObserver' in window)) {
-							iframe.setAttribute('loading', 'lazy');
-							new IntersectionObserver(([{ target, isIntersecting }], observer) => {
-								if (isIntersecting) {
-									iframe.src = url;
-									this.append(iframe);
-									observer.unobserve(target);
-									observer.disconnect();
-								}
-							}, {
-								rootMargin: `${Math.floor(0.2 * Math.max(screen.height, screen.width, 400))}px`,
-							}).observe(this);
-						} else {
-							iframe.src = url;
-							this.append(iframe);
-						}
-					});
-				}
-				break;
-
-			default:
-				throw new Error(`Unhandled attribute ${name}`);
-		}
-	}
-
 	static get observedAttributes() {
-		return [
-			'video',
-			'width',
-			'height',
-		];
+		return ['video', 'cookies', 'height', 'width'];
 	}
 });
