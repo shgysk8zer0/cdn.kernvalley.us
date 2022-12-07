@@ -509,8 +509,8 @@ registerCustomElement('leaflet-marker', class HTMLLeafletMarkerElement extends H
 		async function callback(markers) {
 			return await markers.map(async marker => {
 				const markerEl = new HTMLLeafletMarkerElement({
-					latitude: marker.geo.latitude,
-					longitude: marker.geo.longitude,
+					latitude: 'geo' in marker ? marker.geo.latitude : marker.location.geo.latitude,
+					longitude: 'geo' in marker ? marker.geo.longitude : marker.location.geo.longitude,
 					popup: `<h3>${marker.name}</h3>`,
 					icon: await HTMLLeafletMarkerElement.getSchemaIcon(marker),
 				});
@@ -524,9 +524,17 @@ registerCustomElement('leaflet-marker', class HTMLLeafletMarkerElement extends H
 			});
 		}
 
+		function hasGeo(marker) {
+			if ('location' in marker && 'geo' in marker.location) {
+				return 'longitude' in marker.location.geo && 'latitude' in marker.location.geo;
+			} else if ('geo' in marker) {
+				return 'longitude' in marker.geo && 'latitude' in marker.geo;
+			}
+		}
+
 		return await Promise.all(filterTypes(types).map(type => {
 			return getJSON(`https://maps.kernvalley.us/places/${type}.json`)
-				.then(markers => callback(markers));
+				.then(markers => callback(markers.filter(hasGeo)));
 		})).then(markers => Promise.all(markers.flat()));
 
 	}
