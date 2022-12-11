@@ -1,12 +1,8 @@
 import { registerCustomElement } from '../../js/std-js/custom-elements.js';
-import { createIframe } from '../../js/std-js/elements.js';
+import { createYouTubeEmbed } from '../../js/std-js/youtube.js';
 import { whenIntersecting } from '../../js/std-js/intersect.js';
 import { loaded } from '../../js/std-js/events.js';
 
-const YOUTUBE  = 'https://www.youtube.com/embed/';
-const NOCOOKIE = 'https://www.youtube-nocookie.com/embed/';
-const SANDBOX = ['allow-scripts', 'allow-popups', 'allow-same-origin', 'allow-presentation'];
-const ALLOW = ['accelerometer', 'encrypted-media', 'gyroscope', 'picture-in-picture'];
 const protectedData = new WeakMap();
 
 registerCustomElement('youtube-player', class HTMLYouTubePlayerElement extends HTMLElement {
@@ -91,22 +87,17 @@ registerCustomElement('youtube-player', class HTMLYouTubePlayerElement extends H
 		const { shadow } = protectedData.get(this);
 
 		if (typeof video === 'string') {
-			const url = new URL(`./${video}`, cookies ? YOUTUBE : NOCOOKIE);
-			const iframe = createIframe(url, {
-				sandbox: SANDBOX,
-				allow: ALLOW,
-				width,
-				height,
-				referrerPolicy: 'origin',
-			});
-
 			if (loading === 'lazy') {
 				await whenIntersecting(this);
 			}
 
-			loaded(iframe).then(() => this.dispatchEvent(new Event('ready')));
+			const iframe = createYouTubeEmbed(video, { width, height, cookies });
+
+			const prom = loaded(iframe).then(() => this.dispatchEvent(new Event('ready')));
 
 			shadow.replaceChildren(iframe);
+
+			await prom;
 		} else {
 			shadow.replaceChildren();
 		}
