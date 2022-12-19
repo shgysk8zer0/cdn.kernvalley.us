@@ -537,7 +537,7 @@ HTMLCustomElement.register('leaflet-map', class HTMLLeafletMapElement extends HT
 	}
 
 	set allowFullscreen(val) {
-		this.toggleAttribute('allowfullscreen');
+		this.toggleAttribute('allowfullscreen', val);
 	}
 
 	get allowLocate() {
@@ -545,7 +545,7 @@ HTMLCustomElement.register('leaflet-map', class HTMLLeafletMapElement extends HT
 	}
 
 	set allowLocate(val) {
-		this.toggleAttribute('allowlocate');
+		this.toggleAttribute('allowlocate', val);
 	}
 
 	get crossOrigin() {

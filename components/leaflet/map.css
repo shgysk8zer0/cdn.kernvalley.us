@@ -46,6 +46,14 @@
 	height: 100%;
 }
 
+:host(:not([allowfullscreen]):not([allowlocate])) [part~="container"] > .leaflet-control-container {
+	display: none;
+}
+
+:host(:not([allowlocate])) [part~="locate-btn"] {
+	display: none;
+}
+
 :host(:not([allowfullscreen])) [part~="fullscreen-btn"] {
 	display: none;
 }
