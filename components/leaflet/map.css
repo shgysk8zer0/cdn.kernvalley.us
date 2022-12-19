@@ -46,6 +46,18 @@
 	height: 100%;
 }
 
+:host(:not([allowfullscreen])) [part~="fullscreen-btn"] {
+	display: none;
+}
+
+:host(:fullscreen) slot[name="enter-fullscreen-icon"] {
+	display: none;
+}
+
+:host(:not(:fullscreen)) slot[name="exit-fullscreen-icon"] {
+	display: none;
+}
+
 * {
 	box-sizing: border-box;
 }
@@ -78,6 +90,16 @@ slot[name="map"] {
 [part~="popup"] {
 	max-height: var(--marker-max-height, calc(0.6 * var(--map-height, 400px)));
 	overflow: auto;
+}
+
+[part~="control-btn"] {
+	width: 30px;
+	height: 30px;
+	line-height: 30px;
+}
+
+slot svg.icon {
+	vertical-align: middle;
 }
 
 .leaflet-popup-content img {
