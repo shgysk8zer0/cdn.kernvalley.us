@@ -50,7 +50,11 @@
 	display: none;
 }
 
-:host(:not([allowlocate])) [part~="locate-btn"] {
+:host(:fullscreen) slot[name="enter-fullscreen-icon"] {
+	display: none;
+}
+
+:host(:not(:fullscreen)) slot[name="exit-fullscreen-icon"] {
 	display: none;
 }
 

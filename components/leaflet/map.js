@@ -334,14 +334,18 @@ HTMLCustomElement.register('leaflet-map', class HTMLLeafletMapElement extends HT
 														event.preventDefault();
 														if (this.isSameNode(document.fullscreenElement)) {
 															document.exitFullscreen();
+															// this._shadow.querySelector('slot[name="enter-fullscreen-btn"]').hidden = false;
+															// this._shadow.querySelector('slot[name="exit-fullscreen-btn"]').hidden = true;
 														} else {
 															this.requestFullscreen();
+															// this._shadow.querySelector('slot[name="enter-fullscreen-btn"]').hidden = true;
+															// this._shadow.querySelector('slot[name="exit-fullscreen-btn"]').hidden = false;
 														}
 													}
 												},
 												children: [
 													create('slot', {
-														name: 'fullscreen-btn',
+														name: 'enter-fullscreen-icon',
 														children: [
 															createSVG({
 																width: iconSize,
@@ -349,13 +353,35 @@ HTMLCustomElement.register('leaflet-map', class HTMLLeafletMapElement extends HT
 																classList: ['icon'],
 																viewBox: [0, 0, 14, 16],
 																fill: 'currentColor',
-																part: ['icon', 'fullscreen-icon'],
+																part: ['icon', 'enter-fullscreen-icon'],
 																children: [
-																	createPath('M13 10h1v3c0 .547-.453 1-1 1h-3v-1h3v-3zM1 10H0v3c0 .547.453 1 1 1h3v-1H1v-3zm0-7h3V2H1c-.547 0-1 .453-1 1v3h1V3zm1 1h10v8H2V4zm2 6h6V6H4v4zm6-8v1h3v3h1V3c0-.547-.453-1-1-1h-3z'),
+																	createPath(
+																		'M13 10h1v3c0 .547-.453 1-1 1h-3v-1h3v-3zM1 10H0v3c0 .547.453 1 1 1h3v-1H1v-3zm0-7h3V2H1c-.547 0-1 .453-1 1v3h1V3zm1 1h10v8H2V4zm2 6h6V6H4v4zm6-8v1h3v3h1V3c0-.547-.453-1-1-1h-3z',
+																		{ 'fill-rule': 'evenodd' },
+																	),
 																]
 															})
 														]
 													}),
+													create('slot', {
+														name: 'exit-fullscreen-icon',
+														children: [
+															createSVG({
+																width: iconSize,
+																height: iconSize,
+																classList: ['icon'],
+																viewBox: [0, 0, 14, 16],
+																fill: 'currentColor',
+																part: ['icon', 'exit-fullscreen-icon'],
+																children: [
+																	createPath(
+																		'M2 4H0V3h2V1h1v2c0 .547-.453 1-1 1zm0 8H0v1h2v2h1v-2c0-.547-.453-1-1-1zm9-2c0 .547-.453 1-1 1H4c-.547 0-1-.453-1-1V6c0-.547.453-1 1-1h6c.547 0 1 .453 1 1v4zM9 7H5v2h4V7zm2 6v2h1v-2h2v-1h-2c-.547 0-1 .453-1 1zm1-10V1h-1v2c0 .547.453 1 1 1h2V3h-2z',
+																		{ 'fill-rule': 'evenodd' },
+																	)
+																]
+															})
+														]
+													})
 												],
 											}),
 											create('a', {
