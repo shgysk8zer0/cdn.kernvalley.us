@@ -9,6 +9,7 @@ import { getURLResolver } from '../../js/std-js/utility.js';
 import HTMLCustomElement from '../custom-element.js';
 import { MARKER_TYPES } from './marker-types.js';
 import { TILES } from './tiles.js';
+import { createSVG, createPath } from '../../js/std-js/svg.js';
 import {
 	map as LeafletMap,
 	tileLayer as LeafletTileLayer,
@@ -140,21 +141,23 @@ function close() {
  */
 HTMLCustomElement.register('leaflet-map', class HTMLLeafletMapElement extends HTMLCustomElement {
 	constructor({
-		longitude    = NaN,
-		latitude     = NaN,
-		zoom         = NaN,
-		minZoom      = NaN,
-		maxZoom      = NaN,
-		zoomControl  = null,
-		crossOrigin  = null,
-		detectRetina = null,
-		loading      = null,
-		markers      = null,
-		router       = null,
-		centerOnUser = null,
-		tileSrc      = null,
-		watch        = NaN,
-		find         = NaN,
+		longitude       = NaN,
+		latitude        = NaN,
+		zoom            = NaN,
+		minZoom         = NaN,
+		maxZoom         = NaN,
+		zoomControl     = null,
+		crossOrigin     = null,
+		detectRetina    = null,
+		loading         = null,
+		markers         = null,
+		router          = null,
+		centerOnUser    = null,
+		tileSrc         = null,
+		watch           = NaN,
+		find            = NaN,
+		allowLocate     = null,
+		allowFullscreen = null,
 	} = {}) {
 		super();
 		this._shadow = this.attachShadow({ mode: 'closed' });
@@ -180,6 +183,14 @@ HTMLCustomElement.register('leaflet-map', class HTMLLeafletMapElement extends HT
 				this.center = { latitude, longitude };
 			} else if (centerOnUser === true) {
 				this.centerOnUser();
+			}
+
+			if (allowLocate) {
+				this.allowLocate = true;
+			}
+
+			if (allowFullscreen) {
+				this.allowFullscreen = true;
 			}
 
 			if (typeof tileSrc === 'string') {
@@ -277,6 +288,7 @@ HTMLCustomElement.register('leaflet-map', class HTMLLeafletMapElement extends HT
 				}
 			};
 
+			const iconSize = 18;
 			const doc = create('div', {
 				part: ['container'],
 				children: [
@@ -301,6 +313,87 @@ HTMLCustomElement.register('leaflet-map', class HTMLLeafletMapElement extends HT
 								}
 							})
 						],
+					}),
+					create('div', {
+						classList: ['leaflet-control-container'],
+						children: [
+							create('div', {
+								classList: ['leaflet-bottom', 'leaflet-left'],
+								children: [
+									create('div', {
+										classList: ['leaflet-bar', 'leaflet-control'],
+										children: [
+											create('a', {
+												role: 'button',
+												href: '#',
+												title: 'Toggle fullscreen',
+												part: ['btn', 'fullscreen-btn', 'control-btn'],
+												classList: ['leaflet-touch'],
+												events: {
+													click: event => {
+														event.preventDefault();
+														if (this.isSameNode(document.fullscreenElement)) {
+															document.exitFullscreen();
+														} else {
+															this.requestFullscreen();
+														}
+													}
+												},
+												children: [
+													create('slot', {
+														name: 'fullscreen-btn',
+														children: [
+															createSVG({
+																width: iconSize,
+																height: iconSize,
+																classList: ['icon'],
+																viewBox: [0, 0, 14, 16],
+																fill: 'currentColor',
+																part: ['icon', 'fullscreen-icon'],
+																children: [
+																	createPath('M13 10h1v3c0 .547-.453 1-1 1h-3v-1h3v-3zM1 10H0v3c0 .547.453 1 1 1h3v-1H1v-3zm0-7h3V2H1c-.547 0-1 .453-1 1v3h1V3zm1 1h10v8H2V4zm2 6h6V6H4v4zm6-8v1h3v3h1V3c0-.547-.453-1-1-1h-3z'),
+																]
+															})
+														]
+													}),
+												],
+											}),
+											create('a', {
+												role: 'button',
+												href: '#',
+												title: 'Locate',
+												part: ['btn', 'locate-btn', 'control-btn'],
+												events: {
+													click: (event) => {
+														event.preventDefault();
+														this.locate();
+													}
+												},
+												classList: ['leaflet-touch'],
+												children: [
+													create('slot', {
+														name: 'locate-btn',
+														children: [
+															createSVG({
+																width: iconSize,
+																height: iconSize,
+																classList: ['icon'],
+																viewBox: [0, 0, 16, 16],
+																fill: 'currentColor',
+																part: ['icon','locate-icon'],
+																children: [
+																	createPath('M7 0v1.031A6.514 6.514 0 0 0 1.062 7H0v1h1.063A6.514 6.514 0 0 0 7 13.969V15h1v-1.031c3.188-.234 5.724-2.78 5.969-5.969H15V7h-1.031C13.724 3.811 11.189 1.233 8 1V0zm.531 2.813c2.607 0 4.688 2.08 4.688 4.687s-2.081 4.688-4.688 4.688c-2.606 0-4.75-2.082-4.75-4.688s2.144-4.688 4.75-4.688zM7.5 4a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7z'),
+																]
+															})
+														],
+													}),
+												],
+											}),
+										],
+									}),
+								]
+							})
+						]
 					}),
 					create('slot', { events, attrs: { name: 'markers' }}),
 					create('slot', { events, attrs: { name: 'overlays' }}),
@@ -411,6 +504,22 @@ HTMLCustomElement.register('leaflet-map', class HTMLLeafletMapElement extends HT
 		} else {
 			return Promise.resolve(this);
 		}
+	}
+
+	get allowFullscreen() {
+		return this.hasAttribute('allowfullscreen');
+	}
+
+	set allowFullscreen(val) {
+		this.toggleAttribute('allowfullscreen');
+	}
+
+	get allowLocate() {
+		return this.hasAttribute('allowlocate');
+	}
+
+	set allowLocate(val) {
+		this.toggleAttribute('allowlocate');
 	}
 
 	get crossOrigin() {
