@@ -328,7 +328,7 @@ HTMLCustomElement.register('leaflet-map', class HTMLLeafletMapElement extends HT
 												href: '#',
 												title: 'Toggle fullscreen',
 												part: ['btn', 'fullscreen-btn', 'control-btn'],
-												classList: ['leaflet-touch'],
+												classList: ['leaflet-control-btn'],
 												events: {
 													click: event => {
 														event.preventDefault();
@@ -395,7 +395,7 @@ HTMLCustomElement.register('leaflet-map', class HTMLLeafletMapElement extends HT
 														this.locate();
 													}
 												},
-												classList: ['leaflet-touch'],
+												classList: ['leaflet-control-btn'],
 												children: [
 													create('slot', {
 														name: 'locate-btn',
