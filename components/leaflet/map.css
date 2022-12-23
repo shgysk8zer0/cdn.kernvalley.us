@@ -46,7 +46,11 @@
 	height: 100%;
 }
 
-:host(:not([allowfullscreen]):not([allowlocate])) [part~="container"] > .leaflet-control-container {
+:host(:not([allowfullscreen]):not([allowlocate])) [part~="other-controls"] {
+	display: none;
+}
+
+:host(:not([zoomcontrol])) [part~="zoom-controls"] {
 	display: none;
 }
 
@@ -101,9 +105,9 @@ slot[name="map"] {
 }
 
 [part~="control-btn"] {
-	width: 30px;
-	height: 30px;
-	line-height: 30px;
+	width: 35px;
+	height: 35px;
+	line-height: 35px;
 }
 
 slot svg.icon {
