@@ -15,11 +15,11 @@ import {
 	tileLayer as LeafletTileLayer,
 	point as Point,
 	latLng as LatLng,
-} from 'https://unpkg.com/leaflet@1.8.0/dist/leaflet-src.esm.js';
+} from './dist.js';
 
 export const stylesheet = {
-	href: 'https://unpkg.com/leaflet@1.8.0/dist/leaflet.css',
-	integrity: 'sha512-hoalWLoI8r4UszCkZ5kL8vayOGVae1oxXe/2A4AO6J9+580uKHDO3JdHb7NzwwzK5xr/Fs0W40kiNHxM9vyTtQ==',
+	href: 'https://unpkg.com/leaflet@1.9.3/dist/leaflet.css',
+	integrity: 'sha512-mD70nAW2ThLsWH0zif8JPbfraZ8hbCtjQ+5RU1m4+ztZq6/MymyZeB55pWsi4YAX+73yvcaJyk61mzfYMvtm9w==',
 	crossOrigin: 'anonymous',
 	referrerPolicy: 'no-referrer',
 	fetchPriority: 'high',
