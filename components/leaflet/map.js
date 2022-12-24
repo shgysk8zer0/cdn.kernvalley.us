@@ -563,8 +563,6 @@ HTMLCustomElement.register('leaflet-map', class HTMLLeafletMapElement extends HT
 			create('slot', { name: 'top-right', classList: ['leaflet-control'] }),
 		);
 
-		console.log({ tl, bl, br, tr });
-
 		const handler = ({ type, target }) => {
 			const event = type === 'move' ? 'pan': 'zoom';
 			const { lat: latitude, lng: longitude } = target.getCenter();
