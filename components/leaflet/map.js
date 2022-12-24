@@ -17,14 +17,24 @@ import {
 	latLng as LatLng,
 } from 'https://unpkg.com/leaflet@1.8.0/dist/leaflet-src.esm.js';
 
+export const stylesheet = {
+	href: 'https://unpkg.com/leaflet@1.8.0/dist/leaflet.css',
+	integrity: 'sha512-hoalWLoI8r4UszCkZ5kL8vayOGVae1oxXe/2A4AO6J9+580uKHDO3JdHb7NzwwzK5xr/Fs0W40kiNHxM9vyTtQ==',
+	crossOrigin: 'anonymous',
+	referrerPolicy: 'no-referrer',
+	fetchPriority: 'high',
+};
+
 const initialTitle = document.title;
 const GEO_EXP = /#-?\d{1,3}\.\d+,-?\d{1,3}\.\d+(,\d{1,2})?/;
 const resolveURL = getURLResolver({ base: meta.url, path: '/components/leaflet/' });
 
 let data = new WeakMap();
 
-async function locate(map, { enableHighAccuracy = true, setView = true,
-	watch = false, maxZoom = Infinity, timeout = 10000, maximumAge = 0 } = {}) {
+async function locate(map, {
+	enableHighAccuracy = true, setView = true,
+	watch = false, maxZoom = Infinity, timeout = 10000, maximumAge = 0,
+} = {}) {
 	return await new Promise((resolve, reject) => {
 		function success(event) {
 			map.off('locationfound', success);
@@ -288,7 +298,6 @@ HTMLCustomElement.register('leaflet-map', class HTMLLeafletMapElement extends HT
 				}
 			};
 
-			const iconSize = 18;
 			const doc = create('div', {
 				part: ['container'],
 				children: [
@@ -314,113 +323,6 @@ HTMLCustomElement.register('leaflet-map', class HTMLLeafletMapElement extends HT
 							})
 						],
 					}),
-					create('div', {
-						classList: ['leaflet-control-container'],
-						children: [
-							create('div', {
-								classList: ['leaflet-bottom', 'leaflet-left'],
-								children: [
-									create('div', {
-										classList: ['leaflet-bar', 'leaflet-control'],
-										children: [
-											create('a', {
-												role: 'button',
-												href: '#',
-												title: 'Toggle fullscreen',
-												part: ['btn', 'fullscreen-btn', 'control-btn'],
-												classList: ['leaflet-control-btn'],
-												events: {
-													click: event => {
-														event.preventDefault();
-														if (this.isSameNode(document.fullscreenElement)) {
-															document.exitFullscreen();
-															// this._shadow.querySelector('slot[name="enter-fullscreen-btn"]').hidden = false;
-															// this._shadow.querySelector('slot[name="exit-fullscreen-btn"]').hidden = true;
-														} else {
-															this.requestFullscreen();
-															// this._shadow.querySelector('slot[name="enter-fullscreen-btn"]').hidden = true;
-															// this._shadow.querySelector('slot[name="exit-fullscreen-btn"]').hidden = false;
-														}
-													}
-												},
-												children: [
-													create('slot', {
-														name: 'enter-fullscreen-icon',
-														children: [
-															createSVG({
-																width: iconSize,
-																height: iconSize,
-																classList: ['icon'],
-																viewBox: [0, 0, 14, 16],
-																fill: 'currentColor',
-																part: ['icon', 'enter-fullscreen-icon'],
-																children: [
-																	createPath(
-																		'M13 10h1v3c0 .547-.453 1-1 1h-3v-1h3v-3zM1 10H0v3c0 .547.453 1 1 1h3v-1H1v-3zm0-7h3V2H1c-.547 0-1 .453-1 1v3h1V3zm1 1h10v8H2V4zm2 6h6V6H4v4zm6-8v1h3v3h1V3c0-.547-.453-1-1-1h-3z',
-																		{ 'fill-rule': 'evenodd' },
-																	),
-																]
-															})
-														]
-													}),
-													create('slot', {
-														name: 'exit-fullscreen-icon',
-														children: [
-															createSVG({
-																width: iconSize,
-																height: iconSize,
-																classList: ['icon'],
-																viewBox: [0, 0, 14, 16],
-																fill: 'currentColor',
-																part: ['icon', 'exit-fullscreen-icon'],
-																children: [
-																	createPath(
-																		'M2 4H0V3h2V1h1v2c0 .547-.453 1-1 1zm0 8H0v1h2v2h1v-2c0-.547-.453-1-1-1zm9-2c0 .547-.453 1-1 1H4c-.547 0-1-.453-1-1V6c0-.547.453-1 1-1h6c.547 0 1 .453 1 1v4zM9 7H5v2h4V7zm2 6v2h1v-2h2v-1h-2c-.547 0-1 .453-1 1zm1-10V1h-1v2c0 .547.453 1 1 1h2V3h-2z',
-																		{ 'fill-rule': 'evenodd' },
-																	)
-																]
-															})
-														]
-													})
-												],
-											}),
-											create('a', {
-												role: 'button',
-												href: '#',
-												title: 'Locate',
-												part: ['btn', 'locate-btn', 'control-btn'],
-												events: {
-													click: (event) => {
-														event.preventDefault();
-														this.locate();
-													}
-												},
-												classList: ['leaflet-control-btn'],
-												children: [
-													create('slot', {
-														name: 'locate-btn',
-														children: [
-															createSVG({
-																width: iconSize,
-																height: iconSize,
-																classList: ['icon'],
-																viewBox: [0, 0, 16, 16],
-																fill: 'currentColor',
-																part: ['icon','locate-icon'],
-																children: [
-																	createPath('M7 0v1.031A6.514 6.514 0 0 0 1.062 7H0v1h1.063A6.514 6.514 0 0 0 7 13.969V15h1v-1.031c3.188-.234 5.724-2.78 5.969-5.969H15V7h-1.031C13.724 3.811 11.189 1.233 8 1V0zm.531 2.813c2.607 0 4.688 2.08 4.688 4.687s-2.081 4.688-4.688 4.688c-2.606 0-4.75-2.082-4.75-4.688s2.144-4.688 4.75-4.688zM7.5 4a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7z'),
-																]
-															})
-														],
-													}),
-												],
-											}),
-										],
-									}),
-								]
-							})
-						]
-					}),
 					create('slot', { events, attrs: { name: 'markers' }}),
 					create('slot', { events, attrs: { name: 'overlays' }}),
 					create('slot', { events, attrs: { name: 'geojson' }}),
@@ -428,8 +330,11 @@ HTMLCustomElement.register('leaflet-map', class HTMLLeafletMapElement extends HT
 			});
 
 			await Promise.allSettled([
-				loadStylesheet('https://unpkg.com/leaflet@1.8.0/dist/leaflet.css', {
-					integrity: 'sha512-hoalWLoI8r4UszCkZ5kL8vayOGVae1oxXe/2A4AO6J9+580uKHDO3JdHb7NzwwzK5xr/Fs0W40kiNHxM9vyTtQ==',
+				loadStylesheet(stylesheet.href, {
+					integrity: stylesheet.integrity,
+					crossOrigin: stylesheet.crossOrigin,
+					referrerPolicy: stylesheet.referrerPolicy,
+					fetchPriority: stylesheet.fetchPriority,
 					parent: this._shadow,
 				}),
 				loadStylesheet(resolveURL('./map.css'), { parent: this._shadow }),
@@ -451,9 +356,212 @@ HTMLCustomElement.register('leaflet-map', class HTMLLeafletMapElement extends HT
 		this.dispatchEvent(new Event('connected'));
 
 		await Promise.all([ this._populated, prom ]);
-		const m = LeafletMap(this.mapElement, {
-			zoomControl: this.zoomControl,
-		});
+		const mapEl = this.mapElement;
+		const iconSize = 19;
+		const m = LeafletMap(mapEl, { zoomControl: false });
+		const tl = mapEl.querySelector('.leaflet-top.leaflet-left');
+		const bl = mapEl.querySelector('.leaflet-bottom.leaflet-left');
+		const br = mapEl.querySelector('.leaflet-bottom.leaflet-right');
+		const tr = mapEl.querySelector('.leaflet-top.leaflet-right');
+
+		tl.part.add('top-left');
+		bl.part.add('bottom-left');
+		br.part.add('bottom-right');
+		tr.part.add('top-right');
+
+		tl.append(
+			create('slot', { name: 'top-left', classList: ['leaflet-control'] }),
+			create('div', {
+				classList: ['leaflet-bar', 'leaflet-control'],
+				part: ['zoom-controls'],
+				children: [
+					create('a', {
+						href: '#',
+						role: 'button',
+						title: 'Zoom In',
+						part: ['btn', 'zoom-in-btn', 'zoom-btn', 'control-btn'],
+						classList: ['leaflet-control-btn', 'background-inherit', 'color-inherit'],
+						events: {
+							click: event => {
+								event.preventDefault();
+								this.zoomIn();
+							}
+						},
+						children: [
+							createSVG({
+								width: iconSize,
+								height: iconSize,
+								classList: ['icon'],
+								viewBox: [0, 0, 16, 16],
+								fill: 'currentColor',
+								part: ['icon', 'zoom-in-icon'],
+								children: [
+									createPath(
+										'M3.19 2c-.663 0-1.188.549-1.188 1.219v9.562c0 .67.525 1.22 1.188 1.22h9.625c.663 0 1.187-.55 1.187-1.22V3.22c0-.67-.524-1.219-1.187-1.219zm3.812 3h2v2h2v2h-2v2h-2V9h-2V7h2z',
+									),
+								]
+							})
+						]
+					}),
+					create('a', {
+						href: '#',
+						role: 'button',
+						title: 'Zoom Out',
+						part: ['btn', 'zoom-out-btn', 'zoom-btn', 'control-btn'],
+						classList: ['leaflet-control-btn'],
+						events: {
+							click: event => {
+								event.preventDefault();
+								this.zoomOut();
+							}
+						},
+						children: [
+							createSVG({
+								width: iconSize,
+								height: iconSize,
+								classList: ['icon'],
+								viewBox: [0, 0, 16, 16],
+								fill: 'currentColor',
+								part: ['icon', 'zoom-out-icon'],
+								children: [
+									createPath(
+										'M3.19 2c-.663 0-1.188.549-1.188 1.219v9.562c0 .67.525 1.22 1.188 1.22h9.625c.663 0 1.187-.55 1.187-1.22V3.22c0-.67-.524-1.219-1.187-1.219zm1.812 5h6v2h-6z',
+									),
+								]
+							})
+						]
+					}),
+				]
+			})
+		);
+
+		bl.append(
+			create('slot', { name: 'bottom-left', classList: ['leaflet-control'] }),
+			create('div', {
+				classList: ['leaflet-bar', 'leaflet-control'],
+				part: ['other-controls'],
+				children: [
+					create('a', {
+						role: 'button',
+						href: '#',
+						title: 'Toggle fullscreen',
+						part: ['btn', 'fullscreen-btn', 'control-btn'],
+						classList: ['leaflet-control-btn'],
+						events: {
+							click: event => {
+								event.preventDefault();
+								if (this.isSameNode(document.fullscreenElement)) {
+									document.exitFullscreen();
+								} else {
+									this.requestFullscreen();
+								}
+							}
+						},
+						children: [
+							create('slot', {
+								name: 'enter-fullscreen-icon',
+								children: [
+									createSVG({
+										width: iconSize,
+										height: iconSize,
+										classList: ['icon'],
+										viewBox: [0, 0, 14, 16],
+										fill: 'currentColor',
+										part: ['icon', 'enter-fullscreen-icon'],
+										children: [
+											createPath(
+												'M13 10h1v3c0 .547-.453 1-1 1h-3v-1h3v-3zM1 10H0v3c0 .547.453 1 1 1h3v-1H1v-3zm0-7h3V2H1c-.547 0-1 .453-1 1v3h1V3zm1 1h10v8H2V4zm2 6h6V6H4v4zm6-8v1h3v3h1V3c0-.547-.453-1-1-1h-3z',
+												{ 'fill-rule': 'evenodd' },
+											),
+										]
+									})
+								]
+							}),
+							create('slot', {
+								name: 'exit-fullscreen-icon',
+								children: [
+									createSVG({
+										width: iconSize,
+										height: iconSize,
+										classList: ['icon'],
+										viewBox: [0, 0, 14, 16],
+										fill: 'currentColor',
+										part: ['icon', 'exit-fullscreen-icon'],
+										children: [
+											createPath(
+												'M2 4H0V3h2V1h1v2c0 .547-.453 1-1 1zm0 8H0v1h2v2h1v-2c0-.547-.453-1-1-1zm9-2c0 .547-.453 1-1 1H4c-.547 0-1-.453-1-1V6c0-.547.453-1 1-1h6c.547 0 1 .453 1 1v4zM9 7H5v2h4V7zm2 6v2h1v-2h2v-1h-2c-.547 0-1 .453-1 1zm1-10V1h-1v2c0 .547.453 1 1 1h2V3h-2z',
+												{ 'fill-rule': 'evenodd' },
+											)
+										]
+									})
+								]
+							})
+						],
+					}),
+					create('a', {
+						role: 'button',
+						href: '#',
+						title: 'Locate',
+						part: ['btn', 'locate-btn', 'control-btn'],
+						events: {
+							click: async event => {
+								event.preventDefault();
+
+								const [{ coords }, LeafletMarker] = await Promise.all([
+									getLocation({ enableHighAccuracy: true }),
+									getCustomElement('leaflet-marker'),
+								]);
+
+								const marker = new LeafletMarker({
+									latitude: coords.latitude,
+									longitude: coords.longitude,
+									popup: '<h3>Current Loction</h3>',
+									icon: 'https://cdn.kernvalley.us/img/adwaita-icons/actions/mark-location.svg',
+								});
+
+								marker.id = `${coords.latitude},${coords.longitude}`;
+
+								marker.addEventListener('close', ({ target }) => target.remove());
+								this.append(marker);
+								await this.flyTo(marker, 16);
+
+								if (this.router) {
+									document.title = 'Current Location';
+								}
+								marker.open = true;
+							}
+						},
+						classList: ['leaflet-control-btn'],
+						children: [
+							create('slot', {
+								name: 'locate-btn',
+								children: [
+									createSVG({
+										width: iconSize,
+										height: iconSize,
+										classList: ['icon'],
+										viewBox: [0, 0, 16, 16],
+										fill: 'currentColor',
+										part: ['icon','locate-icon'],
+										children: [
+											createPath('M7 0v1.031A6.514 6.514 0 0 0 1.062 7H0v1h1.063A6.514 6.514 0 0 0 7 13.969V15h1v-1.031c3.188-.234 5.724-2.78 5.969-5.969H15V7h-1.031C13.724 3.811 11.189 1.233 8 1V0zm.531 2.813c2.607 0 4.688 2.08 4.688 4.687s-2.081 4.688-4.688 4.688c-2.606 0-4.75-2.082-4.75-4.688s2.144-4.688 4.75-4.688zM7.5 4a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7z'),
+										]
+									})
+								],
+							}),
+						],
+					}),
+				],
+			}),
+		);
+
+		br.append(
+			create('slot', { name: 'bottom-right', classList: ['leaflet-control'] }),
+		);
+
+		tr.append(
+			create('slot', { name: 'top-right', classList: ['leaflet-control'] }),
+		);
 
 		const handler = ({ type, target }) => {
 			const event = type === 'move' ? 'pan': 'zoom';
