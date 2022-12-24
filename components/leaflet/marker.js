@@ -1,4 +1,4 @@
-import { marker, icon, latLng } from 'https://unpkg.com/leaflet@1.8.0/dist/leaflet-src.esm.js';
+import { marker, icon, latLng } from './dist.js';
 import { registerCustomElement } from '../../js/std-js/custom-elements.js';
 import { parse } from '../../js/std-js/dom.js';
 import { getJSON } from '../../js/std-js/http.js';
