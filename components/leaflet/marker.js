@@ -7,6 +7,7 @@ import { watch as watchLocation, get as findLocation } from '../../js/std-js/geo
 import { clamp } from '../../js/std-js/math.js';
 import { getSchemaIcon } from './schema-icon.js';
 import { MARKER_TYPES } from './marker-types.js';
+import { getFloat, setFloat, getBool, setBool, getInt, setInt } from '../../js/std-js/attrs.js';
 
 const data = new WeakMap();
 const controllers = new WeakMap();
@@ -174,56 +175,36 @@ registerCustomElement('leaflet-marker', class HTMLLeafletMarkerElement extends H
 	}
 
 	get latitude() {
-		return parseFloat(this.getAttribute('latitude'));
+		return getFloat(this, 'latitude');
 	}
 
 	set latitude(val) {
-		this.setAttribute('latitude', val);
+		setFloat(this, 'latitude', val);
 	}
 
 	get longitude() {
-		return parseFloat(this.getAttribute('longitude'));
+		return getFloat(this, 'longitude');
 	}
 
 	set longitude(val) {
-		this.setAttribute('longitude', val);
+		setFloat(this, 'longitude', val);
 	}
 
 	get minZoom() {
-		if (this.hasAttribute('minzoom')) {
-			return parseInt(this.getAttribute('minzoom'));
-		} else {
-			return NaN;
-		}
+		return getInt(this, 'minzoom', { min: 0 });
 	}
 
 	set minZoom(val) {
-		if (Number.isInteger(val)) {
-			this.setAttribute('minzoom', val);
-		} else if (typeof val === 'string') {
-			this.minZoom = parseInt(val);
-		} else {
-			this.removeAttribute('minzoom');
-		}
+		setInt(this, 'minzoom', val);
 	}
 
 
 	get maxZoom() {
-		if (this.hasAttribute('maxzoom')) {
-			return parseInt(this.getAttribute('maxzoom'));
-		} else {
-			return NaN;
-		}
+		return getInt(this, 'maxzoom');
 	}
 
 	set maxZoom(val) {
-		if (Number.isInteger(val)) {
-			this.setAttribute('maxzoom', val);
-		} else if (typeof val === 'string') {
-			this.minZoom = parseInt(val);
-		} else {
-			this.removeAttribute('maxzoom');
-		}
+		setInt(this, 'maxzooom', val);
 	}
 
 	get iconImg() {
@@ -297,23 +278,19 @@ registerCustomElement('leaflet-marker', class HTMLLeafletMarkerElement extends H
 	}
 
 	get opacity() {
-		return this.hasAttribute('opacity') ? clamp(0, parseFloat(this.getAttribute('opacity')), 1) : 1;
+		return clamp(0, getFloat(this, 'opacity', { fallback: 1 }), 1);
 	}
 
 	set opacity(val) {
-		if (typeof val === 'number') {
-			this.setAttribute('opacity', clamp(0, val, 1).toString());
-		} else {
-			this.removeAttribute('opacity');
-		}
+		setInt(this, 'opacity', val, { min: 0, max: 1 });
 	}
 
 	get open() {
-		return this.hasAttribute('open');
+		return getBool(this, 'open');
 	}
 
 	set open(val) {
-		this.toggleAttribute('open', val);
+		setBool(this, 'open', val);
 	}
 
 	get visible() {
