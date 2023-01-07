@@ -2,6 +2,7 @@ import { whenIntersecting } from '../../js/std-js/intersect.js';
 import { getDeferred } from '../../js/std-js/promises.js';
 import { createIframe } from '../../js/std-js/elements.js';
 import { loaded } from '../../js/std-js/events.js';
+import { getString, setString, getInt, setInt } from '../../js/std-js/attrs.js';
 
 const protectedData = new WeakMap();
 
@@ -103,63 +104,43 @@ customElements.define('github-gist', class HTMLGitHubGistElement extends HTMLEle
 	}
 
 	get file() {
-		return this.getAttribute('file');
+		return getString(this, 'file');
 	}
 
 	set file(val) {
-		if (typeof val === 'string' && val.length !== 0) {
-			this.setAttribute('file', val);
-		} else {
-			this.removeAttribute('file');
-		}
+		setString(this, 'file', val);
 	}
 
 	get gist() {
-		return this.getAttribute('gist');
+		return getString(this, 'gist');
 	}
 
 	set gist(val) {
-		if (typeof val === 'string' && val.length !== 0) {
-			this.setAttribute('gist', val);
-		} else {
-			this.removeAttribute('gist');
-		}
+		setString(this, 'gist', val);
 	}
 
 	get height() {
-		return parseInt(this.getAttribute('height'));
+		return getInt(this, 'height');
 	}
 
 	set height(val) {
-		if (Number.isSafeInteger(val) && val > 0) {
-			this.setAttribute('height', val);
-		} else {
-			this.removeAttribute('height');
-		}
+		setInt(this, 'height', val, { min: 0 });
 	}
 
 	get loading() {
-		return this.getAttribute('loading') || 'eager';
+		return getString(this, 'loading', { fallback: 'eager' });
 	}
 
 	set loading(val) {
-		if (typeof val === 'string' && val.length !== 0) {
-			this.setAttribute('loading', val);
-		} else {
-			this.removeAttribute('val');
-		}
+		setString(this, 'loading',val);
 	}
 
 	get user() {
-		return this.getAttribute('user');
+		return getString(this, 'user');
 	}
 
 	set user(val) {
-		if (typeof val === 'string' && val.length !== 0) {
-			this.setAttribute('user', val);
-		} else {
-			this.removeAttribute('user');
-		}
+		setString(this, 'user', val);
 	}
 
 	get rendered() {
@@ -178,15 +159,11 @@ customElements.define('github-gist', class HTMLGitHubGistElement extends HTMLEle
 	}
 
 	get width() {
-		return parseInt(this.getAttribute('width'));
+		return getInt(this, 'width');
 	}
 
 	set width(val) {
-		if (Number.isSafeInteger(val) && val > 0) {
-			this.setAttribute('width', val);
-		} else {
-			this.removeAttribute('width');
-		}
+		setInt(this, 'width', val,{ min: 0 });
 	}
 
 	get whenConnected() {

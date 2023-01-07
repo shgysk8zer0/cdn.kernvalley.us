@@ -7,6 +7,7 @@ import { getDeferred } from '../../js/std-js/promises.js';
 import { registerCustomElement } from '../../js/std-js/custom-elements.js';
 import { getURLResolver } from '../../js/std-js/utility.js';
 import { meta } from '../../import.meta.js';
+import { getString, setString } from '../../js/std-js/attrs.js';
 
 const resolveURL = getURLResolver({ base: meta.url, path: '/components/github/' });
 const symbols = {
@@ -203,15 +204,11 @@ registerCustomElement('github-repo', class HTMLGitHubRepoElement extends HTMLEle
 	}
 
 	get loading() {
-		return this.getAttribute('loading') || 'eager';
+		return getString(this, 'loading', { fallback: 'eager' });
 	}
 
 	set loading(val) {
-		if (typeof val === 'string' && val.length !== 0) {
-			this.setAttribute('loading', val);
-		} else {
-			this.removeAttribute('loading');
-		}
+		setString(this, 'loading', val);
 	}
 
 	get ready() {
@@ -227,27 +224,19 @@ registerCustomElement('github-repo', class HTMLGitHubRepoElement extends HTMLEle
 	}
 
 	get repo() {
-		return this.getAttribute('repo');
+		return getString(this, 'repo');
 	}
 
 	set repo(val) {
-		if (typeof val === 'string' && val.length !== 0) {
-			this.setAttribute('repo', val);
-		} else {
-			this.removeAttribute('repo');
-		}
+		setString(this, 'repo', val);
 	}
 
 	get user() {
-		return this.getAttribute('user');
+		return getString(this, 'user');
 	}
 
 	set user(val) {
-		if (typeof val === 'string' && val.length !== 0) {
-			this.setAttribute('user', val);
-		} else {
-			this.removeAttribute('user');
-		}
+		setString(this, 'user', val);
 	}
 
 	static get observedAttributes() {

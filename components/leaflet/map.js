@@ -10,6 +10,7 @@ import HTMLCustomElement from '../custom-element.js';
 import { MARKER_TYPES } from './marker-types.js';
 import { TILES } from './tiles.js';
 import { createSVG, createPath } from '../../js/std-js/svg.js';
+import { getBool, setBool, getInt, setInt, getString, setString } from '../../js/std-js/attrs.js';
 import {
 	map as LeafletMap,
 	tileLayer as LeafletTileLayer,
@@ -641,72 +642,60 @@ HTMLCustomElement.register('leaflet-map', class HTMLLeafletMapElement extends HT
 	}
 
 	get allowFullscreen() {
-		return this.hasAttribute('allowfullscreen');
+		return getBool(this, 'allowfullscreen');
 	}
 
 	set allowFullscreen(val) {
-		this.toggleAttribute('allowfullscreen', val);
+		setBool(this, 'allowfullscreen', val);
 	}
 
 	get allowLocate() {
-		return this.hasAttribute('allowlocate');
+		return getBool(this, 'allowlocate');
 	}
 
 	set allowLocate(val) {
-		this.toggleAttribute('allowlocate', val);
+		setBool(this, 'allowlocate', val);
 	}
 
 	get crossOrigin() {
-		return this.getAttribute('crossorigin') || 'anonymous';
+		return getString(this, 'crossorigin', { fallback: 'anonymous' });
 	}
 
 	set crossOrigin(val) {
-		this.setAttribute('crossorigin', val);
+		setString(this, 'crossorigin', val);
 	}
 
 	get detectRetina() {
-		return this.hasAttribute('detectretina');
+		return getBool(this, 'detectretina');
 	}
 
 	set detectRetina(val) {
-		this.toggleAttribute('detectretina', val);
+		setBool(this, 'detectretina', val);
 	}
 
 	get zoom() {
-		return parseInt(this.getAttribute('zoom')) || 13;
+		return getInt(this, 'zoom', { fallback: 13 });
 	}
 
 	set zoom(val) {
-		const num = parseInt(val);
-		if (Number.isNaN(num)) {
-			throw new Error(`Invalid zoom: ${val}`);
-		} else {
-			this.setAttribute('zoom', num);
-		}
+		const { minZoom, maxZoom } = this;
+		setInt(this, 'zoom', val, { min: minZoom, max: maxZoom });
 	}
 
 	get minZoom() {
-		return parseInt(this.getAttribute('minzoom')) || 7;
+		return getInt(this, 'minzoom', { fallback: 7 });
 	}
 
 	set minZoom(val) {
-		if (Number.isSafeInteger(val)) {
-			this.setAttribute('minzoom', val);
-		} else {
-			this.removeAttribute('minzoom');
-		}
+		setInt(this, 'minzoom', { min: 0 });
 	}
 
 	get maxZoom() {
-		return parseInt(this.getAttribute('maxzoom')) || 19;
+		return getInt(this, 'maxzoom', { fallback: 19 });
 	}
 
 	set maxZoom(val) {
-		if (Number.isSafeInteger(val)) {
-			this.setAttribute('maxzoom', val);
-		} else {
-			this.removeAttribute('maxzoom');
-		}
+		setInt(this, 'maxzoom', val, { min: 0 });
 	}
 
 	get bounds() {
@@ -742,31 +731,27 @@ HTMLCustomElement.register('leaflet-map', class HTMLLeafletMapElement extends HT
 	}
 
 	get zoomControl() {
-		return this.hasAttribute('zoomcontrol');
+		return getBool(this, 'zoomcontrol');
 	}
 
 	set zoomControl(val) {
-		this.toggleAttribute('zoomcontrol', val);
+		setBool(this, 'zoomcontrol', val);
 	}
 
 	get tileSrc() {
-		return this.getAttribute('tilesrc') || TILES.wikimedia.tileSrc;
+		return getString(this, 'tilesrc', { fallback: TILES.wikimedia.tileSrc });
 	}
 
 	set tileSrc(val) {
-		if (typeof val === 'string') {
-			this.setAttribute('tilesrc', val);
-		} else {
-			this.removeAttribute('tilesrc');
-		}
+		setString(this, 'tilesrc', val);
 	}
 
 	get toolbar() {
-		return this.hasAttribute('toolbar');
+		return getBool(this, 'toolbar');
 	}
 
 	set toolbar(val) {
-		this.toggleAttribute('toolbar', val);
+		setBool(this, 'toolbar', val);
 	}
 
 	get attribution() {
@@ -1014,11 +999,11 @@ HTMLCustomElement.register('leaflet-map', class HTMLLeafletMapElement extends HT
 	}
 
 	get router() {
-		return this.hasAttribute('router');
+		return getBool(this, 'router');
 	}
 
 	set router(val) {
-		this.toggleAttribute('router');
+		setBool(this, 'router', val);
 	}
 
 	get token() {
@@ -1030,18 +1015,14 @@ HTMLCustomElement.register('leaflet-map', class HTMLLeafletMapElement extends HT
 	}
 
 	get watch() {
-		return parseInt(this.hasAttribute('watch')) || this.maxZoom;
+		return getInt(this, 'watch') || this.maxZoom;
 	}
 
 	/**
 	 * Value will be `maxZoom` on call to `locate()`
 	 */
 	set watch(val) {
-		if (Number.isSafeInteger(val)) {
-			this.setAttribute('watch', val);
-		} else {
-			this.removeAttribute('watch');
-		}
+		setInt(this, 'watch', val);
 	}
 
 	async findLayer(callback) {
