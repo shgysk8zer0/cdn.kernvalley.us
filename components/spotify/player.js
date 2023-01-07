@@ -7,6 +7,7 @@ import { getHTML } from '../../js/std-js/http.js';
 import { getURLResolver } from '../../js/std-js/utility.js';
 import { meta } from '../../import.meta.js';
 import { loadStylesheet } from '../../js/std-js/loader.js';
+import { getBool, setBool, getString, setString } from '../../js/std-js/attrs.js';
 
 const protectedData = new WeakMap();
 const resolveURL = getURLResolver({ path: '/components/spotify/', base: meta.url });
@@ -124,11 +125,11 @@ registerCustomElement('spotify-player', class HTMLSpotifyPlayerElement extends H
 	}
 
 	get large() {
-		return this.hasAttribute('large');
+		return getBool(this, 'large');
 	}
 
 	set large(val) {
-		this.toggleAttribute('large', val);
+		setBool(this, 'large', val);
 	}
 
 	get link() {
@@ -151,15 +152,11 @@ registerCustomElement('spotify-player', class HTMLSpotifyPlayerElement extends H
 	}
 
 	get loading() {
-		return this.getAttribute('loading') || 'eager';
+		return getString(this, 'loading', { fallback: 'eager' });
 	}
 
 	set loading(val) {
-		if (typeof val === 'string' && val.length !== 0) {
-			this.setAttribute('loading', val);
-		} else {
-			this.removeAttribute('loading');
-		}
+		setString(this, 'loading', val);
 	}
 
 	get uri() {

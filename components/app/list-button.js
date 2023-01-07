@@ -4,6 +4,7 @@ import { loadImage, preload } from '../../js/std-js/loader.js';
 import { getApps, apps as SRC } from '../../js/std-js/krv/apps.js';
 import { hasGa, send } from '../../js/std-js/google-analytics.js';
 import { getDeferred } from '../../js/std-js/promises.js';
+import { getString, setString, getBool, setBool } from '../../js/std-js/attrs.js';
 const { resolve, promise: def } = getDeferred();
 
 const appPromise = def.then(() => getApps());
@@ -100,55 +101,43 @@ registerCustomElement('app-list', class HTMLKernValleyAppListButtonlement extend
 	}
 
 	get content() {
-		return this.getAttribute('content') || 'krv-app-list';
+		return getString(this, 'content', { fallback: 'krv-app-list' });
 	}
 
-	set content(value) {
-		if (typeof value === 'string' && value.length !== 0) {
-			this.setAttribute('content', value);
-		} else {
-			this.removeAttribute('content');
-		}
+	set content(val) {
+		setString(this, 'content', val);
 	}
 
 	get dev() {
-		return this.hasAttribute('dev');
+		return getBool(this, 'dev');
 	}
 
 	set dev(val) {
-		this.toggleAttribute('dev', val);
+		setBool(this, 'dev', val);
 	}
 
 	get medium() {
-		return this.getAttribute('medium') || 'referral';
+		return getString(this, 'medium', { fallback: 'referral' });
 	}
 
-	set medium(value) {
-		if (typeof value === 'string' && value.length !== 0) {
-			this.setAttribute('medium', value);
-		} else {
-			this.removeAttribute('medium');
-		}
+	set medium(val) {
+		setString(this, 'medium', val);
 	}
 
 	get host() {
-		return this.hasAttribute('host');
+		return getString(this, 'host');
 	}
 
 	set host(val) {
-		this.toggleAttribute('host', val);
+		setBool(this, 'host', val);
 	}
 
 	get source() {
-		return this.getAttribute('source');
+		return getString(this, 'source');
 	}
 
-	set source(value) {
-		if (typeof value === 'string' && value.length !== 0) {
-			this.setAttribute('source', value);
-		} else {
-			this.removeAttribute('source');
-		}
+	set source(val) {
+		setString(this, 'source', val);
 	}
 
 	async show() {

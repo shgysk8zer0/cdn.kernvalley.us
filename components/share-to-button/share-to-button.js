@@ -5,6 +5,8 @@ import { getHTML } from '../../js/std-js/http.js';
 import { meta } from '../../import.meta.js';
 import { getURLResolver } from '../../js/std-js/utility.js';
 import { loadStylesheet } from '../../js/std-js/loader.js';
+import { getString, setString, getBool, setBool, getURL, setURL } from '../../js/std-js/attrs.js';
+import { setUTMParams } from '../../js/std-js/utility.js';
 import { Facebook, Twitter, Reddit, LinkedIn, Gmail, Pinterest, Email, Tumblr, Telegram, getShareURL }
 	from '../../js/std-js/share-targets.js';
 
@@ -156,137 +158,90 @@ HTMLCustomElement.register('share-to-button', class HTMLShareToButtonElement ext
 	}
 
 	get content() {
-		return this.getAttribute('content') || 'share-to-button';
+		return getString(this, 'content', { fallback: 'share-to-button' });
 	}
 
 	set content(val) {
-		if (typeof val === 'string' && val.length !== 0) {
-			this.setAttribute('content', val);
-		} else {
-			this.removeAttribute('content');
-		}
+		setString(this, 'content', val);
 	}
 
 	get disabled() {
-		return this.hasAttribute('disabled');
+		return getBool(this, 'disabled');
 	}
 
 	set disabled(val) {
-		this.toggleAttribute('disabled', val);
+		getBool(this, 'disabled', val);
 	}
 
 	get medium() {
-		return this.getAttribute('medium') || 'share';
+		return getString(this, 'medium', { fallback: 'share' });
 	}
 
 	set medium(val) {
-		if (typeof val === 'string' && val.length !== 0) {
-			this.setAttribute('medium', val);
-		} else {
-			this.removeAttribute('medium');
-		}
+		setString(this, 'medium', val);
 	}
 
 	get source() {
-		return this.getAttribute('source');
+		return getString(this, 'source');
 	}
 
 	set source(val) {
-		if (typeof val === 'string' && val.length !== 0) {
-			this.setAttribute('source', val);
-		} else {
-			this.removeAttribute('source');
-		}
+		setString(this, 'source', val);
 	}
 
 	get target() {
-		return this.getAttribute('target');
+		return getString(this, 'target');
 	}
 
 	set target(val) {
-		if (typeof val === 'string' && val.length !== 0) {
-			this.setAttribute('target', val);
-		} else {
-			this.removeAttribute('target');
-		}
+		setString(this, 'target', val);
 	}
 
 	get url() {
 		if (this.hasAttribute('url')) {
-			const url = new URL(this.getAttribute('url'), location.href);
+			const url = getURL(this, 'url');
 			const { source, medium, content } = this;
-
-			if (typeof source === 'string' && typeof medium === 'string') {
-				if (! url.searchParams.has('utm_source')) {
-					url.searchParams.set('utm_source', source);
-				}
-
-				if (! url.searchParams.has('utm_medium')) {
-					url.searchParams.set('utm_medium', medium);
-				}
-
-				if (! url.searchParams.has('utm_content')) {
-					url.searchParams.set('utm_content', content);
-				}
-			}
-
-			return url.href;
+			return setUTMParams(url, { source, medium, content }).href;
 		} else {
 			const { source, medium, content } = this;
 
 			if (typeof source === 'string' && typeof medium === 'string') {
 				const url = new URL(location.href);
-
-				if (! url.searchParams.has('utm_source')) {
-					url.searchParams.set('utm_source', source);
-				}
-
-				if (! url.searchParams.has('utm_medium')) {
-					url.searchParams.set('utm_medium', medium);
-				}
-
-				if (! url.searchParams.has('utm_content')) {
-					url.searchParams.set('utm_content', content);
-				}
-				return url.href;
+				return setUTMParams(url, { source, medium, content }).href;
 			} else {
 				return location.href;
 			}
 		}
 	}
 
-	set url(url) {
-		if (typeof url === 'string' && url.length !== 0) {
-			this.setAttribute('url', url);
-		} else {
-			this.removeAttribute('url');
-		}
+	set url(val) {
+		setURL(this, 'url', val);
 	}
 
 	get text() {
-		return this.getAttribute('text');
+		return getString(this, 'text');
 	}
 
 	set text(val) {
-		this.setAttribute('text', val);
+		setString(this, 'text', val);
 	}
 
 	// `title` is not available, so use `sharetitle` / `shareTitle`
 
 	get shareTitle() {
-		return this.getAttribute('sharetitle') || document.title;
+		return getString(this, 'sharetitle', { fallback: document.title });
 	}
 
 	set shareTitle(val) {
-		this.setAttribute('sharetitle', val);
+		setString(this, 'sharetitle', val);
 	}
 
 	get stack() {
-		return this.hasAttribute('stack');
+		return getBool(this, 'stack');
 	}
 
 	set stack(val) {
-		this.toggleAttribute('stack', val);
+		setBool(this, 'stack', val);
 	}
 
 	async attributeChangedCallback(name, oldValue, newValue) {

@@ -3,6 +3,7 @@ import { confirm } from '../../js/std-js/asyncDialog.js';
 import { registerCustomElement } from '../../js/std-js/custom-elements.js';
 import { manifestPromise } from '../../js/std-js/promises.js';
 import { hasGa, send } from '../../js/std-js/google-analytics.js';
+import { getString, setString, getURL, setURL, getBool, setBool } from '../../js/std-js/attrs.js';
 const getManifest = async () => manifestPromise;
 
 registerCustomElement('pwa-install', class HTMLPWAInstallButton extends HTMLButtonElement {
@@ -43,7 +44,7 @@ registerCustomElement('pwa-install', class HTMLPWAInstallButton extends HTMLButt
 
 		await this.serviceWorker;
 
-		window.addEventListener('beforeinstallprompt', event => {
+		globalThis.addEventListener('beforeinstallprompt', event => {
 			event.preventDefault();
 			this.dispatchEvent(new Event('shown'));
 			this.hidden = false;
@@ -88,35 +89,27 @@ registerCustomElement('pwa-install', class HTMLPWAInstallButton extends HTMLButt
 	}
 
 	get reloadOnUpdate() {
-		return this.hasAttribute('reloadonupdate');
+		return getBool(this, 'reloadonupdate');
 	}
 
 	set reloadOnUpdate(val) {
-		this.toggleAttribute('reloadonupdate', val);
+		setBool(this, 'reloadonupdate', val);
 	}
 
 	get src() {
-		return this.getAttribute('src');
+		return getURL(this, 'src');
 	}
 
 	set src(val) {
-		if (typeof val === 'string' && val.length !== 0) {
-			this.setAttribute('src', val);
-		} else {
-			this.removeAttribute('src');
-		}
+		setURL(this, 'src', val);
 	}
 
 	get scope() {
-		return this.getAttribute('scope') || document.baseURI;
+		return getString(this, 'scope', { fallback: document.baseURI });
 	}
 
 	set scope(val) {
-		if (typeof val === 'string' && val.length !== 0) {
-			this.setAttribute('scope', val);
-		} else {
-			this.removeAttribute('scope');
-		}
+		setString(this, 'scope', val);
 	}
 
 	get supported() {

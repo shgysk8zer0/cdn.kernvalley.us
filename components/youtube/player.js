@@ -2,6 +2,7 @@ import { registerCustomElement } from '../../js/std-js/custom-elements.js';
 import { createYouTubeEmbed } from '../../js/std-js/youtube.js';
 import { whenIntersecting } from '../../js/std-js/intersect.js';
 import { loaded } from '../../js/std-js/events.js';
+import { getString, setString, getInt, setInt, getBool, setBool } from '../../js/std-js/attrs.js';
 
 const protectedData = new WeakMap();
 
@@ -116,47 +117,35 @@ registerCustomElement('youtube-player', class HTMLYouTubePlayerElement extends H
 	}
 
 	get height() {
-		return parseInt(this.getAttribute('height')) || 315;
+		return getInt(this, 'height', { fallback: 315 });
 	}
 
 	set height(val) {
-		if (typeof val === 'string' && val.length !== 0) {
-			this.setAttribute('height', val);
-		} else {
-			this.removeAttribute('height');
-		}
+		setInt(this, 'height', val, { min: 0 });
 	}
 
 	get width() {
-		return parseInt(this.getAttribute('width')) || 560;
+		return getInt(this, 'width', { fallback: 560 });
 	}
 
 	set width(val) {
-		if (typeof val === 'string' && val.length !== 0) {
-			this.setAttribute('width', val);
-		} else {
-			this.removeAttribute('width');
-		}
+		setInt(this, 'width', val, { min: 0 });
 	}
 
 	get loading() {
-		return this.getAttribute('loading') || 'eager';
+		return getString(this, 'loading', { fallback: 'eager' });
 	}
 
 	set loading(val) {
-		if (typeof val === 'string' && val.length !== 0) {
-			this.setAttribute('loading', val);
-		} else {
-			this.removeAttribute('loading');
-		}
+		setString(this, 'loading', val);
 	}
 
 	get cookies() {
-		return this.hasAttribute('cookies');
+		return getBool(this, 'cookies');
 	}
 
 	set cookies(val) {
-		this.toggleAttribute('cookies', val);
+		setBool(this, 'cookies', val);
 	}
 
 	get video() {
@@ -184,11 +173,7 @@ registerCustomElement('youtube-player', class HTMLYouTubePlayerElement extends H
 	}
 
 	set video(val) {
-		if (typeof val === 'string' && val.length !== 0) {
-			this.setAttribute('video', val);
-		} else {
-			this.removeAttribute('video');
-		}
+		setString(this, 'video', val);
 	}
 
 	static get observedAttributes() {
