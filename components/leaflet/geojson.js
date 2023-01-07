@@ -2,6 +2,10 @@ import { geoJSON } from './dist.js';
 import { registerCustomElement } from '../../js/std-js/custom-elements.js';
 const map = new Map();
 const MIME_TYPE = 'application/geo+json';
+import {
+	getInt, setInt, getString, setString, getBool, setBool, getFloat, setFloat,
+	getURL, setURL,
+} from '../../js/std-js/attrs.js';
 
 registerCustomElement('leaflet-geojson', class HTMLLeafletGeoJSONElement extends HTMLElement {
 	constructor() {
@@ -43,11 +47,11 @@ registerCustomElement('leaflet-geojson', class HTMLLeafletGeoJSONElement extends
 	}
 
 	get color() {
-		return this.getAttribute('color') || '#ff7800';
+		return getString(this, 'color', { fallback: '#ff7800' });
 	}
 
 	set color(val) {
-		this.setAttribute('color', val);
+		setString(this, 'color', val);
 	}
 
 	get data() {
@@ -90,11 +94,11 @@ registerCustomElement('leaflet-geojson', class HTMLLeafletGeoJSONElement extends
 	}
 
 	get fill() {
-		return this.hasAttribute('fill');
+		return getBool(this, 'color');
 	}
 
 	set fill(val) {
-		this.toggleAttribute('fill', val);
+		setBool(this, 'fill', val);
 	}
 
 	get marker() {
@@ -108,15 +112,15 @@ registerCustomElement('leaflet-geojson', class HTMLLeafletGeoJSONElement extends
 	}
 
 	set marker(val) {
-		this.setAttribute('marker', val);
+		setString(this, 'marker', val);
 	}
 
 	get opacity() {
-		return this.hasAttribute('opacity') ? parseFloat(this.getAttribute('opacity')) : 1;
+		return getFloat(this, 'opacity', { min: 0, max: 1 });
 	}
 
 	set opacity(val) {
-		this.setAttribute('opacity', val);
+		setFloat(this, 'opacity', val );
 	}
 
 	get ready() {
@@ -130,27 +134,27 @@ registerCustomElement('leaflet-geojson', class HTMLLeafletGeoJSONElement extends
 	}
 
 	get src() {
-		return new URL(this.getAttribute('src'), document.baseURI);
+		return getURL(this, 'src');
 	}
 
 	set src(val) {
-		this.setAttribute('src', val);
+		setURL(this, 'src', val);
 	}
 
 	get stroke() {
-		return this.hasAttribute('stroke');
+		return getBool(this, 'stroke');
 	}
 
 	set stroke(val) {
-		this.toggleAttribute('stroke', val);
+		setBool(this, 'stroke', val);
 	}
 
 	get weight() {
-		return this.hasAttribute('weight') ? parseInt(this.getAttribute('weight')) : 5;
+		return getInt(this, 'weight', { fallback: 5 });
 	}
 
 	set weight(val) {
-		this.setAttribute('weight', val);
+		setInt(this, 'weight',{ min: 0 });
 	}
 
 	get whenConnected() {
