@@ -9,6 +9,7 @@ import { getURLResolver, setUTMParams } from '../../js/std-js/utility.js';
 import { meta } from '../../import.meta.js';
 import { loadStylesheet } from '../../js/std-js/loader.js';
 import { purify as policy } from '../../js/std-js/htmlpurify.js';
+import { getString, setString, getBool, setBool } from '../../js/std-js/attrs.js';
 
 const protectedData = new WeakMap();
 const WFD = 'https://whiskeyflatdays.com/';
@@ -109,34 +110,26 @@ registerCustomElement('wfd-events', class HTMLWFDEventsElement extends HTMLEleme
 	}
 
 	get images() {
-		return this.hasAttribute('images');
+		return getBool(this, 'images');
 	}
 
 	set images(val) {
-		this.toggleAttribute('images', val);
+		setBool(this, 'images', val);
 	}
 
 	get source() {
-		return this.getAttribute('source');
+		return getString(this, 'source');
 	}
 
 	set source(val) {
-		if (typeof val === 'string' && val.length !== 0) {
-			this.setAttribute('source',val);
-		} else {
-			this.removeAttribute('source');
-		}
+		setString(this, 'source', val);
 	}
 
 	get theme() {
-		return this.getAttribute('theme') || 'auto';
+		return getString(this, 'theme', { fallback: 'auto' });
 	}
 
 	set theme(val) {
-		if (typeof val === 'string' && val.length !== 0) {
-			this.setAttribute('theme', val);
-		} else {
-			this.removeAttribute('theme');
-		}
+		setString(this, 'theme', val);
 	}
 });

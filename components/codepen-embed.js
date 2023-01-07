@@ -1,4 +1,6 @@
 import { createIframe } from '../js/std-js/elements.js';
+import { getString, setString, getBool, setBool, getInt, setInt } from '../js/std-js/attrs.js';
+
 function render(el) {
 	const { shadowRoot, user, pen, theme, loading, tab, height, editable, clickToLoad } = el;
 	const src = new URL(`https://codepen.io/${user}/embed/${clickToLoad ? 'preview/' : '/'}${pen}`);
@@ -39,91 +41,67 @@ customElements.define('codepen-embed', class HTMLCodePenEmbedElement extends HTM
 	}
 	
 	get clickToLoad() {
-		return this.hasAttribute('clicktoload');
+		return getBool(this, 'clicktoload');
 	}
 	
 	set clickToLoad(val) {
-		this.toggleAttribute('clicktoload', val);
+		setBool(this, 'clicktoload', val);
 	}
 	
 	get editable() {
-		return this.hasAttribute('editable');
+		return getBool(this, 'editable');
 	}
 	
 	set editable(val) {
-		this.toggleAttribute('editable');
+		setBool(this, 'editable', val);
 	}
 	
 	get height() {
-		return parseInt(this.getAttribute('height')) || 300;
+		return getInt(this, 'height', { fallback: 300 });
 	}
 	
 	set height(val) {
-		if (Number.isSafeInteger(val) && val > 0) {
-			this.setAttribute('height', val);
-		} else {
-			this.removeAttribute('height');
-		}
+		setInt(this, 'height', val, { min: 0 });
 	}
 	
 	get loading() {
-		return this.getAttribute('loading') || 'lazy';
+		return getString(this, 'loading', { fallback: 'lazy' });
 	}
 	
 	set loading(val) {
-		if (typeof val === 'string' && val.length !== 0) {
-			this.setAttribute('loading', val);
-		} else {
-			this.removeAttribbute('loading');
-		}
+		setString(this, 'loading', val);
 	}
 	
 	get pen() {
-		return this.getAttribute('pen');
+		return getString(this, 'pen');
 	}
 	
 	set pen(val) {
-		if (typeof val === 'string' && val.length !== 0) {
-			this.setAttribute('pen', val);
-		} else {
-			this.removeAttribbute('pen');
-		}
+		setString(this, 'pen');
 	}
 	
 	get tab() {
-		return this.getAttribute('tab') || 'result';
+		return getString(this, 'tab', { fallback: 'result' });
 	}
 	
 	set tab(val) {
-		if (typeof val === 'string' && val.length !== 0) {
-			this.setAttribute('tab', val);
-		} else {
-			this.removeAttribbute('tab');
-		}
+		setString(this, 'tab', val);
 	}
 	
 	get theme() {
-		return this.getAttribute('theme') || 'default';
+		return getString(this, 'theme', { fallback: 'default' });
 	}
 	
 	set theme(val) {
-		if (typeof val === 'string' && val.length !== 0) {
-			this.setAttribute('theme', val);
-		} else {
-			this.removeAttribbute('theme');
-		}
+		setString(this, 'theme', val);
 	}
 	
 	get user() {
-		return this.getAttribute('user');
+		return getString(this, 'user');
 	}
 	
 	set user(val) {
-		if (typeof val === 'string' && val.length !== 0) {
-			this.setAttribute('user', val);
-		} else {
-			this.removeAttribbute('user');
-		}
+		setString(this, 'user', val);
 	}
 	
 	static get observedAttributes() {

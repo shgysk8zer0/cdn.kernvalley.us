@@ -10,6 +10,9 @@ import { getDeferred } from '../../js/std-js/promises.js';
 import UTM from '../../js/std-js/UTM.js';
 import { getURLResolver } from '../../js/std-js/utility.js';
 import { purify as policy } from '../../js/std-js/htmlpurify.js';
+import {
+	getString, setString, getBool, setBool, getInt, setInt, getURL, setURL,
+} from '../../js/std-js/attrs.js';
 
 const { resolve, promise: def } = getDeferred();
 const resolveURL = getURLResolver({ base: meta.url, path: '/components/ad/' });
@@ -484,7 +487,7 @@ HTMLCustomElement.register('ad-block', class HTMLAdBlockElement extends HTMLCust
 			border,
 			color,
 			linkColor,
-			url,
+			url: url.href,
 			source,
 			medium,
 			campaign,
@@ -496,39 +499,27 @@ HTMLCustomElement.register('ad-block', class HTMLAdBlockElement extends HTMLCust
 	}
 
 	get background() {
-		return this.getAttribute('background');
+		return getString(this, 'background', { minLength: 4, maxLength: 7 });
 	}
 
 	set background(val) {
-		if (typeof val === 'string' && val.length !== 0) {
-			this.setAttribute('background', val);
-		} else {
-			this.removeAttribute('background');
-		}
+		setString(this, 'background', val);
 	}
 
 	get border() {
-		return this.getAttribute('border');
+		return getString(this, 'border');
 	}
 
 	set border(val) {
-		if (typeof val === 'string' && val.length !== 0) {
-			this.setAttribute('border', val);
-		} else {
-			this.removeAttribute('border');
-		}
+		setString(this, 'border', val);
 	}
 
 	get borderWidth() {
-		return this.getAttribute('borderwidth');
+		return getInt(this, 'borderwidth');
 	}
 
 	set borderWidth(val) {
-		if ((typeof val === 'string' && val.length !== 0) || Number.isInteger(val) && val > 0) {
-			this.setAttribute('borderwidth', val);
-		} else {
-			this.removeAttribute('borderwidth');
-		}
+		setInt(this, 'borderwidth', val, { min: 0 });
 	}
 
 	get callToAction() {
@@ -546,39 +537,27 @@ HTMLCustomElement.register('ad-block', class HTMLAdBlockElement extends HTMLCust
 	}
 
 	get campaign() {
-		return this.getAttribute('campaign') || 'krv-ads';
+		return getString(this, 'campaign', { fallback: 'krv-adds' });
 	}
 
 	set campaign(val) {
-		if (typeof val === 'string' && val.length !== 0) {
-			this.setAttribute('campaign', val);
-		} else {
-			this.removeAttribute('campaign');
-		}
+		setString(this, 'campaign', val);
 	}
 
 	get color() {
-		return this.getAttribute('color');
+		return getString(this, 'color');
 	}
 
 	set color(val) {
-		if (typeof val === 'string' && val.length !== 0) {
-			this.setAttribute('color', val);
-		} else {
-			this.removeAttribute('color');
-		}
+		setString(this, 'color', val);
 	}
 
 	get content() {
-		return this.getAttribute('content');
+		return getString(this, 'content');
 	}
 
 	set content(val) {
-		if (typeof val === 'string' && val.length !== 0) {
-			this.setAttribute('content', val);
-		} else {
-			this.removeAttribute('content');
-		}
+		setString(this, 'content', val);
 	}
 
 	get description() {
@@ -596,17 +575,11 @@ HTMLCustomElement.register('ad-block', class HTMLAdBlockElement extends HTMLCust
 	}
 
 	get height() {
-		return this.getAttribute('height');
+		return getInt(this, 'height');
 	}
 
 	set height(val) {
-		if (typeof val === 'string' && val.length !== 0) {
-			this.setAttribute('height', val);
-		} else if (typeof val === 'number') {
-			this.setAttribute('height', `${val}px`);
-		} else {
-			this.removeAttribute('height');
-		}
+		setInt(this, 'height', val, { min: 0 });
 	}
 
 	get image() {
@@ -637,27 +610,19 @@ HTMLCustomElement.register('ad-block', class HTMLAdBlockElement extends HTMLCust
 	}
 
 	get imageFit() {
-		return this.getAttribute('imagefit');
+		return getString(this, 'imagefit');
 	}
 
 	set imageFit(val) {
-		if (typeof val === 'string' && val.length !== 0) {
-			this.setAttribute('imagefit', val);
-		} else {
-			this.removeAttribute('imagefit');
-		}
+		setString(this, 'imagefit',val);
 	}
 
 	get imagePosition() {
-		return this.getAttribute('imageposition');
+		return getString(this, 'imageposition');
 	}
 
 	set imagePosition(val) {
-		if (typeof val === 'string' && val.length !== 0) {
-			this.setAttribute('imageposition', val);
-		} else {
-			this.removeAttribute('imageposition');
-		}
+		setString(this, 'imageposition', val);
 	}
 
 	get label() {
@@ -675,107 +640,75 @@ HTMLCustomElement.register('ad-block', class HTMLAdBlockElement extends HTMLCust
 	}
 
 	get layout() {
-		return this.getAttribute('layout') || 'default';
+		return getString(this, 'layout', { fallback: 'default' });
 	}
 
 	set layout(val) {
-		if (typeof val === 'string' && val.length !== 0) {
-			this.setAttribute('layout', val);
-		} else {
-			this.removeAttribute('layout');
-		}
+		setString(this, 'layout', val);
 	}
 
 	get linkColor() {
-		return this.getAttribute('linkcolor');
+		return getString(this, 'linkcolor');
 	}
 
 	set linkColor(val) {
-		if (typeof val === 'string' && val.length !== 0) {
-			this.setAttribute('linkcolor', val);
-		} else {
-			this.removeAttribute('linkcolor');
-		}
+		setString(this, 'linkcolor', val);
 	}
 
 	get media() {
-		return this.getAttribute('media');
+		return getString(this, 'media');
 	}
 
 	set media(val) {
-		if (typeof val === 'string') {
-			this.setAttribute('media', val);
-		} else {
-			this.removeAttribute('media');
-		}
+		setString(this, 'media', val);
 	}
 
 	get medium() {
-		return this.getAttribute('medium');
+		return getString(this, 'medium');
 	}
 
 	set medium(val) {
-		if (typeof val === 'string' && val.length !== 0) {
-			this.setAttribute('medium', val);
-		} else {
-			this.removeAttribute('medium');
-		}
+		setString(this, 'medium', val);
 	}
 
 	get preview() {
-		return this.hasAttribute('preview');
+		return getBool(this, 'preview');
 	}
 
 	set preview(val) {
-		this.toggleAttribute('preview', val);
+		setBool(this, 'preview', val);
 	}
 
 	get source() {
-		return this.getAttribute('source');
+		return getString(this, 'source');
 	}
 
 	set source(val) {
-		if (typeof val === 'string' && val.length !== 0) {
-			this.setAttribute('source', val);
-		} else {
-			this.removeAttribute('source');
-		}
+		setString(this, 'source', val);
 	}
 
 	get theme() {
-		return this.getAttribute('theme') || 'auto';
+		return getString(this, 'theme', { fallback: 'auto' });
 	}
 
 	set theme(val) {
-		if (typeof val === 'string') {
-			this.setAttribute('theme', val);
-		} else {
-			this.removeAttribute('theme');
-		}
+		setString(this, 'theme', val);
 	}
 
 	get term() {
-		return this.getAttribute('term');
+		return getString(this, 'term');
 	}
 
 	set term(val) {
-		if (typeof val === 'string' && val.length !== 0) {
-			this.setAttribute('term', val);
-		} else {
-			this.removeAttribute('term');
-		}
+		setString(this, 'term', val);
 	}
 
 	get url() {
-		return this.getAttribute('url');
+		return getURL(this, 'url');
 	}
 
 	set url(val) {
-		if (typeof val === 'string' || val instanceof URL) {
-			this.setAttribute('url', val);
-		} else {
-			this.removeAttribute('url');
-		}
+		setURL(this, 'url', val);
 	}
 
 	get width() {
@@ -787,7 +720,7 @@ HTMLCustomElement.register('ad-block', class HTMLAdBlockElement extends HTMLCust
 			this.setAttribute('width', val);
 		} else if (typeof val === 'number') {
 			this.setAttribute('width', `${val}px`);
-		}  else {
+		} else {
 			this.removeAttribute('width');
 		}
 	}

@@ -1,6 +1,8 @@
 import { registerCustomElement } from '../../js/std-js/custom-elements.js';
 import { loadScript, preload } from '../../js/std-js/loader.js';
 import { whenIntersecting } from '../../js/std-js/intersect.js';
+import { getString, setString } from '../../js/std-js/attrs.js';
+
 const symbols = {
 	shadow: Symbol('shadow'),
 };
@@ -80,31 +82,21 @@ registerCustomElement('disqus-comments', class HTMLDisqusCommentsElement extends
 	}
 
 	get loading() {
-		return this.getAttribute('loading') || 'eager';
+		return getString(this, 'loading', { fallback: 'eager' });
 	}
 
-	set loading(value) {
-		if (typeof value === 'string' && value.length !== 0) {
-			this.setAttribute('loading', value);
-		} else {
-			this.removeAttribute('loading');
-		}
+	set loading(val) {
+		setString(this, 'loading', val);
 	}
 
 	get site() {
-		return this.getAttribute('site');
+		return getString(this, 'site');
 	}
 
 	set site(newValue) {
-		const oldValue = this.getAttribute('site') || null;
-
-		if (typeof newValue === 'string' && newValue.length !==0) {
-			this.setAttribute('site', newValue);
-			this.dispatchEvent(new CustomEvent('sitechange',{ detail: { oldValue, newValue }}));
-		} else {
-			this.removeAttribute('site');
-			this.dispatchEvent(new CustomEvent('sitechange',{ detail: { oldValue, newValue: null }}));
-		}
+		const oldValue = getString(this, 'site');
+		setString(this, 'site', newValue);
+		this.dispatchEvent(new CustomEvent('sitechange', { detail: { oldValue, newValue }}));
 	}
 
 	static get observedAttributes() {

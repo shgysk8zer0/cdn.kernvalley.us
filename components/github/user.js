@@ -6,6 +6,7 @@ import { getDeferred } from '../../js/std-js/promises.js';
 import { purify as policy } from '../../js/std-js/htmlpurify.js';
 import { whenIntersecting } from '../../js/std-js/intersect.js';
 import { getURLResolver } from '../../js/std-js/utility.js';
+import { getString, setString, getBool, setBool } from '../../js/std-js/attrs.js';
 
 const ENDPOINT = 'https://api.github.com';
 import HTMLCustomElement from '../custom-element.js';
@@ -63,23 +64,19 @@ HTMLCustomElement.register('github-user', class HTMLGitHubUserElement extends HT
 	}
 
 	get bio() {
-		return this.hasAttribute('bio');
+		return getBool(this, 'bio');
 	}
 
 	set bio(val) {
-		this.toggleAttribute('bio', val);
+		setBool(this, 'bio', val);
 	}
 
 	get user() {
-		return this.getAttribute('user');
+		return getString(this, 'user');
 	}
 
 	set user(val) {
-		if (typeof val === 'string' && val.length !== 0) {
-			this.setAttribute('user', val);
-		} else {
-			this.removeAttribute('user');
-		}
+		setString(this, 'user', val);
 	}
 
 	attributeChangedCallback(name, oldVal, newVal) {

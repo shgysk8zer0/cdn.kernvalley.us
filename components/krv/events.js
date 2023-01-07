@@ -8,6 +8,7 @@ import { meta } from '../../import.meta.js';
 import { getURLResolver } from '../../js/std-js/utility.js';
 import { purify as policy } from '../../js/std-js/htmlpurify.js';
 import { whenIntersecting } from '../../js/std-js/intersect.js';
+import { getString, setString, getInt, setInt } from '../../js/std-js/attrs.js';
 
 const resolveURL = getURLResolver({ base: meta.url, path: '/components/krv/' });
 const getTemplate = (() => getHTML(resolveURL('events.html'), { policy })).once();
@@ -152,107 +153,67 @@ registerCustomElement('krv-events', class HTMLKRVEventsElement extends HTMLEleme
 	}
 
 	get count() {
-		if (this.hasAttribute('count')) {
-			return parseInt(this.getAttribute('count')) || 5;
-		} else {
-			return 5;
-		}
-	}
-
-	get content() {
-		return this.getAttribute('content') || 'krv-events';
-	}
-
-	set content(val) {
-		if (typeof val === 'string' && val.length !== 0) {
-			this.setAttribute('content', val);
-		} else {
-			this.removeAttribute('content');
-		}
+		return getInt(this, 'count', { fallback: 5 });
 	}
 
 	set count(val) {
-		if (Number.isInteger(val) && val > 0) {
-			this.setAttribute('count', val);
-		} else {
-			this.removeAttribute('count');
-		}
+		setInt(this, 'count', val);
+	}
+
+	get content() {
+		return getString(this, 'content', { fallback: 'krv-events' });
+	}
+
+	set content(val) {
+		setString(this, 'content', val);
 	}
 
 	get loading() {
-		return this.getAttribute('loading') || 'eager';
+		return getString(this,'loading', { fallback: 'eager' });
 	}
 
 	set loading(val) {
-		if (typeof val === 'string' && val.length !== 0) {
-			this.setAttribute('loading', val);
-		} else {
-			this.removeAttribute('loading');
-		}
+		setString(this, 'loading', val);
 	}
 
 	get medium() {
-		return this.getAttribute('medium') || 'referral';
+		return getString(this, 'medium', { fallback: 'referral' });
 	}
 
 	set medium(val) {
-		if (typeof val === 'string' && val.length !== 0) {
-			this.setAttribute('medium', val);
-		} else {
-			this.removeAttribute('medium');
-		}
+		setString(this, 'medium',val);
 	}
 
 	get source() {
-		return this.getAttribute('source');
+		return getString(this, 'source');
 	}
 
 	set source(val) {
-		if (typeof val === 'string' && val.length !== 0) {
-			this.setAttribute('source', val);
-		} else {
-			this.removeAttribute('source');
-		}
+		setString(this, 'source', val);
 	}
 
 	get target() {
-		return this.getAttribute('target') || '_self';
+		return getString(this, 'target', { fallback: '_self' });
 	}
 
 	set target(val) {
-		if (typeof val === 'string' && val.length !== 0) {
-			this.setAttribute('target', val);
-		} else {
-			this.removeAttribute('target');
-		}
+		setString(this, 'target', val);
 	}
 
 	get theme() {
-		if (this.hasAttribute('theme')) {
-			return this.getAttribute('theme');
-		} else {
-			return 'auto';
-		}
+		return getString(this, 'theme', { fallback: 'auto' });
 	}
 
 	set theme(val) {
-		if (typeof val === 'string' && val.length !== 0) {
-			this.setAttribute('theme', val);
-		} else {
-			this.removeAttribute('theme');
-		}
+		setString(this, 'theme', val);
 	}
 
 	get term() {
-		return this.getAttribute('term');
+		return getString(this, 'term');
 	}
 
 	set term(val) {
-		if (typeof val === 'string' && val.length !== 0) {
-			this.setAttribute('term', val);
-		} else {
-			this.removeAttribute('term');
-		}
+		setString(this, 'term', val);
 	}
 
 	attributeChangedCallback(name/*, oldVal, newVal*/) {
