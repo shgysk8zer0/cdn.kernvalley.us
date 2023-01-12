@@ -29,14 +29,18 @@ export class HTMLStripePaymentFormElement extends HTMLElement {
 	constructor(key, clientSecret, {
 		billing = false,
 		shipping = true,
-		theme = 'stripe',
+		theme = 'auto',
 		returnURL = './',
 		layout = 'tabs',
 		phone = true,
 		allowPOBoxes = true,
-		allowedCountries = [],
+		allowedCountries = ['US'],
 	} = {}) {
 		super();
+
+		if (typeof theme !== 'string' || theme === 'auto') {
+			theme = matchMedia('(prefers-color-scheme: dark)').matches ? 'night' : 'stripe';
+		}
 
 		if (typeof key !== 'string') {
 			throw new TypeError('`key` expected to be a string');
