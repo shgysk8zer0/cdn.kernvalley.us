@@ -40,6 +40,7 @@
     "preinstall": "npm run git:submodules",
     "postinstall": "npm run build",
     "preversion": "npm test",
+    "create:lock": "npm i --package-lock-only --ignore-scripts",
     "git:fetch": "git fetch --prune --tags",
     "git:submodules": "if [ -f '.gitmodules' ]; then git submodule update --init --recursive; fi",
     "lint:css": "if [ -f '.stylelintrc.json' ]; then stylelint ${npm_package_config_dir_css}; fi",
@@ -65,10 +66,10 @@
     "version:bump": "npm run version:bump:patch",
     "version:bump:patch": "npm version --no-git-tag-version patch",
     "version:bump:minor": "npm version --no-git-tag-version minor",
-    "version:bump:major": "npm version --no-git-tag-version patch"
+    "version:bump:major": "npm version --no-git-tag-version major"
   },
   "dependencies": {
-    "netlify-js-app": "^2.0.0",
+    "netlify-js-app": "^2.1.1",
     "svg-sprite-standardized": "^1.1.0"
   }
 }
