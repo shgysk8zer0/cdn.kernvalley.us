@@ -2,4 +2,4 @@
 [build]
   base = "./"
   publish = "./"
-  command = "npm i"
+  command = "npm ci"
