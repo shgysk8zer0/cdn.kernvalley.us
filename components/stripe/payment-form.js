@@ -1,40 +1,55 @@
-import { loadScript, loadStylesheet } from '../../js/std-js/loader.js';
+import { loadStylesheet } from '../../js/std-js/loader.js';
 import { registerCustomElement } from '../../js/std-js/custom-elements.js';
 import { create, text } from '../../js/std-js/dom.js';
 import { getURL, setURL, getBool, setBool, getString, setString } from '../../js/std-js/attrs.js';
-import { getURLResolver } from '../../js/std-js/utility.js';
+import { getURLResolver, debounce } from '../../js/std-js/utility.js';
 import { createSVG, createPath } from '../../js/std-js/svg.js';
 import { meta } from '../../import.meta.js';
+import { getStripeInstance, loadStripe, getCurrencySymbol } from './utils.js';
 
-const VERSION = '/v3/';
 const protectedData = new WeakMap();
 const resolveURL = getURLResolver({ base : meta.url, path: '/components/stripe/' });
 const ERROR_DURATION = 5000;
-const loadStripe = (async () => {
-	await loadScript(new URL(VERSION, 'https://js.stripe.com/'));
 
-	if ('Stripe' in globalThis) {
-		return globalThis.Stripe;
+function getSlot(name, shadow) {
+	return shadow.querySelector(`slot[name="${name}"]`);
+}
+
+function getSlotted(name, shadow) {
+	const slot = getSlot(name, shadow);
+
+	if (slot instanceof HTMLSlotElement) {
+		return slot.assignedElements();
 	} else {
-		throw new Error('Error loading Stripe');
+		return [];
 	}
-}).once();
+}
 
-const getStripeInstance = (async key => {
-	const Stripe = await loadStripe();
-	return Stripe(key);
-}).once();
+function clearSlot(name, shadow) {
+	getSlotted(name, shadow).forEach(el => el.remove());
+}
 
 export class HTMLStripePaymentFormElement extends HTMLElement {
 	constructor(key, clientSecret, {
-		billing = false,
-		shipping = true,
-		theme = 'auto',
-		returnURL = './',
-		layout = 'tabs',
-		phone = true,
-		allowPOBoxes = true,
-		allowedCountries = ['US'],
+		details: {
+			displayItems = [],
+			modifiers: {
+				additionalDisplayItems = [],
+			} = {},
+			// total = 0,
+		},
+		options: {
+			requestShipping = true,
+			requestPayerPhone = true,
+
+		} = {},
+		config: {
+			theme = 'auto',
+			returnURL = './',
+			layout = 'tabs',
+			allowPOBoxes = true,
+			allowedCountries = ['US'],
+		} = {},
 	} = {}) {
 		super();
 
@@ -49,14 +64,21 @@ export class HTMLStripePaymentFormElement extends HTMLElement {
 		}
 
 		setTimeout(() => {
-			this.billing = billing;
-			this.shipping = shipping;
+			this.requestShipping = requestShipping;
 			this.theme = theme;
 			this.returnURL = returnURL;
 			this.layout = layout;
 			this.allowPOBoxes = allowPOBoxes;
 			this.allowedCountries = allowedCountries;
-			this.phone = phone;
+			this.requestPayerPhone = requestPayerPhone;
+
+			if (Array.isArray(displayItems)) {
+				this.displayItems = displayItems;
+			}
+
+			if (Array.isArray(additionalDisplayItems)) {
+				this.additionalDisplayItems = additionalDisplayItems;
+			}
 		}, 10);
 
 		const shadow = this.attachShadow({ mode: 'closed' });
@@ -69,20 +91,19 @@ export class HTMLStripePaymentFormElement extends HTMLElement {
 
 		const [stripe] = await Promise.all([
 			this.getStripeInstance(),
-			loadStylesheet(resolveURL('/css/core-css/forms.css'), {
-				parent: shadow,
-			}),
 			loadStylesheet(resolveURL('./payment-form.css'), {
 				parent: shadow,
 			})
 		]);
 
-		const { billing, shipping, theme, layout } = this;
+		const { requestShipping, theme, layout } = this;
 
 		const elements = stripe.elements({
 			appearance: { theme },
 			clientSecret,
 		});
+
+		const slotchange = debounce(() => this.updateTotal());
 
 		const form = create('form', {
 			events: {
@@ -123,10 +144,13 @@ export class HTMLStripePaymentFormElement extends HTMLElement {
 			part: ['form'],
 			children: [
 				create('section', {
-					part: ['cart'],
+					id: 'overview',
+					part: ['overview'],
 					children: [
 						create('details', {
-							part: ['cart'],
+							// open: true,
+							part: ['items-overview', 'text'],
+							classList: ['accordion'],
 							children: [
 								create('summary', {
 									classList: ['cursor-pointer'],
@@ -149,16 +173,45 @@ export class HTMLStripePaymentFormElement extends HTMLElement {
 										}),
 									],
 								}),
-								create('slot', {
-									name: 'cart',
+								create('div', {
+									part: ['display-items', 'text'],
 									children: [
-										create('div', { text: 'No Items in cart.' }),
+										create('h4', { text: 'Items' }),
+										create('div', {
+											id: 'display-items-container',
+											children: [
+												create('slot', {
+													name: 'displayitems',
+													events: { slotchange },
+													children: [
+														create('div', { text: 'No Items in cart.' }),
+													]
+												}),
+											]
+										})
+									]
+								}),
+								create('div', {
+									part: ['additional-display-items', 'text'],
+									children: [
+										create('h4', { text: 'Additional Items & Fees' }),
+										create('div', {
+											id: 'additional-display-items-container',
+											children: [
+												create('slot', {
+													name: 'additionaldisplayitems',
+													events: { slotchange },
+													children: create('div', { text: 'Nothing to display.' }),
+												}),
+											]
+										}),
 									]
 								}),
 							]
 						}),
 						document.createElement('hr'),
 						create('div', {
+							part: ['text'],
 							children: [
 								create('b', { text: 'Total' }),
 								create('span', { text: ' ' }),
@@ -173,6 +226,7 @@ export class HTMLStripePaymentFormElement extends HTMLElement {
 					classList: ['no-border'],
 					children: [
 						create('legend', {
+							part: ['contact-legend', 'legend', 'text'],
 							children: [
 								create('slot', { text: 'Contact Info', slot: 'contact' }),
 							]
@@ -184,14 +238,15 @@ export class HTMLStripePaymentFormElement extends HTMLElement {
 								create('label', {
 									for: 'stripe-user-name',
 									classList: ['input-label', 'required'],
-									text: 'Name',
+									part: ['text'],
+									text: 'Full name',
 								}),
 								create('input', {
 									type: 'text',
 									name: 'name',
 									id: 'stripe-user-name',
 									required: true,
-									placeholder: 'Full Name',
+									placeholder: 'First and last name',
 									autocomplete: 'name',
 									classList: ['input'],
 								})
@@ -204,6 +259,7 @@ export class HTMLStripePaymentFormElement extends HTMLElement {
 								create('label', {
 									for: 'stripe-email',
 									classList: ['input-label', 'required'],
+									part: ['text'],
 									text: 'Email',
 								}),
 								create('input', {
@@ -224,7 +280,7 @@ export class HTMLStripePaymentFormElement extends HTMLElement {
 					classList: ['no-border'],
 					children: [
 						create('legend', {
-							part: ['label', 'card-label'],
+							part: ['legend', 'card-legend', 'text'],
 							children: [
 								create('slot', {
 									name: 'card-label',
@@ -237,28 +293,11 @@ export class HTMLStripePaymentFormElement extends HTMLElement {
 				}),
 				create('fieldset', {
 					hidden: true,
-					part: ['billing-section'],
-					classList: ['no-border'],
-					children: [
-						create('legend', {
-							part: ['legend','billing-legend'],
-							children: [
-								create('slot', {
-									name: 'billing-legend',
-									text: 'Billing Info',
-								})
-							]
-						}),
-						create('slot', { name: 'stripe-billing' }),
-					],
-				}),
-				create('fieldset', {
-					hidden: true,
 					part: ['shipping-section'],
 					classList: ['no-border'],
 					children: [
 						create('legend', {
-							part: ['legend','shipping-legend'],
+							part: ['legend','shipping-legend', 'text'],
 							children: [
 								create('slot', {
 									name: 'shipping-legend',
@@ -301,36 +340,29 @@ export class HTMLStripePaymentFormElement extends HTMLElement {
 			layout: { type: layout },
 		}).mount('#payment-element');
 
-		if (shipping) {
+		if (requestShipping) {
 			shadow.querySelector('[part~="shipping-section"]').hidden = false;
 			this.append(create('div', { slot: 'stripe-shipping', id: 'shipping-element' }));
 
-			elements.create('address', {
+			const shipping = elements.create('address', {
 				mode: 'shipping',
 				allowedCountries: this.allowedCountries,
 				blockPoBoxes: !this.allowPOBoxes,
 				fields: {
-					phone: this.phone ? 'always' : 'never',
+					phone: this.requestPayerPhone ? 'always' : 'never',
 				},
 				validation: {
-					phone: { required: this.phone ? 'always' : 'never' },
+					phone: { required: this.requestPayerPhone ? 'always' : 'never' },
 				},
-			}).mount('#shipping-element');
-		} else if (billing) {
-			shadow.querySelector('[part~="billing-section"]').hidden = false;
-			this.append(create('div', { slot: 'stripe-billing', id: 'billing-element' }));
+			});
+			shipping.mount('#shipping-element');
 
-			elements.create('address', {
-				mode: 'billing',
-				allowedCountries: this.allowedCountries,
-				fields: {
-					phone: this.phone ? 'always' : 'never',
-				},
-				validation: {
-					phone: { required: this.phone ? 'always' : 'never' },
-				}
-			}).mount('#billing-element');
+			shipping.on('change', ({ value: detail }) => {
+				this.dispatchEvent(new CustomEvent('shippingaddresschange', { detail }));
+			});
 		}
+
+		this.dispatchEvent(new Event('ready'));
 	}
 
 	get allowPOBox() {
@@ -353,12 +385,12 @@ export class HTMLStripePaymentFormElement extends HTMLElement {
 		}
 	}
 
-	get phone() {
-		return getBool(this, 'phone');
+	get requestPayerPhone() {
+		return getBool(this, 'requestpayerphone');
 	}
 
-	set phone(val) {
-		setBool(this, 'phone', val);
+	set requestPayerPhone(val) {
+		setBool(this, 'requestpayerphone', val);
 	}
 
 	get billing() {
@@ -369,12 +401,114 @@ export class HTMLStripePaymentFormElement extends HTMLElement {
 		setBool(this, 'billing', val);
 	}
 
-	get shipping() {
-		return getBool(this, 'shipping');
+	get requestShipping() {
+		return getBool(this, 'requestshipping');
 	}
 
-	set shipping(val) {
-		setBool(this, 'shipping', val);
+	set requestShipping(val) {
+		setBool(this, 'requestshipping', val);
+	}
+
+	get additionalDisplayItems() {
+		return getSlotted('additionaldisplayitems', protectedData.get(this).shadow).map(el => ({
+			label: el.querySelector('[itemprop="name"]').textContent,
+			amount: {
+				value: parseFloat(el.querySelector('[itemprop="price"]').textContent),
+				currency: el.querySelector('[itemprop="priceCurrency"]').textContent,
+			}
+		}));
+	}
+
+	set additionalDisplayItems(val) {
+		clearSlot('additionaldisplayitems', protectedData.get(this).shadow);
+		const styles = {
+			width: '180px',
+			'text-overflow': 'ellipsis',
+		};
+
+		if (Array.isArray(val) && val.length !== 0) {
+			this.append(...val.map(({ label, amount: { value, currency = 'USD' }}) => create('div', {
+				slot: 'additionaldisplayitems',
+				itemtype: 'https://schema.org/Offer',
+				itemscope: true,
+				classList: ['display-item'],
+				children: [
+					create('b', { itemprop: 'name', text: label, styles }),
+					create('span', {
+						children: [
+							create('span', {
+								itemprop: 'priceCurrency',
+								content: currency,
+								text: getCurrencySymbol(currency),
+							}),
+							create('span', { itemprop: 'price', text: value.toFixed(2) }),
+						]
+					}),
+				]
+			})));
+		}
+	}
+
+	get displayItems() {
+		return getSlotted('displayitems', protectedData.get(this).shadow).map(el => ({
+			label: el.querySelector('[itemprop="name"]').textContent,
+			amount: {
+				value: parseFloat(el.querySelector('[itemprop="price"]').textContent),
+				currency: el.querySelector('[itemprop="priceCurrency"]').textContent,
+			}
+		}));
+	}
+
+	set displayItems(val) {
+		clearSlot('displayitems', protectedData.get(this).shadow);
+
+		const styles = {
+			width: '180px',
+			'text-overflow': 'ellipsis',
+		};
+
+		if (Array.isArray(val) && val.length !== 0) {
+			this.append(...val.map(({ label, amount: { value, currency = 'USD' }}) => create('div', {
+				slot: 'displayitems',
+				itemtype: 'https://schema.org/Offer',
+				itemscope: true,
+				classList: ['display-item'],
+				children: [
+					create('b', { itemprop: 'name', text: label, styles }),
+					create('span', {
+						children: [
+							create('span', {
+								itemprop: 'priceCurrency',
+								content: currency,
+								text: getCurrencySymbol(currency),
+							}),
+							create('span', { itemprop: 'price', text: value.toFixed(2) }),
+						]
+					}),
+				]
+			})));
+		}
+	}
+
+	get total() {
+		const slotted = getSlotted('total', protectedData.get(this).shadow);
+
+		if (slotted.length === 1) {
+			return parseFloat(slotted.textContent);
+		} else {
+			return 0;
+		}
+	}
+
+	set total(val) {
+		clearSlot('total', protectedData.get(this).shadow);
+
+		if (typeof val === 'number' && val > 0) {
+			this.append(create('span', {
+				slot: 'total',
+				text: val.toFixed(2),
+			}));
+		}
 	}
 
 	get layout() {
@@ -406,12 +540,15 @@ export class HTMLStripePaymentFormElement extends HTMLElement {
 		return getStripeInstance(key);
 	}
 
-	static async loadScript() {
-		await loadStripe();
+	updateTotal() {
+		this.total = [
+			...this.displayItems,
+			...this.additionalDisplayItems,
+		].reduce((total, { amount: { value }}) => total + value, 0);
 	}
 
-	static define(tag = 'stripe-payment-form') {
-		registerCustomElement(tag, this);
+	static async loadScript() {
+		await loadStripe();
 	}
 
 	static getTotal(items) {
@@ -422,3 +559,5 @@ export class HTMLStripePaymentFormElement extends HTMLElement {
 		}
 	}
 }
+
+registerCustomElement('stripe-payment-form', HTMLStripePaymentFormElement);
