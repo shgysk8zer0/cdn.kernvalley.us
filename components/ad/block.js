@@ -57,10 +57,10 @@ function openLink(event) {
 			} else if (new URL(url, document.baseURI).origin === location.origin) {
 				log('ad-click', this);
 				this.dispatchEvent(new Event('opened'));
-				setTimeout(() => location.href = this.getUrl(), 20);
+				setTimeout(() => location.href = url, 20);
 			} else {
 				log('ad-click', this);
-				popup(this.getUrl());
+				popup(url);
 				this.dispatchEvent(new Event('opened'));
 			}
 		}
@@ -462,7 +462,21 @@ HTMLCustomElement.register('ad-block', class HTMLAdBlockElement extends HTMLCust
 	getUrl() {
 		if (this.hasAttribute('url')) {
 			const { url, source, medium, term, content, campaign } = this;
-			return new UTM(url, { source, medium, term, content, campaign }).href;
+			const uri = new UTM(url, { source, medium, term, content, campaign });
+
+			switch(url.protocol) {
+				case 'http:':
+				case 'https:':
+					return uri.href;
+
+				case 'mailto:':
+				case 'tel:':
+				case 'geo:':
+					return `${uri.protocol}${uri.pathname}`;
+
+				default:
+					throw new DOMException(`Unsupported protocol "${uri.protocol}"`);
+			}
 		}
 	}
 
