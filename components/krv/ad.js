@@ -310,10 +310,7 @@ class HTMLKRVAdElement extends HTMLElement {
 			this.append(image);
 		}
 
-		setTimeout(() => {
-			this.hidden = true;
-			shadow.append(container);
-		}, 1);
+		shadow.append(container);
 
 		const publisherEl = this.querySelector('[itemprop="publisher"]');
 
@@ -495,7 +492,7 @@ class HTMLKRVAdElement extends HTMLElement {
 				break;
 
 			case 'media':
-				this.hidden = typeof newVal !== 'string' || ! matchMedia(newVal).matches;
+				// this.hidden = typeof newVal !== 'string' || ! matchMedia(newVal).matches;
 				break;
 
 			default:
