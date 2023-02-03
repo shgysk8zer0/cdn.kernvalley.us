@@ -74,7 +74,7 @@ function getSlot(el, name) {
 function getSlotted(el, name) {
 	const slot = getSlot(el, name);
 
-	return el instanceof HTMLElement ? slot.assignedElements() : [];
+	return slot instanceof HTMLElement ? slot.assignedElements() : [];
 }
 
 function clearSlotted(el, name) {
