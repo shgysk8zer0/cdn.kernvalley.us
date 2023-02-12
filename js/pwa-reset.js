@@ -31,7 +31,19 @@ if (confirm('Delete all Web App data?')) {
 		})
 	]).then(function() {
 		alert('Web App data cleared');
-		location.href = '/';
+		const params = new URLSearchParams(location.search);
+		
+		if (params.has('redirect')) {
+			const url = new URL(params.get('redirect'), location.origin);
+			if (url.origin === location.origin) {
+				location.href = url.href;
+			} else {
+				console.warn('Redirect URL to different origin');
+				location.href = location.origin;
+			}
+		} else {
+			location.href = location.origin;
+		}
 	}).catch(function(err) {
 		console.error(err);
 		if (typeof err === 'string') {
