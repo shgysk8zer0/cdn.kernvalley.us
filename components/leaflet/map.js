@@ -811,6 +811,38 @@ HTMLCustomElement.register('leaflet-map', class HTMLLeafletMapElement extends HT
 		return this.querySelector('leaflet-marker[open]');
 	}
 
+	async getClosestMarker({
+		priority = 'background',
+		maximumAge = 60000,
+		enableHighAccuracy = true,
+		timeout,
+		filter,
+		signal,
+	} = {}) {
+		const [
+			{ coords: { latitude: lat, longitude: lng }},
+		] = await Promise.all([
+			getLocation({ maximumAge, timeout, signal, enableHighAccuracy }),
+			customElements.whenDefined('leaflet-marker'),
+		]);
+
+		const d = ({ latitude, longitude }) => Math.hypot(lat - latitude, lng - longitude);
+		const selector = 'leaflet-marker[latitude][longitude]';
+
+		return scheduler.postTask(() => {
+			const markers = filter instanceof Function
+				? [...this.querySelectorAll(selector)].filter(filter)
+				: [...this.querySelectorAll(selector)];
+
+			switch(markers.length) {
+				case 0: return null;
+				case 1: return markers[0];
+				default:
+					return markers.reduce((closest, marker) => d(marker) < d(closest) ? marker : closest);
+			}
+		}, { priority, signal });
+	}
+
 	async zoomIn() {
 		this.map.zoomIn();
 	}
@@ -1303,3 +1335,4 @@ HTMLCustomElement.register('leaflet-map', class HTMLLeafletMapElement extends HT
 		return new LatLng({ lat: latitude, lng: longitude, alt: altitude });
 	}
 });
+
