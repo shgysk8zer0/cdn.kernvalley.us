@@ -404,10 +404,7 @@ class HTMLKRVAdElement extends HTMLElement {
 					timeout: setTimeout(() => {
 						const url = this.getUrl();
 						updateData(this, { timeout: NaN });
-
-						if (typeof url === 'string' && url.length !== 0) {
-							shadow.querySelector('[part~="container"').href = url;
-						}
+						setURL(shadow.querySelector('[part~="container"]'), 'href', url);
 					}, 10),
 				});
 
@@ -792,3 +789,4 @@ class HTMLKRVAdElement extends HTMLElement {
 }
 
 registerCustomElement('krv-ad', HTMLKRVAdElement);
+
