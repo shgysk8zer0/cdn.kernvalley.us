@@ -1,15 +1,13 @@
 import { css, attr } from '../../js/std-js/dom.js';
 import { registerCustomElement } from '../../js/std-js/custom-elements.js';
-import { loadImage, preload } from '../../js/std-js/loader.js';
+import { preload } from '../../js/std-js/loader.js';
 import { getApps, apps as SRC } from '../../js/std-js/krv/apps.js';
 import { hasGa, send } from '../../js/std-js/google-analytics.js';
-import { getDeferred } from '../../js/std-js/promises.js';
 import { getString, setString, getBool, setBool } from '../../js/std-js/attrs.js';
-const { resolve, promise: def } = getDeferred();
+import { createXIcon } from '../../js/std-js/icons.js';
+import { createImage } from '../../js/std-js/elements.js';
 
-const appPromise = def.then(() => getApps());
-
-const X = '<svg width="12" height="16" fill="currentColor" viewBox="0 0 12 16"><path fill-rule="evenodd" d="M7.48 8l3.75 3.75-1.48 1.48L6 9.48l-3.75 3.75-1.48-1.48L4.52 8 .77 4.25l1.48-1.48L6 6.52l3.75-3.75 1.48 1.48L7.48 8z"/></svg>';
+const fetchApps = getApps.once();
 
 function log() {
 	if (hasGa()) {
@@ -23,12 +21,12 @@ function log() {
 	}
 }
 
-async function makeAppItem({ name, url, description, image }) {
+function makeAppItem({ name, url, description, image }) {
 	const container = document.createElement('a');
 	const nameEl = document.createElement('b');
 	const link = document.createElement('meta');
 	const descriptionEl = document.createElement('div');
-	const img = await loadImage(image.url, { height: 150, width: 150, ...image });
+	const img = createImage(image.url, { height: 150, width: 150, ...image });
 
 	container.addEventListener('click', log, { passive: true, capture: true });
 
@@ -147,7 +145,7 @@ registerCustomElement('app-list', class HTMLKernValleyAppListButtonlement extend
 		const list = await HTMLKernValleyAppListButtonlement.getAppList({
 			source, medium, content, dev, host,
 		});
-		const apps = await Promise.all(list.map(makeAppItem));
+		const apps = list.map(makeAppItem);
 		const header = document.createElement('header');
 		const close = document.createElement('button');
 		const container = document.createElement('div');
@@ -161,15 +159,16 @@ registerCustomElement('app-list', class HTMLKernValleyAppListButtonlement extend
 			'flex-basis': '100%',
 		});
 
-		close.innerHTML = X;
-		css('svg', {
-			'color': 'inherit',
-			'max-width': '100%',
-			'max-height': '100%',
-			'width': 'var(--icon-size, 1em)',
-			'height': 'var(--icon-size, 1em)',
-			'vertical-align': 'middle',
-		}, { base: close });
+		close.append(createXIcon({
+			styles: {
+				'color': 'inherit',
+				'max-width': '100%',
+				'max-height': '100%',
+				'width': 'var(--icon-size, 1em)',
+				'height': 'var(--icon-size, 1em)',
+				'vertical-align': 'middle',
+			}
+		}));
 
 		close.addEventListener('click', ({ target }) => {
 			target.closest('dialog').close();
@@ -231,8 +230,7 @@ registerCustomElement('app-list', class HTMLKernValleyAppListButtonlement extend
 	static async getAppList({ source = null, medium = null, content = null,
 		dev = false, host = false,
 	} = {}) {
-		resolve();
-		const list = await appPromise;
+		const list = await fetchApps();
 
 		if (Array.isArray(list)) {
 			const apps = list.map(app => {
