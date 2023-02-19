@@ -1,5 +1,5 @@
 import { registerCustomElement } from '../../js/std-js/custom-elements.js';
-import { manifestPromise } from '../../js/std-js/promises.js';
+import { getManifest } from '../../js/std-js/http.js';
 import { loadImage } from '../../js/std-js/loader.js';
 import { registerButton, promise, signal } from '../../js/std-js/pwa-install.js';
 import { css } from '../../js/std-js/dom.js';
@@ -7,8 +7,6 @@ import { meta } from '../../import.meta.js';
 
 const loading = 'lazy';
 const height = 53;
-
-const getManifest = async () => await manifestPromise;
 
 const getLogoUrl = path => new URL(path, meta.url).href;
 

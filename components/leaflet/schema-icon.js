@@ -1,4 +1,4 @@
-import { loadImage } from 'https://cdn.kernvalley.us/js/std-js/loader.js';
+import { loadImage } from '../..//js/std-js/loader.js';
 
 /**
  * @SEE https://github.com/shgysk8zer0/jekyll-leaflet/blob/master/schema-icon.html
