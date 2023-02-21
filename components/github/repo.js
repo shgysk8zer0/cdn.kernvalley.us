@@ -5,7 +5,7 @@ import { purify as policy } from '../../js/std-js/htmlpurify.js';
 import { whenIntersecting } from '../../js/std-js/intersect.js';
 import { getDeferred } from '../../js/std-js/promises.js';
 import { registerCustomElement } from '../../js/std-js/custom-elements.js';
-import { getURLResolver } from '../../js/std-js/utility.js';
+import { getURLResolver, callOnce } from '../../js/std-js/utility.js';
 import { meta } from '../../import.meta.js';
 import { getString, setString } from '../../js/std-js/attrs.js';
 
@@ -18,7 +18,7 @@ const symbols = {
 
 const ENDPOINT =  'https://api.github.com/repos/';
 
-const getTemplate = (() => getHTML(resolveURL('./repo.html'), { policy })).once();
+const getTemplate = callOnce(() => getHTML(resolveURL('./repo.html'), { policy }));
 
 async function getJSON(url, { signal } = {}) {
 	const key = `github-repo:${url}`;

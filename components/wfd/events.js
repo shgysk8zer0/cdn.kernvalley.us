@@ -5,7 +5,7 @@ import { whenIntersecting } from '../../js/std-js/intersect.js';
 import { text, attr } from '../../js/std-js/dom.js';
 import { days } from '../../js/std-js/date-consts.js';
 import { getHTML } from '../../js/std-js/http.js';
-import { getURLResolver, setUTMParams } from '../../js/std-js/utility.js';
+import { getURLResolver, setUTMParams, callOnce } from '../../js/std-js/utility.js';
 import { meta } from '../../import.meta.js';
 import { loadStylesheet } from '../../js/std-js/loader.js';
 import { purify as policy } from '../../js/std-js/htmlpurify.js';
@@ -17,8 +17,8 @@ const medium = 'referral';
 const content = 'wfd-events';
 const sanitizer = new Sanitizer();
 const resolveURL = getURLResolver({ base : meta.url, path: '/components/wfd/' });
-const getTemplate = (() => getHTML(resolveURL('events.html'), { policy })).once();
-const getEvents = (() => getAllEvents()).once();
+const getTemplate = callOnce(() => getHTML(resolveURL('events.html'), { policy }));
+const getEvents = callOnce(() => getAllEvents());
 
 function getWFDLink(path, params) {
 	return setUTMParams(new URL(path, WFD), params);
