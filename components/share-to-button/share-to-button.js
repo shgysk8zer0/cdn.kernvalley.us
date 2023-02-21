@@ -3,7 +3,7 @@ import { hasGa, send } from '../../js/std-js/google-analytics.js';
 import { popup } from '../../js/std-js/popup.js';
 import { getHTML } from '../../js/std-js/http.js';
 import { meta } from '../../import.meta.js';
-import { getURLResolver } from '../../js/std-js/utility.js';
+import { getURLResolver, callOnce } from '../../js/std-js/utility.js';
 import { loadStylesheet } from '../../js/std-js/loader.js';
 import { getString, setString, getBool, setBool, getURL, setURL } from '../../js/std-js/attrs.js';
 import { setUTMParams } from '../../js/std-js/utility.js';
@@ -14,7 +14,7 @@ import { purify as policy } from '../../js/std-js/htmlpurify.js';
 const resolveURL = getURLResolver({ base: meta.url, path: '/components/share-to-button/' });
 
 
-const getTemplate = (() => getHTML(resolveURL('./share-to-button.html'), { policy })).once();
+const getTemplate = callOnce(() => getHTML(resolveURL('./share-to-button.html'), { policy }));
 
 function log(btn) {
 	if (hasGa()) {

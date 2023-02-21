@@ -5,13 +5,13 @@ import { registerCustomElement } from '../../js/std-js/custom-elements.js';
 import { loadStylesheet } from '../../js/std-js/loader.js';
 import { hasGa, send } from '../../js/std-js/google-analytics.js';
 import { meta } from '../../import.meta.js';
-import { getURLResolver } from '../../js/std-js/utility.js';
+import { getURLResolver, callOnce } from '../../js/std-js/utility.js';
 import { purify as policy } from '../../js/std-js/htmlpurify.js';
 import { whenIntersecting } from '../../js/std-js/intersect.js';
 import { getString, setString, getInt, setInt } from '../../js/std-js/attrs.js';
 
 const resolveURL = getURLResolver({ base: meta.url, path: '/components/krv/' });
-const getTemplate = (() => getHTML(resolveURL('events.html'), { policy })).once();
+const getTemplate = callOnce(() => getHTML(resolveURL('events.html'), { policy }));
 const getEvents = (() => getAllEvents()).once();
 const protectedData = new WeakMap();
 

@@ -5,13 +5,13 @@ import { loadStylesheet } from '../../js/std-js/loader.js';
 import { getDeferred } from '../../js/std-js/promises.js';
 import { purify as policy } from '../../js/std-js/htmlpurify.js';
 import { whenIntersecting } from '../../js/std-js/intersect.js';
-import { getURLResolver } from '../../js/std-js/utility.js';
+import { getURLResolver, callOnce } from '../../js/std-js/utility.js';
 import { getString, setString, getBool, setBool } from '../../js/std-js/attrs.js';
 
 const ENDPOINT = 'https://api.github.com';
 import HTMLCustomElement from '../custom-element.js';
 const resolveURL = getURLResolver({ base : meta.url, path: '/components/github/' });
-const getTemplate = (() => getHTML(resolveURL('./user.html', meta.url), { policy })).once();
+const getTemplate = callOnce(() => getHTML(resolveURL('./user.html', meta.url), { policy }));
 async function getUser(user) {
 	const key = `github-user-${user}`;
 

@@ -2,11 +2,11 @@ import HTMLCustomElement from '../custom-element.js';
 import { registerButton } from '../../js/pwa-install.js';
 import { getHTML } from '../../js/std-js/http.js';
 import { meta } from '../../import.meta.js';
-import { getURLResolver } from '../../js/std-js/utility.js';
+import { getURLResolver, callOnce } from '../../js/std-js/utility.js';
 import { purify as policy } from '../../js/std-js/htmlpurify.js';
 
 const resolveURL = getURLResolver({ base: meta.url, path: '/components/pwa/' });
-const getTemplate = (() => getHTML(resolveURL('./prompt.html'),  { policy })).once();
+const getTemplate = callOnce(() => getHTML(resolveURL('./prompt.html'),  { policy }));
 
 function getBySize(opts, width) {
 	if (Array.isArray(opts)) {

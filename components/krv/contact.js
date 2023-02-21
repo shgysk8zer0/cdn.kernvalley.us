@@ -3,11 +3,12 @@ import { on } from '../../js/std-js/dom.js';
 import { loadStylesheet } from '../../js/std-js/loader.js';
 import { getHTML } from '../../js/std-js/http.js';
 import { meta } from '../../import.meta.js';
-import { getURLResolver } from '../../js/std-js/utility.js';
+import { getURLResolver, callOnce } from '../../js/std-js/utility.js';
 import { send } from '../../js/std-js/slack.js';
 import { whenIntersecting } from '../../js/std-js/intersect.js';
 const ENDPOINT = 'https://contact.kernvalley.us/api/slack';
 const resolveURL = getURLResolver({ base: meta.url, path: '/components/krv/' });
+const getTemplate = callOnce(() => getHTML(resolveURL('./contact.html')));
 
 const symbols = {
 	shadow: Symbol('shadow'),
@@ -22,7 +23,7 @@ registerCustomElement('krv-contact', class HTMLKRVContactElement extends HTMLEle
 
 		whenIntersecting(this).then(async () => {
 			const [tmp] = await Promise.all([
-				getHTML(resolveURL('./contact.html')),
+				getTemplate().then(tmp => tmp.cloneNode(true)),
 				loadStylesheet(resolveURL('./contact.css'), { parent: shadow }),
 				loadStylesheet('https://cdn.kernvalley.us/css/core-css/forms.css', { parent: shadow }),
 				whenIntersecting(this),

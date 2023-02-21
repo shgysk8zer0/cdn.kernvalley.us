@@ -4,14 +4,14 @@ import { whenIntersecting } from '../../js/std-js/intersect.js';
 import { purify as policy } from '../../js/std-js/htmlpurify.js';
 import { loaded } from '../../js/std-js/events.js';
 import { getHTML } from '../../js/std-js/http.js';
-import { getURLResolver } from '../../js/std-js/utility.js';
+import { getURLResolver, callOnce } from '../../js/std-js/utility.js';
 import { meta } from '../../import.meta.js';
 import { loadStylesheet } from '../../js/std-js/loader.js';
 import { getBool, setBool, getString, setString } from '../../js/std-js/attrs.js';
 
 const protectedData = new WeakMap();
 const resolveURL = getURLResolver({ path: '/components/spotify/', base: meta.url });
-const getTemplate = (() => getHTML(resolveURL('./player.html'), { policy })).once();
+const getTemplate = callOnce(() => getHTML(resolveURL('./player.html'), { policy }));
 
 const SPOTIFY = 'https://open.spotify.com/embed/';
 const TYPES = [
