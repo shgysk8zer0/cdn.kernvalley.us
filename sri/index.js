@@ -1,5 +1,5 @@
 import { createScript, createLink } from '/js/std-js/elements.js';
-import { hash } from '/js/std-js/hash.js';
+import { hash, SRI } from '/js/std-js/hash.js';
 import { text, enable, disable } from '/js/std-js/dom.js';
 import { JS, CSS, HTML } from '/js/std-js/types.js';
 
@@ -15,8 +15,7 @@ async function getIntegrity(resp, data) {
 	} else if (data.get('type') === 'image' && ! resp.headers.get('Content-Type').toLowerCase().startsWitH('image/')) {
 		throw new TypeError(`Expected an image but got a ${resp.headers.get('Content-Type')}`);
 	} else {
-		const hashed = await hash(await resp.text(), { algorithm: data.get('algo') });
-		return `${data.get('algo').toLowerCase().replace('-', '')}-${hashed}`;
+		return await hash(await resp.text(), { algorithm: data.get('algo'), output: SRI });
 	}
 }
 
