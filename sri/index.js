@@ -49,7 +49,7 @@ ready().then(() => {
 
 			try {
 				on('.btn-reject', { click: () => controller.abort() }, { signal, once: true });
-				const integrity = await fromFile(data.get('file'), { algo: data.get('algo') });
+				const integrity = await fromFile(data.get('file'), { algorithm: data.get('algo') });
 				value('#hash', integrity);
 				document.getElementById('error-msg').replaceChildren();
 
@@ -71,7 +71,7 @@ ready().then(() => {
 		reset: () => {
 			value('#hash', '');
 			disable('#copy-btn');
-			document.getElementById('error-container').replaceChildren();
+			document.getElementById('error-msg').replaceChildren();
 		},
 	});
 
