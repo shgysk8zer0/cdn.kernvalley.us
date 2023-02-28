@@ -81,9 +81,11 @@ registerCustomElement('calendly-embed', class HTMLCalendlyEmbedElement extends H
 		}
 		
 		if ('Calendly' in globalThis) {
+			const container = shadow.getElementById('container');
+			container.replaceChildren();
 			globalThis.Calendly.initInlineWidget({
 				url: this.url,
-				parentElement: shadow.getElementById('container'),
+				parentElement: container,
 			});
 		}
 	}
