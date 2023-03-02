@@ -10,7 +10,11 @@ const trustedOrigins = [
 export const sanitizer = new globalThis.Sanitizer(config);
 
 export const defaultPolicy = createPolicy('default', {
-	createHTML: input => sanitizer.sanitizeFor('div', input).innerHTML,
+	createHTML: input => {
+		const el = document.createElement('div');
+		el.setHTML(input, { sanitizer });
+		return el.innerHTML;
+	},
 	createScript: () => '',
 	createScriptURL: input => {
 		if (trustedOrigins.includes(new URL(input, document.baseURI).origin)) {
