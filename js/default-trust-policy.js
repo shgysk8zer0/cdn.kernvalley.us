@@ -11,9 +11,16 @@ export const sanitizer = new globalThis.Sanitizer(config);
 
 export const defaultPolicy = createPolicy('default', {
 	createHTML: input => {
-		const el = document.createElement('div');
-		el.setHTML(input, { sanitizer });
-		return el.innerHTML;
+		if (Element.prototype.setHTML instanceof Function) {
+			const el = document.createElement('div');
+			el.setHTML(input, { sanitizer });
+			return el.innerHTML;
+		} else if ('Sanitizer' in globalThis && Sanitizer.prototype.sanitizeFor instanceof Function) {
+			return sanitizer.sanitizeFor('div', input).innerHTML;
+		} else {
+			throw new Error('No required methods are supported');
+		}
+			
 	},
 	createScript: () => '',
 	createScriptURL: input => {
