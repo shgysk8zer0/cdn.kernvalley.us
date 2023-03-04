@@ -2,8 +2,19 @@ import { registerCustomElement } from '../../js/std-js/custom-elements.js';
 import { loadScript, preload } from '../../js/std-js/loader.js';
 import { whenIntersecting } from '../../js/std-js/intersect.js';
 import { getString, setString } from '../../js/std-js/attrs.js';
+import { createPolicy } from '../../js/std-js/trust.js';
 
 // @TODO: Can creating the iframe be done using a policy?
+const policy = createPolicy('disqus#script-url', {
+	createScriptURL: input => {
+		if (/^https:\/\/[\w-]+\.disqus\.com\/embed\.js$/.test(input)) {
+			return input;
+		} else {
+			throw new TypeError(`Invalid Disqus URL: ${input}`);
+		}
+	}
+});
+
 
 const symbols = {
 	shadow: Symbol('shadow'),
@@ -60,9 +71,10 @@ registerCustomElement('disqus-comments', class HTMLDisqusCommentsElement extends
 					/**
 					 * Can no longer load this script within the Shadow
 					 */
-					const script = await loadScript(`https://${newVal}.disqus.com/embed.js`, {
+					const script = await loadScript(policy.createScriptURL(`https://${newVal}.disqus.com/embed.js`), {
 						crossOrigin: preloadOpts.crossOrigin,
 						// parent: this[symbols.shadow],
+						dataset: { timestamp: Date.now() },
 						referrerPolicy: 'origin',
 					});
 
