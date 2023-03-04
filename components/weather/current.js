@@ -1,7 +1,7 @@
 import { shadows, clearSlot, getWeatherByPostalCode, createIcon, getIcon, getSprite } from './helper.js';
 import { createPolicy } from '../../js/std-js/trust.js';
 import { getURLResolver } from '../../js/std-js/utility.js';
-import { meta } from '../../../import.meta.js';
+import { meta } from '../../import.meta.js';
 import { getHTML } from '../../js/std-js/http.js';
 import HTMLCustomElement from '../custom-element.js';
 
