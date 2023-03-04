@@ -7,7 +7,7 @@ import { createPolicy } from '../../js/std-js/trust.js';
 // @TODO: Can creating the iframe be done using a policy?
 const policy = createPolicy('disqus#script-url', {
 	createScriptURL: input => {
-		if (/https:\/\/[\w\-]+\.disqus\.com\/embed\.js/.test(input)) {
+		if (/^https:\/\/[\w-]+\.disqus\.com\/embed\.js$/.test(input)) {
 			return input;
 		} else {
 			throw new TypeError(`Invalid Disqus URL: ${input}`);
