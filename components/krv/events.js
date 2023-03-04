@@ -6,13 +6,14 @@ import { loadStylesheet } from '../../js/std-js/loader.js';
 import { hasGa, send } from '../../js/std-js/google-analytics.js';
 import { meta } from '../../import.meta.js';
 import { getURLResolver, callOnce } from '../../js/std-js/utility.js';
-import { purify as policy } from '../../js/std-js/htmlpurify.js';
 import { whenIntersecting } from '../../js/std-js/intersect.js';
 import { getString, setString, getInt, setInt } from '../../js/std-js/attrs.js';
+import { createPolicy } from '../../js/std-js/trust.js';
 
+const policy = createPolicy('krv-events#html', { createHTML: input => input });
 const resolveURL = getURLResolver({ base: meta.url, path: '/components/krv/' });
 const getTemplate = callOnce(() => getHTML(resolveURL('events.html'), { policy }));
-const getEvents = (() => getAllEvents()).once();
+const getEvents = callOnce(() => getAllEvents());
 const protectedData = new WeakMap();
 
 function utm(url, { campaign, content, medium, source, term }) {
