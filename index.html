@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" dir="ltr" data-layout="right-sidebar" data-theme="auto" data-trusted-policies="default empty#html empty#script sanitizer-raw#html purify-raw#html purify#html github#gist dompurify share-to-buttons#html weather-current#html weather-forecast#html codepen#script-url module#script-url">
+<html lang="en" dir="ltr" data-layout="right-sidebar" data-theme="auto" data-trusted-policies="default empty#html empty#script sanitizer-raw#html purify-raw#html purify#html github#gist dompurify share-to-buttons#html weather-current#html weather-forecast#html codepen#script-url krv-events#html module#script-url">
 	<head>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width" />
@@ -72,6 +72,9 @@
 				<i>(JavaScript, Stylesheets, Images, &amp; Fonts)</i> are shared and accessible
 				on a number of different sites.
 			</blockquote>
+			<krv-events>
+				<script type="module" src="/components/krv/events.js" referrerpolicy="no-referrer"></script>
+			</krv-events>
 			<weather-forecast postalcode="93240" appid="6be145cbc5791c9f80471ff39d8523ed" theme="auto" loading="lazy"></weather-forecast>
 			<div class="center">
 				<leaflet-map center="35.753003,-118.424572" zoom="13" crossorigin="anonymous" detectretina="" loading="lazy" router="" zoomcontrol="" allowfullscreen="" allowlocate="" data-markers="towns restaurants campgrounds stores landmarks">
