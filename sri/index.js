@@ -2,11 +2,17 @@ import { createScript, createLink } from '/js/std-js/elements.js';
 import { hash, SRI } from '/js/std-js/hash.js';
 import { text, enable, disable } from '/js/std-js/dom.js';
 import { JS, CSS, HTML } from '/js/std-js/types.js';
+import { createPolicy } from '/js/std-js/trust.js';
+
+const policy = createPolicy('sri#script-url', { createScriptURL: input => input });
 
 async function getIntegrity(resp, data) {
 	if (! resp.ok) {
 		throw new Error(`${resp.url} [${resp.status} ${resp.statusText}]`);
-	} else if (data.get('type') === 'script' && ! resp.headers.get('Content-Type').toLowerCase().startsWith(JS)) {
+	} else if (
+		data.get('type') === 'script'
+		&& ! [JS, 'text/javascript'].some(type => resp.headers.get('Content-Type').toLowerCase().startsWith(type))
+	) {
 		throw new TypeError(`Expected a script but got ${resp.headers.get('Content-Type')}`);
 	} else if (data.get('type') === 'stylesheet' && ! resp.headers.get('Content-Type').toLowerCase().startsWith(CSS)) {
 		throw new TypeError(`Expected a script but got ${resp.headers.get('Content-Type')}`);
@@ -65,7 +71,7 @@ async function generateSRIHash(data) {
 
 	switch(data.get('type')) {
 		case 'script': {
-			const script = createScript(data.get('url'),  {
+			const script = createScript(data.get('url'), {
 				crossOrigin: data.get('crossOrigin'),
 				referrerPolicy: data.get('referrerPolicy'),
 				defer: data.has('defer'),
@@ -73,8 +79,10 @@ async function generateSRIHash(data) {
 				noModule: data.has('noModule'),
 				type: data.get('script-type'),
 				fetchPriority: data.get('fetchPriority'),
-				integrity,
+				integrity, policy,
 			});
+
+			script.crossOrigin = data.get('crossOrigin');
 
 			if (! script.hasAttribute('fetchpriority')) {
 				script.setAttribute('fetchpriority', data.get('fetchPriority'));

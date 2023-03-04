@@ -1,7 +1,20 @@
 import { shadows, clearSlot, getWeatherByPostalCode, createIcon, getIcon, getSprite } from './helper.js';
+import { createPolicy } from '../../js/std-js/trust.js';
+import { getURLResolver } from '../../js/std-js/utility.js';
+import { meta } from '../../import.meta.js';
+import { getHTML } from '../../js/std-js/http.js';
 import HTMLCustomElement from '../custom-element.js';
 
-import { purify as policy } from '../../js/std-js/htmlpurify.js';
+const resolveURL = getURLResolver({ base: meta.url, path: '/components/weather/' });
+const policy = createPolicy('weather-current#html', {
+	createHTML: input => input,
+});
+const getTemplate = async () => getHTML(resolveURL('./current.html'), { policy })
+	.then(tmp => {
+		tmp.querySelectorAll('link[href]').forEach(link => link.href = resolveURL(link.getAttribute('href')));
+		return tmp;
+	});
+
 
 HTMLCustomElement.register('weather-current', class HTMLWeatherForecastElement extends HTMLCustomElement {
 	constructor({ appId = null, postalCode = null, loading = null } = {}) {
@@ -23,7 +36,7 @@ HTMLCustomElement.register('weather-current', class HTMLWeatherForecastElement e
 
 			await Promise.all([this.whenConnected, this.whenLoad]);
 
-			const tmp = await this.getTemplate('./components/weather/current.html', { policy });
+			const tmp = await getTemplate();
 			shadow.append(tmp);
 			shadows.set(this, shadow);
 			this.dispatchEvent(new Event('ready'));

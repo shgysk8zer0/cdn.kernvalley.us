@@ -7,12 +7,15 @@ import { getURLResolver, callOnce } from '../../js/std-js/utility.js';
 import { loadStylesheet } from '../../js/std-js/loader.js';
 import { getString, setString, getBool, setBool, getURL, setURL } from '../../js/std-js/attrs.js';
 import { setUTMParams } from '../../js/std-js/utility.js';
-import { Facebook, Twitter, Reddit, LinkedIn, Gmail, Pinterest, Email, Tumblr, Telegram, getShareURL }
-	from '../../js/std-js/share-targets.js';
+import { createPolicy } from '../../js/std-js/trust.js';
+import {
+	Facebook, Twitter, Reddit, LinkedIn, Gmail, Pinterest, Email, Tumblr, Telegram, getShareURL,
+} from '../../js/std-js/share-targets.js';
 
-import { purify as policy } from '../../js/std-js/htmlpurify.js';
 const resolveURL = getURLResolver({ base: meta.url, path: '/components/share-to-button/' });
-
+export const policy = createPolicy('share-to-buttons#html', {
+	createHTML: input => input,
+});
 
 const getTemplate = callOnce(() => getHTML(resolveURL('./share-to-button.html'), { policy }));
 

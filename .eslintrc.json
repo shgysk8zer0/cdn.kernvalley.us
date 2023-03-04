@@ -44,6 +44,7 @@
       "globalThis": "readonly",
       "MediaMetadata": "readonly",
       "Sanitizer": "readonly",
-      "scheduler": "readonly"
+      "scheduler": "readonly",
+      "trustedTypes": "readonly"
     }
 }

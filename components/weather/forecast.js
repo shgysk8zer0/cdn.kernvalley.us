@@ -1,17 +1,20 @@
 import { meta } from '../../../import.meta.js';
-import {shadows, clearSlot, clearSlots, getForecastByPostalCode, createIcon, getSprite} from './helper.js';
+import { shadows, clearSlot, clearSlots, getForecastByPostalCode, createIcon, getSprite} from './helper.js';
 import HTMLCustomElement from '../custom-element.js';
-import { purify as policy } from '../../js/std-js/htmlpurify.js';
+import { createPolicy } from '../../js/std-js/trust.js';
 import { getHTML } from '../../js/std-js/http.js';
 import { getURLResolver } from '../../js/std-js/utility.js';
+const policy = createPolicy('weather-forecast#html', {
+	createHTML: input => input,
+});
 
 const resolveURL = getURLResolver({ base: meta.url, path: '/components/weather/' });
 
-async function getTemplate() {
+const getTemplate = async () => {
 	const tmp = await getHTML(resolveURL('./forecast.html'), { policy });
 	tmp.querySelectorAll('link[href]').forEach(link => link.href = resolveURL(link.getAttribute('href')));
 	return tmp;
-}
+};
 
 HTMLCustomElement.register('weather-forecast', class HTMLWeatherForecastElement extends HTMLElement {
 	constructor({ appId = null, postalCode = null } = {}) {

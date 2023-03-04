@@ -1,5 +1,5 @@
 import { createPolicy } from './std-js/trust.js';
-import { SanitizerConfig as config } from './std-js/SanitizerConfig.js';
+import { SanitizerConfig as config } from './std-js/SanitizerConfigW3C.js';
 
 const trustedOrigins = [
 	location.origin,

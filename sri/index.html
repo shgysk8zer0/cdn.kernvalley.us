@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" dir="ltr">
+<html lang="en" dir="ltr" data-trusted-policies="sri#script-url" data-untrusted-policies="ga#script-url goog#html">
 	<head>
 		<meta charset="utf-8" />
 		<meta name="color-scheme" content="light dark" />
@@ -12,6 +12,7 @@
 		<link rel="preload" href="/components/github/user.html" as="fetch" type="text/html" referrerpolicy="no-referrer" />
 		<link rel="preload" href="/components/github/user.css" as="style" type="text/css" referrerpolicy="no-referrer" />
 		<script type="application/javascript" src="/js/shims.min.js" referrerpolicy="no-referrer" defer=""></script>
+		<script type="application/javascript" src="/js/security.min.js" referrerpolicy="no-referrer" defer=""></script>
 		<script type="module" src="./index.js" referrerpolicy="no-referrer"></script>
 		<script type="module" src="/components/github/user.js" referrerpolicy="no-referrer"></script>
 		<link rel="stylesheet" href="/css/core-css/theme/default/index.css" referrerpolicy="no-referrer" media="all" />
@@ -103,13 +104,13 @@
 					<div class="form-group">
 						<label for="referrerPolicy" class="input-label required">Referrer Policy</label>
 						<select name="referrerPolicy" id="referrerPolicy" class="input" required="">
-							<option value="no-referrer" label="No Referrer"></option>
+							<option value="no-referrer" label="No Referrer" selected=""></option>
 							<option value="no-referrer-when-downgrade" label="No Referrer When Downgrade"></option>
 							<option value="origin" label="Origin"></option>
 							<option value="origin-when-cross-origin" label="Origin When Cross Origin"></option>
 							<option value="same-origin" label="Same Origin"></option>
 							<option value="strict-origin" label="Strict Origin"></option>
-							<option value="strict-origin-when-cross-origin" label="Strict Origin When Cross Origin" selected=""></option>
+							<option value="strict-origin-when-cross-origin" label="Strict Origin When Cross Origin"></option>
 							<option value="unsafe-url" label="Unsafe URL"></option>
 						</select>
 					</div>

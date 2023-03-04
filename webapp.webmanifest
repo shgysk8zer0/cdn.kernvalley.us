@@ -23,13 +23,13 @@
   ],
   "prefer_related_applications": false,
   "shortcuts": [{
-  	"name": "SRI Generator",
-  	"url": "/sri/",
-  	"description": "Generate SRI Hashes",
+    "name": "SRI Generator",
+    "url": "/sri/",
+    "description": "Generate SRI Hashes"
   }, {
-  	"name": "Image Took",
-  	"url": "/convert/",
-  	"description": "Resize and Convert Image",
+    "name": "Image Took",
+    "url": "/convert/",
+    "description": "Resize and Convert Image"
   }],
   "related_applications":  [{
     "platform": "webapp",
