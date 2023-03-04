@@ -1,8 +1,21 @@
 import { whenIntersecting } from '../../js/std-js/intersect.js';
 import { getDeferred } from '../../js/std-js/promises.js';
-import { createIframe } from '../../js/std-js/elements.js';
-import { loaded } from '../../js/std-js/events.js';
+import { createIframe, createScript } from '../../js/std-js/elements.js';
+import { createPolicy } from '../../js/std-js/trust.js';
 import { getString, setString, getInt, setInt } from '../../js/std-js/attrs.js';
+
+const policy = createPolicy('github#gist', {
+	createHTML: input => input,
+	createScriptURL: input => {
+		if (input.startsWith('https://gist.github.com')) {
+			return input;
+		} else {
+			throw new TypeError(`Invalid Gist URL: ${input}`);
+		}
+	},
+});
+
+export const trustedPolicies = [policy.name];
 
 const protectedData = new WeakMap();
 
@@ -18,12 +31,14 @@ async function render(target, { signal } = {}) {
 		}
 
 		protectedData.set(target, {
+			shadow,
 			timeout: requestAnimationFrame(async () => {
 				const { user, gist, file, height, width } = target;
-				const script = document.createElement('script');
+				const { resolve, reject, promise } = getDeferred();
+				const src = new URL(`/${user}/${gist}.js`, 'https://gist.github.com');
+				const script = createScript(policy.createScriptURL(src.href), { defer: false, async: false, referrerPolicy: 'no-referrer' });
 				const link = document.createElement('link');
 				const base = document.createElement('base');
-				const src = new URL(`/${user}/${gist}.js`, 'https://gist.github.com');
 				link.rel = 'preconnect';
 				link.href = 'https://github.githubassets.com';
 				base.target = '_blank';
@@ -32,32 +47,47 @@ async function render(target, { signal } = {}) {
 					src.searchParams.set('file', file);
 				}
 
-				script.src = src.href;
-
 				const iframe = createIframe(null, {
-					srcdoc: `<!DOCTYPE html><html><head>${base.outerHTML}${link.outerHTML}</head><body>${script.outerHTML}</body></html>`,
+					srcdoc: policy.createHTML(
+						`<!DOCTYPE html><html><head>${base.outerHTML}${link.outerHTML}</head><body>${script.outerHTML}</body></html>`
+					),
 					referrerPolicy: 'no-referrer',
 					sandbox: ['allow-scripts', 'allow-popups'],
 					width,
 					height,
 					part: ['embed'],
+					events: {
+						load: () => {
+							resolve();
+							target.dispatchEvent(new Event('load'));
+						},
+						error: () => reject(new DOMException('Failed loading Gist')),
+					}
 				});
 
 				shadow.replaceChildren(iframe);
-				protectedData.set(target, { shadow, timeout: null });
-				loaded(iframe).then(() => target.dispatchEvent(new Event('load')));
-			}),
-			shadow,
-		}, 100);
-	}
 
+				await promise;
+			})
+		});
+	}
 }
 
 customElements.define('github-gist', class HTMLGitHubGistElement extends HTMLElement {
-	constructor() {
+	constructor({ user, gist } = {}) {
 		super();
 		const shadow = this.attachShadow({ mode: 'closed' });
 		protectedData.set(this, { shadow, timeout: null });
+
+		requestAnimationFrame(() => {
+			if (typeof user === 'string') {
+				this.user = user;
+			}
+
+			if (typeof gist === 'string') {
+				this.gist = gist;
+			}
+		});
 	}
 
 	connectedCallback() {

@@ -7,7 +7,7 @@ import { getString, setString, getInt, setInt, getBool, setBool } from '../../js
 const protectedData = new WeakMap();
 
 registerCustomElement('youtube-player', class HTMLYouTubePlayerElement extends HTMLElement {
-	constructor(video, { height, width, cookies, loading } = {}) {
+	constructor(video, { height, width, cookies, loading, start, controls } = {}) {
 		super();
 
 		requestAnimationFrame(() => {
@@ -29,6 +29,14 @@ registerCustomElement('youtube-player', class HTMLYouTubePlayerElement extends H
 
 			if (typeof loading === 'string') {
 				this.loading = loading;
+			}
+
+			if (typeof start === 'number') {
+				this.start = start;
+			}
+
+			if (typeof controls === 'boolean') {
+				this.controls = controls;
 			}
 		});
 
@@ -84,7 +92,7 @@ registerCustomElement('youtube-player', class HTMLYouTubePlayerElement extends H
 	}
 
 	async render() {
-		const { cookies, loading, height, width, video } = this;
+		const { cookies, loading, height, width, video, controls, start } = this;
 		const { shadow } = protectedData.get(this);
 
 		if (typeof video === 'string') {
@@ -92,7 +100,7 @@ registerCustomElement('youtube-player', class HTMLYouTubePlayerElement extends H
 				await whenIntersecting(this);
 			}
 
-			const iframe = createYouTubeEmbed(video, { width, height, cookies });
+			const iframe = createYouTubeEmbed(video, { width, height, cookies, start, controls });
 
 			const prom = loaded(iframe).then(() => this.dispatchEvent(new Event('ready')));
 
@@ -140,12 +148,28 @@ registerCustomElement('youtube-player', class HTMLYouTubePlayerElement extends H
 		setString(this, 'loading', val);
 	}
 
+	get controls() {
+		return getBool(this, 'controls');
+	}
+
+	set controls(val) {
+		setBool(this, 'controls', val);
+	}
+
 	get cookies() {
 		return getBool(this, 'cookies');
 	}
 
 	set cookies(val) {
 		setBool(this, 'cookies', val);
+	}
+
+	get start() {
+		return getInt(this, 'start', { min: 0 });
+	}
+
+	set start(val) {
+		setInt(this, 'start', { min: 1 });
 	}
 
 	get video() {

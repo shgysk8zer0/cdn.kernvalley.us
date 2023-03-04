@@ -1,9 +1,15 @@
 import { createIframe } from '../js/std-js/elements.js';
+import { createPolicy } from '../js/std-js/trust.js';
 import { getString, setString, getBool, setBool, getInt, setInt } from '../js/std-js/attrs.js';
+const protectedData = new WeakMap();
+
+const policy = createPolicy('codepen#script-url', {
+	createScriptURL: input => input,
+});
 
 function render(el) {
 	const { shadowRoot, user, pen, theme, loading, tab, height, editable, clickToLoad } = el;
-	const src = new URL(`https://codepen.io/${user}/embed/${clickToLoad ? 'preview/' : '/'}${pen}`);
+	const src = new URL(`https://codepen.io/${user}/embed${clickToLoad ? '/preview/' : '/'}${pen}`);
 
 	src.searchParams.set('default-tab', tab);
 	src.searchParams.set('theme-id', theme);
@@ -11,7 +17,8 @@ function render(el) {
 	if (editable) {
 		src.searchParams.set('editable', 'true');
 	}
-	const iframe = createIframe(src, {
+
+	const iframe = createIframe(policy.createScriptURL(src.href), {
 		loading, height,
 		sandbox: ['allow-scripts', 'allow-popups'],
 		part: ['embed'],
@@ -26,6 +33,7 @@ function render(el) {
 customElements.define('codepen-embed', class HTMLCodePenEmbedElement extends HTMLElement {
 	constructor() {
 		super();
+		protectedData.set(this, { timeout: NaN });
 		this.attachShadow({ mode: 'open' });
 	}
 	
@@ -35,9 +43,18 @@ customElements.define('codepen-embed', class HTMLCodePenEmbedElement extends HTM
 	}
 	
 	attributeChangedCallback() {
-		if (this.isConnected && this.shadowRoot.childElementCount !== 0) {
-			render(this);
+		const { timeout } = protectedData.get(this);
+
+		if (typeof timeout === 'number' && ! Number.isNaN(timeout)) {
+			cancelAnimationFrame(timeout);
 		}
+
+		protectedData.set(this, {
+			timeout: requestAnimationFrame(() => {
+				render(this);
+				protectedData.set(this, { timeout: NaN });
+			})
+		});
 	}
 	
 	get clickToLoad() {
@@ -77,7 +94,7 @@ customElements.define('codepen-embed', class HTMLCodePenEmbedElement extends HTM
 	}
 	
 	set pen(val) {
-		setString(this, 'pen');
+		setString(this, 'pen', val);
 	}
 	
 	get tab() {

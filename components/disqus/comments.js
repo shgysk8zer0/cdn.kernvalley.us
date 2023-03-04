@@ -3,6 +3,8 @@ import { loadScript, preload } from '../../js/std-js/loader.js';
 import { whenIntersecting } from '../../js/std-js/intersect.js';
 import { getString, setString } from '../../js/std-js/attrs.js';
 
+// @TODO: Can creating the iframe be done using a policy?
+
 const symbols = {
 	shadow: Symbol('shadow'),
 };
