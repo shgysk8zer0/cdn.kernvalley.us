@@ -7,7 +7,7 @@ import { getString, setString, getInt, setInt } from '../../js/std-js/attrs.js';
 const policy = createPolicy('github#gist', {
 	createHTML: input => input,
 	createScriptURL: input => {
-		if (input.startsWith('https://gist.github.com')) {
+		if (input.startsWith('https://gist.github.com/')) {
 			return input;
 		} else {
 			throw new TypeError(`Invalid Gist URL: ${input}`);
