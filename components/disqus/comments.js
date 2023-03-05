@@ -1,29 +1,10 @@
 import { registerCustomElement } from '../../js/std-js/custom-elements.js';
-import { loadScript, preload } from '../../js/std-js/loader.js';
 import { whenIntersecting } from '../../js/std-js/intersect.js';
 import { getString, setString } from '../../js/std-js/attrs.js';
-import { createPolicy } from '../../js/std-js/trust.js';
-
-// @TODO: Can creating the iframe be done using a policy?
-const policy = createPolicy('disqus#script-url', {
-	createScriptURL: input => {
-		if (/^https:\/\/[\w-]+\.disqus\.com\/embed\.js$/.test(input)) {
-			return input;
-		} else {
-			throw new TypeError(`Invalid Disqus URL: ${input}`);
-		}
-	}
-});
-
+import { loadScript, ID } from '../../js/std-js/disqus.js';
 
 const symbols = {
 	shadow: Symbol('shadow'),
-};
-
-const preloadOpts = {
-	as: 'script',
-	crossOrigin: null,
-	importance: 'low',
 };
 
 registerCustomElement('disqus-comments', class HTMLDisqusCommentsElement extends HTMLElement {
@@ -41,17 +22,18 @@ registerCustomElement('disqus-comments', class HTMLDisqusCommentsElement extends
 		});
 
 		container.slot = 'comments';
+		container.id = ID;
 		slot.name = 'comments';
+
 		shadow.append(slot);
 		this.append(container);
 
 		slot.addEventListener('slotchange', ({ target }) => {
-			target.assignedElements().forEach(el => el.id = 'disqus_thread');
+			target.assignedElements().forEach(el => el.id = ID);
 		});
 
 		if (typeof site === 'string') {
-			preload(`https://${site}.disqus.com/embed.js`, preloadOpts);
-			requestIdleCallback(() =>  this.site = site);
+			this.site = site;
 		}
 	}
 
@@ -71,19 +53,14 @@ registerCustomElement('disqus-comments', class HTMLDisqusCommentsElement extends
 					/**
 					 * Can no longer load this script within the Shadow
 					 */
-					const script = await loadScript(policy.createScriptURL(`https://${newVal}.disqus.com/embed.js`), {
-						crossOrigin: preloadOpts.crossOrigin,
-						// parent: this[symbols.shadow],
-						dataset: { timestamp: Date.now() },
-						referrerPolicy: 'origin',
-					});
+					await loadScript(this.site);
 
-					script.dataset.timestamp = Date.now();
 					this.dispatchEvent(new Event('ready'));
 				}
 				break;
 
-			default: throw new Error(`Unhandled attribute changed: "${name}"`);
+			default:
+				throw new Error(`Unhandled attribute changed: "${name}"`);
 		}
 	}
 
