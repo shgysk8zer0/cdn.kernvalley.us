@@ -4,7 +4,7 @@
   Referrer-Policy: no-referrer
   Link: </js/shims.min.js>; rel=preload; as=script; referrerpolicy=no-referrrer;
   Link: </js/security.min.js>; rel=preload; as=script; referrerpolicy=no-referrrer;
-  Content-Security-Policy-X: default-src 'self'; style-src 'self' cdn.kernvalley.us unpkg.com; script-src 'self' cdn.kernvalley.us unpkg.com www.gstatic.com/firebasejs/ gist.github.com; connect-src 'self' *.kernvalley.us api.github.com api.openweathermap.org/data/ baconipsum.com/api/ whiskeyflatdays.com; img-src * data: blob:; media-src 'none'; font-src 'self' cdn.kernvalley.us; upgrade-insecure-requests; trusted-types default empty#html empty#script sanitizer-raw#html purify-raw#html purify#html github#gist dompurify share-to-buttons#html weather-current#html weather-forecast#html krv-events#html codepen#script-url module#script-url purify-raw#html purify#html; require-trusted-types-for 'script';
+  Content-Security-Policy: default-src 'self'; style-src 'self' cdn.kernvalley.us unpkg.com; script-src 'self' cdn.kernvalley.us unpkg.com www.gstatic.com/firebasejs/ gist.github.com; connect-src 'self' *.kernvalley.us api.github.com api.openweathermap.org/data/ baconipsum.com/api/ whiskeyflatdays.com; img-src * data: blob:; media-src 'none'; font-src 'self' cdn.kernvalley.us; upgrade-insecure-requests; trusted-types default empty#html empty#script sanitizer-raw#html purify-raw#html purify#html github#gist dompurify share-to-buttons#html weather-current#html weather-forecast#html krv-events#html codepen#script-url module#script-url purify-raw#html purify#html; require-trusted-types-for 'script';
 
 /convert/
   X-Frame-Options: DENY
@@ -39,4 +39,5 @@
   Access-Control-Allow-Methods: GET, HEAD, OPTIONS
   X-Content-Type-Options: nosniff
   Tk: N
+
 
