@@ -1,15 +1,14 @@
-import { registerCustomElement, getCustomElement } from '../../js/std-js/custom-elements.js';
+import { registerCustomElement } from '../../js/std-js/custom-elements.js';
 import { meta } from '../../import.meta.js';
 import { getURLResolver } from '../../js/std-js/utility.js';
 import { loadStylesheet } from '../../js/std-js/loader.js';
 import { getHTML } from '../../js/std-js/http.js';
-import { loaded } from '../../js/std-js/dom.js';
 import { query, create, text, on, off } from '../../js/std-js/dom.js';
 import { hasGa, send } from '../../js/std-js/google-analytics.js';
 import { registerButton } from '../../js/std-js/pwa-install.js';
 import { createPolicy } from '../../js/std-js/trust.js';
 import { getManifest } from '../../js/std-js/http.js';
-import { callOnce } from '../../js/std-js/utility.js';
+import { callOnce, autoServiceWorkerRegistration } from '../../js/std-js/utility.js';
 import '../notification/html-notification.js';
 
 const policy = createPolicy('pwa-install', {
@@ -102,48 +101,8 @@ function getIcon(...icons) {
 }
 
 if ('serviceWorker' in navigator && 'serviceWorker' in document.documentElement.dataset) {
-	loaded().then(() => {
-		const { serviceWorker, scope = '/' } = document.documentElement.dataset;
-		if ('trustedTypes' in globalThis && trustedTypes.defaultPolicy !== null) {
-			navigator.serviceWorker.register(trustedTypes.defaultPolicy.createScriptURL(serviceWorker), { scope }).catch(console.error);
-		} else {
-			navigator.serviceWorker.register(serviceWorker, { scope }).catch(console.error);
-		}
-	});
-
-	if ('reloadOnUpdate' in document.documentElement.dataset) {
-		navigator.serviceWorker.ready.then(reg => {
-			reg.addEventListener('updatefound', ({ target }) => {
-				target.update();
-				getCustomElement('html-notification').then(HTMLNotificationElement => {
-					const notification = new HTMLNotificationElement('Update available', {
-						body: 'App updated in background. Would you like to reload to see updates?',
-						requireInteraction: true,
-						actions: [{
-							title: 'Reload',
-							action: 'reload',
-						}, {
-							title: 'Dismiss',
-							action: 'dismiss',
-						}]
-					});
-
-					notification.addEventListener('notificationclick', ({ target, action }) => {
-						switch(action) {
-							case 'dismiss':
-								target.close();
-								break;
-
-							case 'reload':
-								target.close();
-								location.reload();
-								break;
-						}
-					});
-				});
-			});
-		});
-	}
+	console.warn('Installing service workers via <install-prompt> is deprecated and will be removed.');
+	autoServiceWorkerRegistration({ policy });
 }
 
 registerCustomElement('install-prompt', class HTMLInstallPromptElement extends HTMLElement {
