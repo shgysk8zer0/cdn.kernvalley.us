@@ -3,6 +3,8 @@ import { loadScript } from './js/std-js/loader.js';
 import { konami } from '/js/konami/konami.js';
 import { getDefaultPolicy } from '/js/std-js/trust-policies.js';
 import { createPolicy } from '/js/std-js/trust.js';
+import { alert } from '/js/std-js/asyncDialog.js';
+import '/components/install/prompt.js';
 
 getDefaultPolicy();
 
@@ -82,7 +84,7 @@ const modules = [
 	// './components/leaflet/marker.js',
 	'./components/app/list-button.js',
 	'./components/app/stores.js',
-	'./components/notification/html-notification.js',
+	// './components/notification/html-notification.js',
 	'./js/std-js/theme-cookie.js',
 	'./components/krv/ad.js',
 	'./components/loading-spinner.js',

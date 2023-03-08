@@ -6,7 +6,10 @@ import { getURLResolver, callOnce } from '../../js/std-js/utility.js';
 import { purify as policy } from '../../js/std-js/htmlpurify.js';
 
 const resolveURL = getURLResolver({ base: meta.url, path: '/components/pwa/' });
-const getTemplate = callOnce(() => getHTML(resolveURL('./prompt.html'),  { policy }));
+const getTemplate = callOnce(() => getHTML(resolveURL('./prompt.html'), {
+	policy,
+	// integrity: 'sha384-zS8v7FQoAGePrBa0yKrCmjfNijXh4RPZi3XTOV71Yk3HvRZHeGmMi7lCiahio4xY',
+}));
 
 function getBySize(opts, width) {
 	if (Array.isArray(opts)) {

@@ -1,9 +1,23 @@
-import HTMLCustomElement from '../custom-element.js';
 import { getDeferred } from '../../js/std-js/promises.js';
-import { purify as policy } from '../../js/std-js/htmlpurify.js';
+import { getURLResolver, callOnce } from '../../js/std-js/utility.js';
+import { createPolicy } from '../../js/std-js/trust.js';
+import { meta } from '../../import.meta.js';
+import { loadStylesheet } from '../../js/std-js/loader.js';
+import { createElement, createImage } from '../../js/std-js/elements.js';
+import { createXIcon, createBellIcon } from '../../js/std-js/icons.js';
+import { getString, setString, getInt, setInt } from '../../js/std-js/attrs.js';
+import { remove } from '../../js/std-js/dom.js';
+import { registerCustomElement } from '../../js/std-js/custom-elements.js';
+
+// Need to create `<script type="application/json">`s
+const policyName = 'html-notification#script';
+const resolveURL = getURLResolver({ base: meta.url, path: '/components/notification/' });
+const getPolicy = callOnce(() => createPolicy(policyName, { createScript: input => input }));
+const protectedData = new WeakMap();
 
 function getSlot(name, base) {
-	const slot = base.shadowRoot.querySelector(`slot[name="${name}"]`);
+	const { shadow } = protectedData.get(base);
+	const slot = shadow.querySelector(`slot[name="${name}"]`);
 
 	if (slot instanceof HTMLElement) {
 		const els = slot.assignedElements();
@@ -12,6 +26,21 @@ function getSlot(name, base) {
 	} else {
 		return null;
 	}
+}
+
+function clearSlot(name, base) {
+	remove(`[slot="${name}"]`, { base });
+}
+
+function setSlot(name, content, base) {
+	if (typeof content === 'string') {
+		return setSlot(name, createElement('span', { text: content, slot: name }), base);
+	} else if (content instanceof Element) {
+		clearSlot(name, base);
+		content.slot = name;
+		base.append(content);
+	}
+
 }
 
 /**
@@ -23,10 +52,9 @@ function getSlot(name, base) {
  * here they still dispatch a `notificationclick` event with `actions` & `notification`
  * set on the event.
  *
- * @TODO Implement queue or stacking of notifications
  * @SEE https://developer.mozilla.org/en-US/docs/Web/API/Notification
  */
-export class HTMLNotificationElement extends HTMLCustomElement {
+export class HTMLNotificationElement extends HTMLElement {
 	constructor(title, {
 		body = null,
 		icon = null,
@@ -38,13 +66,14 @@ export class HTMLNotificationElement extends HTMLCustomElement {
 		data = null,
 		vibrate = null,
 		silent = false,
-		timestamp = Date.now(),
+		timestamp = undefined,
 		requireInteraction = false,
 		actions = [],
 		signal = undefined,
 	} = {}) {
 		super();
-		this.attachShadow({ mode: 'open' });
+		const shadow = this.attachShadow({ mode: 'open' });
+		protectedData.set(this, { shadow });
 
 		Promise.resolve().then(() => {
 			this.setAttribute('role', 'dialog');
@@ -57,118 +86,165 @@ export class HTMLNotificationElement extends HTMLCustomElement {
 			this.onerror = null;
 		});
 
-		this.getTemplate('./components/notification/html-notification.html', { signal, policy }).then(tmp => {
-			tmp.querySelector('[part="close"]').addEventListener('click', () => this.close(), {
-				capture: true,
-				once: true,
-				passive: true,
-			});
+		const tmp = createElement('div', {
+			part: 'container',
+			children: [
+				createElement('button', {
+					type: 'button',
+					events: { click: () => this.close() },
+					children: [
+						createElement('slot', {
+							name: 'close-icon',
+							children: [createXIcon({ size: 22, fill: 'currentColor' })]
+						})
+					]
+				}),
+				createElement('span', {
+					part: ['url'],
+					children: [createElement('slot', { name: 'url' })]
+				}),
+				createElement('span', {
+					part: ['icon'],
+					children: [
+						createElement('slot', {
+							name: 'icon',
+							children: [createBellIcon({ size: 56, fill: 'currentColor' })],
+						})
+					]
+				}),
+				createElement('h4', {
+					part: ['title'],
+					children: [createElement('slot', { name: 'title' })]
+				}),
+				createElement('span', {
+					part: ['badge'],
+					children: [
+						createElement('slot', {
+							name: 'badge',
+							children: [createBellIcon({ size: 16, fill: 'currentColor' })]
+						})
+					]
+				}),
+				createElement('p', {
+					part: ['body'],
+					children: [createElement('slot', { name: 'body' })]
+				}),
+				createElement('div', {
+					part: ['image'],
+					children: [createElement('slot', { name: 'image' })]
+				}),
+				createElement('div', {
+					part: ['actions'],
+					children: [createElement('slot', { name: 'actions' })],
+				}),
+				createElement('slot', { name: 'data', hidden: true }),
+				createElement('slot', { name: 'timestamp' })
+			]
+		});
 
-			this.shadowRoot.append(tmp);
+		loadStylesheet(resolveURL('./html-notification.css'), { parent: shadow }).then(() => {
+			shadow.append(...tmp.children);
 
 			if (typeof title === 'string') {
-				this.setSlot('title', title);
+				setSlot('title', title, this);
 			}
 
 			if (Array.isArray(actions) && actions.length !== 0) {
-				this.append(...actions.map(({ title = '', action = '', icon = null }) => {
-					const btn = document.createElement('button');
-					const text = document.createElement('span');
-					btn.type = 'button';
-					btn.title = title;
-					text.textContent = title;
-					btn.dataset.action = action;
-					btn.slot = 'actions';
-					btn.classList.add('no-border', 'no-background', 'background-transparent');
+				const click = event => {
+					event.preventDefault();
+					const evt = new Event('notificationclick');
+					evt.action = event.currentTarget.dataset.action;
+					evt.notification = this;
+					this.dispatchEvent(evt);
+				};
 
-					if (typeof icon === 'string' && icon !== '') {
-						const img = new Image(22, 22);
-						img.decoding = 'async';
-						img.referrerPolicy = 'no-referrer';
-						img.crossOrigin = 'anonymous';
-						img.src = icon;
-						btn.append(img, document.createElement('br'));
+				this.append(...actions.map(({ title = '', action = '', icon = null }) => {
+					const btn = createElement('button', {
+						type: 'button',
+						classList: ['no-border', 'no-background', 'background-transparent'],
+						title: title,
+						dataset: { action },
+						events: { click },
+						slot: 'actions',
+					});
+
+					if ((typeof icon === 'string' && icon !== '') || icon instanceof URL) {
+						btn.append(createImage(icon, {
+							height: 22,
+							width: 22,
+							decoding: 'async',
+							crossOrigin: 'anonymous',
+							referrerPolicy: 'no-referrer',
+						}), document.createElement('br'), createElement('span', { text: title }));
+					} else {
+						btn.append(createElement('span', { text: title }));
 					}
 
-					btn.append(text);
 					return btn;
 				}));
 			}
 
 			if (typeof body === 'string') {
-				this.setSlot('body', body, { tag: 'p' });
+				setSlot('body', body, this);
 			}
 
 			if (Number.isInteger(timestamp)) {
-				this.setAttribute('timestamp', timestamp);
-			} else if (timestamp instanceof Date) {
-				this.setAttribute('timestamp', timestamp.getTime());
+				this.timestamp = timestamp;
 			}
 
 			if (typeof icon === 'string' || icon instanceof URL) {
-				this.setSlot('icon', null, {
-					tag: 'img',
-					attrs: {
-						src: icon,
-						height: 64,
-						width: 64,
-						loading: 'lazy',
-						decoding: 'async',
-						crossorigin: 'anonymous',
-						referrerpolicy: 'no-referrer',
-					}
-				});
+				setSlot('icon', createImage(icon, {
+					height: 64,
+					width: 64,
+					loading: 'lazy',
+					decoding: 'async',
+					crossorigin: 'anonymous',
+					referrerpolicy: 'no-referrer',
+				}), this);
 			}
 
 			if (typeof badge === 'string' || badge instanceof URL) {
-				this.setSlot('badge', null, {
-					tag: 'img',
-					attrs: {
-						src: badge,
-						height: 22,
-						width: 22,
-						loading: 'lazy',
-						decoding: 'async',
-						crossorigin: 'anonymous',
-						referrerpolicy: 'no-referrer',
-					},
-				});
+				setSlot('badge', createImage(badge, {
+					height: 22,
+					width: 22,
+					loading: 'lazy',
+					decoding: 'async',
+					crossorigin: 'anonymous',
+					referrerpolicy: 'no-referrer',
+
+				}), this);
 			}
 
 			if (data) {
-				this.setSlot('data', JSON.stringify(data), {
-					tag: 'script',
-					attrs: { type: 'application/json' },
-				});
+				const script = createElement('script', { type: 'application/json' });
+				script.text = getPolicy().createScript(JSON.stringify(data));
+				setSlot('data', script, this);
 			}
 
 			if (typeof image === 'string' || image instanceof URL) {
-				this.setSlot('image', null, {
-					tag: 'img',
-					attrs: {
-						src: image,
-						decoding: 'async',
-						referrerpolicy: 'no-referrer',
-						crossorigin: 'anonymous',
-						loading: 'lazy',
-						height: 80,
-					}
-				});
+				setSlot('image', createImage(image, {
+					decoding: 'async',
+					referrerpolicy: 'no-referrer',
+					crossorigin: 'anonymous',
+					loading: 'lazy',
+					height: 80,
+				}), this);
 			}
 
-			this.shadowRoot.querySelector('slot[name="actions"]').assignedElements().forEach(btn => {
-				btn.addEventListener('click', event => {
-					event.preventDefault();
-					const evt = new Event('notificationclick');
-					evt.action = event.target.closest('[data-action]').dataset.action;
-					evt.notification = this;
-					this.dispatchEvent(evt);
-				}, {
-					capture: true,
-				});
-			});
-
 			this.dispatchEvent(new Event('ready'));
+
+			if ('locks' in navigator && navigator.locks.request instanceof Function) {
+				navigator.locks.request('html-notification', { mode: 'exclusive', signal }, async () => {
+					const { resolve, promise } = getDeferred();
+					this.hidden = false;
+					this.dispatchEvent(new Event('show'));
+					this.addEventListener('close', resolve);
+					await promise;
+				});
+			} else {
+				this.hidden = false;
+				this.dispatchEvent(new Event('show'));
+			}
 		});
 
 		this.dir = dir;
@@ -217,7 +293,12 @@ export class HTMLNotificationElement extends HTMLCustomElement {
 			}
 
 			const pattern = this.vibrate;
-			if (! this.silent && pattern.length !== 0 && ! pattern.every(n => n === 0)  && (navigator.vibrate instanceof Function)) {
+			if (
+				! this.silent
+				&& pattern.length !== 0
+				&& ! pattern.every(n => n === 0)
+				&& (navigator.vibrate instanceof Function)
+			) {
 				navigator.vibrate(this.vibrate);
 			}
 		}, {
@@ -234,21 +315,6 @@ export class HTMLNotificationElement extends HTMLCustomElement {
 				}
 			}, { once: true });
 		}
-
-		this.stylesLoaded.then(() => {
-			if ('locks' in navigator && navigator.locks.request instanceof Function) {
-				navigator.locks.request('html-notification', { mode: 'exclusive', signal }, async () => {
-					const { resolve, promise } = getDeferred();
-					this.hidden = false;
-					this.dispatchEvent(new Event('show'));
-					this.addEventListener('close', resolve);
-					await promise;
-				});
-			} else {
-				this.hidden = false;
-				this.dispatchEvent(new Event('show'));
-			}
-		});
 	}
 
 	connectedCallback() {
@@ -341,34 +407,22 @@ export class HTMLNotificationElement extends HTMLCustomElement {
 	}
 
 	get tag() {
-		return this.getAttribute('tag');
+		return getString(this, 'tag');
 	}
 
 	set tag(value) {
-		if (typeof value === 'string') {
-			this.setAttribute('tag', value);
-		} else {
-			this.removeAttribute('tag');
-		}
+		setString(this, 'tag', value);
 	}
 
 	get timestamp() {
-		if (this.hasAttribute('timestamp')) {
-			return parseInt(this.getAttribute('timestamp'));
-		} else {
-			return Date.now();
-		}
+		return getInt(this, 'timestamp', { fallback: Date.now() });
 	}
 
 	set timestamp(value) {
-		if (Number.isInteger(value)) {
-			this.setAttribute('timestamp', value);
-		} else if (value instanceof Date) {
-			this.timestamp = value.getTime();
-		} else if (typeof value === 'string' && value.length !== 0) {
-			this.timestamp = Date.parse(value);
+		if (value instanceof Date) {
+			setInt(this, 'timestamp', value.getTime());
 		} else {
-			this.removeAttribute('timestamp');
+			setInt(this, 'timestmap', value);
 		}
 	}
 
@@ -421,4 +475,5 @@ export class HTMLNotificationElement extends HTMLCustomElement {
 }
 
 // @SEE https://developer.mozilla.org/en-US/docs/Web/API/Notification
-HTMLCustomElement.register('html-notification', HTMLNotificationElement);
+registerCustomElement('html-notification', HTMLNotificationElement);
+export const trustPolicies = [policyName];
