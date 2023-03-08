@@ -8,7 +8,7 @@ import { getHTML } from '../../js/std-js/http.js';
 import { getURLResolver, setUTMParams, callOnce } from '../../js/std-js/utility.js';
 import { meta } from '../../import.meta.js';
 import { loadStylesheet } from '../../js/std-js/loader.js';
-import { createPolicy } from '../../js/trust.js';
+import { createPolicy } from '../../js/std-js/trust.js';
 import { getString, setString, getBool, setBool } from '../../js/std-js/attrs.js';
 
 const protectedData = new WeakMap();
