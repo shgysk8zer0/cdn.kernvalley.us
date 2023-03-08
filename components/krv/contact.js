@@ -5,10 +5,14 @@ import { getHTML } from '../../js/std-js/http.js';
 import { meta } from '../../import.meta.js';
 import { getURLResolver, callOnce } from '../../js/std-js/utility.js';
 import { send } from '../../js/std-js/slack.js';
+import { createPolicy } from '../../js/std-js/trust.js';
 import { whenIntersecting } from '../../js/std-js/intersect.js';
+
 const ENDPOINT = 'https://contact.kernvalley.us/api/slack';
+const policy = createPolicy('krv-contact#html', { createHTML: input => input });
 const resolveURL = getURLResolver({ base: meta.url, path: '/components/krv/' });
-const getTemplate = callOnce(() => getHTML(resolveURL('./contact.html')));
+const getTemplate = callOnce(() => getHTML(resolveURL('./contact.html'), { policy }));
+export const trustPolicies = [policy.name];
 
 const symbols = {
 	shadow: Symbol('shadow'),
