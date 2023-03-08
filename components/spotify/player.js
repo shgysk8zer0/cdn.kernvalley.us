@@ -1,19 +1,31 @@
 import { registerCustomElement } from '../../js/std-js/custom-elements.js';
 import { createIframe } from '../../js/std-js/elements.js';
 import { whenIntersecting } from '../../js/std-js/intersect.js';
-import { purify as policy } from '../../js/std-js/htmlpurify.js';
 import { loaded } from '../../js/std-js/events.js';
 import { getHTML } from '../../js/std-js/http.js';
 import { getURLResolver, callOnce } from '../../js/std-js/utility.js';
 import { meta } from '../../import.meta.js';
 import { loadStylesheet } from '../../js/std-js/loader.js';
 import { getBool, setBool, getString, setString } from '../../js/std-js/attrs.js';
+import { createPolicy } from '../../js/std-js/trust.js';
 
 const protectedData = new WeakMap();
 const resolveURL = getURLResolver({ path: '/components/spotify/', base: meta.url });
 const getTemplate = callOnce(() => getHTML(resolveURL('./player.html'), { policy }));
-
 const SPOTIFY = 'https://open.spotify.com/embed/';
+
+const policy = createPolicy('spotify-player', {
+	createHTML: input => input,
+	// Used for setting `<iframe src>`
+	createScriptURL: input => {
+		if (input.startsWith(SPOTIFY)) {
+			return input;
+		} else {
+			throw new TypeError(`Invalid Script URL: ${input}`);
+		}
+	},
+});
+
 const TYPES = [
 	'album',
 	'artist',
@@ -210,7 +222,7 @@ registerCustomElement('spotify-player', class HTMLSpotifyPlayerElement extends H
 							await whenIntersecting(this);
 						}
 
-						const iframe = createIframe(new URL(`${type}/${id}`, SPOTIFY), {
+						const iframe = createIframe(policy.createScriptURL(new URL(`${type}/${id}`, SPOTIFY)), {
 							width: 300,
 							height: large ? 380 : 80,
 							referrerPolicy: 'origin',
@@ -248,3 +260,5 @@ registerCustomElement('spotify-player', class HTMLSpotifyPlayerElement extends H
 		];
 	}
 });
+
+export const trustPolicies = [policy.name];

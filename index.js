@@ -8,8 +8,6 @@ import '/components/install/prompt.js';
 
 getDefaultPolicy();
 
-customElements.whenDefined('install-prompt').then(Prompt => new Prompt().show());
-
 const policy = createPolicy('module#script-url', {
 	createScriptURL: input => {
 		const url = new URL(input, document.baseURI);

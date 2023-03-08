@@ -3,6 +3,7 @@ import { confirm } from '../../js/std-js/asyncDialog.js';
 import { registerCustomElement } from '../../js/std-js/custom-elements.js';
 import { manifestPromise } from '../../js/std-js/promises.js';
 import { hasGa, send } from '../../js/std-js/google-analytics.js';
+import { ready } from '../../js/std-js/dom.js';
 import { getString, setString, getURL, setURL, getBool, setBool } from '../../js/std-js/attrs.js';
 const getManifest = async () => manifestPromise;
 
@@ -131,7 +132,7 @@ registerCustomElement('pwa-install', class HTMLPWAInstallButton extends HTMLButt
 					});
 					resolve(reg);
 				} else {
-					await Promise.all([this.ready, this.whenConnected]);
+					await Promise.all([this.ready, this.whenConnected, ready()]);
 					const reg = await navigator.serviceWorker.register(this.src, {scope: this.scope});
 					this.dispatchEvent(new CustomEvent('serviceworkerinstall', {detail: reg}));
 					resolve(reg);
