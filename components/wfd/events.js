@@ -1,5 +1,5 @@
 import { getEvents as getAllEvents } from '../../js/std-js/krv/wfd.js';
-import { create } from '../../js/std-js/dom.js';
+import { createElement } from '../../js/std-js/elements.js';
 import { registerCustomElement } from '../../js/std-js/custom-elements.js';
 import { whenIntersecting } from '../../js/std-js/intersect.js';
 import { text, attr } from '../../js/std-js/dom.js';
@@ -8,10 +8,12 @@ import { getHTML } from '../../js/std-js/http.js';
 import { getURLResolver, setUTMParams, callOnce } from '../../js/std-js/utility.js';
 import { meta } from '../../import.meta.js';
 import { loadStylesheet } from '../../js/std-js/loader.js';
-import { purify as policy } from '../../js/std-js/htmlpurify.js';
+import { createPolicy } from '../../js/std-js/trust.js';
 import { getString, setString, getBool, setBool } from '../../js/std-js/attrs.js';
 
 const protectedData = new WeakMap();
+const policy = createPolicy('wfd-events#html', { createHTML: input => input });
+export const trustPolicies = [policy.name];
 const WFD = 'https://whiskeyflatdays.com/';
 const medium = 'referral';
 const content = 'wfd-events';
@@ -30,19 +32,19 @@ registerCustomElement('wfd-events', class HTMLWFDEventsElement extends HTMLEleme
 		const shadow = this.attachShadow({ mode: 'closed' });
 
 		shadow.append(
-			create('a', {
+			createElement('a', {
 				href: getWFDLink('', { source: this.source, medium, content }),
 				target: '_blank',
 				rel: 'noopener noreferrer external',
 				part: ['text', 'link'],
 				children: [
-					create('slot', {
+					createElement('slot', {
 						name: 'label',
-						children: [create('h2', { text: 'Whiskey Flat Days Events' })],
+						children: [createElement('h2', { text: 'Whiskey Flat Days Events' })],
 					}),
 				]
 			}),
-			create('div', { part: ['list'] }),
+			createElement('div', { part: ['list'] }),
 		);
 
 		protectedData.set(this, { shadow });

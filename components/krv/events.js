@@ -11,6 +11,7 @@ import { getString, setString, getInt, setInt } from '../../js/std-js/attrs.js';
 import { createPolicy } from '../../js/std-js/trust.js';
 
 const policy = createPolicy('krv-events#html', { createHTML: input => input });
+export const trustPolicies = [policy.name];
 const resolveURL = getURLResolver({ base: meta.url, path: '/components/krv/' });
 const getTemplate = callOnce(() => getHTML(resolveURL('events.html'), { policy }));
 const getEvents = callOnce(() => getAllEvents());
