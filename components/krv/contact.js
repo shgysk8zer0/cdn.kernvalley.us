@@ -37,7 +37,8 @@ registerCustomElement('krv-contact', class HTMLKRVContactElement extends HTMLEle
 				reset: () => this.dispatchEvent(new Event('reset')),
 				submit: async event => {
 					event.preventDefault();
-					const data = new FormData(event.target);
+					const target = event.target;
+					const data = new FormData(target);
 
 					try {
 						const resp = await send(ENDPOINT, {
@@ -51,7 +52,7 @@ registerCustomElement('krv-contact', class HTMLKRVContactElement extends HTMLEle
 
 						if (resp.success) {
 							this.dispatchEvent(new Event('sent'));
-							event.target.reset();
+							target.reset();
 						} else {
 							throw new Error(`<${resp.url}> [${resp.status} ${resp.statusText}]`);
 						}
