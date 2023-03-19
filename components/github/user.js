@@ -52,7 +52,7 @@ HTMLCustomElement.register('github-user', class HTMLGitHubUserElement extends HT
 			})).catch(err => {
 				console.error(err);
 				internals.state.delete('--loading');
-				internals.states.add('--error);
+				internals.states.add('--error');
 			});
 		});
 	}
