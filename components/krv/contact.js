@@ -16,6 +16,7 @@ export const trustPolicies = [policy.name];
 
 const symbols = {
 	shadow: Symbol('shadow'),
+	internals: Symbol('internals'),
 };
 
 registerCustomElement('krv-contact', class HTMLKRVContactElement extends HTMLElement {
@@ -23,6 +24,12 @@ registerCustomElement('krv-contact', class HTMLKRVContactElement extends HTMLEle
 		super();
 		const shadow = this.attachShadow({ mode: 'closed' });
 		this[symbols.shadow] = shadow;
+
+		if (HTMLElement.prototype.attachInternals instanceof Function) {
+			this[symbols.internals] = this.attachInternals();
+			this[symbols.internals].states.add('--loading');
+		}
+
 		this.addEventListener('error', console.error);
 
 		whenIntersecting(this).then(async () => {
@@ -30,7 +37,6 @@ registerCustomElement('krv-contact', class HTMLKRVContactElement extends HTMLEle
 				getTemplate().then(tmp => tmp.cloneNode(true)),
 				loadStylesheet(resolveURL('./contact.css'), { parent: shadow }),
 				loadStylesheet('https://cdn.kernvalley.us/css/core-css/forms.css', { parent: shadow }),
-				whenIntersecting(this),
 			]);
 
 			on(tmp.querySelector('form'), {
@@ -52,11 +58,20 @@ registerCustomElement('krv-contact', class HTMLKRVContactElement extends HTMLEle
 
 						if (resp.success) {
 							this.dispatchEvent(new Event('sent'));
+							if (this.hasOwnProperty(symbols.internals)) {
+								this[symbols.internals].states.delete('--error');
+								this[symbols.internals].states.add('--sent');
+							}
 							target.reset();
 						} else {
 							throw new Error(`<${resp.url}> [${resp.status} ${resp.statusText}]`);
 						}
 					} catch(error) {
+						if (this.hasOwnProperty(symbols.internals)) {
+							this[symbols.internals].states.delete('--sent');
+							this[symbols.internals].states.add('--error');
+						}
+
 						this.dispatchEvent(new ErrorEvent('error', {
 							error,
 							message: 'Error submitting form',
@@ -67,6 +82,11 @@ registerCustomElement('krv-contact', class HTMLKRVContactElement extends HTMLEle
 
 			shadow.append(tmp);
 			this.dispatchEvent(new Event('ready'));
+
+			if (this.hasOwnProperty(symbols.internals)) {
+				this[symbols.internals].states.delete('--loading');
+				this[symbols.internals].states.add('--ready');
+			}
 		});
 	}
 
@@ -88,5 +108,29 @@ registerCustomElement('krv-contact', class HTMLKRVContactElement extends HTMLEle
 		} else {
 			return new Promise(resolve => this.addEventListener('connected', () => resolve(), { once: true}));
 		}
+	}
+
+	set subject(val) {
+		this.ready.then(() => this[symbols.shadow].getElementById('krv-contact-subject').value = val);
+	}
+
+	set body(val) {
+		this.ready.then(() => this[symbols.shadow].getElementById('krv-contact-body').value = val);
+	}
+
+	set url(val) {
+		this.ready.then(() => this[symbols.shadow].getElementById('krv-contact-url').value = val);
+	}
+
+	/**
+	 * Based on https://developer.chrome.com/articles/web-share-target/
+	 */
+	static fromSearchParams({ title = 'title', text = 'text', url = 'url' } = {}) {
+		const contactForm = new HTMLKRVContactElement();
+		const params = new URLSearchParams(location.search);
+		contactForm.subject = params.get(title);
+		contactForm.body = params.get(text);
+		contactForm.url = params.get(url);
+		return contactForm;
 	}
 });
