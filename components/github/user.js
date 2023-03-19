@@ -30,24 +30,29 @@ HTMLCustomElement.register('github-user', class HTMLGitHubUserElement extends HT
 		super();
 
 		this.attachShadow({ mode: 'open' });
+		const internals = this.attachInternals();
+		internals.states.add('--loading');
 
 		Promise.resolve().then(() => {
 			if (typeof user === 'string') {
 				this.user = user;
 			}
 
-			Promise.allSettled([
+			Promise.all([
 				this.whenLoad,
 				this.whenConnected,
 				whenIntersecting(this),
-			]).then(() => {
-				Promise.all([
-					getTemplate().then(e => e.cloneNode(true)),
-					loadStylesheet(resolveURL('./user.css'), { parent: this.shadowRoot }),
-				]).then(([tmp]) => {
-					this.shadowRoot.append(tmp);
-					this.dispatchEvent(new Event('ready'));
-				});
+			]).then(() => Promise.all([
+				getTemplate().then(e => e.cloneNode(true)),
+				loadStylesheet(resolveURL('./user.css'), { parent: this.shadowRoot }),
+			]).then(([tmp]) => {
+				this.shadowRoot.append(tmp);
+				this.dispatchEvent(new Event('ready'));
+				internals.states.delete('--loading');
+			})).catch(err => {
+				console.error(err);
+				internals.state.delete('--loading');
+				internals.states.add('--error');
 			});
 		});
 	}

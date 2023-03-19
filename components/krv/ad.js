@@ -109,6 +109,8 @@ class HTMLKRVAdElement extends HTMLElement {
 	} = {}) {
 		super();
 		const shadow = this.attachShadow({ mode: 'closed' });
+		const internals = this.attachInternals();
+		internals.states.add('--loading');
 		const publisher = createElement('div', {
 			'@type': 'Organization',
 			itemprop: 'publisher',
@@ -246,7 +248,7 @@ class HTMLKRVAdElement extends HTMLElement {
 			]
 		});
 
-		protectedData.set(this, { shadow, timeout: NaN, container });
+		protectedData.set(this, { shadow, timeout: NaN, container, internals });
 
 		if (typeof callToAction === 'string') {
 			this.callToAction = callToAction;
@@ -288,7 +290,6 @@ class HTMLKRVAdElement extends HTMLElement {
 
 		this.addEventListener('connected', () => {
 			// this.tabIndex = 0;
-			this.setAttribute('role', 'document');
 			this.setAttribute('itemtype', ITEMTYPE);
 			this.setAttribute('itemscope', '');
 
@@ -371,15 +372,19 @@ class HTMLKRVAdElement extends HTMLElement {
 			if (typeof width === 'number' && ! Number.isNaN(height)) {
 				this.width = width;
 			}
+
 		});
 	}
 
 	async connectedCallback() {
 		this.dispatchEvent(new Event('connected'));
+		const { shadow, internals } = protectedData.get(this);
 		await whenIntersecting(this);
-		const { shadow } = protectedData.get(this);
+		internals.states.add('--seen');
 		await loadStylesheet(resolveURL('./ad.css'), { parent: shadow });
 		setTimeout(() => this.hidden = false, 1);
+		internals.states.delete('--loading');
+
 
 		if (this.id.length !== 0) {
 			log('view', this);
