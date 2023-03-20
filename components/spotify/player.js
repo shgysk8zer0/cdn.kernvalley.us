@@ -21,7 +21,9 @@ registerCustomElement('spotify-player', class HTMLSpotifyPlayerElement extends H
 	constructor({ uri = null, large = null, loading = null } = {}) {
 		super();
 		const shadow = this.attachShadow({ mode: 'open' });
-		protectedData.set(this, { shadow });
+		const internals = this.attachInternals();
+		protectedData.set(this, { shadow, internals });
+		internals.states.add('--loading');
 
 		this.addEventListener('connected', async () => {
 			if (typeof uri === 'string') {
@@ -45,6 +47,8 @@ registerCustomElement('spotify-player', class HTMLSpotifyPlayerElement extends H
 				loadStylesheet(resolveURL('./player.css'),{ parent: shadow }),
 			]).then(([tmp]) => {
 				shadow.append(tmp.cloneNode(true));
+				internals.states.delete('--loading');
+				internals.states.add('--ready');
 				this.dispatchEvent(new Event('ready'));
 			});
 		}, { once: true });
@@ -147,6 +151,8 @@ registerCustomElement('spotify-player', class HTMLSpotifyPlayerElement extends H
 					if (typeof newValue === 'string') {
 						const { uri, loading, large } = this;
 						const { type = null, id = null } = parseURI(uri);
+						const { internals } = protectedData.get(this);
+						internals.states.add('--loading');
 
 						if (loading === 'lazy') {
 							await whenIntersecting(this);
@@ -159,6 +165,7 @@ registerCustomElement('spotify-player', class HTMLSpotifyPlayerElement extends H
 						});
 
 						iframe.addEventListener('load', () => {
+							internals.states.delete('--loading');
 							this.dispatchEvent(new CustomEvent('trackchange', { detail: {
 								from: oldValue,
 								to: newValue
