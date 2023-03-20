@@ -1,97 +1,29 @@
 import { registerCustomElement } from '../../js/std-js/custom-elements.js';
-import { createIframe } from '../../js/std-js/elements.js';
 import { whenIntersecting } from '../../js/std-js/intersect.js';
-import { loaded } from '../../js/std-js/events.js';
 import { getHTML } from '../../js/std-js/http.js';
 import { getURLResolver, callOnce } from '../../js/std-js/utility.js';
 import { meta } from '../../import.meta.js';
 import { loadStylesheet } from '../../js/std-js/loader.js';
 import { getBool, setBool, getString, setString } from '../../js/std-js/attrs.js';
 import { createPolicy } from '../../js/std-js/trust.js';
+import {
+	createSpotifyPlaylist, createSpotifyAlbum, createSpotifyArtist, createSpotifyTrack,
+	createSpotifyShow, parseURI, linkToUri, uriToLink, policy as embedPolicy,
+} from '../../js/std-js/spotify.js';
 
 const protectedData = new WeakMap();
 const resolveURL = getURLResolver({ path: '/components/spotify/', base: meta.url });
 const getTemplate = callOnce(() => getHTML(resolveURL('./player.html'), { policy }));
-const SPOTIFY = 'https://open.spotify.com/embed/';
 
-const policy = createPolicy('spotify-player', {
-	createHTML: input => input,
-	// Used for setting `<iframe src>`
-	createScriptURL: input => {
-		if (input.startsWith(SPOTIFY)) {
-			return input;
-		} else {
-			throw new TypeError(`Invalid Script URL: ${input}`);
-		}
-	},
-});
-
-const TYPES = [
-	'album',
-	'artist',
-	'playlist',
-	'show',
-	'track',
-];
-
-const SANDBOX = ['allow-scripts', 'allow-popups', 'allow-same-origin'];
-const ALLOW = ['encrypted-media'];
-
-function linkToUri(link) {
-	if (typeof link === 'string' && link.startsWith('https:')) {
-		const url = new URL(link);
-		const [type = null, id = null] = url.pathname.substr(1).split('/');
-
-		if (
-			url.host.toLowerCase() === 'open.spotify.com'
-			&& typeof type === 'string'
-			&& typeof id === 'string'
-		) {
-			return `spotify:${type}:${id}`;
-		} else {
-			return null;
-		}
-	} else {
-		return null;
-	}
-}
-
-function uriToLink(uri) {
-	if (typeof uri === 'string' && uri.startsWith('spotify:')) {
-		const [, type = null, id = null] = uri.split(':');
-
-		if (typeof type == 'string' && typeof id === 'string') {
-			const url = new URL(`${type}/${id}`, 'https://open.spotify.com');
-			return url.href;
-		} else {
-			return null;
-		}
-	} else {
-		return null;
-	}
-}
-
-function parseURI(uri) {
-	if (typeof uri !== 'string') {
-		throw new Error('URI is not a string');
-	} else if (! uri.startsWith('spotify:')) {
-		throw new Error('URI is not a valid Spotify URI');
-	} else {
-		const [, type = '', id = ''] = uri.split(':');
-
-		if (! TYPES.includes(type)) {
-			throw new Error(`Unsupported type: ${type}`);
-		} else {
-			return { type, id };
-		}
-	}
-}
+const policy = createPolicy('spotify-player#html', { createHTML: input => input });
 
 registerCustomElement('spotify-player', class HTMLSpotifyPlayerElement extends HTMLElement {
 	constructor({ uri = null, large = null, loading = null } = {}) {
 		super();
 		const shadow = this.attachShadow({ mode: 'open' });
-		protectedData.set(this, { shadow });
+		const internals = this.attachInternals();
+		protectedData.set(this, { shadow, internals });
+		internals.states.add('--loading');
 
 		this.addEventListener('connected', async () => {
 			if (typeof uri === 'string') {
@@ -115,6 +47,8 @@ registerCustomElement('spotify-player', class HTMLSpotifyPlayerElement extends H
 				loadStylesheet(resolveURL('./player.css'),{ parent: shadow }),
 			]).then(([tmp]) => {
 				shadow.append(tmp.cloneNode(true));
+				internals.states.delete('--loading');
+				internals.states.add('--ready');
 				this.dispatchEvent(new Event('ready'));
 			});
 		}, { once: true });
@@ -217,27 +151,26 @@ registerCustomElement('spotify-player', class HTMLSpotifyPlayerElement extends H
 					if (typeof newValue === 'string') {
 						const { uri, loading, large } = this;
 						const { type = null, id = null } = parseURI(uri);
+						const { internals } = protectedData.get(this);
+						internals.states.add('--loading');
 
 						if (loading === 'lazy') {
 							await whenIntersecting(this);
 						}
 
-						const iframe = createIframe(policy.createScriptURL(new URL(`${type}/${id}`, SPOTIFY)), {
-							width: 300,
-							height: large ? 380 : 80,
-							referrerPolicy: 'origin',
+						const iframe = HTMLSpotifyPlayerElement.createSpotifyEmbed(type, id, {
 							slot: 'player',
-							sandbox: SANDBOX,
-							allow: ALLOW,
-							title: 'Spotify Player',
+							large,
+							part: ['embed'],
 						});
 
-						loaded(iframe).then(() => {
+						iframe.addEventListener('load', () => {
+							internals.states.delete('--loading');
 							this.dispatchEvent(new CustomEvent('trackchange', { detail: {
 								from: oldValue,
 								to: newValue
 							}}));
-						});
+						}, { once: true });
 
 						this.querySelectorAll('[slot="player"]').forEach(el => el.remove());
 						this.append(iframe);
@@ -250,6 +183,18 @@ registerCustomElement('spotify-player', class HTMLSpotifyPlayerElement extends H
 			default:
 				throw new Error(`Unknown attribute changed: ${name}`);
 		}
+
+	}
+
+	static createSpotifyEmbed(type, id, { title = 'Spotify Player', large = false, slot, part } = {}) {
+		switch(type) {
+			case 'playlist': return createSpotifyPlaylist(id, { title, large, slot, part });
+			case 'artist': return createSpotifyArtist(id, { title, large, slot, part });
+			case 'album': return createSpotifyAlbum(id, { title, large, slot, part });
+			case 'track': return createSpotifyTrack(id, { title, large, slot, part });
+			case 'show': return createSpotifyShow(id, { title, large, slot, part });
+			default: throw new TypeError(`Invalid Spotify embed type: ${type}`);
+		}
 	}
 
 	static get observedAttributes() {
@@ -261,4 +206,4 @@ registerCustomElement('spotify-player', class HTMLSpotifyPlayerElement extends H
 	}
 });
 
-export const trustPolicies = [policy.name];
+export const trustPolicies = [policy.name, embedPolicy.name];
