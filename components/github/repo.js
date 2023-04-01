@@ -1,24 +1,29 @@
 import { text, attr, hide, unhide } from '../../js/std-js/dom.js';
-import { getHTML } from '../../js/std-js/http.js';
-import { loadStylesheet, loadImage } from '../../js/std-js/loader.js';
-import { purify as policy } from '../../js/std-js/htmlpurify.js';
+import { loadStylesheet, loadImage, getTemplateLoader } from '../../js/std-js/loader.js';
 import { whenIntersecting } from '../../js/std-js/intersect.js';
 import { getDeferred } from '../../js/std-js/promises.js';
 import { registerCustomElement } from '../../js/std-js/custom-elements.js';
-import { getURLResolver, callOnce } from '../../js/std-js/utility.js';
+import { getURLResolver } from '../../js/std-js/utility.js';
 import { meta } from '../../import.meta.js';
 import { getString, setString } from '../../js/std-js/attrs.js';
+import { createPolicy }  from '../../js/std-js/trust.js';
 
+const policy = createPolicy('github-repo#html', { createHTML: input => input });
 const resolveURL = getURLResolver({ base: meta.url, path: '/components/github/' });
+const getTemplate  = getTemplateLoader(resolveURL('./repo.html'), {
+	policy,
+	referrerPolicy: 'no-referrer',
+});
+
 const symbols = {
 	shadow: Symbol('shadow'),
 	timeout: Symbol('timeout'),
 	controller: Symbol('controller'),
+	internals: Symbol('internals'),
 };
 
 const ENDPOINT =  'https://api.github.com/repos/';
 
-const getTemplate = callOnce(() => getHTML(resolveURL('./repo.html'), { policy }));
 
 async function getJSON(url, { signal } = {}) {
 	const key = `github-repo:${url}`;
@@ -64,7 +69,13 @@ registerCustomElement('github-repo', class HTMLGitHubRepoElement extends HTMLEle
 				configurable: false,
 				writable: true,
 				value: null,
-			}
+			},
+			[symbols.internals]: {
+				enumerable: false,
+				configurable: false,
+				writable: true,
+				value: this.attachInternals(),
+			},
 		});
 
 		if (typeof repo === 'string') {
@@ -107,7 +118,7 @@ registerCustomElement('github-repo', class HTMLGitHubRepoElement extends HTMLEle
 		}
 
 		const [tmp] = await Promise.all([
-			getTemplate().then(e => e.cloneNode(true)),
+			getTemplate(),
 			loadStylesheet(resolveURL('./repo.css'), { parent: this[symbols.shadow] }),
 		]);
 
