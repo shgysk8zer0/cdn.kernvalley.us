@@ -1,17 +1,20 @@
 import { text, attr, remove, on } from '../../js/std-js/dom.js';
-import { getJSON, getHTML } from '../../js/std-js/http.js';
+import { getJSON } from '../../js/std-js/http.js';
 import { meta } from '../../import.meta.js';
 import { loadStylesheet } from '../../js/std-js/loader.js';
 import { getDeferred } from '../../js/std-js/promises.js';
-import { purify as policy } from '../../js/std-js/htmlpurify.js';
 import { whenIntersecting } from '../../js/std-js/intersect.js';
-import { getURLResolver, callOnce } from '../../js/std-js/utility.js';
+import { getURLResolver } from '../../js/std-js/utility.js';
 import { getString, setString, getBool, setBool } from '../../js/std-js/attrs.js';
+import { getTemplateLoader }  from '../../js/std-js/loader.js';
+import { createPolicy } from '../../js/std-js/trust.js';
+import { registerCustomElement } from '../../js/std-js/custom-elements.js';
 
 const ENDPOINT = 'https://api.github.com';
-import HTMLCustomElement from '../custom-element.js';
+const policy = createPolicy('github-user#html', { createHTML: input => input });
 const resolveURL = getURLResolver({ base : meta.url, path: '/components/github/' });
-const getTemplate = callOnce(() => getHTML(resolveURL('./user.html', meta.url), { policy }));
+const getTemplate = getTemplateLoader(resolveURL('./user.html'), { policy });
+
 async function getUser(user) {
 	const key = `github-user-${user}`;
 
@@ -22,10 +25,9 @@ async function getUser(user) {
 		sessionStorage.setItem(key, JSON.stringify(data));
 		return data;
 	}
-
 }
 
-HTMLCustomElement.register('github-user', class HTMLGitHubUserElement extends HTMLCustomElement {
+registerCustomElement('github-user', class HTMLGitHubUserElement extends HTMLElement {
 	constructor(user = null) {
 		super();
 
@@ -43,7 +45,7 @@ HTMLCustomElement.register('github-user', class HTMLGitHubUserElement extends HT
 				this.whenConnected,
 				whenIntersecting(this),
 			]).then(() => Promise.all([
-				getTemplate().then(e => e.cloneNode(true)),
+				getTemplate(),
 				loadStylesheet(resolveURL('./user.css'), { parent: this.shadowRoot }),
 			]).then(([tmp]) => {
 				this.shadowRoot.append(tmp);
@@ -86,16 +88,15 @@ HTMLCustomElement.register('github-user', class HTMLGitHubUserElement extends HT
 
 	attributeChangedCallback(name, oldVal, newVal) {
 		switch(name) {
-			case 'loading':
-				this.lazyLoad(newVal === 'lazy');
-				break;
-
 			case 'user':
 				if (typeof newVal === 'string' && newVal.length !== 0) {
-					this.ready.then(async () => {
+					Promise.all([
+						getUser(newVal),
+						this.ready,
+					]).then(async ([user]) => {
 						try {
 							const base = this.shadowRoot;
-							const user = await getUser(this.user);
+							console.log(user);
 
 							attr('[part~="avatar"]', {
 								src: `${user.avatar_url}&s=64`,
@@ -132,7 +133,7 @@ HTMLCustomElement.register('github-user', class HTMLGitHubUserElement extends HT
 								attr('[part~="email-container"]', { hidden: true }, { base });
 							}
 
-							if (user.company !== null) {
+							if (typeof user.company === 'string') {
 								text('[part~="company"]', user.company, { base });
 								attr('[part~="company"]', {
 									href: `https://github.com/${user.company.replace('@', '')}`,
@@ -159,9 +160,12 @@ HTMLCustomElement.register('github-user', class HTMLGitHubUserElement extends HT
 		}
 	}
 
+	connectedCallback() {
+		this.dispatchEvent(new Event('connected'));
+	}
+
 	static get observedAttributes() {
 		return [
-			'loading',
 			'user',
 		];
 	}
