@@ -1,8 +1,7 @@
 import { getBool, setBool, getString, setString } from '../../js/std-js/attrs.js';
 
-const symbols = {
-	internals: Symbol('internals'),
-};
+const protectedData = new WeakMap();
+
 export const STATES = {
 	checked: '--checked',
 	required: '--required',
@@ -13,24 +12,23 @@ export const STATES = {
 	readOnly: '--readonly',
 };
 
-export class HTMLElementWithInternals extends HTMLElement {
+export class HTMLCustomInputElement extends HTMLElement {
+	// call `super(function(internals){...})
+	// Must be `function()`, not arrow function to use `this`
 	constructor(callback) {
 		super();
 		const internals = this.attachInternals();
 
-		Object.defineProperty(this, symbols.internals, {
-			value: internals,
-			enumerable: false,
-			configurable: false,
-		});
+		protectedData.set(this, internals);
 
 		if (callback instanceof Function) {
-			callback(internals);
+			callback.call(this, internals);
 		}
 	}
 
+	// call `super.attributeChangedCallback(name, oldVal, newVal)`
 	attributeChangedCallback(name, oldVal, newVal) {
-		const internals = this[symbols.internals];
+		const internals = protectedData.get(this);
 
 		switch(name) {
 			case 'required':
@@ -64,16 +62,18 @@ export class HTMLElementWithInternals extends HTMLElement {
 		}
 	}
 
+	// call `super.connectedCallback()`
 	connectedCallback() {
-		const internals = this[symbols.internals];
+		const internals = protectedData.get(this);
 
 		if (internals._associateForm instanceof Function) {
 			internals._associateForm(this.closest('form'), this);
 		}
 	}
 
+	// call `super.disconnectedCallback()`
 	disconnectedCallback() {
-		const internals = this[symbols.internals];
+		const internals = protectedData.get(this);
 
 		if (internals._associateForm instanceof Function) {
 			internals._associateForm(null, this);
@@ -85,15 +85,15 @@ export class HTMLElementWithInternals extends HTMLElement {
 	}
 
 	set disabled(val) {
-		setBool(this, 'disabled');
+		setBool(this, 'disabled', val);
 	}
 
 	get form() {
-		return this[symbols.internals].form;
+		return protectedData.get(this).form;
 	}
 
 	get labels() {
-		return this[symbols.internals].labels;
+		return protectedData.get(this).labels;
 	}
 
 	get name() {
@@ -113,22 +113,27 @@ export class HTMLElementWithInternals extends HTMLElement {
 	}
 
 	get validationMessage() {
-		return this[symbols.internals].validationMessage;
+		return protectedData.get(this).validationMessage;
 	}
 
 	get validity() {
-		return this[symbols.internals].validity;
+		return protectedData.get(this).validity;
 	}
 
 	get willValidate() {
-		return this[symbols.internals].willValidate;
+		return protectedData.get(this).willValidate;
 	}
 
+	// `[...HTMLCustomInputElement.observedAttributes, ...]`
 	static get observedAttributes() {
 		return ['required', 'disabled', 'readonly'];
 	}
 
 	static get formAssociated() {
 		return true;
+	}
+
+	static get STATES() {
+		return STATES;
 	}
 }
