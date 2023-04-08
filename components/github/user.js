@@ -96,7 +96,6 @@ registerCustomElement('github-user', class HTMLGitHubUserElement extends HTMLEle
 					]).then(async ([user]) => {
 						try {
 							const base = this.shadowRoot;
-							console.log(user);
 
 							attr('[part~="avatar"]', {
 								src: `${user.avatar_url}&s=64`,
