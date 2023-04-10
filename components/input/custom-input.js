@@ -1,4 +1,4 @@
-import { getBool, setBool, getString, setString } from '../../js/std-js/attrs.js';
+import { getBool, setBool, getString, setString, getInt, setInt } from '../../js/std-js/attrs.js';
 
 const protectedData = new WeakMap();
 
@@ -14,7 +14,7 @@ export const STATES = {
 
 export class HTMLCustomInputElement extends HTMLElement {
 	// call `super(function(internals){...})
-	// Must be `function()`, not arrow function to use `this`
+	// Must be `function() {}`, not `() => ...` to use `this`
 	constructor(callback) {
 		super();
 		const internals = this.attachInternals();
@@ -22,7 +22,7 @@ export class HTMLCustomInputElement extends HTMLElement {
 		protectedData.set(this, internals);
 
 		if (callback instanceof Function) {
-			callback.call(this, internals);
+			callback.call(this, internals, this);
 		}
 	}
 
@@ -41,16 +41,6 @@ export class HTMLCustomInputElement extends HTMLElement {
 				}
 				break;
 
-			case 'disabled':
-				if (typeof newVal === 'string') {
-					internals.ariaDisabled = 'true';
-					internals.states.add(STATES.disabled);
-				} else {
-					internals.ariaDisabled = 'false';
-					internals.states.delete(STATES.disabled);
-				}
-				break;
-
 			case 'readonly':
 				if (typeof newVal === 'string') {
 					internals.ariaReadOnly = 'true';
@@ -62,7 +52,7 @@ export class HTMLCustomInputElement extends HTMLElement {
 		}
 	}
 
-	// call `super.connectedCallback()`
+	// Call `super.connectedCallback()` when overriding
 	connectedCallback() {
 		const internals = protectedData.get(this);
 
@@ -71,12 +61,25 @@ export class HTMLCustomInputElement extends HTMLElement {
 		}
 	}
 
-	// call `super.disconnectedCallback()`
+	// Call `super.disconnectedCallback()` when overriding
 	disconnectedCallback() {
 		const internals = protectedData.get(this);
 
 		if (internals._associateForm instanceof Function) {
 			internals._associateForm(null, this);
+		}
+	}
+
+	// formResetCallback()
+	// formAssociatedCallback(form)
+	// formStateRestoreCallback(state, mode ["restore" | "autocomplete"])
+
+	// Call `super.formDisabledCallback(disabled)` when overriding
+	formDisabledCallback(disabled) {
+		if (disabled) {
+			protectedData.get(this).states.add(STATES.disabled);
+		} else {
+			protectedData.get(this).states.delete(STATES.disabled);
 		}
 	}
 
@@ -94,6 +97,22 @@ export class HTMLCustomInputElement extends HTMLElement {
 
 	get labels() {
 		return protectedData.get(this).labels;
+	}
+
+	get maxLength() {
+		return getInt(this, 'maxlength', { min: 0 });
+	}
+
+	set maxLength(val) {
+		setInt(this, 'maxLength', val, { min: 0 });
+	}
+
+	get minLength() {
+		return getInt(this, 'minlength', { min: 0 });
+	}
+
+	set minLength(val) {
+		setInt(this, 'minLength', val, { min: 0 });
 	}
 
 	get name() {
@@ -126,7 +145,7 @@ export class HTMLCustomInputElement extends HTMLElement {
 
 	// `[...HTMLCustomInputElement.observedAttributes, ...]`
 	static get observedAttributes() {
-		return ['required', 'disabled', 'readonly'];
+		return ['required', 'readonly'];
 	}
 
 	static get formAssociated() {

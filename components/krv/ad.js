@@ -1,33 +1,26 @@
 import { registerCustomElement } from '../../js/std-js/custom-elements.js';
-import { createElement, createImage } from '../../js/std-js/elements.js';
+import { createElement, createImage, createSlot } from '../../js/std-js/elements.js';
 import { getString, setString, getURL, setURL, getInt, setInt, getBool, setBool } from '../../js/std-js/attrs.js';
 import { loadStylesheet } from '../../js/std-js/loader.js';
 import { getURLResolver, isObject, setUTMParams } from '../../js/std-js/utility.js';
 import { whenIntersecting } from '../../js/std-js/intersect.js';
 import { meta } from '../../import.meta.js';
-import { createPath, createSVG } from '../../js/std-js/svg.js';
-import { createCallStartIcon, createMailIcon, createLinkExternalIcon, createInfoIcon } from '../../js/std-js/icons.js';
 import { save, open } from '../../js/std-js/filesystem.js';
+import {
+	createCallStartIcon, createMailIcon, createMarkLocationIcon,
+	createLinkExternalIcon, createInfoIcon,
+} from '../../js/std-js/icons.js';
 
 const protectedData = new WeakMap();
 const resolveURL = getURLResolver({ base: meta.url, path: '/components/krv/' });
 const ITEMTYPE = new URL('/WPAdBlock', 'https://schema.org').href;
 const size = 18;
+
 const callIcon = createCallStartIcon({ size });
 const emailIcon = createMailIcon({ size });
 const linkIcon = createLinkExternalIcon({ size });
-const infoIcon = createInfoIcon();
-
-const geoIcon = createSVG({
-	width: size,
-	height: size,
-	viewBox: [0, 0, 16, 16],
-	fill: 'currentColor',
-	children: [
-		createPath('M8 0a5 5 0 0 0-5 5c0 .173.014.332.031.5.014.167.036.336.063.5C3.666 9.514 6 12.003 8 14.003c2-2 4.334-4.489 4.906-8.003a6.38 6.38 0 0 0 .063-.5c.017-.168.03-.327.03-.5a5 5 0 0 0-5-5zm0 3a2 2 0 1 1 0 4 2 2 0 0 1 0-4z')
-	]
-});
-
+const infoIcon = createInfoIcon({ size });
+const geoIcon = createMarkLocationIcon({ size });
 
 function getSlot(el, name) {
 	const { shadow } = protectedData.get(el);
@@ -111,6 +104,8 @@ class HTMLKRVAdElement extends HTMLElement {
 		const shadow = this.attachShadow({ mode: 'closed' });
 		const internals = this.attachInternals();
 		internals.states.add('--loading');
+		internals.ariaBusy = 'true';
+		internals.role = 'document';
 		const publisher = createElement('div', {
 			'@type': 'Organization',
 			itemprop: 'publisher',
@@ -126,7 +121,7 @@ class HTMLKRVAdElement extends HTMLElement {
 		const container = createElement('a', {
 			id: 'container',
 			part: ['container'],
-			rel: 'noopner noreferrer external',
+			rel: 'noopener noreferrer external',
 			itemprop: 'url',
 			target: '_blank',
 			events: {
@@ -148,8 +143,7 @@ class HTMLKRVAdElement extends HTMLElement {
 					id: 'label',
 					part: ['label', 'text'],
 					children: [
-						createElement('slot', {
-							name: 'label',
+						createSlot('label', {
 							events: { slotchange: slotChange('name') },
 						}),
 					]
@@ -158,8 +152,7 @@ class HTMLKRVAdElement extends HTMLElement {
 					id: 'image',
 					part: ['image'],
 					children: [
-						createElement('slot', {
-							name: 'image',
+						createSlot('image', {
 							events: { slotchange: slotChange('image') },
 							children: [
 								createImage('https://cdn.kernvalley.us/img/raster/missing-image.png', {
@@ -175,8 +168,7 @@ class HTMLKRVAdElement extends HTMLElement {
 					id: 'description',
 					part: ['text', 'description'],
 					children: [
-						createElement('slot', {
-							name: 'description',
+						createSlot('description', {
 							text: 'No Description',
 							events: { slotchange: slotChange('description') },
 						}),
@@ -186,15 +178,13 @@ class HTMLKRVAdElement extends HTMLElement {
 					id: 'call-to-action',
 					part: ['call-to-action'],
 					children: [
-						createElement('slot', {
-							name: 'calltoaction',
+						createSlot('calltoaction', {
 							text: 'No Call-to-Action',
 						}),
 						createElement('span', {
 							part: ['icon', 'call-icon'],
 							children: [
-								createElement('slot', {
-									name: 'call-icon',
+								createSlot('call-icon', {
 									children: [callIcon.cloneNode(true)],
 								})
 							]
@@ -202,8 +192,7 @@ class HTMLKRVAdElement extends HTMLElement {
 						createElement('span', {
 							part: ['icon', 'email-icon'],
 							children: [
-								createElement('slot', {
-									name: 'email-icon',
+								createSlot('email-icon', {
 									children: [emailIcon.cloneNode(true)],
 								})
 							]
@@ -211,8 +200,7 @@ class HTMLKRVAdElement extends HTMLElement {
 						createElement('span', {
 							part: ['icon', 'link-icon'],
 							children: [
-								createElement('slot', {
-									name: 'link-icon',
+								createSlot('link-icon', {
 									children: [linkIcon.cloneNode(true)],
 								})
 							]
@@ -220,8 +208,7 @@ class HTMLKRVAdElement extends HTMLElement {
 						createElement('span', {
 							part: ['icon', 'geo-icon'],
 							children: [
-								createElement('slot', {
-									name: 'geo-icon',
+								createSlot('geo-icon', {
 									children: [geoIcon.cloneNode(true)],
 								})
 							]
@@ -287,6 +274,8 @@ class HTMLKRVAdElement extends HTMLElement {
 		} else {
 			this.append(publisher);
 		}
+
+		internals.ariaBusy = 'false';
 
 		this.addEventListener('connected', () => {
 			// this.tabIndex = 0;
@@ -372,7 +361,6 @@ class HTMLKRVAdElement extends HTMLElement {
 			if (typeof width === 'number' && ! Number.isNaN(height)) {
 				this.width = width;
 			}
-
 		});
 	}
 
@@ -384,7 +372,6 @@ class HTMLKRVAdElement extends HTMLElement {
 		await loadStylesheet(resolveURL('./ad.css'), { parent: shadow });
 		setTimeout(() => this.hidden = false, 1);
 		internals.states.delete('--loading');
-
 
 		if (this.id.length !== 0) {
 			log('view', this);
@@ -794,4 +781,3 @@ class HTMLKRVAdElement extends HTMLElement {
 }
 
 registerCustomElement('krv-ad', HTMLKRVAdElement);
-

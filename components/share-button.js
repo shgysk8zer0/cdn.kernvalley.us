@@ -2,6 +2,7 @@ import './toast-message.js';
 import { registerCustomElement } from '../js/std-js/custom-elements.js';
 import { shim } from '../js/std-js/share.js';
 import { GET } from '../js/std-js/http.js';
+import { getString, setString } from '../js/std-js/attrs.js';
 import { hasGa, send } from '../js/std-js/google-analytics.js';
 import UTM from '../js/std-js/UTM.js';
 import { Facebook, Twitter, LinkedIn, Reddit, Gmail, Pinterest, Telegram, Tumblr,
@@ -108,15 +109,11 @@ registerCustomElement('share-button', class HTMLShareButtonElement extends HTMLB
 	}
 
 	get content() {
-		return this.getAttribute('content') || 'share-button';
+		return getString(this, 'content', { fallback: 'share-button' });
 	}
 
 	set content(val) {
-		if (typeof val === 'string' && val.length !== 0) {
-			this.setAttribute('content', val);
-		} else {
-			this.removeAttribute('content');
-		}
+		setString(this, 'content', val);
 	}
 
 	get file() {
@@ -136,47 +133,35 @@ registerCustomElement('share-button', class HTMLShareButtonElement extends HTMLB
 	}
 
 	get medium() {
-		return this.getAttribute('medium') || 'share';
+		return getString(this, 'medium', { fallback: 'share' });
 	}
 
 	set medium(val) {
-		if (typeof val === 'string' && val.length !== 0) {
-			this.setAttribute('medium', val);
-		} else {
-			this.removeAttribute('medium');
-		}
+		setString(this, 'medium', val);
 	}
 
 	get shareTitle() {
-		return this.getAttribute('sharetitle') || this.title || document.title;
+		return getString(this, 'sharetitle', { fallback: document.title });
 	}
 
 	set shareTitle(val) {
-		if (typeof val === 'string' && val.length !== 0) {
-			this.setAttribute('sharetitle', val);
-		} else {
-			this.removeAttribute('sharetitle');
-		}
+		setString(this, 'sharetitle', val);
 	}
 
 	get source() {
-		return this.getAttribute('source');
+		return getString(this, 'source');
 	}
 
 	set source(val) {
-		if (typeof val === 'string' && val.length !== 0) {
-			this.setAttribute('source', val);
-		} else {
-			this.removeAttribute('source');
-		}
+		setString(this, 'source', val);
 	}
 
 	get text() {
-		return this.getAttribute('text');
+		return getString(this, 'text');
 	}
 
-	set text(text) {
-		this.setAttribute('text', text);
+	set text(val) {
+		setString(this, 'text', val);
 	}
 
 	get url() {
