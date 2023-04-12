@@ -156,19 +156,8 @@ registerCustomElement('star-rating', class HTMLStarRatingElement extends HTMLCus
 		this.dispatchEvent(new Event('connected'));
 	}
 
-	formStateRestoreCallback(state, mode) {
-		console.log({ state, mode });
+	formStateRestoreCallback(state) {
 		this.value = state;
-	}
-
-	formAssociatedCallback(form) {
-		if (form instanceof HTMLFormElement) {
-			form.addEventListener('submit', event => {
-				event.preventDefault();
-				const data = new FormData(event.target);
-				console.log(Object.fromEntries(data.entries()));
-			});
-		}
 	}
 
 	attributeChangedCallback(name, oldVal, newVal) {
