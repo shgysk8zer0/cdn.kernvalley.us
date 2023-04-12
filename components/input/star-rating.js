@@ -57,18 +57,18 @@ async function setValue(el) {
 	const { max, min, value, fill, required } = el;
 
 	if (Number.isNaN(value)) {
-		internals.setValidity({ badInput: true }, 'Please provide a valid number for value');
+		internals.setValidity({ badInput: true }, 'Please provide a valid number for value', getContainer(el));
 	} else if (value === 0 && required) {
-		internals.setValidity({ valueMissing: true }, 'Please select a star rating.');
+		internals.setValidity({ valueMissing: true }, 'Please select a star rating.', getContainer(el));
 	} else if (value > max) {
-		internals.setValidity({ rangeOverflow: true }, `Please select a rating between ${min} and ${max}.`);
+		internals.setValidity({ rangeOverflow: true }, `Please select a rating between ${min} and ${max}.`, getContainer(el));
 	} else if (value < min) {
-		internals.setValidity({ rangeUnderflow: true }, `Please select a rating between ${min} and ${max}.`);
+		internals.setValidity({ rangeUnderflow: true }, `Please select a rating between ${min} and ${max}.`, getContainer(el));
 	} else {
 		internals.setFormValue(value, value);
 		internals.setValidity({}, '');
 		internals.ariaValueNow = `${value}`;
-		internals.ariaValueText = `${value} stars`;
+		internals.ariaValueText = `${value} out of ${max} stars`;
 		el.dispatchEvent(new Event('change'));
 
 		getStars(el).forEach((star, i) => {
@@ -96,9 +96,56 @@ registerCustomElement('star-rating', class HTMLStarRatingElement extends HTMLCus
 		super();
 		const shadow = this.attachShadow({ mode: 'closed' });
 		const internals = this.attachInternals();
-		internals.ariaLabel = 'Star Rating';
-		shadow.append(createElement('div', { part: ['container'] }));
+		shadow.append(createElement('div', { part: ['container'], aria: { role: 'group' }}));
 		protectedData.set(this, { shadow, internals });
+		this.addEventListener('accessibleincrement', this.increment);
+		this.addEventListener('accessibledecrement', this.decrement);
+		this.addEventListener('keydown', event => {
+			switch(event.keyCode) {
+				case 38: // ↑
+				case 107: // +
+					event.preventDefault();
+					event.target.increment();
+					break;
+
+				case 40: // ↓
+				case 109: // -
+					event.preventDefault();
+					event.target.decrement();
+					break;
+
+				case 49: // 1-9
+				case 50:
+				case 51:
+				case 52:
+				case 53:
+				case 54:
+				case 55:
+				case 56:
+				case 57:
+					this.value = Math.min((event.keyCode - 48), this.max);
+					break;
+				case 48: // 0 = 10
+					this.value = Math.min(10, this.max);
+					break;
+
+				case 97: // 0-9 (numeric keypad)
+				case 98:
+				case 99:
+				case 100:
+				case 101:
+				case 102:
+				case 103:
+				case 104:
+				case 105:
+					this.value = Math.min((event.keyCode - 96), this.max);
+					break;
+
+				case 96: // 0 = 10 (numeric keypad)
+					this.value = Math.min(10, this.max);
+					break;
+			}
+		});
 	}
 
 	get fill() {
@@ -110,11 +157,11 @@ registerCustomElement('star-rating', class HTMLStarRatingElement extends HTMLCus
 	}
 
 	get max() {
-		return getInt(this, 'max', { min: 0, fallback: 5 });
+		return getInt(this, 'max', { min: 0, max: 10, fallback: 5 });
 	}
 
 	set max(val) {
-		setInt(this, 'max', val, { min: 0 });
+		setInt(this, 'max', val, { min: 0, max: 10 });
 	}
 
 	get min() {
@@ -151,8 +198,12 @@ registerCustomElement('star-rating', class HTMLStarRatingElement extends HTMLCus
 		super.connectedCallback();
 		const { internals } = protectedData.get(this);
 		const { max, value, fill, size } = this;
-		internals.ariaValueMin = '0';
+		this.tabIndex = 0;
 		internals.role = 'slider';
+		internals.ariaLabel = 'Star Rating';
+		internals.ariaValueMin = '0';
+		internals.ariaValueNow = `${value}`;
+		internals.ariaValueText = `${value} out of ${max} stars`;
 
 		if (! this.hasAttribute('max')) {
 			internals.ariaValueMax = `${max}`;
@@ -171,13 +222,16 @@ registerCustomElement('star-rating', class HTMLStarRatingElement extends HTMLCus
 		this.removeAttribute('value');
 
 		getStars(this).forEach(star => {
-			star.removeAttribute('fill');
+			star.setAttribute('fill', 'none');
 			star.classList.remove('checked');
 		});
+
 		internals.setFormValue(0, 0);
+		internals.ariaValueNow = '0';
+		internals.ariaValueText = `0 out of ${this.max} stars`;
 
 		if (this.required) {
-			internals.setValidity({ valueMissing: true }, 'Please select a star rating.');
+			internals.setValidity({ valueMissing: true }, 'Please select a star rating.', getContainer(this));
 			internals.states.add(STATES.invalid);
 			internals.states.delete(STATES.valid);
 		}
@@ -227,7 +281,7 @@ registerCustomElement('star-rating', class HTMLStarRatingElement extends HTMLCus
 	}
 
 	decrement() {
-		if (this.value !== 0) {
+		if (this.value > 0) {
 			this.value--;
 		}
 	}
