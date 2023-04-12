@@ -69,6 +69,8 @@ async function setValue(el) {
 		internals.setValidity({}, '');
 		internals.ariaValueNow = `${value}`;
 		internals.ariaValueText = `${value} stars`;
+		el.dispatchEvent(new Event('change'));
+
 		getStars(el).forEach((star, i) => {
 			if (i < value) {
 				star.classList.add('checked');
