@@ -2,7 +2,7 @@ import { registerCustomElement } from '../../js/std-js/custom-elements.js';
 import { createElement } from '../../js/std-js/elements.js';
 import { createStarIcon } from '../../js/std-js/icons.js';
 import { getInt, setInt, getColor, setColor } from '../../js/std-js/attrs.js';
-import { HTMLCustomInputElement } from './custom-input.js';
+import { HTMLCustomInputElement, STATES } from './custom-input.js';
 
 const protectedData = new WeakMap();
 
@@ -80,6 +80,14 @@ async function setValue(el) {
 				star.setAttribute('fill', 'none');
 			}
 		});
+	}
+
+	if (internals.validity.valid) {
+		internals.state.add(STATES.valid);
+		internals.states.delete(STATES.invalid);
+	} else {
+		internals.state.add(STATES.invalid);
+		internals.states.delete(STATES.valid);
 	}
 }
 
@@ -159,7 +167,20 @@ registerCustomElement('star-rating', class HTMLStarRatingElement extends HTMLCus
 	}
 	
 	formResetCallback() {
-		this.value = this.min;
+		const { internals } = protectedData.get(this);
+		this.removeAttribute('value');
+
+		getStars(this).forEach(star => {
+			star.removeAttribute('fill');
+			star.classList.remove('checked');
+		});
+		internals.setFormValue(0, 0);
+
+		if (this.required) {
+			internals.setValidity({ valueMissing: true }, 'Please select a star rating.');
+			internals.states.add(STATES.invalid);
+			internals.states.delete(STATES.valid);
+		}
 	}
 
 	formStateRestoreCallback(state) {
