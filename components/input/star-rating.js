@@ -57,13 +57,13 @@ async function setValue(el) {
 	const { max, min, value, fill, required } = el;
 
 	if (Number.isNaN(value)) {
-		internals.setValidity({ badInput: true }, 'Please provide a valid number for value', el);
+		internals.setValidity({ badInput: true }, 'Please provide a valid number for value');
 	} else if (value === 0 && required) {
-		internals.setValidity({ valueMissing: true }, 'Please select a star rating.', el);
+		internals.setValidity({ valueMissing: true }, 'Please select a star rating.');
 	} else if (value > max) {
-		internals.setValidity({ rangeOverflow: true }, `Please select a rating between ${min} and ${max}.`, el);
+		internals.setValidity({ rangeOverflow: true }, `Please select a rating between ${min} and ${max}.`);
 	} else if (value < min) {
-		internals.setValidity({ rangeUnderflow: true }, `Please select a rating between ${min} and ${max}.`, el);
+		internals.setValidity({ rangeUnderflow: true }, `Please select a rating between ${min} and ${max}.`);
 	} else {
 		internals.setFormValue(value, value);
 		internals.setValidity({}, '');
