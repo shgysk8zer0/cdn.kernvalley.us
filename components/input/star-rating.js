@@ -83,10 +83,10 @@ async function setValue(el) {
 	}
 
 	if (internals.validity.valid) {
-		internals.state.add(STATES.valid);
+		internals.states.add(STATES.valid);
 		internals.states.delete(STATES.invalid);
 	} else {
-		internals.state.add(STATES.invalid);
+		internals.states.add(STATES.invalid);
 		internals.states.delete(STATES.valid);
 	}
 }
