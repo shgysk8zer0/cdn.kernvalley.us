@@ -1,4 +1,5 @@
 import { getBool, setBool, getString, setString, getInt, setInt } from '../../js/std-js/attrs.js';
+const attachInternals = HTMLElement.prototype.attachInternals;
 
 const protectedData = new WeakMap();
 
@@ -13,17 +14,10 @@ export const STATES = {
 };
 
 export class HTMLCustomInputElement extends HTMLElement {
-	// call `super(function(internals){...})
-	// Must be `function() {}`, not `() => ...` to use `this`
-	constructor(callback) {
-		super();
-		const internals = this.attachInternals();
-
+	attachInternals() {
+		const internals = attachInternals.call(this);
 		protectedData.set(this, internals);
-
-		if (callback instanceof Function) {
-			callback.call(this, internals, this);
-		}
+		return internals;
 	}
 
 	// call `super.attributeChangedCallback(name, oldVal, newVal)`
@@ -93,6 +87,10 @@ export class HTMLCustomInputElement extends HTMLElement {
 
 	get form() {
 		return protectedData.get(this).form;
+	}
+
+	get internals() {
+		return protectedData.get(this);
 	}
 
 	get labels() {
