@@ -20,15 +20,15 @@ function setStarRating(event) {
 	}
 }
 
-function createStars(qty, { size, fill, value = 0 } = {}) {
+function createStars(qty, { size, fill, stroke, strokeWidth, value = 0 } = {}) {
 	return Array.from({ length: qty }).map((_, i) => createStarIcon({
 		size,
 		fill: (i + 1) <= value ? fill : 'none',
-		stroke: fill,
+		stroke: stroke,
 		title: `${i + 1} stars`,
 		tabindex: 0,
 		role: 'button',
-		'stroke-width': 2,
+		'stroke-width': strokeWidth,
 		dataset: { value: i + 1 },
 		classList: ['star'],
 		part: ['star'],
@@ -44,11 +44,22 @@ async function updateFill(el) {
 	const color = el.fill;
 
 	getStars(el).forEach(star => {
-		star.setAttribute('stroke', color);
 		if (star.classList.contains('checked')) {
 			star.setAttribute('fill', color);
 		}
 	});
+}
+
+async function updateStroke(el) {
+	await el.ready;
+	const color = el.stroke;
+	getStars(el).forEach(star => star.setAttribute('stroke', color));
+}
+
+async function updateStrokeWidth(el) {
+	await el.ready;
+	const width = el.strokeWidth;
+	getStars(el).forEach(star => star.setAttribute('stroke-width', width));
 }
 
 async function setValue(el) {
@@ -186,6 +197,22 @@ registerCustomElement('star-rating', class HTMLStarRatingElement extends HTMLCus
 		setInt(this, 'size', val, { min: 0 });
 	}
 
+	get stroke() {
+		return getColor(this, 'stroke') || this.fill;
+	}
+
+	set stroke(val) {
+		setColor(this, 'stroke', val);
+	}
+
+	get strokeWidth() {
+		return getInt(this, 'stroke-width', { fallback: 1 });
+	}
+
+	set strokeWidth(val) {
+		setInt(this, 'stroke-width', val, { min: 0 });
+	}
+
 	get value() {
 		return getInt(this, 'value', { min: 0, max: this.max, fallback: 0 });
 	}
@@ -197,7 +224,7 @@ registerCustomElement('star-rating', class HTMLStarRatingElement extends HTMLCus
 	connectedCallback() {
 		super.connectedCallback();
 		const { internals } = protectedData.get(this);
-		const { max, value, fill, size } = this;
+		const { max, value, fill, size, stroke, strokeWidth } = this;
 		this.tabIndex = 0;
 		internals.role = 'slider';
 		internals.ariaLabel = 'Star Rating';
@@ -207,7 +234,7 @@ registerCustomElement('star-rating', class HTMLStarRatingElement extends HTMLCus
 
 		if (! this.hasAttribute('max')) {
 			internals.ariaValueMax = `${max}`;
-			getContainer(this).replaceChildren(...createStars(max, { fill, size, value }));
+			getContainer(this).replaceChildren(...createStars(max, { fill, size, value, stroke, strokeWidth }));
 		}
 
 		if (! this.hasAttribute('value')) {
@@ -245,13 +272,16 @@ registerCustomElement('star-rating', class HTMLStarRatingElement extends HTMLCus
 		switch(name) {
 			case 'fill':
 				updateFill(this);
+				if (! this.hasAttribute('stroke')) {
+					updateStroke(this);
+				}
 				break;
 
 			case 'max':
 				this.ready.then(() => {
-					const { max, fill, size } = this;
+					const { max, fill, size, stroke, strokeWidth } = this;
 					protectedData.get(this).internals.ariaValueMax = `${max}`;
-					getContainer(this).replaceChildren(...createStars(max, { fill, size, max }));
+					getContainer(this).replaceChildren(...createStars(max, { fill, size, max, stroke, strokeWidth }));
 				});
 				break;
 
@@ -263,6 +293,14 @@ registerCustomElement('star-rating', class HTMLStarRatingElement extends HTMLCus
 						star.setAttribute('width', size);
 					});
 				});
+				break;
+
+			case 'stroke':
+				updateStroke(this);
+				break;
+
+			case 'stroke-width':
+				updateStrokeWidth(this);
 				break;
 
 			case 'value':
@@ -287,6 +325,6 @@ registerCustomElement('star-rating', class HTMLStarRatingElement extends HTMLCus
 	}
 
 	static get observedAttributes() {
-		return [...HTMLCustomInputElement.observedAttributes, 'max', 'value', 'fill', 'size'];
+		return [...HTMLCustomInputElement.observedAttributes, 'max', 'value', 'fill', 'size', 'stroke', 'stroke-width'];
 	}
 });
