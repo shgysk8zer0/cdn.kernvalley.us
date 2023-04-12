@@ -64,6 +64,7 @@ async function log(type, {
 	if (
 		['localhost'].includes(location.hostname)
 		|| location.hostname.endsWith('.netlify.live')
+		|| location.hostname.endsWith('.netlify.app')
 		|| /^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/.test(location.hostname)
 	) {
 		console.info({ type, endpoint, params });
@@ -570,7 +571,7 @@ class HTMLKRVAdElement extends HTMLElement {
 	}
 
 	set label(val) {
-		clearSlotted(this, 'laebl');
+		clearSlotted(this, 'label');
 
 		if (typeof val === 'string' && val.length !== 0) {
 			this.append(createElement('span', {
