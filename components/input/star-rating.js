@@ -155,6 +155,10 @@ registerCustomElement('star-rating', class HTMLStarRatingElement extends HTMLCus
 
 		this.dispatchEvent(new Event('connected'));
 	}
+	
+	formResetCallback() {
+		this.value = this.min;
+	}
 
 	formStateRestoreCallback(state) {
 		this.value = state;
