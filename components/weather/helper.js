@@ -40,9 +40,12 @@ export function getIconSrc(icon) {
 
 export function createIcon(symbol, owner = document) {
 	const sprite = owner.getElementById(symbol);
-	const svg = createSVG({ fill: 'currentColor', viewBox: sprite.getAttribute('viewBox') });
-	svg.append(...[...sprite.children].map(node => node.cloneNode(true)));
-	return svg;
+	return createSVG({
+		fill: 'currentColor',
+		viewBox: sprite.getAttribute('viewBox'),
+		role: 'presentation',
+		children: [...sprite.children].map(node => node.cloneNode(true)),
+	});
 }
 
 export function getIcon(icon) {

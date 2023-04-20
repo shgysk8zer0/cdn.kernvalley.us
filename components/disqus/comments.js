@@ -16,7 +16,7 @@ registerCustomElement('disqus-comments', class HTMLDisqusCommentsElement extends
 		const slot = document.createElement('slot');
 		const container = document.createElement('div');
 
-		Object.definePropertie(this, {
+		Object.defineProperties(this, {
 			[symbols.shadow]: {
 				enumerable: false,
 				configurable: false,
