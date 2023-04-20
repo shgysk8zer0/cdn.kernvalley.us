@@ -5,20 +5,30 @@ import { loadScript, ID } from '../../js/std-js/disqus.js';
 
 const symbols = {
 	shadow: Symbol('shadow'),
+	internals: Symbol('internals'),
 };
 
 registerCustomElement('disqus-comments', class HTMLDisqusCommentsElement extends HTMLElement {
 	constructor(site) {
 		super();
 		const shadow = this.attachShadow({ mode: 'closed' });
+		const internals = this.attachInternals();
 		const slot = document.createElement('slot');
 		const container = document.createElement('div');
 
-		Object.defineProperty(this, symbols.shadow, {
-			enumerable: false,
-			configurable: false,
-			writable: false,
-			value: shadow,
+		Object.definePropertie(this, {
+			[symbols.shadow]: {
+				enumerable: false,
+				configurable: false,
+				writable: false,
+				value: shadow,
+			},
+			[symbols.internals]: {
+				enumerable: false,
+				configurable: false,
+				writable: false,
+				value: internals,
+			}
 		});
 
 		container.slot = 'comments';
@@ -27,6 +37,8 @@ registerCustomElement('disqus-comments', class HTMLDisqusCommentsElement extends
 
 		shadow.append(slot);
 		this.append(container);
+		internals.role = 'document';
+		internals.ariaLabel = 'Disqus Comments';
 
 		slot.addEventListener('slotchange', ({ target }) => {
 			target.assignedElements().forEach(el => el.id = ID);

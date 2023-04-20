@@ -47,7 +47,7 @@
     "lint:html": "if [ -f '.htmlhintrc' ]; then htmlhint ${npm_package_config_dir_html}; fi",
     "lint:js": "if [ -f '.eslintrc.json' ]; then eslint .; fi",
     "fix:css": "if [ -f './stylelintrc.json' ]; then stylelint ${npm_package_config_dir_css} --fix; fi",
-    "fix:js": "if [ -f '.eslintrc.json' ]; then eslint. --fix; fi",
+    "fix:js": "if [ -f '.eslintrc.json' ]; then eslint . --fix; fi",
     "build": "npm run build:js && npm run build:icons && npm run build:markers",
     "build:js": "npm run build:js:shims && npm run build:js:maps && npm run build:js:ads && npm run build:js:events && npm run build:js:weather && npm run build:js:share && npm run build:js:wfd && npm run build:js:security",
     "build:js:ads": "npm run build:js:ad-block && npm run build:js:krv-ad",

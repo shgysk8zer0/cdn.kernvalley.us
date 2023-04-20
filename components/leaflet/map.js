@@ -33,8 +33,7 @@ export const stylesheet = {
 const initialTitle = document.title;
 const GEO_EXP = /#-?\d{1,3}\.\d+,-?\d{1,3}\.\d+(,\d{1,2})?/;
 const resolveURL = getURLResolver({ base: meta.url, path: '/components/leaflet/' });
-
-let data = new WeakMap();
+const protectedData = new WeakMap();
 
 async function locate(map, {
 	enableHighAccuracy = true, setView = true,
@@ -175,11 +174,12 @@ HTMLCustomElement.register('leaflet-map', class HTMLLeafletMapElement extends HT
 		allowFullscreen = null,
 	} = {}) {
 		super();
-		this._shadow = this.attachShadow({ mode: 'closed' });
+		const shadow = this.attachShadow({ mode: 'closed' });
+		const internals = this.attachInternals();
+		protectedData.set(this, { shadow, internals });
 
 		if (Array.isArray(markers)) {
-			customElements.whenDefined('leaflet-marker').then(() => {
-				const Marker = customElements.get('leaflet-marker');
+			customElements.whenDefined('leaflet-marker').then(Marker => {
 				markers.forEach(marker => {
 					if (marker instanceof Marker) {
 						marker.slot = 'markers';
@@ -305,6 +305,7 @@ HTMLCustomElement.register('leaflet-map', class HTMLLeafletMapElement extends HT
 
 			const doc = create('div', {
 				part: ['container'],
+				aria: { hidden: 'true' },
 				children: [
 					create('slot', { events, attrs: { name: 'toolbar' }}),
 					create('slot', {
@@ -340,13 +341,13 @@ HTMLCustomElement.register('leaflet-map', class HTMLLeafletMapElement extends HT
 					crossOrigin: stylesheet.crossOrigin,
 					referrerPolicy: stylesheet.referrerPolicy,
 					fetchPriority: stylesheet.fetchPriority,
-					parent: this._shadow,
+					parent: protectedData.get(this).shadow,
 				}),
-				loadStylesheet(resolveURL('./map.css'), { parent: this._shadow }),
+				loadStylesheet(resolveURL('./map.css'), { parent: shadow }),
 			]);
 
 			requestAnimationFrame(async () => {
-				this._shadow.append(doc);
+				shadow.append(doc);
 				this.dispatchEvent(new Event('populated'));
 
 				if ('markers' in this.dataset) {
@@ -357,6 +358,11 @@ HTMLCustomElement.register('leaflet-map', class HTMLLeafletMapElement extends HT
 	}
 
 	async connectedCallback() {
+		const { internals } = protectedData.get(this);
+		internals.role = 'presentation';
+		internals.ariaLabel = 'Leaflet Map';
+		internals.ariaRoleDescription = 'This map is currently presentation only.';
+
 		const prom = this.whenConnected;
 		this.dispatchEvent(new Event('connected'));
 
@@ -573,19 +579,15 @@ HTMLCustomElement.register('leaflet-map', class HTMLLeafletMapElement extends HT
 			label: 'OpenStreetMap',
 		}).addTo(m);
 
-		data.set(this, { map: m, tiles });
+		protectedData.set(this, { ...protectedData.get(this), map: m, tiles });
 
 		this.dispatchEvent(new Event('ready'));
-	}
-
-	disconnectedCallback() {
-		data.delete(this);
 	}
 
 	get ready() {
 		return new Promise(async resolve => {
 			await this._populated;
-			if (! data.has(this)) {
+			if (! ('map' in protectedData.get(this))) {
 				this.addEventListener('ready', () => {
 					this.map.whenReady(() => resolve(this));
 				}, {
@@ -598,7 +600,7 @@ HTMLCustomElement.register('leaflet-map', class HTMLLeafletMapElement extends HT
 	}
 
 	get _populated() {
-		if (this._shadow.childElementCount === 0) {
+		if (protectedData.get(this).shadow.childElementCount === 0) {
 			return new Promise(r =>on(this, 'populated', () => r(this), { once: true }));
 		} else {
 			return Promise.resolve(this);
@@ -663,8 +665,8 @@ HTMLCustomElement.register('leaflet-map', class HTMLLeafletMapElement extends HT
 	}
 
 	get bounds() {
-		if (data.has(this)) {
-			return data.get(this).map.getBounds();
+		if (protectedData.has(this)) {
+			return protectedData.get(this).map.getBounds();
 		} else {
 			return null;
 		}
@@ -719,7 +721,7 @@ HTMLCustomElement.register('leaflet-map', class HTMLLeafletMapElement extends HT
 	}
 
 	get attribution() {
-		const slot = this._shadow.querySelector('slot[name="attribution"]');
+		const slot = protectedData.get(this).shadow.querySelector('slot[name="attribution"]');
 		const nodes = slot.assignedNodes();
 
 		if (nodes.length === 1) {
@@ -759,13 +761,13 @@ HTMLCustomElement.register('leaflet-map', class HTMLLeafletMapElement extends HT
 	}
 
 	get mapElement() {
-		const slot = this._shadow.querySelector('slot[name="map"]');
+		const slot = protectedData.get(this).shadow.querySelector('slot[name="map"]');
 		const nodes = slot.assignedNodes();
 		return nodes.length === 1 ? nodes[0] : slot.firstElementChild;
 	}
 
 	set mapElement(el) {
-		const slot = this._shadow.querySelector('slot[name="map"]');
+		const slot = protectedData.get(this).shadow.querySelector('slot[name="map"]');
 		slot.assignedNodes().forEach(el => el.remove());
 		el.slot = 'map';
 		this.append(el);
@@ -930,15 +932,15 @@ HTMLCustomElement.register('leaflet-map', class HTMLLeafletMapElement extends HT
 	}
 
 	containsMarkers(...markers) {
-		if (data.has(this)) {
+		if (protectedData.has(this)) {
 			const bounds = this.bounds;
 			return markers.filter(({ latLng }) => bounds.contains(latLng));
 		}
 	}
 
 	get map() {
-		if (data.has(this)) {
-			return data.get(this).map;
+		if (protectedData.has(this)) {
+			return protectedData.get(this).map;
 		} else {
 			return null;
 		}
@@ -960,19 +962,19 @@ HTMLCustomElement.register('leaflet-map', class HTMLLeafletMapElement extends HT
 	}
 
 	get overlays() {
-		if (this._shadow.childElementCount === 0) {
+		if (protectedData.get(this).shadow.childElementCount === 0) {
 			return [];
 		} else {
-			const slot = this._shadow.querySelector('slot[name="overlays"]');
+			const slot = protectedData.get(this).shadow.querySelector('slot[name="overlays"]');
 			return slot.assignedNodes();
 		}
 	}
 
 	get markers() {
-		if (this._shadow.childElementCount === 0) {
+		if (protectedData.get(this).shadow.childElementCount === 0) {
 			return [];
 		} else {
-			const slot = this._shadow.querySelector('slot[name="markers"]');
+			const slot = protectedData.get(this).shadow.querySelector('slot[name="markers"]');
 			return slot.assignedNodes();
 		}
 	}
@@ -986,10 +988,10 @@ HTMLCustomElement.register('leaflet-map', class HTMLLeafletMapElement extends HT
 	}
 
 	get geoJson() {
-		if (this._shadow.childElementCount === 0) {
+		if (protectedData.get(this).shadow.childElementCount === 0) {
 			return [];
 		} else {
-			const slot = this._shadow.querySelector('slot[name="geojson"]');
+			const slot = protectedData.get(this).shadow.querySelector('slot[name="geojson"]');
 			return slot.assignedNodes();
 		}
 	}
@@ -1110,7 +1112,7 @@ HTMLCustomElement.register('leaflet-map', class HTMLLeafletMapElement extends HT
 	async setTileServer({ tileSrc, minZoom, maxZoom, attribution, detectRetina, crossOrigin, label }) {
 		await this.ready;
 
-		const { tiles } = data.get(this);
+		const { tiles } = protectedData.get(this);
 
 		if (tiles) {
 			tiles.remove();
@@ -1118,8 +1120,9 @@ HTMLCustomElement.register('leaflet-map', class HTMLLeafletMapElement extends HT
 
 		const newTiles = LeafletTileLayer(tileSrc, { minZoom, maxZoom, attribution,
 			detectRetina, crossOrigin, label }).addTo(this.map);
-
-		data.set(this, { map: this.map, tiles: newTiles });
+		if (protectedData.has(this)) {
+			protectedData.set(this, { ...protectedData.get(this), tiles: newTiles });
+		}
 	}
 
 	async attributeChangedCallback(name, oldVal, newVal) {
@@ -1145,13 +1148,13 @@ HTMLCustomElement.register('leaflet-map', class HTMLLeafletMapElement extends HT
 
 			case 'minzoom':
 				if (typeof newVal === 'string') {
-					this.ready.then(() => data.get(this).map.setMinZoom(parseInt(newVal)));
+					this.ready.then(() => protectedData.get(this).map.setMinZoom(parseInt(newVal)));
 				}
 				break;
 
 			case 'maxzoom':
 				if (typeof newVal === 'string') {
-					this.ready.then(() => data.get(this).map.setMaxZoom(parseInt(newVal)));
+					this.ready.then(() => protectedData.get(this).map.setMaxZoom(parseInt(newVal)));
 				}
 				break;
 
@@ -1195,7 +1198,7 @@ HTMLCustomElement.register('leaflet-map', class HTMLLeafletMapElement extends HT
 			case 'tilesrc':
 				this.ready.then(async () => {
 					if (typeof newVal === 'string') {
-						const { tiles } = data.get(this);
+						const { tiles } = protectedData.get(this);
 						tiles.setUrl(newVal);
 					}
 				});

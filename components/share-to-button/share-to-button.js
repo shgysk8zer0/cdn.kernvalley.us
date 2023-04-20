@@ -1,4 +1,5 @@
-import HTMLCustomElement from '../custom-element.js';
+// import HTMLCustomElement from '../custom-element.js';
+import { HTMLCustomButtonElement } from '../button/custom.js';
 import { hasGa, send } from '../../js/std-js/google-analytics.js';
 import { popup } from '../../js/std-js/popup.js';
 import { getHTML } from '../../js/std-js/http.js';
@@ -8,9 +9,26 @@ import { loadStylesheet } from '../../js/std-js/loader.js';
 import { getString, setString, getBool, setBool, getURL, setURL } from '../../js/std-js/attrs.js';
 import { setUTMParams } from '../../js/std-js/utility.js';
 import { createPolicy } from '../../js/std-js/trust.js';
+import { registerCustomElement } from '../../js/std-js/custom-elements.js';
 import {
 	Facebook, Twitter, Reddit, LinkedIn, Gmail, Pinterest, Email, Tumblr, Telegram, getShareURL,
 } from '../../js/std-js/share-targets.js';
+
+const protectedData = new WeakMap();
+
+const labels = {
+	facebook: 'Share this on Facebook',
+	twitter: 'Share this on Twitter',
+	reddit: 'Share this on Reddit',
+	linkedin: 'Share this on LinkedIn',
+	gmail: 'Share this via Gmail',
+	pinterest: 'Share this on Pinterest',
+	tumblr: 'Share this on Tumblr',
+	telegram: 'Share this via Telegram',
+	clipboard: 'Send this to your clipboard',
+	print: 'Print this',
+	email: 'Send this via email',
+};
 
 const resolveURL = getURLResolver({ base: meta.url, path: '/components/share-to-button/' });
 export const policy = createPolicy('share-to-buttons#html', {
@@ -31,8 +49,24 @@ function log(btn) {
 	}
 }
 
+function updateLabel(el) {
+	const { internals } = protectedData.get(el);
+	internals.ariaLabel = labels[el.target.toLowerCase()] || 'No handler available for this button';
+}
+
 function openShare(target, { title, text, url, height = 360, width = 720, name = 'SharePopup' } = {}) {
 	return popup(getShareURL(target, { title, text, url }), { height, width, name });
+}
+
+async function handler ({ type, key, isTrusted, currentTarget }) {
+	if (isTrusted && ! currentTarget.disabled && (type === 'click' || key === 'Enter' || key === ' ')) {
+		const { internals } = protectedData.get(currentTarget);
+		internals.ariaPressed = 'true';
+		const { shareTitle, target, url, text } = currentTarget;
+		await share({ target, title: shareTitle, url, text }).catch(console.error);
+		log(currentTarget);
+		internals.ariaPressed = 'false';
+	}
 }
 
 async function share({
@@ -97,18 +131,17 @@ async function share({
 	}
 }
 
-HTMLCustomElement.register('share-to-button', class HTMLShareToButtonElement extends HTMLCustomElement {
+registerCustomElement('share-to-button', class HTMLShareToButtonElement extends HTMLCustomButtonElement {
 	constructor({ target = null, url = null, source = null, medium = null, content = null } = {}) {
 		super();
-		this.attachShadow({mode: 'open'});
-
-		Promise.resolve().then(() => {
-			this.setAttribute('tabindex', '0');
-			this.setAttribute('role', 'button');
-		});
+		const shadow = this.attachShadow({ mode: 'open' });
+		const internals = this.attachInternals();
+		protectedData.set(this, { shadow, internals });
 
 		getTemplate().then(tmp => tmp.cloneNode(true)).then(tmp => {
 			const wasHidden = this.hidden;
+			internals.ariaHasPopup = 'dialog';
+			internals.ariaPressed = 'false';
 			this.hidden = true;
 			if (typeof target === 'string') {
 				this.target = target;
@@ -132,22 +165,13 @@ HTMLCustomElement.register('share-to-button', class HTMLShareToButtonElement ext
 			this.shadowRoot.append(tmp);
 
 			loadStylesheet(resolveURL('./share-to-button.css'), { parent: this.shadowRoot }).then(() => {
-				this.dispatchEvent(new Event('ready'));
 				this.hidden = wasHidden;
+				this.dispatchEvent(new Event('ready'));
 			});
 		});
 
-		this.addEventListener('click', async () => {
-			const { shareTitle, target, url, text } = this;
-			await share({ target, title: shareTitle, url, text });
-			log(this);
-		});
-
-		this.addEventListener('keypress', ({ charCode }) => {
-			if (charCode === 32) {
-				share(this);
-			}
-		});
+		this.addEventListener('click', handler, { passive: true });
+		this.addEventListener('keydown', handler, { passive: true });
 	}
 
 	get ready() {
@@ -173,6 +197,7 @@ HTMLCustomElement.register('share-to-button', class HTMLShareToButtonElement ext
 	}
 
 	set disabled(val) {
+		protectedData.get(this).ariaDisabled = val ? 'true' : 'false';
 		getBool(this, 'disabled', val);
 	}
 
@@ -250,6 +275,7 @@ HTMLCustomElement.register('share-to-button', class HTMLShareToButtonElement ext
 	async attributeChangedCallback(name, oldValue, newValue) {
 		switch (name) {
 			case 'target':
+				updateLabel(this);
 				if (typeof newValue !== 'string' || newValue.length === 0) {
 					this.hidden = true;
 				} else if (newValue.toLowerCase() === 'clipboard') {

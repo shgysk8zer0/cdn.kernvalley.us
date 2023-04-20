@@ -1,13 +1,14 @@
-import { css, attr } from '../../js/std-js/dom.js';
+import { css, attr } from '../../js/std-js/attrs.js';
 import { registerCustomElement } from '../../js/std-js/custom-elements.js';
 import { preload } from '../../js/std-js/loader.js';
+import { callOnce } from '../../js/std-js/utility.js';
 import { getApps, apps as SRC } from '../../js/std-js/krv/apps.js';
 import { hasGa, send } from '../../js/std-js/google-analytics.js';
 import { getString, setString, getBool, setBool } from '../../js/std-js/attrs.js';
 import { createXIcon } from '../../js/std-js/icons.js';
 import { createImage } from '../../js/std-js/elements.js';
 
-const fetchApps = getApps.once();
+const fetchApps = callOnce(getApps);
 
 function log() {
 	if (hasGa()) {
@@ -79,6 +80,8 @@ registerCustomElement('app-list', class HTMLKernValleyAppListButtonlement extend
 		this.addEventListener('click', this.show, { passive: true, capture: true });
 		this.addEventListener('connected', () => {
 			this.hidden = false;
+			this.ariaHasPopup = 'dialog';
+			this.ariaLabel = 'Show KRV Apps dialog';
 
 			if (typeof source === 'string') {
 				this.source = source;
@@ -149,6 +152,7 @@ registerCustomElement('app-list', class HTMLKernValleyAppListButtonlement extend
 		const header = document.createElement('header');
 		const close = document.createElement('button');
 		const container = document.createElement('div');
+		close.ariaLabel = 'Close dialog';
 
 		css(header, {
 			'height': '2.8em',
@@ -174,6 +178,7 @@ registerCustomElement('app-list', class HTMLKernValleyAppListButtonlement extend
 			target.closest('dialog').close();
 			this.disabled = false;
 		});
+
 		css(close, {
 			'display': 'inline-block',
 			'background-color': '#dc3545',

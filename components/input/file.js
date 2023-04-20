@@ -27,58 +27,45 @@ function allowedFile(file, accept) {
 
 customElements.define('input-file', class HTMLINputFileElement extends HTMLCustomInputElement {
 	constructor() {
-		const { resolve, promise } = getDeferred();
-		super(resolve);
+		super();
+		const internals = this.attachInternals();
+		internals.ariaBusy = 'true';
+		internals.role = 'button';
+		internals.states.add(STATES.loading);
+		const shadow = this.attachShadow({ mode: 'closed' });
 
-		promise.then(internals => {
-			internals.ariaBusy = 'true';
-			internals.role = 'button';
-			internals.states.add(STATES.loading);
-			const shadow = this.attachShadow({ mode: 'closed' });
+		shadow.append(createElement('div', {
+			part: ['container'],
+			children: [
+				createElement('button', {
+					type: 'button',
+					part: ['btn'],
+					title: 'Select a file',
+					events: {
+						click: async () => {
+							const { accept, prompt: description } = this;
+							const [file = null] = await open({ accept, description }).catch(console.error);
+							this.value = file;
+						}
+					},
+					children: [
+						createElement('slot', {
+							name: 'icon',
+							children: [createFileIcon({ size: 18, fill: 'currentColor' })]
+						})
+					]
+				}),
+				createElement('span', {
+					part: ['filename'],
+					text: 'No file selected',
+				})
+			]
+		}));
 
-			shadow.append(createElement('div', {
-				part: ['container'],
-				children: [
-					createElement('button', {
-						type: 'button',
-						part: ['btn'],
-						title: 'Select a file',
-						events: {
-							click: async () => {
-								const { accept, prompt: description } = this;
-								const [file = null] = await open({ accept, description }).catch(console.error);
-								this.value = file;
-							}
-						},
-						children: [
-							createElement('slot', {
-								name: 'icon',
-								children: [createFileIcon({ size: 18, fill: 'currentColor' })]
-							})
-						]
-					}),
-					createElement('span', {
-						part: ['filename'],
-						text: 'No file selected',
-					})
-				]
-			}));
-
-			protectedData.set(this, { internals, shadow, file: null });
-			internals.states.delete(STATES.loading);
-			internals.ariaBusy = 'false';
-			this.dispatchEvent(new Event('ready'));
-		});
-	}
-
-	formAssociatedCallback(form) {
-		if (form instanceof HTMLFormElement) {
-			form.addEventListener('submit', event => {
-				event.preventDefault();
-				const data = new FormData(event.target);
-				console.log(data);
-			});
-		}
+		protectedData.set(this, { internals, shadow, file: null });
+		internals.states.delete(STATES.loading);
+		internals.ariaBusy = 'false';
+		this.dispatchEvent(new Event('ready'));
 	}
 
 	formDisabledCallback(disabled) {
