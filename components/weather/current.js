@@ -22,6 +22,10 @@ HTMLCustomElement.register('weather-current', class HTMLWeatherForecastElement e
 
 		this.addEventListener('connected', async () => {
 			const shadow = this.attachShadow({ mode: 'closed' });
+			const internals = this.attachInternals();
+			internals.role = 'group';
+			internals.ariaBusy = 'true';
+			internals.ariaLabel = 'Local Weather';
 			if (typeof appId === 'string') {
 				this.appId = appId;
 			}
@@ -40,6 +44,7 @@ HTMLCustomElement.register('weather-current', class HTMLWeatherForecastElement e
 			shadow.append(tmp);
 			shadows.set(this, shadow);
 			this.dispatchEvent(new Event('ready'));
+			internals.ariaBusy = 'false';
 		}, { once: true });
 	}
 
