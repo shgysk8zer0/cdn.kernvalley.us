@@ -50,12 +50,15 @@ registerCustomElement('krv-events', class HTMLKRVEventsElement extends HTMLEleme
 	constructor() {
 		super();
 		const parent = this.attachShadow({ mode: 'closed' });
+		const internals = this.attachInternals();
 
 		Promise.all([
 			getTemplate().then(frag => frag.cloneNode(true)),
 			loadStylesheet(resolveURL('./events.css'), { parent }),
 			this.whenConnected,
 		]).then(([frag]) => {
+			internals.role = 'document';
+			internals.ariaLabel = 'Kern Valley Events Calendar';
 			const link = frag.querySelector('.app-link');
 			link.target = this.target;
 
@@ -64,7 +67,7 @@ registerCustomElement('krv-events', class HTMLKRVEventsElement extends HTMLEleme
 			}
 
 			parent.append(frag);
-			protectedData.set(this, { shadow: parent });
+			protectedData.set(this, { shadow: parent, internals });
 			this.dispatchEvent(new Event('ready'));
 		});
 	}

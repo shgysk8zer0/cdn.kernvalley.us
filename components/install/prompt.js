@@ -25,6 +25,7 @@ const policy = createPolicy('pwa-install', {
 
 const resolveURL = getURLResolver({ base: meta.url, path: '/components/install/' });
 const getTemplate = callOnce(() => getHTML(resolveURL('./prompt.html'), { policy }));
+const protectedData = new WeakMap();
 
 function getBySize(opts, width) {
 	if (Array.isArray(opts)) {
@@ -109,18 +110,25 @@ registerCustomElement('install-prompt', class HTMLInstallPromptElement extends H
 	constructor() {
 		super();
 		const shadow = this.attachShadow({ mode: 'closed' });
+		const internals = this.attachInternals();
+		protectedData.set(this, { shadow, internals });
 
 		Promise.all([
-			getTemplate(),
+			getTemplate().then(tmp => tmp.cloneNode(true)),
 			getManifest(),
 			loadStylesheet(resolveURL('./prompt.css'), { parent: shadow }),
 		]).then(async ([base, manifest]) => {
 			/**
 			 * @TODO: Handle `prefer_related_applications` somehow
 			 */
+
 			const { name, description, features, categories = [], screenshots = [], icons = [],
 				related_applications: relatedApps = [],/* prefer_related_applications: preferRelatedApps = false,*/
 			} = manifest;
+			internals.role = 'dialog';
+			internals.ariaModal = 'true';
+			internals.ariaHidden = this.open ? 'false': 'true';
+			internals.ariaLabel = `Install ${name}`;
 
 			registerButton(base.querySelector('.header-btn.install-btn')).catch(() => {});
 
@@ -218,17 +226,26 @@ registerCustomElement('install-prompt', class HTMLInstallPromptElement extends H
 	}
 
 	async attributeChangedCallback(attr, oldVal, newVal) {
+		const { internals, shadow } = protectedData.get(this);
 		switch(attr) {
 			case 'open':
 				if (typeof newVal === 'string') {
+					internals.ariaHidden = 'false';
+					internals.states.add('--open');
+					[...document.body.children].forEach(el => el.inert = ! el.isSameNode(this));
+					await this.ready;
+					shadow.querySelector('button:not([disabled])').focus();
 					this.dispatchEvent(new Event('open'));
 				} else {
+					internals.ariaHidden = 'true';
+					internals.states.delete('--open');
+					[...document.body.children].forEach(el => el.inert = false);
 					this.dispatchEvent(new Event('close'));
 				}
 				break;
 
 			default:
-				throw new DOMException(`Invalid attribute change handled: ${attr}`);
+				throw new DOMException(`Unhandled attribute changed: "${name}".`);
 		}
 	}
 
@@ -270,6 +287,17 @@ registerCustomElement('install-prompt', class HTMLInstallPromptElement extends H
 
 	set open(val) {
 		this.toggleAttribute('open', val);
+	}
+
+	get ready() {
+		return new Promise(resolve => {
+			const { shadow } = protectedData.get(this);
+			if (shadow.childElementCount < 2) {
+				this.addEventListener('ready', () => resolve(), { once: true });
+			} else {
+				resolve();
+			}
+		});
 	}
 
 	static get observedAttributes() {

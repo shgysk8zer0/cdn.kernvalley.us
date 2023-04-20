@@ -73,12 +73,11 @@ export class HTMLNotificationElement extends HTMLElement {
 	} = {}) {
 		super();
 		const shadow = this.attachShadow({ mode: 'open' });
-		protectedData.set(this, { shadow });
+		const internals = this.attachInternals();
+		protectedData.set(this, { shadow, internals });
 
 		Promise.resolve().then(() => {
-			this.setAttribute('role', 'dialog');
-			this.setAttribute('label', 'Notification');
-
+			internals.role = 'dialog';
 			this.hidden = true;
 			this.onshow = null;
 			this.onclose = null;
@@ -288,6 +287,8 @@ export class HTMLNotificationElement extends HTMLElement {
 		}
 
 		this.addEventListener('show', () => {
+			const actions = shadow.querySelector('slot[name="actions"]').assignedElements();
+			console.log({ actions });
 			if (! this.requireInteraction) {
 				setTimeout(() => this.close(), 5000);
 			}
@@ -300,6 +301,10 @@ export class HTMLNotificationElement extends HTMLElement {
 				&& (navigator.vibrate instanceof Function)
 			) {
 				navigator.vibrate(this.vibrate);
+			}
+
+			if (actions.length !== 0) {
+				actions[0].focus();
 			}
 		}, {
 			once: true,
