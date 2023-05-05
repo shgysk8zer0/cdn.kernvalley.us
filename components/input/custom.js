@@ -48,7 +48,19 @@ export class HTMLCustomInputElement extends HTMLElement {
 
 	// Call `super.connectedCallback()` when overriding
 	connectedCallback() {
+		if (! protectedData.has(this)) {
+			this.attachInternals();
+		}
+
 		const internals = protectedData.get(this);
+
+		if (! (typeof internals.role === 'string' || typeof this.role === 'string')) {
+			this.role = 'input';
+		}
+
+		if (! this.hasAttribute('tabindex')) {
+			this.tabIndex = 0;
+		}
 
 		if (internals._associateForm instanceof Function) {
 			internals._associateForm(this.closest('form'), this);

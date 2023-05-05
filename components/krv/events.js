@@ -5,7 +5,7 @@ import { registerCustomElement } from '../../js/std-js/custom-elements.js';
 import { loadStylesheet } from '../../js/std-js/loader.js';
 import { hasGa, send } from '../../js/std-js/google-analytics.js';
 import { meta } from '../../import.meta.js';
-import { getURLResolver, callOnce } from '../../js/std-js/utility.js';
+import { getURLResolver, callOnce, setUTMParams } from '../../js/std-js/utility.js';
 import { whenIntersecting } from '../../js/std-js/intersect.js';
 import { getString, setString, getInt, setInt } from '../../js/std-js/attrs.js';
 import { createPolicy } from '../../js/std-js/trust.js';
@@ -17,33 +17,8 @@ const getTemplate = callOnce(() => getHTML(resolveURL('events.html'), { policy }
 const getEvents = callOnce(() => getAllEvents());
 const protectedData = new WeakMap();
 
-function utm(url, { campaign, content, medium, source, term }) {
-	if (typeof source === 'string' && source.length !== 0) {
-		const u = new URL(url);
-
-		u.searchParams.set('utm_source', source);
-		u.searchParams.set('utm_campaign', 'krv-events-el');
-
-		if (typeof campaign === 'string' && campaign.length !== 0) {
-			u.searchParams.set('utm_campaign', campaign);
-		}
-
-		if (typeof content === 'string' && content.length !== 0) {
-			u.searchParams.set('utm_content', content);
-		}
-
-		if (typeof medium === 'string' && medium.length !== 0) {
-			u.searchParams.set('utm_medium', medium);
-		}
-
-		if (typeof term === 'string' && term.length !== 0) {
-			u.searchParams.set('utm_term', term);
-		}
-
-		return u.href;
-	} else {
-		return url;
-	}
+function utm(url, { campaign, content = 'krv-events-el', medium, source, term }) {
+	return setUTMParams(url, { campaign, content, medium, source, term }).href;
 }
 
 registerCustomElement('krv-events', class HTMLKRVEventsElement extends HTMLElement {

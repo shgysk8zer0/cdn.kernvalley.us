@@ -2,7 +2,7 @@ import { registerCustomElement } from '../../js/std-js/custom-elements.js';
 import { createElement } from '../../js/std-js/elements.js';
 import { createStarIcon } from '../../js/std-js/icons.js';
 import { getInt, setInt, getColor, setColor } from '../../js/std-js/attrs.js';
-import { HTMLCustomInputElement, STATES } from './custom-input.js';
+import { HTMLCustomInputElement, STATES } from './custom.js';
 
 const protectedData = new WeakMap();
 

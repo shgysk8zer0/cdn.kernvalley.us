@@ -74,14 +74,14 @@ const modules = [
 	'./components/github/user.js',
 	'./components/github/repo.js',
 	'./components/github/gist.js',
-	'./components/ad/block.js',
-	'./components/share-button.js',
+	// './components/ad/block.js',
+	// './components/button/share.js',
 	'./components/window-controls.js',
 	'./components/share-to-button/share-to-button.js',
 	'./components/weather/current.js',
 	'./components/weather/forecast.js',
-	// './components/leaflet/map.js',
-	// './components/leaflet/marker.js',
+	'./components/leaflet/map.js',
+	'./components/leaflet/marker.js',
 	'./components/app/list-button.js',
 	'./components/app/stores.js',
 	// './components/notification/html-notification.js',
@@ -89,6 +89,7 @@ const modules = [
 	'./components/krv/ad.js',
 	'./components/loading-spinner.js',
 	'./components/codepen-embed.js',
+	'./components/button/share.js',
 ];
 
 Promise.all([

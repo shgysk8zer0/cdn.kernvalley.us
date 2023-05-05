@@ -146,6 +146,7 @@ class HTMLKRVAdElement extends HTMLElement {
 					children: [
 						createSlot('label', {
 							events: { slotchange: slotChange('name') },
+							text: 'No Label',
 						}),
 					]
 				}),
