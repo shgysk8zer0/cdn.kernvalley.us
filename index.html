@@ -4,6 +4,7 @@
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width" />
 		<meta name="referrer" content="no-referrer" />
+		<meta name="description" content="CDN for KernValley.US and other sites" />
 		<meta name="color-scheme" content="light dark" />
 		<link rel="manifest" href="/webapp.webmanifest" />
 		<link rel="icon" href="/img/kernvalley-icons/kernvalley.svg" type="image/svg+xml" />
@@ -64,6 +65,24 @@
 			<share-to-button class="grow-1" target="reddit" text="The CDN for KernValley US sites"></share-to-button>
 		</nav>
 		<main id="main" class="contain-content card shadow">
+			<form id="test">
+				<fieldset>
+					<legend>Test Input</legend>
+					<!-- <label for="file-test">Select a file</label> -->
+					<!-- <input-file name="file" id="file-test" accept="image/*" prompt="Select an image" required=""> -->
+					<!-- 	<script type="module" src="/components/input/file.js"></script> -->
+					<!-- </input-file> -->
+					<label for="stars">Rating</label>
+					<star-rating name="rating" id="stars" required="">
+						<script type="module" src="/components/input/star-rating.js"></script>
+					</star-rating>
+					<!-- <input type="file" name="native-file" required="" accept="image/*" /> -->
+				</fieldset>
+				<div class="flex row space-evenly">
+					<button type="submit" class="btn btn-accept">Submit</button>
+					<button type="reset" class="btn btn-reject">Reset</button>
+				</div>
+			</form>
 			<div class="center">
 				<loading-spinner size="192" direction="alternate" easing="ease-in-out" duration="2400"></loading-spinner>
 			</div>
@@ -79,7 +98,7 @@
 			<div class="center">
 				<leaflet-map center="35.753003,-118.424572" zoom="13" crossorigin="anonymous" detectretina="" loading="lazy" router="" zoomcontrol="" allowfullscreen="" allowlocate="" data-markers="towns restaurants campgrounds stores landmarks">
 					<leaflet-marker latitude="35.753003" longitude="-118.424572" slot="marker"></leaflet-marker>
-					<script src="/components/leaflet/map.min.js" defer=""></script>
+					<!-- <script src="/components/leaflet/map.min.js" defer=""></script> -->
 				</leaflet-map>
 			</div>
 		</main>
@@ -120,11 +139,11 @@
 			<time is="current-year">2020</time>
 			<a href="https://kernvalley.us" rel="noopener noreferrer external">KernValley.US</a>
 		</footer>
-		<button type="button" is="share-button" url="https://cdn.kernvalley.us" text="The CDN for KernValley.US sites" class="btn btn-primary round fixed bottom right z-4" hidden="">
+		<share-button url="https://cdn.kernvalley.us" text="The CDN for KernValley.US sites" file="/img/raster/missing-image.png" class="btn btn-primary round fixed bottom right z-4">
 			<svg width="16" height="16" fill="currentColor" class="icon" viewBox="0 0 16 16" role="img" aria-hidden="true">
 				<path d="M5.969 7.969a2.969 2.969 0 1 1-5.938 0 2.969 2.969 0 1 1 5.938 0zm9.969 5a2.969 2.969 0 1 1-5.938 0 2.969 2.969 0 1 1 5.938 0zm0-10a2.969 2.969 0 1 1-5.938 0 2.969 2.969 0 1 1 5.938 0z" overflow="visible"/>
 				<path d="M12.625 2.156L2.562 7.031.75 7.938l1.812.906 10.032 5.062.906-1.812-8.22-4.156 8.219-4-.875-1.782z" overflow="visible"/>
 			</svg>
-		</button>
+		</share-button>
 	</body>
 </html>

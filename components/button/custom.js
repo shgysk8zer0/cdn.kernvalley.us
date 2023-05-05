@@ -1,5 +1,12 @@
 const protectedData = new WeakMap();
 
+export const style = {
+	'-webkit-appearance': 'button',
+	appearance: 'button',
+	display: 'inline-block',
+	cursor: 'pointer',
+};
+
 export const states = {
 	disabled: '--disabled',
 };
