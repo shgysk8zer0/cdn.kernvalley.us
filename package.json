@@ -73,7 +73,7 @@
     "version:bump:major": "npm version --no-git-tag-version major"
   },
   "dependencies": {
-    "netlify-js-app": "^2.1.1",
+    "netlify-js-app": "^2.1.2",
     "svg-sprite-standardized": "^1.1.0"
   }
 }
