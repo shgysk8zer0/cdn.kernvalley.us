@@ -26,5 +26,11 @@
 	path = img/kernvalley-icons
 	url = https://github.com/kernvalley/kernvalley-icons.git
 [submodule "js/konami"]
-	path = js/konami
+	path = js/@shgysk8zer0/konami
 	url = https://github.com/shgysk8zer0/konami.git
+[submodule "js/@shgysk8zer0/kazoo"]
+	path = js/@shgysk8zer0/kazoo
+	url = https://github.com/shgysk8zer0/kazoo.git
+[submodule "js/@shgysk8zer0/polyfills"]
+	path = js/@shgysk8zer0/polyfills
+	url = https://github.com/shgysk8zer0/polyfills.js
