@@ -1,6 +1,6 @@
 import './js/std-js/deprefixer.js';
 import { loadScript } from './js/std-js/loader.js';
-import { konami } from '/js/konami/konami.js';
+import { konami } from '/js/@shgysk8zer0/konami/konami.js';
 import { getDefaultPolicy } from '/js/std-js/trust-policies.js';
 import { createPolicy } from '/js/std-js/trust.js';
 import { alert } from '/js/std-js/asyncDialog.js';
