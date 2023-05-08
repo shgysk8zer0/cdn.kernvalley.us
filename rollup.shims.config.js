@@ -3,7 +3,7 @@ import urlResolve from 'rollup-plugin-url-resolve';
 import { terser } from 'rollup-plugin-terser';
 
 export default {
-	input: 'js/std-js/shims.js',
+	input: 'js/@shgysk8zer0/polyfills/all.js',
 	output: {
 		file: 'js/shims.min.js',
 		format: 'iife',
