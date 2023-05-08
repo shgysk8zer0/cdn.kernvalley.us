@@ -4,5 +4,7 @@
 /css/
 /fonts/
 /js/std-js/
+/js/@shgysk8zer0/
 *.min.js
 /import.meta.js
+
