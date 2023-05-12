@@ -7,7 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <!-- markdownlint-disable -->
 ## [Unreleased]
 
+## [v1.2.0] - 2023-05-12
+
 ### Added
+- Create `importmap.json`
+- Add `<script type="importmap">` on all HTML pages
 - `HTMLLeafletMapElement.locate` now returns data when location is discovered
 - Several new `<leaflet-map>` and `<leaflet-marker>` methods for working with `bounds` & `latLng`
 - New `<leaflet-map find="15">` attribute, indicating intent to find user with `maxZoom` of (e.g.) 15
@@ -19,6 +23,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Full `<shopping-cart>` and `<button is="checkout-button">` experience, using `PaymentRequest` API
 
 ### Changed
+- Update `@shgysk8zer0/rollup-import` via `netlify-js-app`
+- `<leaflet-map>` now imports `version` & uses that for correct stylesheet
+- Update RollUp configs to use `@shgysk8zer0/rollup-import`
 - `HTMLLeafletMapElement.locate()` now has default arguments
 - `<leaflet-map>` now handles `<leaflet-marker minzoom maxzoom>` visibility toggling
 - Rename some map component `WeakMap`s from `map` to `data`

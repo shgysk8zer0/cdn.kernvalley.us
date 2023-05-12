@@ -1,0 +1,12 @@
+{
+  "imports": {
+    "std-js/": "./js/std-js/",
+    "@shgysk8zer0/kazoo/": "https://unpkg.com/@shgysk8zer0/kazoo@0.0.5/",
+    "@shgysk8zer0/polyfills": "https://unpkg.com/@shgysk8zer0/polyfills@0.0.5/all.min.js",
+    "@shgysk8zer0/polyfills/": "https://unpkg.com/@shgysk8zer0/polyfills@0.0.5/",
+    "@shgysk8zer0/konami": "https://unpkg.com/@shgysk8zer0/konami/konami.js",
+    "@shgysk8zer0/components/": "./components/",
+    "@kernvalley/components/": "./components/krv/",
+    "leaflet": "https://unpkg.com/leaflet@1.9.3/dist/leaflet-src.esm.js"
+  }
+}

@@ -1,10 +1,9 @@
-import './js/std-js/deprefixer.js';
-import { loadScript } from './js/std-js/loader.js';
-import { konami } from '/js/konami/konami.js';
-import { getDefaultPolicy } from '/js/std-js/trust-policies.js';
-import { createPolicy } from '/js/std-js/trust.js';
-import { alert } from '/js/std-js/asyncDialog.js';
-import '/components/install/prompt.js';
+import { loadScript } from 'std-js/loader.js';
+import { konami } from '@shgysk8zer0/konami';
+import { getDefaultPolicy } from 'std-js/trust-policies.js';
+import { createPolicy } from 'std-js/trust.js';
+import { alert } from 'std-js/asyncDialog.js';
+import '@shgysk8zer0/components/install/prompt.js';
 
 getDefaultPolicy();
 
