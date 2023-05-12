@@ -20,11 +20,12 @@ import {
 	tileLayer as LeafletTileLayer,
 	point as Point,
 	latLng as LatLng,
+	version,
 } from './dist.js';
 
 export const stylesheet = {
-	href: 'https://unpkg.com/leaflet@1.9.3/dist/leaflet.css',
-	integrity: 'sha512-mD70nAW2ThLsWH0zif8JPbfraZ8hbCtjQ+5RU1m4+ztZq6/MymyZeB55pWsi4YAX+73yvcaJyk61mzfYMvtm9w==',
+	href: `https://unpkg.com/leaflet@${version}/dist/leaflet.css`,
+	// integrity: 'sha512-mD70nAW2ThLsWH0zif8JPbfraZ8hbCtjQ+5RU1m4+ztZq6/MymyZeB55pWsi4YAX+73yvcaJyk61mzfYMvtm9w==',
 	crossOrigin: 'anonymous',
 	referrerPolicy: 'no-referrer',
 	fetchPriority: 'high',
@@ -337,7 +338,7 @@ HTMLCustomElement.register('leaflet-map', class HTMLLeafletMapElement extends HT
 
 			await Promise.allSettled([
 				loadStylesheet(stylesheet.href, {
-					integrity: stylesheet.integrity,
+					// integrity: stylesheet.integrity,
 					crossOrigin: stylesheet.crossOrigin,
 					referrerPolicy: stylesheet.referrerPolicy,
 					fetchPriority: stylesheet.fetchPriority,

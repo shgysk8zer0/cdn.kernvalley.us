@@ -1,5 +1,5 @@
 /* eslint-env node */
-const SVGSprite = require('svg-sprite-standardized').SVGSprite;
+import { SVGSprite } from 'svg-sprite-standardized';
 
 let infilepath = process.argv[2];
 let outfilepath = process.argv[3];
