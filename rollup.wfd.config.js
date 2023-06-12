@@ -1,16 +1,13 @@
 /* eslint-env node */
-import terser from '@rollup/plugin-terser';
-import { rollupImport } from '@shgysk8zer0/rollup-import';
+import { getConfig } from '@shgysk8zer0/js-utils/rollup';
+import { rollupImport } from '@shgysk8zer0/rollup-import/import';
+import { importmap } from '@shgysk8zer0/importmap';
 
-export default {
-	input: ['components/wfd/events.config.js'],
-	output: {
-		file: 'components/wfd/events.min.js',
-		format: 'iife',
-		sourcemap: true,
-	},
+export default getConfig('./components/wfd/events.js', {
 	plugins: [
-		rollupImport('importmap.json'),
-		terser(),
+		rollupImport(importmap),
 	],
-};
+	minify: true,
+	sourcemap: true,
+	format: 'iife',
+});

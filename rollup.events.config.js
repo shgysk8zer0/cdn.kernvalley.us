@@ -1,17 +1,13 @@
 /* eslint-env node */
+import { getConfig } from '@shgysk8zer0/js-utils/rollup';
+import { rollupImport } from '@shgysk8zer0/rollup-import/import';
+import { importmap } from '@shgysk8zer0/importmap';
 
-import terser from '@rollup/plugin-terser';
-import { rollupImport } from '@shgysk8zer0/rollup-import';
-
-export default {
-	input: 'components/krv/events.js',
-	output: {
-		file: 'components/krv/events.min.js',
-		format: 'iife',
-		sourcemap: true,
-	},
+export default getConfig('./components/krv/events.js', {
 	plugins: [
-		rollupImport('importmap.json'),
-		terser(),
+		rollupImport(importmap),
 	],
-};
+	minify: true,
+	sourcemap: true,
+	format: 'iife',
+});
