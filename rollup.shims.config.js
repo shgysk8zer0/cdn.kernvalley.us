@@ -1,16 +1,14 @@
 /* eslint-env node */
-import terser from '@rollup/plugin-terser';
-import { rollupImport } from '@shgysk8zer0/rollup-import';
+import { getConfig } from '@shgysk8zer0/js-utils/rollup';
+import { rollupImport, rollupImportMeta } from '@shgysk8zer0/rollup-import';
+import { importmap } from '@shgysk8zer0/importmap';
 
-export default {
-	input: 'js/@shgysk8zer0/polyfills/all.js',
-	output: {
-		file: 'js/shims.min.js',
-		format: 'iife',
-		sourcemap: true,
-	},
+export default getConfig('./js/shims.js', {
 	plugins: [
-		rollupImport('importmap.json'),
-		terser(),
+		rollupImport(importmap),
+		rollupImportMeta({ baseURL: 'https://cdn.kernvalley.us/' }),
 	],
-};
+	format: 'iife',
+	minify: true,
+	sourcemap: true,
+});
