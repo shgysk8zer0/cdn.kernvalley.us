@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Update `netlify-js-app`
 - Update files
 - Update importmap
+- Update GitHub Relase Action
 
 ### Removed
 - Delete polyfills, kazoo, and konami
