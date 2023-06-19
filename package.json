@@ -1,6 +1,6 @@
 {
   "name": "cdn.kernvalley.us",
-  "version": "1.3.0",
+  "version": "2.0.0",
   "private": true,
   "type": "module",
   "description": "Static assets for modern web development",
@@ -50,16 +50,7 @@
     "fix:css": "if [ -f './stylelintrc.json' ]; then stylelint ${npm_package_config_dir_css} --fix; fi",
     "fix:js": "if [ -f '.eslintrc.json' ]; then eslint . --fix; fi",
     "build": "npm run build:js && npm run build:icons && npm run build:markers",
-    "build:js": "npm run build:js:shims && npm run build:js:maps && npm run build:js:ads && npm run build:js:events && npm run build:js:weather && npm run build:js:share && npm run build:js:wfd && npm run build:js:security",
-    "build:js:ads": "npm run build:js:ad-block && npm run build:js:krv-ad",
-    "build:js:ad-block": "if [ -f 'rollup.ads.config.js' ]; then rollup -c rollup.ads.config.js; fi",
-    "build:js:krv-ad": "if [ -f 'rollup.krv-ad.config.js' ]; then rollup -c rollup.krv-ad.config.js; fi",
-    "build:js:events": "if [ -f 'rollup.events.config.js' ]; then rollup -c rollup.events.config.js; fi",
-    "build:js:maps": "if [ -f 'rollup.map.config.js' ]; then rollup -c rollup.map.config.js; fi",
-    "build:js:share": "if [ -f 'rollup.share.config.js' ]; then rollup -c rollup.share.config.js; fi",
-    "build:js:weather": "if [ -f 'rollup.weather.config.js' ]; then rollup -c rollup.weather.config.js; fi",
-    "build:js:wfd": "if [ -f 'rollup.wfd.config.js' ]; then rollup -c rollup.wfd.config.js; fi",
-    "build:js:shims": "if [ -f 'rollup.shims.config.js' ]; then rollup -c rollup.shims.config.js; fi",
+    "build:js": "npm run build:js:security",
     "build:js:security": "if [ -f 'rollup.security.config.js' ]; then rollup -c rollup.security.config.js; fi",
     "build:icons": "if [ -f 'icons.csv' ]; then svg-sprite-generate -c icons.csv -o img/icons.svg; fi",
     "build:markers": "if [ -d 'img/markers/' ]; then node markers.js img/markers/ img/markers.svg; fi",
@@ -74,8 +65,7 @@
     "version:bump:major": "npm version --no-git-tag-version major"
   },
   "dependencies": {
-    "netlify-js-app": "^3.1.0",
+    "netlify-js-app": "^3.1.1",
     "svg-sprite-standardized": "^1.1.0"
   }
 }
-

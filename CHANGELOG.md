@@ -7,9 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <!-- markdownlint-disable -->
 ## [Unreleased]
 
+## [v2.0.0] - 2023-06-19
+
+### Added
+- Redirects to `unpkg.com/@shgysk8zer0/*` from all `/js/@shgysk8zer0/*`
+
 ### Changed
 - Update `netlify-js-app`
-- Update rollup config files
+- Update files
+- Update importmap
+
+### Removed
+- Delete polyfills, kazoo, and konami
+- Rollup config for most bundles and associated npm scripts
 
 ## [v1.2.0] - 2023-05-12
 
