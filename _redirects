@@ -2,4 +2,12 @@
 
 # Redirect default Netlify subdomain to primary domain
 https://hardcore-bhaskara-69a703.netlify.com/* https://cdn.kernvalley.us/:splat 301!
-/js/konami/* /js/@shgysk8zer0/konami/:splat
+
+# Redirect to unpkg versions
+/js/konami/*			https://unpkg.com/@shgysk8zer0/konami@1.0.10/:splat
+/js/shims.min.js		https://unpkg.com/@shgysk8zer0/polyfills@0.0.8/all.min.js
+/js/shims.min.js.map		https://unpkg.com/@shgysk8zer0/polyfills@0.0.8/all.min.js.map
+/js/@shgysk8zer0/kazoo/*	https://unpkg.com/@shgysk8zer0/kazoo@0.0.16/:splat
+/js/@shgysk8zer0/polyfills/*	https://unpkg.com/@shgysk8zer0/polyfills@0.0.8/:splat
+/js/@shgysk8zer0/konami/*	https://unpkg.com/@shgysk8zer0/konami@1.0.10/:splat
+/components/*			https://unpkg.com/@shgysk8zer0/components@0.0.9/:splat
