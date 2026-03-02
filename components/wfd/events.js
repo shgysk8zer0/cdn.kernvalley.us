@@ -17,7 +17,7 @@ export const trustPolicies = [policy.name];
 const WFD = 'https://whiskeyflatdays.com/';
 const medium = 'referral';
 const content = 'wfd-events';
-const sanitizer = new Sanitizer();
+const sanitizer = new globalThis.Sanitizer();
 const resolveURL = getURLResolver({ base : meta.url, path: '/components/wfd/' });
 const getTemplate = callOnce(() => getHTML(resolveURL('events.html'), { policy }));
 const getEvents = callOnce(() => getAllEvents());
@@ -98,7 +98,7 @@ registerCustomElement('wfd-events', class HTMLWFDEventsElement extends HTMLEleme
 			text('[itemprop="endDate"]', end.toLocaleTimeString().replace(':00 ', ' '), { base });
 			text('[part~="name"]', name, { base });
 			text('[itemprop="location"] [itemprop="name"]', placeName.length === 0 ? 'Kernville' : placeName, { base });
-			
+
 			if (typeof description === 'string') {
 				try {
 					base.querySelector('[itemprop="description"]').setHTML(description, { sanitizer });

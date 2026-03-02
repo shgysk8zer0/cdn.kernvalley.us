@@ -1,4 +1,3 @@
-/* eslint-env serviceworker */
 /* global init */
 
 self.importScripts('/service-worker.js');
