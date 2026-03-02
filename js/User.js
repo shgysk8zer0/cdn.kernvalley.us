@@ -1,4 +1,3 @@
-/* global PasswordCredential */
 const KEYS = [
 	'id',
 	'username',

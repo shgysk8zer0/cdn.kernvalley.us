@@ -1,6 +1,5 @@
-/* eslint-env serviceworker */
 /* eslint no-unused-vars: 0 */
-
+/* global clients: readonly */
 function getURL({ request: { url }}) {
 	if (url.includes('#')) {
 		return url.substr(0, url.indexOf('#'));

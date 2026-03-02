@@ -46,7 +46,7 @@
     "git:submodules": "if [ -f '.gitmodules' ]; then git submodule update --init --recursive; fi",
     "lint:css": "if [ -f '.stylelintrc.json' ]; then stylelint ${npm_package_config_dir_css}; fi",
     "lint:html": "if [ -f '.htmlhintrc' ]; then htmlhint ${npm_package_config_dir_html}; fi",
-    "lint:js": "if [ -f '.eslintrc.json' ]; then eslint .; fi",
+    "lint:js": "if [ -f 'eslint.config.js' ]; then eslint .; fi",
     "fix:css": "if [ -f './stylelintrc.json' ]; then stylelint ${npm_package_config_dir_css} --fix; fi",
     "fix:js": "if [ -f '.eslintrc.json' ]; then eslint . --fix; fi",
     "build": "npm run build:js && npm run build:icons && npm run build:markers",
@@ -67,5 +67,9 @@
   "dependencies": {
     "netlify-js-app": "^3.3.6",
     "svg-sprite-standardized": "^1.1.0"
+  },
+  "devDependencies": {
+    "@shgysk8zer0/eslint-config": "^1.0.5",
+    "@shgysk8zer0/svg-use-symbols": "^1.1.3"
   }
 }

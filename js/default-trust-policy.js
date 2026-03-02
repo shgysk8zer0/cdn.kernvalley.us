@@ -15,12 +15,12 @@ export const defaultPolicy = createPolicy('default', {
 			const el = document.createElement('div');
 			el.setHTML(input, { sanitizer });
 			return el.innerHTML;
-		} else if ('Sanitizer' in globalThis && Sanitizer.prototype.sanitizeFor instanceof Function) {
+		} else if ('Sanitizer' in globalThis && globalThis.Sanitizer.prototype.sanitizeFor instanceof Function) {
 			return sanitizer.sanitizeFor('div', input).innerHTML;
 		} else {
 			throw new Error('No required methods are supported');
 		}
-			
+
 	},
 	createScript: () => '',
 	createScriptURL: input => {

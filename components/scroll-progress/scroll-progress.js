@@ -1,4 +1,3 @@
-/* global ScrollTimeline, CSSUnitValue */
 import { css } from '../../js/std-js/dom.js';
 import { loadScript } from '../../js/std-js/loader.js';
 import { registerCustomElement } from '../../js/std-js/custom-elements.js';
