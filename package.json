@@ -69,7 +69,7 @@
     "svg-sprite-standardized": "^1.1.0"
   },
   "devDependencies": {
-    "@shgysk8zer0/eslint-config": "^1.0.6",
+    "@shgysk8zer0/eslint-config": "^1.0.7",
     "@shgysk8zer0/svg-use-symbols": "^1.1.3"
   }
 }
